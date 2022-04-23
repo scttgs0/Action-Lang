@@ -1,8 +1,6 @@
+; Action! Programming Language
 ; Copyright 1983 by Clinton W Parker
-; All Rights Reserved
-; last modified November 4, 1983
-;
-; This file is part of Action!.
+
 ;
 ; Action! is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -16,6 +14,7 @@
 ;
 ; You should have received a copy of the GNU General Public License
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
+;
 
 
                 .enc "atari-screen-inverse"

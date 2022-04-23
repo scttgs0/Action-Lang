@@ -2,11 +2,9 @@
 ;   FILE: ampl.mon.asm
 ;======================================
 
+; Action! Programming Language
 ; Copyright 1983 by Clinton W Parker
-; All Rights Reserved
-; last modified July 29, 1983
-;
-; This file is part of Action!.
+
 ;
 ; Action! is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by

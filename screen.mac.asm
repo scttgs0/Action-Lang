@@ -2,11 +2,9 @@
 ;   FILE: screen.mac.asm
 ;======================================
 
-; Copyright 1982 by Clinton W Parker
-; All Rights Reserved
-; last modified October 18, 1982
-;
-; This file is part of Action!.
+; Action! Programming Language
+; Copyright 1983 by Clinton W Parker
+
 ;
 ; Action! is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -20,6 +18,8 @@
 ;
 ; You should have received a copy of the GNU General Public License
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
+;
+
 
 scrinit         .proc
                 lda #0

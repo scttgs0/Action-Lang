@@ -2,14 +2,9 @@
 ;   FILE: comp.main.asm
 ;======================================
 
-;======================================
-;         Main compiler entry
-;======================================
+; Action! Programming Language
 ; Copyright 1983 by Clinton W Parker
-; All Rights Reserved
-; last modified September 9, 1983
-;
-; This file is part of Action!.
+
 ;
 ; Action! is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -25,6 +20,10 @@
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
+
+;======================================
+;         Main compiler entry
+;======================================
 ccompile
 spl             ;.proc
                 jsr splend
