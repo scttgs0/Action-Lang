@@ -42,7 +42,9 @@ amplfin
 ;    ------------------------------
                 .fill 4,$00
                 ;* = ml+$08d8
-                .include "8.asm"
+                .include "edit.fnd.asm"
+                .include "edit.sub.asm"
+                .include "edit.tab.asm"
 
 ;    "ACTION! 3.6 - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
