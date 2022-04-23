@@ -36,7 +36,7 @@ open            .proc
 
 ;    Print(device, str)
 ;    ------------------
-print    		.proc
+print           .proc
                 stx arg5
                 sty arg6
                 ldx #0
@@ -44,21 +44,21 @@ print    		.proc
                 ldy #$09
                 jsr xiostr
                 bne print1
-                 lda #$0b
-                 sta $0342,x
-                 lda #eol
-                 jmp $e456
-print1    		rts
+                lda #$0b
+                sta $0342,x
+                lda #eol
+                jmp $e456
+print1          rts
                 .endproc
 
 
 ;    Close(device)
 ;    -------------
-close    		.proc
+close           .proc
                 ldx #>ml
-                stx arg6        		; note: address must be non-zero to
+                stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
-        .if 	ramzap
+        .if ramzap
                  sta (arg5),y
         .else
                  nop
@@ -72,10 +72,10 @@ close    		.proc
 
 ;    Input(device, str)
 ;    ------------------
-input    		.proc
+input           .proc
                 sty arg6
                 ldy #$05
-input1    		stx arg5
+input1          stx arg5
                 ldx #0
                 stx arg3
                 .endproc
@@ -83,29 +83,29 @@ input1    		stx arg5
 
 ;    XIOstr(device,,cmd,aux1,aux2,str)
 ;    ---------------------------------
-xiostr    		.proc
+xiostr          .proc
                 asl a
                 asl a
                 asl a
                 asl a
                 tax
                 tya
-                sta $0342,x        		; command
+                sta $0342,x             ; command
                 lda arg3
                 beq _xs1
-                sta $034a,x        		; aux1
+                sta $034a,x             ; aux1
                 lda arg4
-                sta $034b,x        		; aux2
+                sta $034b,x             ; aux2
                 lda #0
-_xs1    		tay
+_xs1            tay
                 sta $0349,x
                 lda (arg5),y
-                sta $0348,x        		; size
+                sta $0348,x             ; size
                 beq print.print1        ; return
                 clc
                 lda arg5
                 adc #1
-                sta $0344,x        		; buf
+                sta $0344,x             ; buf
                 lda arg6
                 adc #0
                 sta $0345,x
@@ -133,7 +133,7 @@ dspstr          .proc
                 ldy arg4
                 jsr putstr
 
-                lda arg6        		; PutStr size
+                lda arg6                ; PutStr size
                 clc
                 adc lmargin
                 sta colcrs

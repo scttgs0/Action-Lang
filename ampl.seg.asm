@@ -216,4 +216,4 @@ _f3b            lda (props),y
 
 _func4          jsr stmtlist
                 jmp segment
-	            .endproc
+                .endproc
