@@ -101,7 +101,18 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 ;    ACTION! 3.6 - Editor
 ;    --------------------
                 .logical el
-                .include "6.asm"
+                .include "storage.mac.asm"
+                .include "edit.mem.asm"
+                .include "edit.car.asm"
+                .include "edit.man.asm"
+                .include "edit.chr.asm"
+                .include "edit.ini.asm"
+                .include "edit.io.asm"
+                .include "edit.wnd.asm"
+                .include "edit.dsp.asm"
+                .include "edit.cmd.asm"
+                .include "edit.tag.asm"
+
                 .include "7.asm"
                 .fill 149,$00
 
