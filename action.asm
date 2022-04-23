@@ -31,7 +31,9 @@ date            .byte $1,$17,$84        ; assemble date of latest version!
 main
                 .include "main.io.asm"
 propid          ldx $a0
-                .include "3.asm"
+                .include "screen.mac.asm"
+                .include "main.msc.asm"
+                .include "main.bnk.asm"
 
 amplfin
                 ;.fill 15,$00
