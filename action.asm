@@ -20,7 +20,7 @@
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
 
 
-                .include "1.asm"
+                .include "edit.def.asm"
 
                 * = $8000
                 .logical ml

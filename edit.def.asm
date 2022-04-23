@@ -1,6 +1,7 @@
-;====================
-;    EDIT.DEF
-;====================
+;======================================
+;   FILE: edit.def.asm
+;======================================
+
 ; Copyright 1983 by Clinton W Parker
 ; All Rights Reserved
 ; last modified September 9, 1983
