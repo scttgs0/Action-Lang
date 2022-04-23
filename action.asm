@@ -29,7 +29,7 @@ date            .byte $1,$17,$84        ; assemble date of latest version!
 
 
 main
-                .include "2.asm"
+                .include "main.io.asm"
 propid          ldx $a0
                 .include "3.asm"
 

@@ -317,7 +317,7 @@ openchan        .proc
                 adc #2                  ;  so we can insert 'D:'
                 sta (nxtaddr),y
                 tay
-_oc1            lda (nxtaddr),y         ; move string up_.
+_oc1            lda (nxtaddr),y         ; move string up...
                 sta (fr0),y
                 dey
                 bne _oc1
