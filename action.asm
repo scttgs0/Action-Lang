@@ -62,8 +62,16 @@ amplfin
 ;    ACTION! 3.6 - S.T.
 ;    ------------------
                 .logical ll
-                .include "4.asm"
-                .include "5.asm"
+                .include "ampl.mth.asm"
+                .include "ampl.sym.asm"
+                .include "lib.key.asm"
+                .include "spl.err.asm"
+                .include "lib.io.asm"
+                .include "lib.gr.asm"
+                .include "lib.msc.asm"
+                .include "lib.str.asm"
+
+                .include "lib.opt.asm"
 
 cpyright
                 .text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00

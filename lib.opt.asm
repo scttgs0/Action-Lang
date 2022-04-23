@@ -1,5 +1,6 @@
-
-;            LIB.OPT
+;======================================
+;   FILE: lib.opt.asm
+;======================================
 
 ; Copyright 1983 by Clinton W Parker
 ; All Rights Reserved
