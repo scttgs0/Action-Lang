@@ -28,7 +28,6 @@ version         .byte $36
 date            .byte $1,$17,$84        ; assemble date of latest version!
 
 
-main
                 .include "main.io.asm"
 propid          ldx $a0
                 .include "screen.mac.asm"
@@ -45,6 +44,7 @@ amplfin
                 .include "edit.fnd.asm"
                 .include "edit.sub.asm"
                 .include "edit.tab.asm"
+
 
 ;    "ACTION! 3.6 - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
@@ -83,11 +83,11 @@ cpyright
 doc
                 .endlogical
 
-
 ;    "ACTION! 3.6 - Compiler
 ;    -----------------------
                 .logical cl
-                .include "9.asm"
+main
+                .include "comp.main.asm"
 
 cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 
