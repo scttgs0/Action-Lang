@@ -49,13 +49,13 @@ punt            jsr savewd              ; we're in big trouble
 
 ;    FreeMem(addr)
 ;    -------------
-freemem         .proc
+freemem         ;.proc
                 sec
                 sbc #4
                 bcs freem1
                 dex
 freem1          jmp free
-                .endproc
+                ;.endproc
 
 ;    InstB()
 ;    -------
@@ -83,7 +83,7 @@ instbuf         .proc
 
 ;    InstLn(sze,sloc,up)
 ;    -------------------
-instln          .proc
+instln          ;.proc
                 sta arg0                ; save sze
                 stx arg1                ; save sloc
                 sty arg2
@@ -168,7 +168,7 @@ _il4            ldy #4
                 sta (afcur),y
 
                 jmp _il2
-                .endproc
+                ;.endproc
 
 
 ;    DelCur()

@@ -289,6 +289,6 @@ el              = $a000
 ll              = $a000
 cl              = $a000
 bank            = $d500
-ebank           = 1
+ebank           = 3
 lbank           = 0
 cbank           = 9

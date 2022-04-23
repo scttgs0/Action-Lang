@@ -133,11 +133,17 @@ fmcscmd         .word disptb+3          ; default
                 .word loctag
                 .byte $fd
 
-
 outmem          .text 14," "
-                .text +$80,"Out"
-                .text " "
-                .text +$80,"of"
-                .text " "
-                .text +$80,"Memory"
+        .enc "atari-screen-inverse"
+                .text "Out"
+        .enc "none"
 
+                .text " "
+        .enc "atari-screen-inverse"
+                .text "of"
+        .enc "none"
+
+                .text " "
+        .enc "atari-screen-inverse"
+                .text "Memory"
+        .enc "none"

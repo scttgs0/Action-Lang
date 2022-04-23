@@ -46,8 +46,8 @@ ltab            .word lsh1._lshift      ; LSH
 
                 jmp insrtch             ; normal char
                 rts                     ; ctrl-shift char
-serial          .word 0                 ; serial number of ROM
-    ; to be filled in before blowing ROM
+serial          .word $0A00             ; serial number of ROM
+                                        ; TODO: to be filled in before blowing ROM
 
                 jmp getnext.ismt        ; STM catch all
                 rts                     ; illegal monitor cmd

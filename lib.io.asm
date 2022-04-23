@@ -51,10 +51,8 @@ break1          .proc
                 jsr break
                 pla
                 tay
-                .endproc
-
 pfe             rts
-
+                .endproc
 
 ;
 ;PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
@@ -90,7 +88,7 @@ _pf1            lda args+2,x
 _pf2            inc op
                 ldy op
                 cpy token
-                bcs pfe
+                bcs break1.pfe
                 lda (addr),y
                 cmp #'%'
                 bne _pf3

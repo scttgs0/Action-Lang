@@ -1,5 +1,3 @@
-;$title(ACTION! 3.6 - 11/4/83)
-
 ; Copyright 1983 by Clinton W Parker
 ; All Rights Reserved
 ; last modified November 4, 1983
@@ -20,6 +18,12 @@
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
 
 
+                .enc "atari-screen-inverse"
+                .cdef " z", $A0
+                .enc "none"
+
+;--------------------------------------
+
                 .include "edit.def.asm"
 
                 * = $8000
@@ -35,12 +39,10 @@ propid          ldx $a0
                 .include "main.bnk.asm"
 
 amplfin
-                ;.fill 15,$00
 ;    ACTION! 3.6 - Editor Routines
 ;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
                 .fill 4,$00
-                ;* = ml+$08d8
                 .include "edit.fnd.asm"
                 .include "edit.sub.asm"
                 .include "edit.tab.asm"
@@ -50,7 +52,6 @@ amplfin
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
                 .fill 3,$00
-                ;* = ml+$0a80
                 .include "ampl.seg.asm"
                 .include "ampl.pf.asm"
                 .include "ampl.arr.asm"
@@ -97,9 +98,6 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
                 * = cl+$0fff
                 .byte cbank
 
-                ;* = ml+$0a80
-                ;.include "10.asm"
-
                 .endlogical
 
 
@@ -120,14 +118,11 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 
                 .include "ampl.mon.asm"
                 .include "ampl.ini.asm"
-                .fill 149,$00
+
+                .text "ces",$00,$00
 
                 * = el+$0fff
-                .byte ebank
-                ;.fill 2264,$00
-
-                ;* = ml+$08d8
-                ;.include "8.asm"
+                .byte $01
 
 editend
                 .endlogical
