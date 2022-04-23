@@ -28,14 +28,30 @@ version         .byte $36
 date            .byte $1,$17,$84        ; assemble date of latest version!
 
 
+main
                 .include "2.asm"
 propid          ldx $a0
                 .include "3.asm"
-main
-                .fill 1830,$00
 
+amplfin
+                ;.fill 15,$00
+;    ACTION! 3.6 - Editor Routines
+;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
+;    ------------------------------
+                .fill 4,$00
+                ;* = ml+$08d8
+                .include "8.asm"
+
+;    "ACTION! 3.6 - Compiler Routines
+;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
+;    ---------------------------------------
+                .fill 3,$00
+                ;* = ml+$0a80
+                .include "10.asm"
+
+                .fill 9,$00
                 .addr cstart
-                .word $0500             ; boot disk and start cart.
+                .byte $00,$05           ; boot disk and start cart.
                 .addr rstbank.init
 
                 .endlogical
@@ -55,6 +71,23 @@ cpyright
 doc
                 .endlogical
 
+
+;    "ACTION! 3.6 - Compiler
+;    -----------------------
+                .logical cl
+                .include "9.asm"
+
+cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
+
+                * = cl+$0fff
+                .byte cbank
+
+                ;* = ml+$0a80
+                ;.include "10.asm"
+
+                .endlogical
+
+
 ;    ACTION! 3.6 - Editor
 ;    --------------------
                 .logical el
@@ -64,28 +97,12 @@ doc
 
                 * = el+$0fff
                 .byte ebank
-                .fill 2264,$00
+                ;.fill 2264,$00
 
-                * = ml+$08d8
-                .include "8.asm"
+                ;* = ml+$08d8
+                ;.include "8.asm"
 
 editend
-                .fill 3,$00
                 .endlogical
 
-;    "ACTION! 3.6 - Compiler
-;    -----------------------
-                * = cl
-                .include "9.asm"
-
-cright          .text "ACTION! (c)1983 Action Computer Services"
-
-                * = cl+$0fff
-                .byte cbank
-
-                * = ml+$0a80
-                .include "10.asm"
-
-amplfin
-                .fill 15,$00
                 .end

@@ -125,7 +125,7 @@ _spl4           jsr getcdoff            ; no main PROC
 enderr          ldy #ender
                 jmp dostmt.fierr
 
-_spl5           jmp cderr               ; out of qcode space
+_spl5           jmp codeincr.cderr      ; out of qcode space
                 ;.endproc
 
 
