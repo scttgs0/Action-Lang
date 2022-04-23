@@ -51,7 +51,10 @@ amplfin
 ;    ---------------------------------------
                 .fill 3,$00
                 ;* = ml+$0a80
-                .include "10.asm"
+                .include "ampl.seg.asm"
+                .include "ampl.pf.asm"
+                .include "ampl.arr.asm"
+                .include "ampl.cgu.asm"
 
                 .fill 9,$00
                 .addr cstart
