@@ -113,7 +113,8 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
                 .include "edit.cmd.asm"
                 .include "edit.tag.asm"
 
-                .include "7.asm"
+                .include "ampl.mon.asm"
+                .include "ampl.ini.asm"
                 .fill 149,$00
 
                 * = el+$0fff
