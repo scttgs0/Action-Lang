@@ -21,6 +21,9 @@
 ;
 
 
+;======================================
+;
+;======================================
 emjmps          rts                     ; Seg catch all
 
                 .word 0
@@ -69,19 +72,25 @@ serial          .word $0A00             ; serial number of ROM
                 .byte $9d
                 .word istmres           ; STMrAdr in EDIT.DEF
 
-;Init RTS
 
+;======================================
+;   Init RTS
+;======================================
 start           .proc
                 jsr initkeys            ; get keyboard
+
                 lda warmst
                 beq cold
+
                 lda chcvt3
                 cmp #$60                ; make sure RAM initialized
                 bne cold
 
 _warm           lda mpc                 ; see where we were
                 beq _w1
+
                 jmp monitor._mon1       ; monitor
+
 _w1             jmp gmerr.punt          ; editor
 
 cold            lda #0
@@ -95,11 +104,13 @@ _cold1          lda emjmps-1,y          ; init RAM
                 dey
                 sta jmps,y
                 bne _cold1
+
     ; STY ChCvt1 ; Y=0
 
                 jsr einit               ; init editor
 
 ;SPLInit PROC ; init compiler RAM
+
         .if ramzap
                 jsr zap4
         .else
@@ -107,6 +118,7 @@ _cold1          lda emjmps-1,y          ; init RAM
                 nop
                 nop
         .endif
+
                 ldx #8                  ; 2K id space
                 stx stsp
 
@@ -114,12 +126,15 @@ _cold1          lda emjmps-1,y          ; init RAM
                 ldx #4
                 ldy bigst               ; big s.t. ?
                 beq _si1                ; no
+
                 ldx #6
 _si1            jsr getmem              ; get hash table
+
                 sta stglobal            ; qglobal hash table
                 stx stglobal+1
                 ldy bigst               ; big s.t. ?
                 beq _si2                ; no
+
                 inx
                 inx
                 sta stg2                ; big s.t. hash table
