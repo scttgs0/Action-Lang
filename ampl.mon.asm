@@ -52,8 +52,8 @@ _mloop          jsr initkeys
 _mon2           jsr alarm
                 jsr rstcsr
 
-                lda #<mprompt
-                ldx #>mprompt
+                lda #<monitorPrompt
+                ldx #>monitorPrompt
                 jsr gettemp
 
                 ldy tempbuf
@@ -496,4 +496,4 @@ mcmd            .word disptb+9          ; unknown cmd
                 .word mdump
                 .byte '*'
 
-mprompt         .byte 1,">"
+monitorPrompt   .byte 1,">"
