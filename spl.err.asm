@@ -46,7 +46,7 @@ spler1          jsr syserr
                 jsr output
 
                 lda #0
-                sta $02e3
+                sta INITAD+1
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr print

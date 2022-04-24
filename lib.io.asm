@@ -335,12 +335,12 @@ ccio            stx arg4
                 asl a
                 tax
                 lda arg4
-                sta $0342,x
+                sta IOCB0+ICCOM,x
                 lda #0
-                sta $0348,x
-                sta $0349,x
+                sta IOCB0+ICBLL,x
+                sta IOCB0+ICBLH,x
                 tya
-                jsr $e456
+                jsr CIOV
 
                 sta args
                 jmp chkerr
@@ -783,16 +783,16 @@ note            .proc
                 asl a
                 tax
                 lda #$26                ; NOTE
-                sta $0342,x             ; ICCOM
-                jsr $e456               ; CIOV
+                sta IOCB0+ICCOM,x
+                jsr CIOV
                 jsr chkerr
 
                 ldy #0
-                lda $034e,x             ; offset
+                lda IOCB0+ICAX5,x       ; offset
                 sta (arg3),y
-                lda $034c,x             ; low byte of sector
+                lda IOCB0+ICAX3,x       ; low byte of sector
                 sta (arg1),y
-                lda $034d,x             ; high byte of sector
+                lda IOCB0+ICAX4,x       ; high byte of sector
                 iny
                 sta (arg1),y
                 rts
@@ -814,14 +814,14 @@ point           .proc
                 asl a
                 tax
                 tya                     ; sector+1
-                sta $034d,x
+                sta IOCB0+ICAX4,x
                 lda arg1                ; sector
-                sta $034c,x
+                sta IOCB0+ICAX3,x
                 lda arg3                ; offset
-                sta $034e,x
+                sta IOCB0+ICAX5,x
                 lda #$25                ; POINT
-                sta $0342,x             ; ICCOM
-                jsr $e456               ; CIOV
+                sta IOCB0+ICCOM,x
+                jsr CIOV
 
                 jmp chkerr
 

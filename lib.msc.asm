@@ -31,7 +31,7 @@
 ; number between 0 and 255 is returned
 ;======================================
 rand            .proc
-                ldx $d20a               ; RANDOM
+                ldx RANDOM
                 cmp #0
                 beq _rand1
 
@@ -61,14 +61,14 @@ sound           .proc
                 jsr error
 
 _snd1           txa
-                sta $d200,y
+                sta AUDF1,y
                 lda arg2
                 asl a
                 asl a
                 asl a
                 asl a
                 ora arg3
-                sta $d201,y
+                sta AUDC1,y
                 rts
                 .endproc
 
@@ -78,13 +78,13 @@ _snd1           txa
 ; reset sound channels
 ;======================================
 sndrst          .proc
-                lda $0232
+                lda SSKCTL
                 and #$ef                ; turn off two tone bit
-                sta $0232
-                sta $d20f
+                sta SSKCTL
+                sta SKCTL
                 lda #0
                 ldx #8
-_sr1            sta $d200,x             ; zero sound regs
+_sr1            sta AUDF1,x             ; zero sound regs
                 dex
                 bpl _sr1
 
@@ -98,7 +98,7 @@ _sr1            sta $d200,x             ; zero sound regs
 ; Assumes port low  8.
 ; see LIB.ST
 ;Paddle TAX
-; LDA $D200,X
+; LDA POT0,X
 ; STA args
 ; RTS
 ;
@@ -114,7 +114,7 @@ ptrig           .proc
                 inx
                 and #3
 _pt1            tay
-                lda $d300,x
+                lda PORTA,x
                 and _pt2,y
                 sta args
                 rts
@@ -138,7 +138,7 @@ stick           .proc
                 inx
                 and #1
 _stk1           tay
-                lda $d300,x
+                lda PORTA,x
                 dey
                 bne _stk2
 
@@ -159,7 +159,7 @@ _stk2           and #$0f
 ;
 ; see LIB.ST
 ;STrig TAX
-; LDA $D010,X
+; LDA TRIG0,X
 ; STA args
 ; RTS
 ;======================================

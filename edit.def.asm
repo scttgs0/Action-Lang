@@ -220,44 +220,7 @@ cix             = $f2
 inbuff          = $f3
 flptr           = $fc
 
-sdmctl          = $022f
-txtmsc          = $0294
-tabmap          = $02a3
-color4          = $02c8
-memtop          = $02e5
-memlo           = $02e7
-ch              = $02fc
 lbuff           = $0580                 ; fp ASCII buf
-consol          = $d01f
-kbcode          = $02f2                 ; Prior keyboard qcode (CH1 in OS listing)
-
-dmactl          = $d400
-wsync           = $d40a
-
-;    floating point routines
-;    -----------------------
-afp             = $d800
-fasc            = $d8e6
-ifp             = $d9aa
-fpi             = $d9d2
-fadd            = $da66
-fsub            = $da60
-fmul            = $dadb
-fdiv            = $db28
-log             = $decd
-log10           = $ded1
-exp10           = $ddcc
-plyevl          = $dd40
-zfr0            = $da44
-zf1             = $da46
-fld0r           = $dd89
-fld0p           = $dd8d
-fld1r           = $dd98
-fld1p           = $dd9c
-fst0r           = $dda7
-fst0p           = $ddab
-fmove           = $ddb6
-coldsv          = $e477
 
 
 ; window record offsets

@@ -119,7 +119,7 @@ _frd1           lda #1
                 lda allocerr
                 beq _frd1
 
-                ldy #22                 ; file to big
+                ldy #22                 ; file too big
                 bne _fr4
 
 _fr3            cpy #$88                ; EOF
@@ -285,7 +285,7 @@ keybd           .text 2,"K:"
 ;======================================
 gotkey          .proc
     ; Test if key in buffer
-                lda ch                  ; key down?
+                lda CH_                 ; key down?
                 eor #$ff
                 rts
                 .endproc

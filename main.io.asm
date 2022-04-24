@@ -48,9 +48,9 @@ print           .proc
                 bne print1
 
                 lda #$0b
-                sta $0342,x
+                sta IOCB0+ICCOM,x
                 lda #eol
-                jmp $e456
+                jmp CIOV
 
 print1          rts
                 .endproc
@@ -98,28 +98,29 @@ xiostr          .proc
                 asl a
                 tax
                 tya
-                sta $0342,x             ; command
+                sta IOCB0+ICCOM,x       ; command
                 lda arg3
                 beq _xs1
 
-                sta $034a,x             ; aux1
+                sta IOCB0+ICAX1,x
                 lda arg4
-                sta $034b,x             ; aux2
+                sta IOCB0+ICAX2,x
                 lda #0
 _xs1            tay
-                sta $0349,x
+                sta IOCB0+ICBLH,x
                 lda (arg5),y
-                sta $0348,x             ; size
+                sta IOCB0+ICBLL,x       ; size
+
                 beq print.print1        ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta $0344,x             ; buf
+                sta IOCB0+ICBAL,x       ; buffer address
                 lda arg6
                 adc #0
-                sta $0345,x
-                jmp $e456
+                sta IOCB0+ICBAH,x
+                jmp CIOV
 
                 .endproc
 
@@ -191,7 +192,7 @@ rdbuf           .proc
 inputs          jsr input
 
                 sty arg0
-                lda $0348,x             ; size
+                lda IOCB0+ICBLL,x       ; size
                 beq _rb1
 
                 sec
@@ -266,7 +267,7 @@ sermsg          .text 7,"Error: "
 ctostr          .proc
                 sta fr0
                 stx fr0+1
-                jsr ifp                 ; Cardinal to real
+                jsr IFP                 ; Cardinal to real
 
                 .endproc
 
@@ -275,7 +276,7 @@ ctostr          .proc
 ;   RToStr() - real in FR0
 ;======================================
 rtostr          ;.proc
-                jsr fasc
+                jsr FASC
 
                 ldy #$ff
                 ldx #0
@@ -297,8 +298,8 @@ _rts1           iny
 ;======================================
 dspoff          .proc
                 lda tvdisp
-                sta sdmctl
-                sta dmactl
+                sta SDMCTL
+                sta DMACTL
                 rts
                 .endproc
 
@@ -308,10 +309,10 @@ dspoff          .proc
 ;======================================
 dspon           .proc
                 lda #$22
-                sta sdmctl
-                sta dmactl
+                sta SDMCTL
+                sta DMACTL
                 lda bckgrnd             ; background color
-                sta color4              ; restore background
+                sta COLOR4              ; restore background
                 rts
                 .endproc
 
@@ -447,7 +448,7 @@ _htcok          sta arg5
 ;   RToCar()
 ;======================================
 rtocar          .proc
-                jsr fpi
+                jsr FPI
                 bcs rcerr
 
 htcrtn          lda fr0
@@ -468,7 +469,7 @@ storeal         .proc
                 sty cix
                 sta inbuff
                 stx inbuff+1
-                jmp afp
+                jmp AFP
 
                 .endproc
 

@@ -39,7 +39,7 @@ _fm1            lda curch
                 jsr einit.fcmsg1
 
                 lda curch
-                ldy kbcode
+                ldy CH1
                 cpy #$c0                ; Ctrl-Shft
                 bcs _fmcs
 

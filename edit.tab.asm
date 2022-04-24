@@ -28,7 +28,7 @@ tab             .proc
                 jsr setsp
                 jsr tabloc._tabpos
 
-_t1             lda tabmap,x
+_t1             lda TABMAP,x
                 beq _t3
 
                 and _onbit,y
@@ -67,9 +67,9 @@ _offbit         .byte $7f,$bf,$df,$ef,$f7,$fb,$fd,$fe,$ff
 settab          .proc
                 jsr tabloc
 
-                lda tabmap,x
+                lda TABMAP,x
                 ora tab._onbit,y
-                sta tabmap,x
+                sta TABMAP,x
                 rts
                 .endproc
 
@@ -80,9 +80,9 @@ settab          .proc
 clrtab          .proc
                 jsr tabloc
 
-                lda tabmap,x
+                lda TABMAP,x
                 and tab._offbit,y
-                sta tabmap,x
+                sta TABMAP,x
                 rts
                 .endproc
 

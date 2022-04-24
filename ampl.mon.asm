@@ -137,7 +137,7 @@ _md2            lda arg11
                 beq _md1
 
                 ldx #$ff
-                stx ch
+                stx CH_
                 cmp #$de
                 bne _md1
 
@@ -238,8 +238,8 @@ mrun            .proc
 
                 jsr comp
 
-_mr1            lda $02e2
-                ldx $02e3
+_mr1            lda INITAD
+                ldx INITAD+1
                 bne _mr3
 
 _mwrt1          rts
@@ -261,7 +261,7 @@ mwrite          .proc                   ; write object file
                 cmp #quote
                 bne mrun._mwrt1         ; no output file!
 
-                lda $02e3
+                lda INITAD+1
                 beq mrun._mwrt1         ; no program!!
 
                 lda #1
@@ -300,16 +300,19 @@ _mw2            dec arg14
     ; write the qcode
                 ldx #$10
                 lda #$0b                ; output command
-                sta $0342,x
+                sta IOCB0+ICCOM,x
+
                 lda codebase
-                sta $0344,x             ; address
+                sta IOCB0+ICBAL,x       ; buffer address
                 lda codebase+1
-                sta $0345,x
+                sta IOCB0+ICBAH,x
+
                 lda codesize
-                sta $0348,x             ; size
+                sta IOCB0+ICBLL,x       ; size
                 lda codesize+1
-                sta $0349,x
-                jsr $e456               ; CIOV
+                sta IOCB0+ICBLH,x
+
+                jsr CIOV
                 bmi mwout._mwerr
 
     ; save start address
@@ -319,9 +322,9 @@ _mw3            lda _mwinit,x
                 dex
                 bpl _mw3
 
-                lda $02e2
+                lda INITAD
                 sta arg14
-                lda $02e3
+                lda INITAD+1
                 sta arg15
                 jsr mwout
 
@@ -332,8 +335,8 @@ _mw3            lda _mwinit,x
 ;--------------------------------------
 
 _mwinit         .byte 6
-                .word $02e2
-                .word $02e3
+                .word INITAD
+                .word INITAD+1
                 .endproc
 
 

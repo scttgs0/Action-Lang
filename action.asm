@@ -23,6 +23,7 @@
 
 ;--------------------------------------
 
+                .include "equates_system_atari8.asm"
                 .include "edit.def.asm"
 
                 * = $8000

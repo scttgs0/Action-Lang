@@ -30,7 +30,7 @@ splsetup        .proc
                 sta sp
                 sta chan
                 sta symtab
-                sta $02e3
+                sta INITAD+1
                 sta (buf),y
                 sta param
                 sta qglobal
@@ -81,7 +81,7 @@ _spls3          sta codebase
                 sta codebase+1
                 sta qcode+1
 
-                lda memtop+1
+                lda MEMTOP+1
                 sta stmax
                 dec stmax
                 clc
