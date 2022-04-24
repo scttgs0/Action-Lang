@@ -30,7 +30,7 @@ lgetkey         .proc
                 lda rtclok+2
                 adc #14
                 tax
-_bc1            lda CH_                 ; key down?
+_bc1            lda $02FC ;!! CH_                 ; key down?
                 eor #$ff
                 bne _gk0
 
@@ -47,7 +47,7 @@ _gk0            ldy #0
                 lda oldchr
                 eor #$80
                 sta (oldadr),y          ; restore cursor
-                ldx SRTIMR              ; faster repeat
+                ldx $022B ;!! SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5
 
@@ -55,8 +55,8 @@ _gk0            ldy #0
                 bcc _gk2
 
                 ldx #3
-_gk1            stx SRTIMR
-_gk2            lda CH_
+_gk1            stx $022B ;!! SRTIMR
+_gk2            lda $02FC ;!! CH_
                 cmp #$c0
                 bcc _gk3                ; not Ctrl-Shft
 
@@ -75,27 +75,27 @@ _gkey           ldx #$70
                 sta brkkey              ; ignore BREAK key
                 jsr putch.putch2
 
-_gk4            ldx SRTIMR
+_gk4            ldx $022B ;!! SRTIMR
                 cpx #10
                 bcs _gkret
 
                 ldx #3
-                stx SRTIMR
+                stx $022B ;!! SRTIMR
 _gkret          sta curch
                 rts
 
 _gk5            ldx #20
                 bne _gk1
 
-_caps           lda CH_
+_caps           lda $02FC ;!! CH_
                 and #$c0
-                sta SHFLOC
+                sta $02BE ;!! SHFLOC
 _caps1          jsr click
                 bmi lgetkey
 
-_atari          lda INVFLG
+_atari          lda $02B6 ;!! INVFLG
                 eor #$80
-                sta INVFLG
+                sta $02B6 ;!! INVFLG
                 jmp _caps1
 
                 .endproc
@@ -106,11 +106,11 @@ _atari          lda INVFLG
 ;======================================
 click           .proc
                 ldx #$7f
-_click1         stx CONSOL
-                stx WSYNC
+_click1         stx $D01F ;!! CONSOL
+                stx $D40A ;!! WSYNC
                 dex
                 bpl _click1
 
-                stx CH_
+                stx $02FC ;!! CH_
                 rts
                 .endproc

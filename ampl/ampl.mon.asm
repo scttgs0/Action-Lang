@@ -137,7 +137,7 @@ _md2            lda arg11
                 beq _md1
 
                 ldx #$ff
-                stx CH_
+                stx $02FC ;!! CH_
                 cmp #$de
                 bne _md1
 
@@ -238,8 +238,8 @@ mrun            .proc
 
                 jsr comp
 
-_mr1            lda INITAD
-                ldx INITAD+1
+_mr1            lda $02E2 ;!! INITAD
+                ldx $02E3 ;!! INITAD+1
                 bne _mr3
 
 _mwrt1          rts
@@ -261,7 +261,7 @@ mwrite          .proc                   ; write object file
                 cmp #quote
                 bne mrun._mwrt1         ; no output file!
 
-                lda INITAD+1
+                lda $02E3 ;!! INITAD+1
                 beq mrun._mwrt1         ; no program!!
 
                 lda #1
@@ -300,19 +300,19 @@ _mw2            dec arg14
     ; write the qcode
                 ldx #$10
                 lda #$0b                ; output command
-                sta IOCB0+ICCOM,x
+                sta $0342,x ;!! IOCB0+ICCOM,x
 
                 lda codebase
-                sta IOCB0+ICBAL,x       ; buffer address
+                sta $0344,x ;!! IOCB0+ICBAL,x       ; buffer address
                 lda codebase+1
-                sta IOCB0+ICBAH,x
+                sta $0345,x ;!! IOCB0+ICBAH,x
 
                 lda codesize
-                sta IOCB0+ICBLL,x       ; size
+                sta $0348,x ;!! IOCB0+ICBLL,x       ; size
                 lda codesize+1
-                sta IOCB0+ICBLH,x
+                sta $0349,x ;!! IOCB0+ICBLH,x
 
-                jsr CIOV
+                jsr $E456 ;!! CIOV
                 bmi mwout._mwerr
 
     ; save start address
@@ -322,9 +322,9 @@ _mw3            lda _mwinit,x
                 dex
                 bpl _mw3
 
-                lda INITAD
+                lda $02E2 ;!! INITAD
                 sta arg14
-                lda INITAD+1
+                lda $02E3 ;!! INITAD+1
                 sta arg15
                 jsr mwout
 
@@ -335,8 +335,8 @@ _mw3            lda _mwinit,x
 ;--------------------------------------
 
 _mwinit         .byte 6
-                .word INITAD
-                .word INITAD+1
+                .word $02E2 ;!! INITAD
+                .word $02E3 ;!! INITAD+1
                 .endproc
 
 

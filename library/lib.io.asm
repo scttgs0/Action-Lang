@@ -335,12 +335,12 @@ ccio            stx arg4
                 asl a
                 tax
                 lda arg4
-                sta IOCB0+ICCOM,x
+                sta $0342,x ;!! IOCB0+ICCOM,x
                 lda #0
-                sta IOCB0+ICBLL,x
-                sta IOCB0+ICBLH,x
+                sta $0348,x ;!! IOCB0+ICBLL,x
+                sta $0349,x ;!! IOCB0+ICBLH,x
                 tya
-                jsr CIOV
+                jsr $E456 ;!! CIOV
 
                 sta args
                 jmp chkerr
@@ -783,16 +783,16 @@ note            .proc
                 asl a
                 tax
                 lda #$26                ; NOTE
-                sta IOCB0+ICCOM,x
-                jsr CIOV
+                sta $0342,x ;!! IOCB0+ICCOM,x
+                jsr $E456 ;!! CIOV
                 jsr chkerr
 
                 ldy #0
-                lda IOCB0+ICAX5,x       ; offset
+                lda $034E,x ;!! IOCB0+ICAX5,x       ; offset
                 sta (arg3),y
-                lda IOCB0+ICAX3,x       ; low byte of sector
+                lda $034C,x ;!! IOCB0+ICAX3,x       ; low byte of sector
                 sta (arg1),y
-                lda IOCB0+ICAX4,x       ; high byte of sector
+                lda $034D,x ;!! IOCB0+ICAX4,x       ; high byte of sector
                 iny
                 sta (arg1),y
                 rts
@@ -814,14 +814,14 @@ point           .proc
                 asl a
                 tax
                 tya                     ; sector+1
-                sta IOCB0+ICAX4,x
+                sta $034D,x ;!! IOCB0+ICAX4,x
                 lda arg1                ; sector
-                sta IOCB0+ICAX3,x
+                sta $034C,x ;!! IOCB0+ICAX3,x
                 lda arg3                ; offset
-                sta IOCB0+ICAX5,x
+                sta $034E,x ;!! IOCB0+ICAX5,x
                 lda #$25                ; POINT
-                sta IOCB0+ICCOM,x
-                jsr CIOV
+                sta $0342,x ;!! IOCB0+ICCOM,x
+                jsr $E456 ;!! CIOV
 
                 jmp chkerr
 

@@ -306,7 +306,7 @@ _sa2            rts
 ;RToInt LDA FR0
 ; STA _sign
 ; JSR _FSign
-; JSR FPI
+; JSR $D9D2 ;!! FPI
 ; LDA FR0
 ; LDA FR0+1
 ; JMP _SetSign

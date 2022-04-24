@@ -149,8 +149,8 @@ setcolor        .proc
                 asl a
                 ora arg2
                 ldx arg0
-                sta COLOR0,x
-                sta COLPF0,x
+                sta $02C4,x ;!! COLOR0,x
+                sta $D016,x ;!! COLPF0,x
 _sc1            rts
                 .endproc
 

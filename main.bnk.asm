@@ -29,7 +29,7 @@ en1             .text 3,"EOF",$9a
                 .word eof
 
 en2             .text 5,"color",$8a
-                .word FILDAT
+                .word $02FD ;!! FILDAT
 
 en3             .text 4,"LIST",$8a
                 .word list

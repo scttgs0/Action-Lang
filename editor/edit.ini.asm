@@ -25,9 +25,9 @@
 ;
 ;======================================
 minit           .proc                   ; initialize memory
-                lda MEMLO
+                lda $02E7 ;!! MEMLO
                 sta afbase
-                lda MEMLO+1
+                lda $02E8 ;!! MEMLO+1
                 sta afbase+1
                 lda #0
                 tay
@@ -35,11 +35,11 @@ minit           .proc                   ; initialize memory
                 iny
                 sta (afbase),y
                 sec
-                lda MEMTOP
+                lda $02E5 ;!! MEMTOP
                 sbc afbase
                 iny
                 sta (afbase),y
-                lda MEMTOP+1
+                lda $02E6 ;!! MEMTOP+1
                 sbc afbase+1
                 iny
                 sta (afbase),y
