@@ -21,8 +21,9 @@
 ;
 
 
-;    SPLsetup()
-;    ----------
+;======================================
+;   SPLsetup()
+;======================================
 splsetup        .proc
                 lda #0
                 tay
@@ -42,9 +43,11 @@ splsetup        .proc
     ; clear qglobal s.t.
                 ldx bigst               ; big s.t. ?
                 beq _spls0              ; no
+
 _s0             sta (stg2),y
                 iny
                 bne _s0
+
 _spls0          sta (stglobal),y
                 iny
                 bne _spls0
@@ -57,6 +60,7 @@ _spls0          sta (stglobal),y
 _spls1          ldy #1
                 lda (arg0),y
                 beq _spls2
+
                 tax
                 dey
                 lda (arg0),y
@@ -68,8 +72,8 @@ _spls2          clc
                 lda arg0
                 adc #4
                 bcc _spls3
-                inc arg1
 
+                inc arg1
 _spls3          sta codebase
                 sta qcode
 
