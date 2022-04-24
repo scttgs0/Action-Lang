@@ -23,13 +23,14 @@
 
 ;--------------------------------------
 
-                .include "equates_system_atari8.asm"
+                ;.include "equates_system_atari8.asm"
+                .include "equates_system_c256.asm"
                 .include "editor/edit.def.asm"
 
                 * = $8000
                 .logical ml
-version         .byte $36
-date            .byte $1,$17,$84        ; assemble date of latest version!
+version         .byte $40
+date            .byte $04,$24,$22        ; assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -39,7 +40,7 @@ propid          ldx $a0
                 .include "main.bnk.asm"
 
 amplfin
-;    ACTION! 3.6 - Editor Routines
+;    ACTION! - Editor Routines
 ;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
                 .fill 4,$00
@@ -48,7 +49,7 @@ amplfin
                 .include "editor/edit.tab.asm"
 
 
-;    "ACTION! 3.6 - Compiler Routines
+;    "ACTION! - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
                 .fill 3,$00
@@ -65,7 +66,7 @@ amplfin
                 .endlogical
 
 
-;    ACTION! 3.6 - S.T.
+;    ACTION! - S.T.
 ;    ------------------
                 .logical ll
                 .include "ampl/ampl.mth.asm"
@@ -80,20 +81,22 @@ amplfin
                 .include "library/lib.opt.asm"
 
 cpyright
-                .text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00
+               ;.text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00
+                .text "ACTION! (c)2022 GPL3            Foenix version  April 24, 2022    ",$00
 
                 * = ll+$0fff
                 .byte lbank
 doc
                 .endlogical
 
-;    "ACTION! 3.6 - Compiler
+;    "ACTION! - Compiler
 ;    -----------------------
                 .logical cl
 main
                 .include "comp.main.asm"
 
-cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
+cright         ;.text "ACTION! (c)1983 Action Computer Services",$00,$00
+                .text "ACTION! (c)2022 GPL3      Foenix version",$00,$00
 
                 * = cl+$0fff
                 .byte cbank

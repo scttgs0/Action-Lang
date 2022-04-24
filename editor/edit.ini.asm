@@ -144,5 +144,6 @@ fcmsg1          lda #<editc
 
 ;--------------------------------------
 
-editc           .text 19,"ACTION! (c)1983 ACS"
+editc          ;.text 19,"ACTION! (c)1983 ACS"
+                .text 20,"ACTION! (c)2022 GPL3"
                 .endproc
