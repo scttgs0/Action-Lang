@@ -651,9 +651,9 @@ _s1             lda numbuf-1,y
 ; input number from default IOCB
 ; number must be terminated with EOL
 ;======================================
-inb
-inc
-ini
+input_b
+input_c
+input_i
                 lda    device
 
                 ;[fall-through]

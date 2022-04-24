@@ -275,19 +275,19 @@ _en33           .text 8,"PrintIDE",200
                 .word prtide            ; #13
                 .byte 2,138,11
 _en34           .text 6,"InputB",202
-                .word inb               ; #232
+                .word input_b           ; #232
                 .byte 0
 _en35           .text 7,"InputBD",202
                 .word inbd              ; #53
                 .byte 1,138
 _en36           .text 6,"InputI",203
-                .word ini               ; #239
+                .word input_i           ; #239
                 .byte 0
 _en37           .text 7,"InputID",203
                 .word inid              ; #67
                 .byte 1,138
 _en38           .text 6,"InputC",204
-                .word inc               ; #233
+                .word input_c           ; #233
                 .byte 0
 _en39           .text 7,"InputCD",204
                 .word incd              ; #55
