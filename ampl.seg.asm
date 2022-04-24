@@ -26,13 +26,17 @@
 ; low segment type> _:= PROC | low type> FUNC
 
 
-
+;======================================
+;
+;======================================
 segment         .proc
                 cmp #proc
                 beq _proc
+
                 ldx nxttoken
                 cpx #func
                 beq _func
+
                 rts                     ; end of segment list
 
 _proc           lda #funct-vart+char-1
@@ -46,6 +50,7 @@ _func           clc
 
 _func1          jsr makeentry
                 jsr segend
+
                 lda addr
                 sta curproc
                 lda addr+1
@@ -77,7 +82,6 @@ _funcst         sta (stlocal),y
 ; see Params
                 lda #32
                 jsr stincr              ; arg list space
-
                 jsr trashy
 
                 lda nxttoken
@@ -85,16 +89,18 @@ _funcst         sta (stlocal),y
                 sta param               ; this is very tricky!!
                 bne _funchd
                 jsr ideq                ; param must = 0 here
+
                 iny
                 jsr storprops
+
                 ldy #0
                 lda (props),y
                 ora #8
                 sta (props),y           ; set Sys flag
                 sta param
                 jsr getnext
-
 _funchd         jsr getnext
+
                 cmp #lparen
                 bne argerr
 
@@ -104,10 +110,12 @@ _funchd         jsr getnext
 
 
                 jsr getnext
+
                 cmp #rparen
                 beq argerr._func2
 
 _heading        jsr declare
+
                 ldx lsttoken
                 inc lsttoken            ; in case 2 ,'s
                 cpx #comma
@@ -135,6 +143,7 @@ _func2          lda param
     ; save actual procedure address
                 lda #1
                 jsr cprop
+
                 sta arg0
                 stx arg1
                 jsr getcdoff
@@ -144,8 +153,10 @@ _func2          lda param
                 lda #$4c                ; JMP
                 jsr push1
                 jsr getcdoff            ; fill in address
+
                 adc #2
                 bcc _fh2
+
                 inx
 _fh2            jsr push2
 
@@ -153,16 +164,20 @@ _fh2            jsr push2
     ; local frame
 _fh3            lda argbytes
                 beq _func3              ; no arguments
+
                 cmp #3
                 bcs _fh5
+
                 cmp #2
                 lda #$8d                ; STA addr16
                 ldx arg0
                 ldy arg1
                 bcc _fh4
+
                 lda #$8e                ; STX addr16
                 inx
                 bne _fh4
+
                 iny
 _fh4            jsr push3
                 dec argbytes
@@ -172,6 +187,7 @@ _f4             jmp _func4
 
 _fh5            ldx #10
                 jsr jsrtable
+
                 lda arg0
                 ldx arg1
                 ldy argbytes
@@ -180,6 +196,7 @@ _fh5            ldx #10
 
 _func3          lda trace               ; check for trace
                 beq _func4              ; no trace
+
                 lda #$20                ; JSR CTrace
                 ldx #<ctrace
                 ldy #>ctrace
@@ -193,6 +210,7 @@ _f3a            lda (curproc),y
                 sta (qcode),y
                 dey
                 bpl _f3a
+
                 inx
                 txa
                 jsr codeincr
@@ -203,16 +221,20 @@ _f3a            lda (curproc),y
 
                 lda #3
                 jsr cprop
+
                 tay
                 tax
 _f3b            lda (props),y
                 sta (qcode),y
                 dey
                 bpl _f3b
+
                 inx
                 txa
                 jsr codeincr
 
 _func4          jsr stmtlist
+
                 jmp segment
+
                 .endproc
