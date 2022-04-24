@@ -21,6 +21,9 @@
 ;
 
 
+;======================================
+;
+;======================================
 minit           .proc                   ; initialize memory
                 lda memlo
                 sta afbase
@@ -44,6 +47,7 @@ minit           .proc                   ; initialize memory
                 lda #0                  ; allocate 2 pages of
                 ldx #2                  ; spare memory
                 jsr allocate
+
                 lda afcur
                 sta sparem
                 ldx afcur+1
@@ -52,12 +56,16 @@ miret           rts
                 .endproc
 
 
+;======================================
+;
+;======================================
 zerow           .proc                   ; initialize window
                 lda #0
                 ldx #15
 _zw1            dex                     ; zero page0 window table
                 sta sp,x
                 bne _zw1
+
                 sta dirtyf
                 sta inbuf
                 tay
@@ -66,16 +74,22 @@ _zw1            dex                     ; zero page0 window table
                 .endproc
 
 
+;======================================
+;
+;======================================
 w2init          .proc                   ; W2Init()
                 jsr ctrln
+
                 lda wsize
                 sta nlines
                 sta cmdln
                 jsr savworld
+
                 lda #w2-w1
                 sta numwd
                 sta curwdw
                 jsr zerow
+
                 ldy wsize
                 iny
                 sty ytop
@@ -84,15 +98,20 @@ w2init          .proc                   ; W2Init()
                 sbc wsize
                 sta nlines
                 bne einit.fcmsg         ; uncond.
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 einit           .proc
                 jsr minit
 
                 lda #0
                 ldx #1
                 jsr allocate            ; get edit buffer
+
                 lda afcur
                 sta buf
                 ldx afcur+1
@@ -118,9 +137,12 @@ winit1          lda #23
                 sta ytop
 
 fcmsg           jsr ctrln
+
 fcmsg1          lda #<editc
                 ldx #>editc
                 jmp cmdmsg
+
+;--------------------------------------
 
 editc           .text 19,"ACTION! (c)1983 ACS"
                 .endproc
