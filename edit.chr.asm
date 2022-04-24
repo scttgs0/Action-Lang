@@ -21,19 +21,24 @@
 ;
 
 
-;    InsrtCh() char in curCh
-;    ---------
+;======================================
+;   InsrtCh() char in curCh
+;======================================
 insrtch         .proc
                 jsr setsp
+
 _padbuf         ldy #0
                 lda (buf),y
                 cmp linemax
                 bcc _pbuf0              ; test line too long
+
                 jsr scrbell
+
                 ldy #0
                 lda (buf),y
 _pbuf0          cmp sp
                 bcs _pbuf2
+
                 sta arg0
                 lda sp
                 sta (buf),y
@@ -43,16 +48,19 @@ _pbuf1          iny
                 sta (buf),y
                 cpy sp
                 bcc _pbuf1
+
 _pbret          ldy sp
                 lda curch
                 sta (buf),y
                 lda #$ff
                 sta dirtyf
                 jsr dspbuf
+
                 jmp scrlrt
 
 _pbuf2          ldx insert
                 beq _pbret
+
     ; move buf right one char
 _movert         adc #0                  ; really 1, carry set
                 sta (buf),y
@@ -65,11 +73,13 @@ _mrt1           dey
                 cpy sp
                 bne _mrt1
                 beq _pbret
+
                 .endproc
 
 
-;    InsrtSp()
-;    ---------
+;======================================
+;   InsrtSp()
+;======================================
 insrtsp         .proc
                 lda insert
                 pha
@@ -77,19 +87,24 @@ insrtsp         .proc
                 sta insert
                 sta curch
                 jsr insrtch
+
                 pla
                 sta insert
                 jmp scrlft
+
                 .endproc
 
 
-;    Insrt()
-;    -------
+;======================================
+;   Insrt()
+;======================================
 insrt           .proc
                 jsr clnln
                 jsr nextup
+
                 sta cur+1               ; tricky
                 jsr insert2
+
                 lda #0
                 jmp newpage.npage1
 
@@ -99,9 +114,13 @@ insert3         sta (buf),y
                 iny
                 sty dirty
                 jmp instb
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 csret           .proc
     ; handle pad if any
                 jsr insrtsp
@@ -111,6 +130,7 @@ csret           .proc
                 lda (buf),y
                 pha
                 jsr setsp
+
                 sta dirtyf              ; always non-zero
                 sec
                 sbc #1
@@ -123,6 +143,7 @@ csret           .proc
                 lda #0
                 sta arg0
                 beq _csr2
+
 _csr1           lda (buf),y
                 inc arg0
                 ldy arg0
@@ -137,41 +158,53 @@ _csr2           ldy sp
                 jsr insrt.insert3
                 jsr nextup
                 jsr refresh
+
                 jmp return.ret2
+
                 .endproc
 
 
-;    Return()
-;    --------
+;======================================
+;   Return()
+;======================================
 return          .proc
                 ldx insert
                 bne csret
+
                 jsr chkdwn
                 bne ret2
+
 _ret1           jsr insrt.insert2
                 jsr nextup
                 jsr ldbuf
 ret2            jsr scrldwn
+
 ret3            jmp front
+
                 .endproc
 
 
-;    Delete()
-;    --------
+;======================================
+;   Delete()
+;======================================
 delete          .proc
                 jsr clnln
+
                 lda delbuf
                 ldx delbuf+1
                 stx dirty
                 ldy lastch
                 cpy #$9c
                 beq _del1
+
                 jsr delfree
+
 _del1           sta arg3
                 stx arg4
                 jsr instbuf
                 jsr chkdwn              ; last line ?
                 bne _del2               ; no, delete it
+
                 tay
                 sta (buf),y
                 iny
@@ -180,15 +213,19 @@ _del1           sta arg3
 
 _del2           jsr delcur
                 beq _del3
+
                 jsr nextdwn
 _del3           jsr chkcur
+
                 lda #0
+
                 jmp newpage.npage1
                 .endproc
 
 
-;    DelTop()
-;    --------
+;======================================
+;   DelTop()
+;======================================
 deltop          .proc
                 lda delbuf+4
                 ldx delbuf+5
@@ -197,28 +234,33 @@ deltop          .proc
                 .endproc
 
 
-;    DelEnd(ptr)
-;    -----------
+;======================================
+;   DelEnd(ptr)
+;======================================
 delend          .proc
                 cmp #<delbuf
                 bne de1
+
                 cpx #>delbuf
 de1             rts
                 .endproc
 
 
-;    DelFree(bot)
-;    ------------
+;======================================
+;   DelFree(bot)
+;======================================
 delfree         .proc
                 jsr delend
                 beq delend.de1
+
                 jsr delln
                 bne delfree             ; uncond.
                 .endproc
 
 
-;    DelNext()
-;    ---------
+;======================================
+;   DelNext()
+;======================================
 delnext         .proc
                 ldy #5
                 lda (delnxt),y
@@ -228,20 +270,28 @@ delnext         .proc
                 sta delnxt
                 stx delnxt+1
                 jmp delend
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 undo            .proc
                 jsr ldbuf
+
                 jmp front
+
                 .endproc
 
 
-;    DeleteCh()
-;    ----------
+;======================================
+;   DeleteCh()
+;======================================
 delch           .proc
                 jsr chkcol
                 bcc chkdwn.cdwn1
+
                 ldy #0
                 lda (buf),y
                 sta dirtyf
@@ -256,61 +306,82 @@ _dch1           iny
                 iny
                 cpy dirtyf
                 bcc _dch1               ; really checking for =
+
                 .endproc
 
 
-;    RfrshBuf()
-;    ----------
+;======================================
+;   RfrshBuf()
+;======================================
 rfrshbuf        .proc
                 jsr dspbuf
+
                 jmp rstcol.lftrt
+
                 .endproc
 
 
-;    ChkDwn()
-;    --------
+;======================================
+;   ChkDwn()
+;======================================
 chkdwn          .proc
                 jsr clnln
                 beq cdwn1
+
                 ldy #5
                 lda (cur),y
 cdwn1           rts
                 .endproc
 
 
-;    BackSp()
-;    --------
+;======================================
+;   BackSp()
+;======================================
 backsp          .proc
                 jsr setsp
+
                 cmp #2
                 bcc chkdwn.cdwn1
+
 bsp1            jsr scrllft
                 jsr setsp
+
                 tay
                 lda #$20
                 sta (buf),y
                 sta dirtyf
                 lda insert
                 bne delch
+
                 jmp rfrshbuf
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 csbs            .proc
                 jsr setsp
+
                 cmp #2
                 bcs backsp.bsp1
+
                 jsr chkcur
                 beq chkdwn.cdwn1        ; no lines at all!
+
                 ldy #1
                 lda (cur),y
                 beq chkdwn.cdwn1        ; no line to merge with
+
     ; merge
                 jsr scrlup
                 jsr back
                 jsr nextdwn
+
                 sta dirtyf
                 jsr curstr
+
                 clc
                 ldy #0
                 lda (buf),y
@@ -319,6 +390,7 @@ csbs            .proc
                 sta (buf),y
                 lda (arg0),y
                 beq _cb2
+
                 sta arg3
 _cb1            iny
                 sty arg4
@@ -329,6 +401,9 @@ _cb1            iny
                 ldy arg4
                 cpy arg3
                 bne _cb1
+
 _cb2            jsr delcur
+
                 jmp refresh
+
                 .endproc
