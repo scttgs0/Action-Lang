@@ -41,26 +41,31 @@ en5             .text 5,"TRACE",$8a
                 .word trace
 
 
-;    CStrt()
-;    -------
+;======================================
+;   CStrt()
+;======================================
 cstart          .proc
                 ldy #ebank
                 sty curbank
                 sty bank+ebank
                 jmp start
+
                 .endproc
 
 
-;    GetName(char)
-;    -------------
+;======================================
+;   GetName(char)
+;======================================
 getname         .proc
                 sta bank+lbank
                 jsr lgetname
+
                 .endproc
 
 
-;    RstBank()
-;    ---------
+;======================================
+;   RstBank()
+;======================================
 rstbank         .proc
                 php
                 pha
@@ -74,8 +79,9 @@ init            rts
                 .endproc
 
 
-;    Run(address)
-;    ------------
+;======================================
+;   Run(address)
+;======================================
 run             .proc                   ; reset Error routine
                 ldy #<splerr
                 sty error+1
@@ -83,22 +89,27 @@ run             .proc                   ; reset Error routine
                 sty error+2
                 jsr lproceed
                 jsr jsrind
+
                 jmp editbank
+
                 .endproc
 
 
-;    Compile()
-;    ---------
+;======================================
+;   Compile()
+;======================================
 compile         .proc
                 ldy #cbank
                 sty curbank
                 sty bank+cbank
                 jsr ccompile
+
                 .endproc
 
 
-;    EditBank()
-;    ----------
+;======================================
+;   EditBank()
+;======================================
 editbank        .proc
                 php
                 pha
@@ -106,56 +117,73 @@ editbank        .proc
                 ldy #ebank
                 sty curbank
                 jmp rstbank.rbank1
+
                 .endproc
 
 
-;    GetAlias()
-;    ----------
+;======================================
+;   GetAlias()
+;======================================
 getalias        .proc
                 lda #1
                 jsr getprop
+
                 cpx #0
                 beq _gal1
+
                 sta addr
                 stx addr+1
                 sta bank+lbank
                 lda #0
                 jsr getprop
+
                 sta token
                 jmp rstbank
 
 _gal1           jmp mnum._varerr
+
                 .endproc
 
 
-;    GNlocal()
-;    ---------
+;======================================
+;   GNlocal()
+;======================================
 gnlocal         .proc
                 sta bank+lbank
                 jsr lgetname.lgnlocal
+
                 jmp rstbank
+
                 .endproc
 
 
-;    CStmtList()
-;    -----------
+;======================================
+;   CStmtList()
+;======================================
 cstmtlst        .proc
                 ldy #cbank
                 sty curbank
                 sta bank+cbank
                 jsr stmtlist
+
                 jmp editbank
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 mgett1          .proc
                 jsr editbank
                 jsr gettemp.gett1
+
                 .endproc
 
 
-;    LProceed()
-;    ----------
+;======================================
+;   LProceed()
+;======================================
 lproceed        .proc
                 ldy #lbank
                 sty curbank
@@ -164,38 +192,59 @@ lproceed        .proc
                 .endproc
 
 
-
+;======================================
+;
+;======================================
 options         .proc
                 jsr lproceed
                 jsr setopts
+
                 jmp editbank
                 .endproc
 
 
+;======================================
+;
+;======================================
 getkey          .proc
                 sta bank+lbank
                 jsr lgetkey
+
                 jmp rstbank
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 splerr          .proc
                 sta bank+lbank
                 jmp lsplerr
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 emloop          .proc
                 jsr editbank
+
                 jmp monitor._mloop
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 getargs         .proc
                 pha                     ; save arg type load flag
                 sty bank+lbank
                 lda #1
                 jsr getprop
+
                 sta addr
                 stx addr+1
 
@@ -210,30 +259,42 @@ getargs         .proc
                 lda (props),y
                 sta numargs
                 beq _ga2
+
                 tax
                 cpx #9
                 bcs _ga2
+
 _ga1            iny
                 lda (props),y
                 dex
                 sta argtypes,x          ; args inverted
                 bne _ga1
+
 _ga2            jmp rstbank
+
                 .endproc
 
 
+;======================================
+;
+;======================================
 prth            .proc                   ; call only from LBANK!
                 sty bank+ebank
                 jsr printh
+
                 sty bank+lbank
                 jmp chkerr
+
                 .endproc
 
 
+;======================================
 ; go directly to DOS, do NOT pass GO,
 ; do NOT collect $200, but setup LIB
-;------------------------------------
+;======================================
 dret            .proc                   ; Dret()
                 jsr lproceed
+
                 jmp (dosvec)
+
                 .endproc

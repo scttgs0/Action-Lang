@@ -21,8 +21,9 @@
 ;
 
 
-;    LShift(val, cnt)
-;    ----------------
+;======================================
+;   LShift(val, cnt)
+;======================================
 lsh1            .proc
 _a              = aflast+1
 _b              = aflast
@@ -37,38 +38,46 @@ _sign           = token
                 sty _d
 _lshift         ldy _d
                 beq _lshret
+
                 stx _c
 _lsh1           asl a
                 rol _c
                 dey
                 bne _lsh1
+
                 ldx _c
 _lshret         rts
                 .endproc
 
 
-;    NextUp()
-;    --------
+;======================================
+;   NextUp()
+;======================================
 nextup          .proc
                 ldy #1
                 bne next                ; uncond.
+
                 .endproc
 
 
-;    NextDwn()
-;    ---------
+;======================================
+;   NextDwn()
+;======================================
 nextdwn         .proc
                 ldy #5
                 .endproc
 
 
-;    Next(,,dir)
-;    -----------
+;======================================
+;   Next(,,dir)
+;======================================
 next            .proc
                 jsr chkcur
                 beq next1
+
                 lda (cur),y
                 beq next1
+
                 tax
                 dey
                 lda (cur),y
@@ -79,29 +88,33 @@ next1           rts
                 .endproc
 
 
-;    CurStr()
-;    --------
+;======================================
+;   CurStr()
+;======================================
 curstr          .proc
                 lda cur
                 ldx cur+1
                 .endproc
 
 
-;    StrPtr()
-;    --------
+;======================================
+;   StrPtr()
+;======================================
 strptr          .proc
                 clc
                 adc #6
                 sta arg0
                 bcc _sp1
+
                 inx
 _sp1            stx arg1
                 rts
                 .endproc
 
 
-;    MNum()
-;    ------
+;======================================
+;   MNum()
+;======================================
 mnum            .proc
                 lda #0
                 sta afsize
@@ -110,19 +123,26 @@ mnum            .proc
 _mn1            lda nxttoken
                 cmp #timesid
                 beq _mn4                ; qcode reference
+
                 cmp #lbrack
                 beq _mn5
+
                 cmp #record
                 beq _mnvar
+
                 cmp #typet
                 beq _mnvar
+
                 cmp #typet+8
                 beq _mnvar
+
                 cmp #quote
                 beq _mnstr
+
                 cmp #undec
                 beq _mnundec
                 bcs _mnvar
+
                 jsr getconst
                 bcc _mn2
 
@@ -137,14 +157,17 @@ _mn2            clc
                 adc afsize+1
 _mn2a           sta afsize+1
                 jsr nextchar
+
                 cmp #'+'
                 bne _mn2b
+
                 jsr getnext
                 bne _mn1                ; uncond.
 
 _mn2b           ldy #0
                 cmp #'^'
                 bne _mn3
+
                 lda (afsize),y
                 tax
                 iny
@@ -159,25 +182,32 @@ _mn3            dec choff               ; put back character
                 rts
 
 _mn4            jsr getcdoff            ; qcode reference
+
                 jmp _mn2
 
 _mn5            jsr getcdoff            ; table reference
+
                 pha
                 txa
                 pha
                 bne _mn8                ; uncond.
 
 _mnstr          jsr copystr             ; string ref
+
                 jmp _mn2
 
 _mn6            lda nxttoken            ; body of table
                 cmp #rbrack
                 beq _mn9
+
                 jsr getconst
+
                 ldy #0
                 jsr storevar
+
                 lda op
                 beq _mn7                ; byte?
+
                 iny                     ; no, word
 _mn7            tya
                 jsr codeincr
@@ -186,15 +216,18 @@ _mn8            jsr getnext
 
 _mnundec        lda #1
                 jsr nxtprop
+
                 tax
                 iny
                 lda (props),y
                 beq _varerr
+
                 tay
                 sta bank+lbank
                 lda #1
                 jsr gprop
                 jsr rstbank
+
                 jmp _mnv1
 
 _varerr         ldy #varer
@@ -204,25 +237,33 @@ _mn9            pla                     ; end of table
                 tax
                 pla
                 jmp _mn2
+
                 .endproc
 
 
-;    GetConst(token)
-;    ---------------
+;======================================
+;   GetConst(token)
+;======================================
 getconst        .proc
                 ldy #conster
                 cmp #$81
                 bcc mnum._adrerr
+
                 cmp #constt+strt
                 bcs mnum._adrerr
+
                 lda nxtaddr
                 ldx nxtaddr+1
                 rts
                 .endproc
 
 
+;======================================
+;
+;======================================
 copystr         .proc
                 jsr getcdoff
+
                 pha
                 txa
                 pha
@@ -240,8 +281,10 @@ _cs1            lda (nxtaddr),y
                 inx
                 txa
                 bne _cs2
+
                 inc qcode+1
 _cs2            jsr codeincr
+
                 inc choff               ; get rid of end quote
                 pla
                 tax
@@ -250,8 +293,9 @@ _cs2            jsr codeincr
                 .endproc
 
 
-;    GetCdOff()
-;    ----------
+;======================================
+;   GetCdOff()
+;======================================
 getcdoff        .proc
                 clc
                 lda qcode
@@ -265,8 +309,9 @@ getcdoff        .proc
                 .endproc
 
 
-;    StoreVar(low, high, index)
-;    --------------------------
+;======================================
+;   StoreVar(low, high, index)
+;======================================
 storevar        .proc
                 sta (qcode),y
                 iny
@@ -276,8 +321,12 @@ storevar        .proc
                 .endproc
 
 
+;======================================
+;
+;======================================
 lookup          .proc
                 sty arg2
+
         .if ramzap
                 sta (arg1),y            ; zap RAM if any
         .else
@@ -293,6 +342,7 @@ lu1             stx arg1
                 txa
 _fml1           cmp (arg1),y
                 beq _fmjmp
+
                 dey
                 dey
                 dey
@@ -306,17 +356,20 @@ _fmjmp          dey
                 lda (arg1),y
                 sta arg3
                 jmp (arg3)
+
                 .endproc
 
 
-;    AlphaNum(char)
-;    --------------
+;======================================
+;   AlphaNum(char)
+;======================================
 alphanum        .proc
                 jsr alpha
                 bne _anum2
 
 _num            cmp #'0'
                 bmi _anum1
+
                 cmp #':'
                 bmi _anum2
 _anum1          ldx #0
@@ -324,8 +377,9 @@ _anum2          rts
                 .endproc
 
 
-;    Alpha(char)
-;    -----------
+;======================================
+;   Alpha(char)
+;======================================
 alpha           .proc
                 pha
                 ora #$20
@@ -333,20 +387,24 @@ alpha           .proc
                 pla
                 cpx #'a'
                 bmi _alpha1
+
                 cpx #$7b
                 bmi _alpha2
+
 _alpha1         ldx #0
 _alpha2         rts
                 .endproc
 
 
-;    STIncr(size)
-;    ------------
+;======================================
+;   STIncr(size)
+;======================================
 stincr          .proc
                 clc
                 adc symtab
                 sta symtab
                 bcc _s1
+
                 inc symtab+1
 _s1             lda stmax
                 cmp symtab+1
@@ -354,16 +412,19 @@ _s1             lda stmax
 
                 ldy #61                 ; out of s.t. space
                 jmp splerr
+
                 .endproc
 
 
-;    CodeIncr(size)
-;    --------------
+;======================================
+;   CodeIncr(size)
+;======================================
 codeincr        .proc
                 clc
                 adc qcode
                 sta qcode
                 bcc _c1
+
                 inc qcode+1
 _c1             lda stbase
                 cmp qcode+1
@@ -371,13 +432,16 @@ _c1             lda stbase
 
 cderr           sta bank+ebank
                 jsr splsetup            ; reset compiler
+
                 ldy #cder               ; out of qcode space
                 jmp splerr
+
                 .endproc
 
 
-;    NxtProp(offset)
-;    ---------------
+;======================================
+;   NxtProp(offset)
+;======================================
 nxtprop         .proc
                 ldx props
                 stx aflast
@@ -386,28 +450,33 @@ nxtprop         .proc
                 ldx nxtaddr
                 ldy nxtaddr+1
                 bne gprop
+
                 .endproc
 
 
-;    CProp(offset)
-;    -------------
+;======================================
+;   CProp(offset)
+;======================================
 cprop           .proc
                 ldx curproc
                 ldy curproc+1
                 bne gprop
+
                 .endproc
 
 
-;    GetProp(offset)
-;    ---------------
+;======================================
+;   GetProp(offset)
+;======================================
 getprop         .proc
                 ldx addr
                 ldy addr+1
                 .endproc
 
 
-;    GProp(offset, addr)
-;    -------------------
+;======================================
+;   GProp(offset, addr)
+;======================================
 gprop           .proc
                 stx props
                 sty props+1
@@ -415,12 +484,14 @@ gprop           .proc
                 clc
                 adc props
                 bcc _gp1
+
                 inx
 _gp1            sec
                 ldy #0
                 adc (props),y
                 sta props
                 bcc _gp2
+
                 inx
 _gp2            stx props+1
                 iny
@@ -432,6 +503,9 @@ _gp2            stx props+1
                 .endproc
 
 
+;======================================
+;
+;======================================
 rstp            .proc
                 ldy aflast
                 sty props
@@ -441,11 +515,12 @@ rstp            .proc
                 .endproc
 
 
-;    JSRInd(addr)
-;    ------------
+;======================================
+;   JSRInd(addr)
+;======================================
 jsrind          .proc
                 sta adress
                 stx adress+1
                 jmp (adress)
-                .endproc
 
+                .endproc

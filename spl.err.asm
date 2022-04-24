@@ -21,11 +21,13 @@
 ;
 
 
-;    SPLErr(,,error)
-;    ---------------
+;======================================
+;   SPLErr(,,error)
+;======================================
 lsplerr         .proc
                 lda top+1
                 beq spler1
+
     ; set pointer to error
                 ldx curwdw
                 lda spln
@@ -37,14 +39,18 @@ lsplerr         .proc
 spler1          jsr syserr
                 jsr puteol
                 jsr printbuf
+
                 lda #0
                 ldx #<sermsg
                 ldy #>sermsg
                 jsr output
+
                 lda #0
                 sta $02e3
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr print
+
                 jmp emloop
+
                 .endproc

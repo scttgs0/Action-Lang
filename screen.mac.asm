@@ -21,9 +21,13 @@
 ;
 
 
+;======================================
+;
+;======================================
 scrinit         .proc
                 lda #0
                 jsr close               ; close #0, sets X to 0
+
                 lda #$0c
                 sta arg3
                 lda #0
@@ -31,28 +35,33 @@ scrinit         .proc
                 ldy #>scred
                 jmp open
 
+;--------------------------------------
+
 scred           .text 2,"E:",$9b
                 .endproc
 
 
+;======================================
 ;     ScrCh(char)
 ;    ------------
 ; outputs char to screen.  Char passed in A reg.
 ; Control characters are ignored.
-
+;======================================
 scrch           .proc
                 tay
                 lda #0
 scrchar         ldx #1
                 bne putch.putch1
+
                 .endproc
 
 
+;======================================
 ;    PutCh(char)
 ;    -----------
 ; outputs char to screen.  Char passed in A reg.
 ; Processes control characters.
-
+;======================================
 putch           .proc
                 tay
                 lda #0
@@ -70,46 +79,57 @@ putch2          sta $0342,x             ; ICCOM
                 sta $0349,x             ; ICBLH
                 tya
                 jmp $e456               ; CIOV
+
                 .endproc
 
 
-;    ScrUp() - Move cursor up one
-;    ----------------------------
+;======================================
+;   ScrUp() - Move cursor up one
+;======================================
 scrup           .proc
                 lda #$1c
                 bne putch
+
                 .endproc
 
 
-;    ScrDwn() - Move cursor down one
-;    -------------------------------
+;======================================
+;   ScrDwn() - Move cursor down one
+;======================================
 scrdwn          .proc
                 lda #$1d
                 bne putch
+
                 .endproc
 
 
-;    ScrBell() - Bell Char
-;    ---------------------
+;======================================
+;   ScrBell() - Bell Char
+;======================================
 scrbell         .proc
                 lda #$fd
                 bne putch
+
                 .endproc
 
 
-;    ScrLft() - Move cursor left one
-;    -------------------------------
+;======================================
+;   ScrLft() - Move cursor left one
+;======================================
 scrlft          .proc
                 lda #$1e
                 bne putch
+
                 .endproc
 
 
-;    ScrRt() - Move cursor right one
-;    -------------------------------
+;======================================
+;   ScrRt() - Move cursor right one
+;======================================
 scrrt           .proc
                 lda #$1f
                 bne putch
+
                 .endproc
 
 
@@ -255,8 +275,9 @@ brker           = $80                   ; Break key depressed
 ;    Compiler lexicon - get tokens
 ;============================================
 
-;    GetNext()
-;    ---------
+;======================================
+;   GetNext()
+;======================================
 getnext         .proc
                 lda spnxt
                 ldx curnxt
@@ -275,21 +296,25 @@ getnext         .proc
                 sta token
 getnloop
                 jsr nextchar
+
 getnl0          cmp #eofid
                 beq getnr1
 
                 cmp #'!'
                 bcc getnloop
+
     ; save line index for debugging
                 ldx choff
                 stx spnxt
 
                 cmp #'A'
                 bcs _getnl1
+
                 tay
                 lda lexchars-33,y
                 beq getnloop
                 bpl getnr1
+
                 and #$7f
                 bne _getnr0              ; uncond.
 
@@ -298,8 +323,10 @@ _getnl1         jsr alpha
 
                 cmp #'['
                 beq getnr1
+
                 cmp #'^'
                 beq getnr1
+
                 cmp #']'
                 beq getnr1
                 bne getnloop            ; uncond.
@@ -325,16 +352,19 @@ ismt            lda token
                 .endproc
 
 
-;    LexCom()
-;    --------
+;======================================
+;   LexCom()
+;======================================
 lexcom          .proc
                 jsr nextline
                 bne getnext.getnl0      ; uncond.
+
                 .endproc
 
 
-;    LexDig()
-;    --------
+;======================================
+;   LexDig()
+;======================================
 lexdig          .proc
                 lda #constt+intt
                 sta nxttoken
@@ -343,10 +373,13 @@ lexdig          .proc
 ldig1           jsr nextchar            ; cardinal?
                 jsr alphanum._num
                 bne ldig1
+
                 cmp #'.'
                 beq ldig4
+
                 cmp #'E'
                 beq ldig4
+
                 dec choff
                 jsr rtocar
                 bcc ldig3
@@ -360,6 +393,7 @@ ldig3           sta nxtaddr
                 stx nxtaddr+1
                 cpx #0
                 bne getnext.getnr2
+
                 lda #constt+bytet
                 bne getnext.getnr1
 
@@ -368,43 +402,56 @@ ldig4           lda #constt+realt
                 ldy cix
                 ldx #$ff                ; for SET cmd
                 bne ldig2
+
                 .endproc
 
 
-;    LexChr()
-;    --------
+;======================================
+;   LexChr()
+;======================================
 lexchr          .proc
                 jsr nextchar
+
                 sta nxtaddr
                 lda #constt+chart
                 bne getnext.getnr1
+
                 .endproc
 
 
-;    LexNE()
-;    -------
+;======================================
+;   LexNE()
+;======================================
 lexne           .proc
                 jsr nextchar
+
                 cmp #'>'
                 bne lexeq.leq1
+
                 lda #neid
                 bne getnext.getnr1      ; uncond.
+
                 .endproc
 
 
-;    LexEq()
-;    -------
+;======================================
+;   LexEq()
+;======================================
 lexeq           .proc
                 jsr nextchar
+
 leq1            cmp #'='
                 bne putback
+
                 inc nxttoken
                 bne getnext.getnr2      ; uncond.
+
                 .endproc
 
 
-;    LexHex()
-;    --------
+;======================================
+;   LexHex()
+;======================================
 lexhex          .proc
                 lda #constt+cardt
                 sta nxttoken
@@ -412,22 +459,27 @@ lexhex          .proc
                 jsr lexbuf
                 jsr htocar
                 bne lexdig.ldig2        ; uncond.
+
                 .endproc
 
 
-;    PutBack returns character to buf
-;    --------------------------------
+;======================================
+;   PutBack returns character to buf
+;======================================
 putback         .proc
                 dec choff
 pback           jmp getnext.getnr2
+
                 .endproc
 
 
-;    LexPF()
-;    -------
+;======================================
+;   LexPF()
+;======================================
 lexpf           .proc
                 lda qglobal
                 beq putback.pback
+
                 lda #0
                 sta qglobal
 
@@ -436,33 +488,42 @@ lexpf           .proc
                 lda gbase+1
                 sta symtab+1
                 bne putback.pback       ; uncond.
+
                 .endproc
 
 
-;    LexStr()
-;    --------
+;======================================
+;   LexStr()
+;======================================
 lexstr          .proc
                 lda token
                 cmp #quote
                 beq putback.pback       ; zap local st
+
                 lda #0
                 sta arg9
 _lstr1          jsr nextchar
+
                 inc arg9
                 beq _lstr3              ; string too long
+
                 cmp #'"'
                 beq _lstr4
+
 _lstr2          ldy arg9
                 sta (symtab),y
                 lda chan
                 bpl _lstr1              ; if not EOF
+
 _lstr3          ldy #strer
                 jmp splerr
 
 _lstr4          jsr nextchar
+
                 cmp #'"'
                 beq _lstr2              ; " in string
                                         ; end of string
+
                 ldy arg9
                 lda #eol
                 sta (symtab),y
@@ -475,11 +536,13 @@ _lstr4          jsr nextchar
                 ldy choff
                 dey
                 jmp lexdig.ldig2
+
                 .endproc
 
 
-;    NextChar()
-;    ----------
+;======================================
+;   NextChar()
+;======================================
 nextchar        .proc
                 ldy defflg
                 bne lexdef
@@ -487,11 +550,13 @@ nextchar        .proc
 nxtch0          ldy choff
                 cpy sp
                 bcc nextline._nxtch1
+
                 .endproc
 
 
-;    NextLine()
-;    ----------
+;======================================
+;   NextLine()
+;======================================
 nextline        .proc
                 lda chan
                 beq _nln1
@@ -509,20 +574,25 @@ _nln0           dec chan
 
 _nln1           ldy top+1
                 beq _nln0               ; set eof, tricky qcode
+
                 jsr ldbuf
+
                 lda cur
                 sta curnxt
                 ldx cur+1
                 stx curnxt+1
                 jsr nextdwn
                 bne _nln2
+
 ;    LDA #0
                 sta top+1
 
 _nln2           lda list
                 beq _nln3               ; don't list
+
                 lda device
                 jsr wrtbuf
+
 _nln3           ldy #0
                 sty choff
                 lda (buf),y
@@ -543,12 +613,16 @@ _nln4           lda #eofid
                 .endproc
 
 
+;======================================
+;
+;======================================
 lexdef          .proc
                 ldy #0
                 lda (delnxt),y
                 inc choff
                 cmp choff
                 bcs ldef1
+
                 lda defflg
                 sta choff
                 sty defflg
@@ -560,37 +634,46 @@ ldef1           ldy choff
                 .endproc
 
 
-;    LexGet()
-;    --------
+;======================================
+;   LexGet()
+;======================================
 lexget          .proc
                 jsr getnext.getnloop
+
 lget            lda #0
                 sta defflg
                 inc chan
                 lda #4
                 jsr openchan
                 jsr nextline
+
                 jmp getnext.getnl0
+
                 .endproc
 
 
-;    LexSet()
-;    --------
+;======================================
+;   LexSet()
+;======================================
 lexset          .proc
                 jsr getadr
+
                 sta arg11
                 stx arg12
 
                 jsr getnext.getnloop
+
                 lda nxttoken
                 cmp #equalid
                 bne lseterr
 
                 jsr getadr
+
                 ldy #0
                 sta (arg11),y
                 txa
                 beq lset1
+
                 iny
                 sta (arg11),y
 lset1           jmp getnext.getnloop
@@ -599,23 +682,29 @@ lseterr         ldy #seter
                 jmp splerr
 
 getadr          jsr getnext.getnloop
+
                 jmp mnum
+
                 .endproc
 
 
-;    LexExpand()
-;    -----------
+;======================================
+;   LexExpand()
+;======================================
 lexexpand       .proc
                 lda defflg
                 beq lexp
+
                 ldy #dfner
                 jmp splerr
 
 lexp            lda #3
                 jsr nxtprop
+
                 lda props
                 ldx props+1
                 jsr rstp
+
                 ldy choff
 lexp1           sta delnxt
                 stx delnxt+1
@@ -623,23 +712,29 @@ lexp1           sta delnxt
                 lda #0
                 sta choff
                 jmp getnext.getnloop
+
                 .endproc
 
 
-;    LexBuf()
-;    --------
+;======================================
+;   LexBuf()
+;======================================
 lexbuf          .proc
                 ldy choff
                 lda defflg
                 beq _lbuf
+
                 lda delnxt
                 ldx delnxt+1
                 rts
+
 _lbuf           lda buf
                 ldx buf+1
                 rts
                 .endproc
 
+;--------------------------------------
+;--------------------------------------
 
 lexcmd          .word getnext.getnr2
                 .byte 41

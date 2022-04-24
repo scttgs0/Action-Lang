@@ -24,8 +24,9 @@
 slop            = 7                     ; can't be less than 4
 
 
-;    Allocate(size)
-;    --------------
+;======================================
+;   Allocate(size)
+;======================================
 allocate        .proc
                 sta afsize              ; save size
                 stx afsize+1
@@ -40,11 +41,13 @@ _afl1           ldy #0
                 lda (aflast),y          ; cur = last(0)
                 sta afcur
                 bne _afl2               ; while cur # 0
+
                 iny
                 lda (aflast),y
                 sta afcur+1
                 bne _afl3
                 beq _afl6               ; done
+
 _afl2           iny
                 lda (aflast),y
                 sta afcur+1
@@ -53,6 +56,7 @@ _afl3           ldy #3
                 cmp afsize+1            ; high bytes
                 bcc _afl5               ; size too small
                 bne _afl4               ; size too big
+
                 dey
                 lda (afcur),y
                 cmp afsize              ; low bytes
@@ -98,23 +102,23 @@ _afl6           lda afbsze+1
                 beq _afl10              ; no free block
 
     ; see if we need to split block
-
                 sec
                 lda afbsze
                 sbc #slop
                 sta afbsze
                 bcs _afl7
+
                 dec afbsze+1
 _afl7           lda afbsze+1
                 cmp afsize+1
                 bcc _afl8               ; use as is
                 bne _afl11              ; split it
+
                 lda afbsze
                 cmp afsize
                 bcs _afl11              ; split it
 
     ; don't split
-
 _afl8           ldy #0
                 lda (afbest),y          ; cur =  best(0)
                 sta afcur
@@ -130,7 +134,6 @@ _afl8           ldy #0
                 rts
 
     ; found entry of right size
-
 _afl9           ldy #0
                 lda (afcur),y
                 sta (aflast),y
@@ -170,11 +173,13 @@ _afl11          ldy #0
                 sta (afcur),y
                 clc
                 bcc _afl9
+
                 .endproc
 
 
-;    Free(block)
-;    -----------
+;======================================
+;   Free(block)
+;======================================
 free            .proc
                 sta afbest
                 stx afbest+1
@@ -198,8 +203,10 @@ _afl12          lda afcur               ; last = cur
                 sta afcur+1
                 sbc afbest+1
                 bcs _afl13              ; while cur ULS block
+
                 lda afcur+1             ; and cur # 0
                 bne _afl12
+
                 lda afcur
                 bne _afl12
 
@@ -215,8 +222,10 @@ _afl13          iny
                 adc afbest+1
                 cmp afcur+1
                 bne _afl15
+
                 cpx afcur               ; if cur =
                 bne _afl15              ;  (block + block(1))
+
                 dey
                 clc                     ; block(1) =
                 lda (afbest),y          ;  block(1) +  cur(1)
@@ -253,6 +262,7 @@ _afl16          iny                     ; if block =
                 adc (aflast),y
                 cmp afbest+1
                 bne _afl18
+
                 cpx afbest
                 bne _afl18
 

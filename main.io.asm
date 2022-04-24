@@ -21,20 +21,23 @@
 ;
 
 
-;    Open(device, name, mode, opt)
-;    -----------------------------
+;======================================
+;   Open(device, name, mode, opt)
+;--------------------------------------
 ; returns status
-
+;======================================
 open            .proc
                 stx arg5
                 sty arg6
                 ldy #3
                 bne xiostr
+
                 .endproc
 
 
-;    Print(device, str)
-;    ------------------
+;======================================
+;   Print(device, str)
+;======================================
 print           .proc
                 stx arg5
                 sty arg6
@@ -43,16 +46,19 @@ print           .proc
                 ldy #$09
                 jsr xiostr
                 bne print1
+
                 lda #$0b
                 sta $0342,x
                 lda #eol
                 jmp $e456
+
 print1          rts
                 .endproc
 
 
-;    Close(device)
-;    -------------
+;======================================
+;   Close(device)
+;======================================
 close           .proc
                 ldx #>ml
                 stx arg6                ; note: address must be non-zero to
@@ -66,11 +72,13 @@ close           .proc
 
                 ldy #$0c
                 bne input.input1
+
                 .endproc
 
 
-;    Input(device, str)
-;    ------------------
+;======================================
+;   Input(device, str)
+;======================================
 input           .proc
                 sty arg6
                 ldy #$05
@@ -80,8 +88,9 @@ input1          stx arg5
                 .endproc
 
 
-;    XIOstr(device,,cmd,aux1,aux2,str)
-;    ---------------------------------
+;======================================
+;   XIOstr(device,,cmd,aux1,aux2,str)
+;======================================
 xiostr          .proc
                 asl a
                 asl a
@@ -92,6 +101,7 @@ xiostr          .proc
                 sta $0342,x             ; command
                 lda arg3
                 beq _xs1
+
                 sta $034a,x             ; aux1
                 lda arg4
                 sta $034b,x             ; aux2
@@ -101,6 +111,7 @@ _xs1            tay
                 lda (arg5),y
                 sta $0348,x             ; size
                 beq print.print1        ; return
+
                 clc
                 lda arg5
                 adc #1
@@ -109,20 +120,24 @@ _xs1            tay
                 adc #0
                 sta $0345,x
                 jmp $e456
+
                 .endproc
 
 
-;    Output(device, str)
-;    -------------------
+;======================================
+;   Output(device, str)
+;======================================
 output          .proc
                 sty arg6
                 ldy #$0b
                 bne input.input1
+
                 .endproc
 
 
-;    DspStr(prompt, str, invert)
-;    ---------------------------
+;======================================
+;   DspStr(prompt, str, invert)
+;======================================
 dspstr          .proc
                 sty arg12
                 ldy arg3
@@ -141,6 +156,7 @@ dspstr          .proc
                 ldy #0
                 lda (arg12),y
                 beq _ds2
+
                 sta arg3
                 sty arg4
 
@@ -149,14 +165,17 @@ _ds1            inc arg4
                 lda (arg12),y
                 eor arg2
                 jsr scrch
+
                 dec arg3
                 bne _ds1
+
 _ds2            rts
                 .endproc
 
 
-;    RdBuf(device)
-;    -------------
+;======================================
+;   RdBuf(device)
+;======================================
 rdbuf           .proc
     ; INC COLOR4
                 nop
@@ -170,9 +189,11 @@ rdbuf           .proc
                 ldx buf
                 ldy buf+1
 inputs          jsr input
+
                 sty arg0
                 lda $0348,x             ; size
                 beq _rb1
+
                 sec
                 sbc #1
 _rb1            ldy #0
@@ -182,17 +203,20 @@ _rb1            ldy #0
                 .endproc
 
 
-;    WrtBuf(device)
-;    --------------
+;======================================
+;   WrtBuf(device)
+;======================================
 wrtbuf          .proc
                 ldx buf
                 ldy buf+1
                 jmp print
+
                 .endproc
 
 
-;    RstCur()
-;    --------
+;======================================
+;   RstCur()
+;======================================
 rstcur          .proc
                 ldy curwdw
                 lda w1+wcur,y
@@ -200,17 +224,21 @@ rstcur          .proc
                 lda w1+wcur+1,y
                 sta cur+1
                 jmp ldbuf
+
                 .endproc
 
 
-;    SysErr(,,errnum)
-;    ----------------
+;======================================
+;   SysErr(,,errnum)
+;======================================
 syserr          .proc
                 jsr dspon
+
                 tya
                 ldx #0
                 jsr ctostr
                 jsr cmdcol
+
                 lda #$80
                 sta arg4
                 lda #>numbuf
@@ -221,25 +249,34 @@ syserr          .proc
                 jsr dspstr
                 jsr rstcsr
                 jsr rstcol
+
                 jmp scrbell
+
                 .endproc
+
+;--------------------------------------
+;--------------------------------------
 
 sermsg          .text 7,"Error: "
 
 
-;    CToStr(num) - Cardinal to string
-;    --------------------------------
+;======================================
+;   CToStr(num) - Cardinal to string
+;======================================
 ctostr          .proc
                 sta fr0
                 stx fr0+1
                 jsr ifp                 ; Cardinal to real
+
                 .endproc
 
 
-;    RToStr() - real in FR0
-;    ----------------------
+;======================================
+;   RToStr() - real in FR0
+;======================================
 rtostr          ;.proc
                 jsr fasc
+
                 ldy #$ff
                 ldx #0
 _rts1           iny
@@ -247,6 +284,7 @@ _rts1           iny
                 lda (inbuff),y
                 sta numbuf,x
                 bpl _rts1
+
                 eor #$80
                 sta numbuf,x
                 stx numbuf
@@ -254,8 +292,9 @@ _rts1           iny
                 ;.endproc
 
 
-;    DspOff()
-;    --------
+;======================================
+;   DspOff()
+;======================================
 dspoff          .proc
                 lda tvdisp
                 sta sdmctl
@@ -264,8 +303,9 @@ dspoff          .proc
                 .endproc
 
 
-;    DspOn()
-;    -------
+;======================================
+;   DspOn()
+;======================================
 dspon           .proc
                 lda #$22
                 sta sdmctl
@@ -276,33 +316,41 @@ dspon           .proc
                 .endproc
 
 
-;    PrintC(num)
-;    -----------
+;======================================
+;   PrintC(num)
+;======================================
 printc          .proc
                 jsr ctostr
+
 pnum            lda device
                 ldx #<numbuf
                 ldy #>numbuf
                 jmp output
+
                 .endproc
 
 
-;    OpenChan(mode)
-;    --------------
+;======================================
+;   OpenChan(mode)
+;======================================
 openchan        .proc
                 pha
                 lda chan
                 jsr close
+
                 pla
                 sta arg3
+
     ; check for default device
                 lda #':'
                 ldy #2
                 cmp (nxtaddr),y
                 beq _oc2
+
                 iny
                 cmp (nxtaddr),y
                 beq _oc2
+
     ; stuff in D: for device
                 clc
                 lda nxtaddr
@@ -321,6 +369,7 @@ _oc1            lda (nxtaddr),y         ; move string up...
                 sta (fr0),y
                 dey
                 bne _oc1
+
                 iny
                 lda #'D'
                 sta (nxtaddr),y
@@ -333,21 +382,27 @@ _oc2            lda chan
                 ldy nxtaddr+1
                 jsr open
                 bpl printbuf
+
                 jmp splerr              ; oopps error in open
+
                 .endproc
 
 
-;    PrintBuf()
-;    ----------
+;======================================
+;   PrintBuf()
+;======================================
 printbuf        .proc
                 lda list
                 bne rtocar.htcr1        ; return
+
                 jmp wrtbuf
+
                 .endproc
 
 
-;    HToCar(buf,index)
-;    -----------------
+;======================================
+;   HToCar(buf,index)
+;======================================
 htocar          .proc
                 sty cix
                 sta arg1
@@ -361,10 +416,13 @@ _htc1           ldy cix
                 sec
                 sbc #'0'
                 bmi rtocar.htcrtn
+
                 cmp #10
                 bmi _htcok
+
                 cmp #17
                 bmi rtocar.htcrtn
+
                 sbc #7
                 cmp #16
                 bpl rtocar.htcrtn
@@ -374,17 +432,20 @@ _htcok          sta arg5
                 ldx fr0+1
                 ldy #4
                 jsr lsh1
+
                 clc
                 adc arg5
                 sta fr0
                 stx fr0+1
                 inc cix
                 bne _htc1               ; uncond.
+
                 .endproc
 
 
-;    RToCar()
-;    --------
+;======================================
+;   RToCar()
+;======================================
 rtocar          .proc
                 jsr fpi
                 bcs rcerr
@@ -396,44 +457,53 @@ htcr1           rts
 
 rcerr           ldy #conster
                 jmp splerr
+
                 .endproc
 
 
-;    SToReal(str, index)
-;    -------------------
+;======================================
+;   SToReal(str, index)
+;======================================
 storeal         .proc
                 sty cix
                 sta inbuff
                 stx inbuff+1
                 jmp afp
+
                 .endproc
 
 
-;    PutSp()
-;    -------
+;======================================
+;   PutSp()
+;======================================
 putsp           .proc
                 ldy #$20
                 bne putchar
+
                 .endproc
 
 
-;    PutEOL()
-;    --------
+;======================================
+;   PutEOL()
+;======================================
 puteol          .proc
                 ldy #eol
                 .endproc
 
 
-;    PutChar(,,char)
-;    ---------------
+;======================================
+;   PutChar(,,char)
+;======================================
 putchar         .proc
                 lda device
                 jmp scrch.scrchar
+
                 .endproc
 
 
-;    PutStr(str, invert, offset)
-;    ---------------------------
+;======================================
+;   PutStr(str, invert, offset)
+;======================================
 putstr          .proc
                 sta arg6
                 stx arg7
@@ -443,9 +513,9 @@ putstr          .proc
                 adc arg3
                 sta arg4
                 bcc _ps1
+
                 inx
 _ps1            stx arg5
-
                 jsr dsploc
                 jsr zapcsr
 
@@ -460,8 +530,8 @@ _ps2            sta (arg0),y            ; clear line
                 adc lmargin
                 sta arg0
                 bcc _ps3
-                inc arg1
 
+                inc arg1
 _ps3            iny                     ; sets Y to 0
                 clc
                 lda (arg6),y
@@ -500,8 +570,10 @@ _ps4            lda arg2
                 ldy arg6
                 lda arg7
                 bne _ps6
+
                 lda arg2
                 bne _ps7                ; no EOL char if inverted
+
                 iny
 _ps5            lda eolch
                 sta (arg0),y
@@ -512,6 +584,7 @@ _ps6            eor (arg0),y
 
 _ps7            lda arg3
                 beq _ps9
+
 _ps8            ldy #0
                 lda (arg0),y
                 eor #$80
@@ -520,24 +593,29 @@ _ps9            rts
 
 _ps10           lda arg3
                 bne _ps8
+
                 tay
                 beq _ps5                ; uncond.
+
                 .endproc
 
 
-;    CmdCol()
-;    --------
+;======================================
+;   CmdCol()
+;======================================
 cmdcol          .proc
                 jsr savecol
                 jsr rstcsr
+
                 ldy cmdln
                 sty rowcrs
                 rts
                 .endproc
 
 
-;    SaveCol()
-;    ---------
+;======================================
+;   SaveCol()
+;======================================
 savecol         .proc
                 lda rowcrs
                 sta y
@@ -547,8 +625,9 @@ savecol         .proc
                 .endproc
 
 
-;    RstCol()
-;    --------
+;======================================
+;   RstCol()
+;======================================
 rstcol          .proc
                 lda y
                 sta rowcrs
@@ -556,15 +635,19 @@ rstcol          .proc
                 sta colcrs
                 jsr zapcsr
 lftrt           jsr scrlft
+
                 jmp scrrt
+
                 .endproc
 
 
-;    ChkCur()
-;    --------
+;======================================
+;   ChkCur()
+;======================================
 chkcur          .proc
                 lda cur+1
                 bne _ccret
+
 _ldtop          lda top
                 sta cur
                 lda top+1
@@ -573,14 +656,17 @@ _ccret          rts
                 .endproc
 
 
-;    LdBuf() load buf
-;    ----------------
+;======================================
+;   LdBuf() load buf
+;======================================
 ldbuf           .proc
                 jsr chkcur
                 bne _ldb0
+
                 tay
                 sta (buf),y
                 rts
+
 _ldb0           jsr curstr
 
 ldbuf1          ldy #0
@@ -592,12 +678,14 @@ _ldb1           lda (arg0),y
                 sta (buf),y
                 dey
                 bne _ldb1
+
                 rts
                 .endproc
 
 
-;    DspBuf() - display buffer
-;    -------------------------
+;======================================
+;   DspBuf() - display buffer
+;======================================
 dspbuf          .proc
                 clc
                 lda indent
@@ -607,20 +695,23 @@ dspbuf          .proc
                 lda buf
                 ldx buf+1
                 jmp putstr
+
                 .endproc
 
 
-
-;    DspLoc() get address of display
-;    -------------------------------
+;======================================
+;   DspLoc() get address of display
+;======================================
 dsploc          .proc
                 lda savmsc
                 ldx savmsc+1
                 ldy rowcrs
                 beq _dlocrt
+
 _dloc1          clc
                 adc #40
                 bcc _dloc2
+
                 inx
 _dloc2          dey
                 bne _dloc1
@@ -631,8 +722,9 @@ _dlocrt         sta arg0
                 .endproc
 
 
-;    ZapCsr() get rid of old cursor
-;    ------------------------------
+;======================================
+;   ZapCsr() get rid of old cursor
+;======================================
 zapcsr          .proc
                 lda #<csrch
                 sta oldadr
@@ -642,8 +734,9 @@ zapcsr          .proc
                 .endproc
 
 
-;    RstCsr() restore char under Csr
-;    -------------------------------
+;======================================
+;   RstCsr() restore char under Csr
+;======================================
 rstcsr          .proc
                 ldy #0
                 lda oldchr
