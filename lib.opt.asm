@@ -21,14 +21,19 @@
 ;
 
 
+;======================================
+;
+;======================================
 setopts         .proc
     ; Display On?
                 ldx #domsg-optmsg
                 ldy tvdisp
                 jsr _yn
                 beq _do1
+
                 lda #0
                 beq _do2
+
 _do1            lda #$22
 _do2            sta tvdisp
 
@@ -38,8 +43,10 @@ _do2            sta tvdisp
                 cpy #$60
                 jsr _yn
                 beq _a1
+
                 lda #$60                ; RTS
                 bne _a2
+
 _a1             lda #$4c                ; JMP
 _a2             sta alarm
 
@@ -49,8 +56,10 @@ _a2             sta alarm
                 cpy #$df
                 jsr _yn
                 beq _c1
+
                 lda #$df
                 bne _c2
+
 _c1             lda #$ff
 _c2             sta stmask
 
@@ -59,8 +68,10 @@ _c2             sta stmask
                 ldy trace
                 jsr _yn
                 beq _t1
+
                 lda #0
                 beq _t2
+
 _t1             lda #$ff
 _t2             sta trace
 
@@ -69,25 +80,32 @@ _t2             sta trace
                 ldy list
                 jsr _yn
                 beq _lst1
+
                 lda #0
                 beq _lst2
+
 _lst1           lda #$ff
 _lst2           sta list
 
     ; window size
                 lda wsize
                 jsr _getstr
+
                 ldx #wmsg-optmsg
                 jsr _getnum
+
                 cmp #5
                 bcs _w0                 ; make sure at least 5
+
                 lda #5
 _w0             cmp #19
                 bcc _w1                 ; make sure less than 19
+
                 lda #18
 _w1             sta wsize
                 ldx numwd
                 beq _l1
+
                 sta w1+wnlns
                 tay
                 iny
@@ -100,15 +118,19 @@ _w1             sta wsize
     ; line size
 _l1             lda linemax
                 jsr _getstr
+
                 ldx #lmsg-optmsg
                 jsr _getnum
+
                 sta linemax
 
     ; left margin
                 lda lmargin
                 jsr _getstr
+
                 ldx #lmmsg-optmsg
                 jsr _getnum
+
                 sta lmargin
 
     ; EOL char
@@ -126,6 +148,7 @@ _l1             lda linemax
                 tay
                 ldx #emsg-optmsg
                 jsr _yn2
+
                 lda tempbuf+1
                 tay
                 and #$60
@@ -137,17 +160,22 @@ _l1             lda linemax
                 rts
 
 _yn             beq _yn1
+
                 ldy #'Y'
                 bne _yn2
+
 _yn1            ldy #'N'
 _yn2            sty tempbuf+1
                 ldy #1
                 jsr gettmpbuf
+
                 lda tempbuf+1
                 ldy tempbuf
                 bne _yn5
+
                 cmp #$1b
                 bne _yn4
+
 _yn3            pla
                 pla
 _yn4            rts
@@ -164,17 +192,24 @@ _getstr         ldx #0
 
 _getnum         ldy tempbuf
                 jsr gettmpbuf
+
                 ldy tempbuf
                 bne _gn0
+
                 lda tempbuf+1
                 cmp #$1b
                 beq _yn3
+
 _gn0            lda #<tempbuf
                 ldx #>tempbuf
                 jsr valb
+
                 lda args
 _gn1            rts
                 .endproc
+
+;--------------------------------------
+;--------------------------------------
 
 domsg           .text 9,"Display?"
 
@@ -192,6 +227,9 @@ emsg            .text 10,"EOL char:"
 stoa_           .byte $20,$40,$00,$60
 
 
+;======================================
+;
+;======================================
 gettmpbuf       .proc
                 sty arg2
 
@@ -212,4 +250,5 @@ _gt1            lda optmsg+20,x
                 ldx #>(tempbuf+10)
                 ldy arg2
                 jmp mgett1
+
                 .endproc

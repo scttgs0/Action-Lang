@@ -24,12 +24,13 @@
 ;lstr            .proc
 
 
-;
+;======================================
 ;INT FUNC SCompare(STRING a,b)
 ; result returned is:
 ;   =0 if a=b
 ;   low 0 if a<b
 ;   high 0 if a>b
+;======================================
 scompare        .proc
                 sta arg4
                 stx arg5
@@ -40,23 +41,29 @@ scompare        .proc
                 lda (arg4),y
                 cmp (arg2),y
                 beq _sc1
+
                 jsr _sc4
+
 _sc1            cmp #0
                 bne _sc2
+
                 rts
-;
+
 _sc2            sta arg6
 _sc3            iny
                 lda (arg4),y
                 cmp (arg2),y
                 bne _sc4
+
                 cpy arg6
                 bcc _sc3
+
                 rts
-;
+
 _sc4            ldx #$ff
                 stx args
                 bcc _sc5
+
                 lda (arg2),y
                 inx
 _sc5            stx args+1
@@ -64,9 +71,10 @@ _sc5            stx args+1
                 .endproc
 
 
-;
+;======================================
 ;PROC SCopy(STRING dest, src)
 ; dest = src
+;======================================
 scopy           .proc
                 sta arg0
                 stx arg1
@@ -75,19 +83,22 @@ scopy           .proc
                 lda (arg2),y
 _scopy1         sta (arg0),y
                 beq _scp2
+
 _scopy2         tay
 _scp1           lda (arg2),y
                 sta (arg0),y
                 dey
                 bne _scp1
+
 _scp2           rts
                 .endproc
 
 
-;
+;======================================
 ;PROC SCopyS(STRING dest, src, BYTE start, stop)
 ; if LEN(src)<stop then stop=LEN(src)
 ; dest = src(start, stop)
+;======================================
 scopys          .proc
                 sta arg0
                 stx arg1
@@ -96,6 +107,7 @@ scopys          .proc
                 lda (arg2),y
                 cmp arg5
                 bcs _scs1
+
                 sta arg5
 _scs1           dec arg4
                 clc
@@ -103,23 +115,27 @@ _scs1           dec arg4
                 adc arg4
                 sta arg2
                 bcc _scs2
+
                 inc arg3
 _scs2           sec
                 lda arg5
                 sbc arg4
                 bcs _scs3
+
                 lda #0
 _scs3           jmp scopy._scopy1
+
                 .endproc
 
 
-;
+;======================================
 ;PROC SAssign(STRING dest, src, BYTE start, stop)
 ; IF stop-start+1>LEN(src) THEN
 ;   stop = LEN(src)+start-1
 ; IF LEN(dest)<stop THEN
 ;   LEN(dest) = stop
 ; dest(start, stop) = src
+;======================================
 sassign         .proc
                 sta arg0
                 stx arg1
@@ -127,6 +143,7 @@ sassign         .proc
                 ldy #0
                 lda (arg2),y
                 beq _sa1
+
                 sta arg6
                 dec arg4
                 sec
@@ -134,10 +151,13 @@ sassign         .proc
                 sbc arg4
                 beq _sa1
                 bcs _sa2
+
 _sa1            rts
+
 _sa2            tax
                 cmp  arg6
                 bcc  _sa3
+
                 clc
                 lda arg6
                 tax
@@ -146,23 +166,27 @@ _sa2            tax
 _sa3            lda arg5
                 cmp (arg0),y
                 bcc _sa4
+
                 sta (arg0),y
                 clc
 _sa4            lda arg0
                 adc arg4
                 sta arg0
                 bcc _sa5
+
                 inc arg1
 _sa5            txa
                 jmp scopy._scopy2
+
                 .endproc
 
                 ;.endproc
 
 
-;
+;======================================
             ; symbol table
-;
+;======================================
+
 ;:EN6 .BYTE 6,"PrintF",200
 ; .WORD PrtF ; #117
 ; .BYTE 6,17,12,12,12,12,12
@@ -375,9 +399,9 @@ _en73           .text 7,"SAssign",200
                 .byte 4,17,17,138,138
 
 
-;
+;======================================
 ; hash table
-;
+;======================================
 libst           .byte 0                 ; 1
                 .byte >en1              ; EOF #1
                 .byte >en5              ; TRACE #2
@@ -493,7 +517,7 @@ libst           .byte 0                 ; 1
                 .byte >_en10            ; Close #253
                 .byte >_en58            ; Paddle #254
                 .byte 0                 ; 1
-;
+
                 .byte 0                 ; 1
                 .byte <en1
                 .byte <en5
@@ -506,9 +530,13 @@ libst           .byte 0                 ; 1
                 .byte <en2
                 .byte 0                 ; 1
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0 ; 7
 
+
+;======================================
+;
+;======================================
 strig           .proc
                 tax
                 lda $d010,x
@@ -516,12 +544,15 @@ strig           .proc
                 rts
                 .endproc
 
-;
+
                 .byte <_en73
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0 ; 7
 
+;======================================
+;
+;======================================
 paddle          .proc
                 tax
                 lda $0270,x
@@ -529,12 +560,13 @@ paddle          .proc
                 rts
                 .endproc
 
+;--------------------------------------
+;--------------------------------------
 
-;
                 .byte <_en56
                 .byte <en3
                 .byte 0,0               ; 2
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0,0,0,0,0,0               ; 17
 
@@ -546,13 +578,14 @@ _en6            .text 6,"PrintF",200
                 .byte <_en35
                 .byte 0                 ; 1
                 .byte <_en39
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0                               ; 11
+
 _en63           .text 5,"PeekC",204
                 .word peekc             ; #245
                 .byte 1,12
-;
+
                 .byte <_en37
                 .byte 0,0               ; 2
                 .byte <_en24
@@ -579,13 +612,13 @@ _en63           .text 5,"PeekC",204
                 .byte <_en7
                 .byte <_en51
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0             ; 10
 ; (c)1983ACS in internal char. qcode
 
 copyright       .byte 8,99,9,17,25,24,19,33,35,51
 
-;
+
                 .byte <_en48
                 .byte 0                 ; 1
                 .byte <_en47
@@ -608,14 +641,14 @@ copyright       .byte 8,99,9,17,25,24,19,33,35,51
                 .byte <_en16
                 .byte 0                 ; 1
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0,0,0,0,0 ; 17
 
 _en68           .text 9,"MoveBlock",200
                 .word moveblock         ; #85
                 .byte 3,18,18,12
-;
+
                 .byte <en0
                 .byte <_en18
                 .byte 0,0               ; 2
@@ -626,25 +659,25 @@ _en68           .text 9,"MoveBlock",200
                 .byte 0,0,0             ; 3
                 .byte <_en20
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0 ; 14
 
 _en24           .text 7,"PrintBD",200
                 .word prtbd             ; #70
                 .byte 2,138,138
-;
+
                 .byte <_en69
                 .byte 0,0,0,0,0,0,0,0   ; 8
                 .byte <_en71
 
-;
+
 ; .BYTE 0,0,0,0,0,0,0,0,0,0 ; 10
 
 _en62           .text 4,"Peek",202
                 .word peek              ; #73
                 .byte 1,12
-;
+
                 .byte <_en67
                 .byte 0,0,0             ; 3
                 .byte <_en40

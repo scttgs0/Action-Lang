@@ -21,20 +21,25 @@
 ;
 
 
-;
+;======================================
 ;PROC ChkErr=*(BYTE result, block, errCode)
 ; checks for error return from CIO
 ; Sets EOF(block) to true on error
 ; does not call Error if EOF error ($88)
 ; see Hardware manual for CIO details
+;======================================
 chkerr          .proc
                 bpl _ce2
+
                 cpy #$88                ; EOF
                 beq _ce1
+
                 tya
                 cpy #$80                ; break key
                 beq break1
+
                 jmp error
+
 _ce1            txa
                 lsr a
                 lsr a
@@ -55,20 +60,24 @@ _ce2
                 .endproc
 
 
-;    Break1(error)
-;    -------------
+;======================================
+;   Break1(error)
+;======================================
 break1          .proc
                 ldx #1
                 stx brkkey
                 pha
                 jsr break
+
                 pla
                 tay
 pfe             rts
                 .endproc
 
-;
+
+;======================================
 ;PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
+;--------------------------------------
 ; outputs a1-a5 to default device
 ; using format f.  Any non '%' char
 ; in f is output directly.  '%' char
@@ -82,7 +91,7 @@ pfe             rts
 ;    %E - output EOL
 ; any other char after % is treated
 ; the same as %U.
-;
+;======================================
 prtf            .proc
                 sta addr
                 stx addr+1
@@ -96,24 +105,30 @@ _pf1            lda args+2,x
                 sta temps,x
                 dex
                 bne _pf1
+
                 stx lsttoken
                 stx op
 _pf2            inc op
                 ldy op
                 cpy token
                 bcs break1.pfe
+
                 lda (addr),y
                 cmp #'%'
                 bne _pf3
+
                 inc op
                 iny
                 lda (addr),y
                 cmp #'%'
                 beq _pf3
+
                 cmp #'E'
                 bne _pf4
+
                 lda #eol
 _pf3            jsr put
+
                 jmp _pf2
 ;
 _pf4            ldy lsttoken
@@ -125,27 +140,34 @@ _pf4            ldy lsttoken
                 ldy args
                 cpy #'C'
                 beq _pf3
+
                 cpy #'S'
                 bne _pf5
+
                 jsr prt
                 jmp _pf2
+
 _pf5            cpy #'I'
                 bne _pf6
+
                 jsr prti
                 jmp _pf2
+
 _pf6            cpy #'H'
                 bne _pf7
+
                 jsr prth
                 jmp _pf2
+
 _pf7            jsr prtc
                 jmp _pf2
                 .endproc
 
 
-;
-;
+;======================================
 ;PROC Open(BYTE dev, STRING fileSpec, BYTE mode, aux2)
 ; opens fileSpec and assigns it to IOCB dev
+;======================================
 opn             .proc
                 pha
                 stx arg1
@@ -160,22 +182,26 @@ opn             .proc
                 iny
                 lda #eol
                 bne _op2                ; uncond.
+
 _op1            lda (arg1),y
 _op2            sta (buf),y
                 dey
                 bne _op1
+
                 pla
                 ldx buf
                 ldy buf+1
                 jsr open
+
                 jmp chkerr
+
                 .endproc
 
 
-;
-;
+;======================================
 ;PROC PrintE(STRING str)
 ; outputs str to default IOCB with EOL
+;======================================
 prte            .proc
                 stx arg1
                 tax
@@ -185,72 +211,89 @@ prte            .proc
     ; falls into PrintDE
                 .endproc
 
-;
+
+;======================================
 ;PROC PrintDE(BYTE dev, STRING str)
 ; outputs str to IOCB dev appended with an EOL
+;======================================
 prtde           .proc
                 jsr print
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC Close(BYTE dev)
 ; closes IOCB dev
+;======================================
 clos            .proc
                 jsr close
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC Print(STRING str)
 ; outputs str to default IOCB
+;======================================
 prt             .proc
                 stx arg1
                 tax
                 ldy arg1
                 lda device
-    ; falls into PrintD
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC PrintD(BYTE dev, STRING str)
 ; outputs str to IOCB dev
+;======================================
 prtd            .proc
                 jsr output
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC InputS(STRING str)
 ; same as InputSD, but uses default IOCB
+;======================================
 ins             .proc
                 stx arg2
                 tax
                 ldy arg2
                 lda device
-    ; falls into InputSD
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC InputSD(BYTE dev, STRING str)
 ; see Input, size set to 255
+;======================================
 insd            .proc
                 pha
                 lda #255
                 sta arg3
                 pla
-    ; falls into InputMD
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC InputMD(BYTE dev, STRING str, BYTE max)
 ; see Input, size set to max
+;======================================
 inmd            .proc
                 pha
                 stx arg1
@@ -260,24 +303,29 @@ inmd            .proc
                 sta (arg1),y
                 pla
                 ldy arg2
-    ; falls into InputD
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC InputD(BYTE dev, STRING str)
 ; inputs str from IOCB dev
 ; first byte must be set to maximum size
 ; on return, first byte set to size of string input
+;======================================
 ind             .proc
                 jsr rdbuf.inputs
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;BYTE FUNC GetD(BYTE dev)
 ; inputs character from IOCB dev
+;======================================
 getd            .proc
                 ldx #$07
 ccio            stx arg4
@@ -293,52 +341,63 @@ ccio            stx arg4
                 sta $0349,x
                 tya
                 jsr $e456
+
                 sta args
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PutE()
 ; output EOL do default IOCB
+;======================================
 pute            .proc
                 lda #eol
-    ; falls into Put
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC Put(CHAR ch)
 ; outputs ch to default IOCB
+;======================================
 put             .proc
                 tax
                 lda device
-    ; falls into PutD
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC PutD(BYTE dev, CHAR ch)
 ; outputs ch to IOCB dev
+;======================================
 putd            .proc
                 stx arg1
                 ldy arg1
 putd1           ldx #$0b
                 jmp getd.ccio
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PutDE(BYTE dev)
 ; outputs EOL to IOCD dev
+;======================================
 putde           .proc
                 ldy #eol
                 bne putd.putd1          ; uncond.
+
                 .endproc
 
 
-;
+;======================================
 ;PROC XIOstr(BYTE dev, fill, cmd, aux1, aux2, STRING str)
+;--------------------------------------
 ; see Hardware manual for CIO details
 ; performs system CIO call where:
 ;   ICCOM = cmd
@@ -348,106 +407,135 @@ putde           .proc
 ;   ICAX2 = aux2
 ; CIO is not called if str(0)=0
 ; ICAX1 and ICAX2 are not set if aux1=0
+;======================================
 xio             .proc
                 jsr xiostr
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintB(BYTE num)
 ; outputs byte num to default IOCB
+;======================================
 prtb            .proc
                 ldx #0
                 .endproc
 
 
+;======================================
 ;PROC PrintC(CARD num)
 ; outputs cardinal num to default IOCB
+;======================================
 prtc            .proc
                 jsr printc
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintBE(BYTE num)
 ; same as PrintB except EOL appended
+;======================================
 prtbe           .proc
                 ldx #0
                 .endproc
 
 
+;======================================
 ;PROC PrintCE(CARD num)
 ; same as PrintC except EOL appended
+;======================================
 prtce           .proc
                 jsr prtc
+
                 jmp pute
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintBD(BYTE dev, BYTE num)
 ; output byte num to IOCB dev
+;======================================
 prtbd           .proc
                 ldy #0
                 .endproc
 
 
+;======================================
 ;PROC PrintCD(BYTE dev, CARD num)
 ; output cardinal num to IOCB dev
+;======================================
 prtcd           .proc
                 sta arg0
                 txa
                 sty arg2
                 ldx arg2
                 jsr ctostr
+
                 lda arg0
                 jsr printc.pnum+2
+
                 jmp chkerr
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintBDE(BYTE dev, BYTE num)
 ; output num to IOCB dev with EOL
+;======================================
 prtbde          .proc
                 ldy #0
                 .endproc
 
 
+;======================================
 ;PROC PrintCDE(BYTE dev, CARD num)
 ; output num to IOCB dev with EOL
+;======================================
 prtcde          .proc
                 jsr prtcd
+
                 lda arg0
                 jmp putde
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintI(INT num)
 ; outputs integer num to default IOCB
+;======================================
 prti            .proc
                 stx arg2
                 tax
                 ldy arg2
                 lda device
-    ; falls into PrintID
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC PrintID(BYTE dev, INT num)
 ; outputs integer num to IOCB dev
+;======================================
 prtid           .proc
                 cpy #0
                 bpl prtcd
+
                 pha
                 stx arg1
                 sty arg2
                 ldy #'-'
                 jsr putd.putd1
+
                 sec
                 lda #0
                 sbc arg1
@@ -457,61 +545,75 @@ prtid           .proc
                 tay
                 pla
                 jmp prtcd
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintIE(INT num)
 ; same as PrintI with EOL
+;======================================
 prtie           .proc
                 jsr prti
+
                 jmp pute
+
                 .endproc
 
 
-;
+;======================================
 ;PROC PrintIDE(BYTE dev, INT num)
 ; same as PrintID with EOL
+;======================================
 prtide          .proc
                 jsr prtid
+
                 lda arg0
                 jmp putde
+
                 .endproc
 
 
-;
+;======================================
 ;PROC StrB(BYTE n, STRING s)
 ; convert number to string
+;======================================
 strb            .proc
                 stx arg2
                 sty arg3
                 ldx #0
                 ldy arg2
-    ; falls into StrC
                 .endproc
 
+                ;[fall-through]
 
-;
+
+;======================================
 ;PROC StrC(CARD n, STRING s)
 ; convert number to string
+;======================================
 strc            .proc
                 sty arg2
                 jsr ctostr
+
                 iny
 _strc1          lda numbuf,y
                 sta (arg2),y
                 dey
                 bpl _strc1
+
                 rts
                 .endproc
 
 
-;
+;======================================
 ;PROC StrI(INT n, STRING s)
 ; convert number to string
+;======================================
 stri            .proc
                 cpx #0
                 bpl strc
+
                 sta arg0
                 stx arg1
                 sty arg2
@@ -524,6 +626,7 @@ stri            .proc
                 tax
                 tya
                 jsr ctostr
+
                 inx
                 txa
                 tay
@@ -531,6 +634,7 @@ _s1             lda numbuf-1,y
                 sta (arg2),y
                 dey
                 bne _s1
+
                 txa
                 sta (arg2),y
                 iny
@@ -540,24 +644,27 @@ _s1             lda numbuf-1,y
                 .endproc
 
 
-;
+;======================================
 ;BYTE FUNC InputB()
 ;CARD FUNC InputC()
 ;INT FUNC InputI()
 ; input number from default IOCB
 ; number must be terminated with EOL
+;======================================
 inb
-inc:
+inc
 ini
                 lda    device
-    ; falls into InputND
+
+                ;[fall-through]
 
 
-;
+;======================================
 ;BYTE FUNC InputBD()
 ;CARD FUNC InputCD()
 ;INT FUNC InputID(BYTE dev)
 ; same as InputI, but from IOCB dev
+;======================================
 inbd
 incd
 inid
@@ -566,16 +673,19 @@ inid
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr ind
+
                 lda #<numbuf
                 ldx #>numbuf
-    ; falls into ValI
+
+                ;[fall-through]
 
 
-;
+;======================================
 ; BYTE FUNC ValB(STRING s)
 ; INT FUNC ValI(STRING s)
 ; CARD FUNC ValC(STRING s)
 ; returns numeric value of s
+;======================================
 valb
 vali
 valc
@@ -592,21 +702,27 @@ valc
                 iny
 _i1             cmp (arg4),y
                 bne _i2
+
                 iny
                 cpy arg3
                 bmi _i1
+
 _i2             lda (arg4),y
                 cmp #'-'
                 bne _i3
+
                 sta arg2
                 iny
 _i3             cpy arg3
                 bpl _i6
+
 _i4             lda (arg4),y
                 cmp #'0'
                 bmi _i6
+
                 cmp #':'                ; '9'+1
                 bpl _i6
+
                 sec
                 sbc #'0'
                 tax
@@ -631,12 +747,15 @@ _i4             lda (arg4),y
                 adc arg0                ; add in digit
                 sta arg0
                 bcc _i5
+
                 inc arg1
 _i5             iny
                 cpy arg3
                 bmi _i4
+
 _i6             lda arg2
                 beq _i7
+
                 sec
                 lda #0
                 sbc arg0
@@ -647,13 +766,14 @@ _i6             lda arg2
 _i7             rts
 
 
-;
+;======================================
 ;PROC Note(BYTE dev, CARD POINTER sector, BYTE POINTER offset)
 ; returns disk sector and offset in that
 ; sector of next byte to be read or
 ; written to IOCB dev
 ; example:  Note(1, @sect, @pos)
 ; see Hardware manual
+;======================================
 note            .proc
                 stx arg1
                 sty arg2
@@ -666,6 +786,7 @@ note            .proc
                 sta $0342,x             ; ICCOM
                 jsr $e456               ; CIOV
                 jsr chkerr
+
                 ldy #0
                 lda $034e,x             ; offset
                 sta (arg3),y
@@ -678,12 +799,13 @@ note            .proc
                 .endproc
 
 
-;
+;======================================
 ;PROC Point(BYTE dev, CARD sector, BYTE offset)
 ; Sets next byte to be read or written
 ; to be byte offset of sector.    File
 ; must be open for update (mode=12)
 ; see Hardware manual
+;======================================
 point           .proc
                 stx arg1
                 asl a
@@ -700,5 +822,7 @@ point           .proc
                 lda #$25                ; POINT
                 sta $0342,x             ; ICCOM
                 jsr $e456               ; CIOV
+
                 jmp chkerr
+
                 .endproc
