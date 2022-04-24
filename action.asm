@@ -24,7 +24,7 @@
 ;--------------------------------------
 
                 .include "equates_system_atari8.asm"
-                .include "edit.def.asm"
+                .include "editor/edit.def.asm"
 
                 * = $8000
                 .logical ml
@@ -43,19 +43,19 @@ amplfin
 ;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
                 .fill 4,$00
-                .include "edit.fnd.asm"
-                .include "edit.sub.asm"
-                .include "edit.tab.asm"
+                .include "editor/edit.fnd.asm"
+                .include "editor/edit.sub.asm"
+                .include "editor/edit.tab.asm"
 
 
 ;    "ACTION! 3.6 - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
                 .fill 3,$00
-                .include "ampl.seg.asm"
-                .include "ampl.pf.asm"
-                .include "ampl.arr.asm"
-                .include "ampl.cgu.asm"
+                .include "ampl/ampl.seg.asm"
+                .include "ampl/ampl.pf.asm"
+                .include "ampl/ampl.arr.asm"
+                .include "ampl/ampl.cgu.asm"
 
                 .fill 9,$00
                 .addr cstart
@@ -68,16 +68,16 @@ amplfin
 ;    ACTION! 3.6 - S.T.
 ;    ------------------
                 .logical ll
-                .include "ampl.mth.asm"
-                .include "ampl.sym.asm"
-                .include "lib.key.asm"
+                .include "ampl/ampl.mth.asm"
+                .include "ampl/ampl.sym.asm"
+                .include "library/lib.key.asm"
                 .include "spl.err.asm"
-                .include "lib.io.asm"
-                .include "lib.gr.asm"
-                .include "lib.msc.asm"
-                .include "lib.str.asm"
+                .include "library/lib.io.asm"
+                .include "library/lib.gr.asm"
+                .include "library/lib.msc.asm"
+                .include "library/lib.str.asm"
 
-                .include "lib.opt.asm"
+                .include "library/lib.opt.asm"
 
 cpyright
                 .text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00
@@ -105,19 +105,19 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 ;    --------------------
                 .logical el
                 .include "storage.mac.asm"
-                .include "edit.mem.asm"
-                .include "edit.car.asm"
-                .include "edit.man.asm"
-                .include "edit.chr.asm"
-                .include "edit.ini.asm"
-                .include "edit.io.asm"
-                .include "edit.wnd.asm"
-                .include "edit.dsp.asm"
-                .include "edit.cmd.asm"
-                .include "edit.tag.asm"
+                .include "editor/edit.mem.asm"
+                .include "editor/edit.car.asm"
+                .include "editor/edit.man.asm"
+                .include "editor/edit.chr.asm"
+                .include "editor/edit.ini.asm"
+                .include "editor/edit.io.asm"
+                .include "editor/edit.wnd.asm"
+                .include "editor/edit.dsp.asm"
+                .include "editor/edit.cmd.asm"
+                .include "editor/edit.tag.asm"
 
-                .include "ampl.mon.asm"
-                .include "ampl.ini.asm"
+                .include "ampl/ampl.mon.asm"
+                .include "ampl/ampl.ini.asm"
 
                 .text "ces",$00,$00
 
