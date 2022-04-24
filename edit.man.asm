@@ -21,11 +21,13 @@
 ;
 
 
+;======================================
 ; Main program for EDIT/FLASH
-
+;======================================
 floop           .proc
                 lda allocerr
                 beq _fm1
+
                 lda #<outmem
                 ldx #>outmem
                 jsr cmdmsg
@@ -35,8 +37,8 @@ _fm1            lda curch
                 jsr getkey
 
                 jsr einit.fcmsg1
-                lda curch
 
+                lda curch
                 ldy kbcode
                 cpy #$c0                ; Ctrl-Shft
                 bcs _fmcs
@@ -44,9 +46,12 @@ _fm1            lda curch
                 ldy lastch
                 cpy #$1b                ; escape
                 bne _fmch
+
                 cmp #eol
                 beq floop
+
                 jsr insrtch
+
                 jmp floop
 
 _fmcs           ldx #<fmcscmd
@@ -57,8 +62,13 @@ _fmch           ldx #<fmcmd
                 ldy #>fmcmd
 
 _fmlu           jsr lookup
+
                 jmp floop
+
                 .endproc
+
+;--------------------------------------
+;--------------------------------------
 
 fmcmd           .word disptb            ; default routine
                 .byte 50                ; table size
@@ -94,7 +104,6 @@ zap4            .byte $7e
                 .byte $9f
                 .word clrtab
                 .byte $9e
-
 
 fmcscmd         .word disptb+3          ; default
                 .byte 71                ; table size

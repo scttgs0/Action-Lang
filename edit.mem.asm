@@ -21,28 +21,35 @@
 ;
 
 
-;    GetMem(size)
-;    ------------
+;======================================
+;   GetMem(size)
+;======================================
 getmem          .proc
                 clc
                 adc #4
                 sta afsize
                 bcc _gm0
+
                 inx
 _gm0            stx afsize+1
 _gm1            jsr allocate+4
 
                 ldx afcur+1
                 beq gmerr               ; no memory allocated !
+
                 clc
                 lda afcur
                 adc #4
                 bcc _gm2
-                inx
 
+                inx
 _gm2            rts
                 .endproc
 
+
+;======================================
+;
+;======================================
 gmerr           .proc
                 ldy #0
                 jsr syserr
@@ -51,41 +58,51 @@ gmerr           .proc
                 ldx sparem+1
                 ldy allocerr
                 bne punt                ; really out of memory
+
                 inc allocerr
                 jsr free
+
                 jmp getmem._gm1         ; retry
 
 punt            jsr savewd              ; we're in big trouble
+
                 jmp rstwnd
+
                 .endproc
 
 
-;    FreeMem(addr)
-;    -------------
+;======================================
+;   FreeMem(addr)
+;======================================
 freemem         ;.proc
                 sec
                 sbc #4
                 bcs freem1
                 dex
 freem1          jmp free
+
                 ;.endproc
 
-;    InstB()
-;    -------
+
+;======================================
+;   InstB()
+;======================================
 instb           .proc
                 lda cur
                 sta arg3
                 lda cur+1
                 sta arg4
                 jsr instbuf
+
                 sta cur
                 stx cur+1
                 rts
                 .endproc
 
 
-;    InstBuf(,,up)
-;    -------------
+;======================================
+;   InstBuf(,,up)
+;======================================
 instbuf         .proc
                 ldy #0
                 lda (buf),y
@@ -94,8 +111,9 @@ instbuf         .proc
                 .endproc
 
 
-;    InstLn(sze,sloc,up)
-;    -------------------
+;======================================
+;   InstLn(sze,sloc,up)
+;======================================
 instln          ;.proc
                 sta arg0                ; save sze
                 stx arg1                ; save sloc
@@ -113,10 +131,12 @@ instln          ;.proc
                 sta arg6
                 ldy arg0
                 beq _il1a
+
 _il1            lda (arg1),y
                 sta (arg5),y
                 dey
                 bne _il1
+
 _il1a           lda arg0
                 sta (arg5),y
 
@@ -145,6 +165,7 @@ _il1a           lda arg0
 
 _il2            lda arg6
                 bne _il3                ; down # 0
+
                 lda afcur               ; bot _= AFcur
                 sta bot
                 ldx afcur+1
@@ -181,26 +202,31 @@ _il4            ldy #4
                 sta (afcur),y
 
                 jmp _il2
+
                 ;.endproc
 
 
-;    DelCur()
-;    --------
+;======================================
+;   DelCur()
+;======================================
 delcur          .proc
                 lda cur
                 ldx cur+1
                 jsr delln
+
                 sta cur
                 stx cur+1
 dln1            rts
                 .endproc
 
 
-;    DelLn(lineptr)
-;    --------------
+;======================================
+;   DelLn(lineptr)
+;======================================
 delln           .proc
                 cpx #0
                 beq delcur.dln1
+
                 sta arg0
                 stx arg1
                 ldy #4
@@ -218,6 +244,7 @@ delln           .proc
                 sta arg3
 
                 bne _dln2               ; up # 0
+
                 lda arg4
                 sta top                 ; top _= down
                 lda arg5
@@ -233,6 +260,7 @@ _dln2           ldy #4
 
 _dln3           lda arg5
                 bne _dln4               ; down # 0
+
                 lda arg2
                 sta bot                 ; bot _= up
                 lda arg3
