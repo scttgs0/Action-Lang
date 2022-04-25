@@ -16,19 +16,46 @@
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
+                .cpu "65816"
+
+;///  Platform  ///////////////////////
 
                 .enc "atari-screen-inverse"
                 .cdef " z", $A0
                 .enc "none"
 
+                ;.include "equates_system_atari8.asm"
+
 ;--------------------------------------
 
-                ;.include "equates_system_atari8.asm"
                 .include "equates_system_c256.asm"
+                .include "macros_frs_graphic.asm"
+
+;//////////////////////////////////////
+
+
+                .include "macros_65816.asm"
                 .include "editor/edit.def.asm"
 
-                * = $8000
-                .logical ml
+
+;======================================
+; Start of Code
+;======================================
+                * = $037FE0
+;--------------------------------------
+
+                clc
+                xce
+                .m8i8
+                .setdp $0000
+                .setbank $03
+                jmp cstart
+
+;--------------------------------------
+;--------------------------------------
+                * = $038000
+;--------------------------------------
+
 version         .byte $40
 date            .byte $04,$24,$22        ; assemble date of latest version!
 
@@ -58,17 +85,11 @@ amplfin
                 .include "ampl/ampl.arr.asm"
                 .include "ampl/ampl.cgu.asm"
 
-                .fill 9,$00
-                .addr cstart
-                .byte $00,$05           ; boot disk and start cart.
-                .addr rstbank.init
 
-                .endlogical
 
 
 ;    ACTION! - S.T.
 ;    ------------------
-                .logical ll
                 .include "ampl/ampl.mth.asm"
                 .include "ampl/ampl.sym.asm"
                 .include "library/lib.key.asm"
@@ -83,30 +104,19 @@ amplfin
 cpyright
                ;.text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00
                 .text "ACTION! (c)2022 GPL3            Foenix version  April 24, 2022    ",$00
-
-                * = ll+$0fff
-                .byte lbank
 doc
-                .endlogical
 
 ;    "ACTION! - Compiler
 ;    -----------------------
-                .logical cl
 main
                 .include "comp.main.asm"
 
 cright         ;.text "ACTION! (c)1983 Action Computer Services",$00,$00
                 .text "ACTION! (c)2022 GPL3      Foenix version",$00,$00
 
-                * = cl+$0fff
-                .byte cbank
-
-                .endlogical
-
 
 ;    ACTION! 3.6 - Editor
 ;    --------------------
-                .logical el
                 .include "storage.mac.asm"
                 .include "editor/edit.mem.asm"
                 .include "editor/edit.car.asm"
@@ -124,10 +134,5 @@ cright         ;.text "ACTION! (c)1983 Action Computer Services",$00,$00
 
                 .text "ces",$00,$00
 
-                * = el+$0fff
-                .byte $01
-
 editend
-                .endlogical
-
                 .end
