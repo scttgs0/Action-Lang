@@ -48,9 +48,9 @@ print           .proc
                 bne print1
 
                 lda #$0b
-                sta $0342,x ;!! IOCB0+ICCOM,x
+                sta $03_0342,x ;!! IOCB0+ICCOM,x
                 lda #eol
-                jmp $E456 ;!! CIOV
+                jmp $03_E456 ;!! CIOV
 
 print1          rts
                 .endproc
@@ -60,7 +60,7 @@ print1          rts
 ;   Close(device)
 ;======================================
 close           .proc
-                ldx #>ml
+                ldx #>$03_B000 ;!! ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
@@ -98,29 +98,29 @@ xiostr          .proc
                 asl a
                 tax
                 tya
-                sta $0342,x ;!! IOCB0+ICCOM,x       ; command
+                sta $03_0342,x ;!! IOCB0+ICCOM,x       ; command
                 lda arg3
                 beq _xs1
 
-                sta $034A,x ;!! IOCB0+ICAX1,x
+                sta $03_034A,x ;!! IOCB0+ICAX1,x
                 lda arg4
-                sta $034B,x ;!! IOCB0+ICAX2,x
+                sta $03_034B,x ;!! IOCB0+ICAX2,x
                 lda #0
 _xs1            tay
-                sta $0349,x ;!! IOCB0+ICBLH,x
+                sta $03_0349,x ;!! IOCB0+ICBLH,x
                 lda (arg5),y
-                sta $0348,x ;!! IOCB0+ICBLL,x       ; size
+                sta $03_0348,x ;!! IOCB0+ICBLL,x       ; size
 
                 beq print.print1        ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta $0344,x ;!! IOCB0+ICBAL,x       ; buffer address
+                sta $03_0344,x ;!! IOCB0+ICBAL,x       ; buffer address
                 lda arg6
                 adc #0
-                sta $0345,x ;!! IOCB0+ICBAH,x
-                jmp $E456 ;!! CIOV
+                sta $03_0345,x ;!! IOCB0+ICBAH,x
+                jmp $03_E456 ;!! CIOV
 
                 .endproc
 
@@ -178,7 +178,7 @@ _ds2            rts
 ;   RdBuf(device)
 ;======================================
 rdbuf           .proc
-    ; INC $02C8 ;!! COLOR4
+    ; INC $03_02C8 ;!! COLOR4
                 nop
                 nop
                 nop
@@ -192,7 +192,7 @@ rdbuf           .proc
 inputs          jsr input
 
                 sty arg0
-                lda $0348,x ;!! IOCB0+ICBLL,x       ; size
+                lda $03_0348,x ;!! IOCB0+ICBLL,x       ; size
                 beq _rb1
 
                 sec
@@ -267,7 +267,7 @@ sermsg          .text 7,"Error: "
 ctostr          .proc
                 sta fr0
                 stx fr0+1
-                jsr $D9AA ;!! IFP                 ; Cardinal to real
+                jsr $03_D9AA ;!! IFP                 ; Cardinal to real
 
                 .endproc
 
@@ -276,7 +276,7 @@ ctostr          .proc
 ;   RToStr() - real in FR0
 ;======================================
 rtostr          ;.proc
-                jsr $D8E6 ;!! FASC
+                jsr $03_D8E6 ;!! FASC
 
                 ldy #$ff
                 ldx #0
@@ -298,8 +298,8 @@ _rts1           iny
 ;======================================
 dspoff          .proc
                 lda tvdisp
-                sta $022F ;!! SDMCTL
-                sta $D400 ;!! DMACTL
+                sta $03_022F ;!! SDMCTL
+                sta $03_D400 ;!! DMACTL
                 rts
                 .endproc
 
@@ -309,10 +309,10 @@ dspoff          .proc
 ;======================================
 dspon           .proc
                 lda #$22
-                sta $022F ;!! SDMCTL
-                sta $D400 ;!! DMACTL
+                sta $03_022F ;!! SDMCTL
+                sta $03_D400 ;!! DMACTL
                 lda bckgrnd             ; background color
-                sta $02C8 ;!! COLOR4              ; restore background
+                sta $03_02C8 ;!! COLOR4              ; restore background
                 rts
                 .endproc
 
@@ -448,7 +448,7 @@ _htcok          sta arg5
 ;   RToCar()
 ;======================================
 rtocar          .proc
-                jsr $D9D2 ;!! FPI
+                jsr $03_D9D2 ;!! FPI
                 bcs rcerr
 
 htcrtn          lda fr0
@@ -469,7 +469,7 @@ storeal         .proc
                 sty cix
                 sta inbuff
                 stx inbuff+1
-                jmp $D800 ;!! AFP
+                jmp $03_D800 ;!! AFP
 
                 .endproc
 

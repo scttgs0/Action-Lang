@@ -27,7 +27,7 @@
 emjmps          rts                     ; Seg catch all
 
                 .word 0
-                .byte ebank             ; curBank
+                .byte $03 ;!! ebank     ; curBank
                 .byte $df               ; stMask
                 jmp splerr              ; Error
 
@@ -51,12 +51,12 @@ zero            .word 0
                 jmp scrbell             ; Alarm
 
                 .byte 0                 ; EOLch (default = space)
-ltab            .word lsh1._lshift      ; LSH
-                .word rshift
-                .word multi
-                .word divi
-                .word remi
-                .word sargs
+ltab            .addr lsh1._lshift      ; LSH
+                .addr rshift
+                .addr multi
+                .addr divi
+                .addr remi
+                .addr sargs
                 .byte $60               ; ChCvt3
                 .byte $22               ; tvDisp
 
@@ -70,7 +70,7 @@ serial          .word $0A00             ; serial number of ROM
 
                 .byte $86
                 .byte $9d
-                .word istmres           ; STMrAdr in EDIT.DEF
+                .addr istmres           ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -95,7 +95,7 @@ _w1             jmp gmerr.punt          ; editor
 
 cold            lda #0
                 tay
-_c0             sta $0480,y             ; zero RAM
+_c0             sta $03_0480,y             ; zero RAM
                 dey
                 bne _c0
 

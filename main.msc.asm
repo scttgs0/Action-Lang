@@ -223,7 +223,7 @@ _mnundec        lda #1
                 beq _varerr
 
                 tay
-                sta bank+lbank
+                sta $03_D500 ;!! bank+lbank
                 lda #1
                 jsr gprop
                 jsr rstbank
@@ -430,7 +430,7 @@ _c1             lda stbase
                 cmp qcode+1
                 bcs alpha._alpha2       ; return
 
-cderr           sta bank+ebank
+cderr           sta $03_D503 ;!! bank+ebank
                 jsr splsetup            ; reset compiler
 
                 ldy #cder               ; out of qcode space

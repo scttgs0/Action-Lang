@@ -57,8 +57,8 @@ graphics        .proc                   ; Graphics(mode)
 
 _e              .text 2,"E:",eol
 _devs           .text 2,"S:",eol
-_color          = $02FD
-_atachr         = $02FB
+_color          = $03_02FD
+_atachr         = $03_02FB
                 .endproc
 
 
@@ -149,8 +149,8 @@ setcolor        .proc
                 asl a
                 ora arg2
                 ldx arg0
-                sta $02C4,x ;!! COLOR0,x
-                sta $D016,x ;!! COLPF0,x
+                sta $03_02C4,x ;!! COLOR0,x
+                sta $03_D016,x ;!! COLPF0,x
 _sc1            rts
                 .endproc
 

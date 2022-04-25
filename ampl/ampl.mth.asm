@@ -273,7 +273,9 @@ sargs           .proc                   ; saves args for call
                 iny
                 lda (afcur),y           ; # of bytes
                 tay
-_sa1            lda args,y
+_sa1            .databank $00
+                lda args,y
+                .databank $03
                 sta (aflast),y
                 dey
                 bpl _sa1
@@ -306,7 +308,7 @@ _sa2            rts
 ;RToInt LDA FR0
 ; STA _sign
 ; JSR _FSign
-; JSR $D9D2 ;!! FPI
+; JSR $03_D9D2 ;!! FPI
 ; LDA FR0
 ; LDA FR0+1
 ; JMP _SetSign

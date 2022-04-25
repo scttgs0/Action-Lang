@@ -188,195 +188,195 @@ _sa5            txa
 ;======================================
 
 ;:EN6 .BYTE 6,"PrintF",200
-; .WORD PrtF ; #117
+; .addr PrtF ; #117
 ; .BYTE 6,17,12,12,12,12,12
 
 _en7            .text 4,"Open",200
-                .word opn               ; #96
+                .addr opn               ; #96
                 .byte 4,138,17,138,138
 _en8            .text 6,"PrintE",200
-                .word prte              ; #116
+                .addr prte              ; #116
                 .byte 1,17
 _en9            .text 7,"PrintDE",200
-                .word prtde             ; #75
+                .addr prtde             ; #75
                 .byte 2,138,17
 _en10           .text 5,"Close",200
-                .word clos              ; #253
+                .addr clos              ; #253
                 .byte 1,138
 _en11           .text 5,"Print",200
-                .word prt               ; #135
+                .addr prt               ; #135
                 .byte 1,17
 _en12           .text 6,"PrintD",200
-                .word prtd              ; #115
+                .addr prtd              ; #115
                 .byte 2,138,17
 _en13           .text 6,"InputS",200
-                .word ins               ; #249
+                .addr ins               ; #249
                 .byte 1,17
 _en14           .text 7,"InputSD",200
-                .word insd              ; #87
+                .addr insd              ; #87
                 .byte 2,138,17
 _en15           .text 7,"InputMD",200
-                .word inmd              ; #75
+                .addr inmd              ; #75
                 .byte 3,138,17,138
 _en16           .text 4,"GetD",202
-                .word getd              ; #138
+                .addr getd              ; #138
                 .byte 1,138
 _en17           .text 4,"PutE",200
-                .word pute              ; #162
+                .addr pute              ; #162
                 .byte 0
 _en18           .text 3,"Put",200
-                .word put               ; #158
+                .addr put               ; #158
                 .byte 1,137
 _en19           .text 4,"PutD",200
-                .word putd              ; #161
+                .addr putd              ; #161
                 .byte 2,138,137
 _en20           .text 5,"PutDE",200
-                .word putde             ; #168
+                .addr putde             ; #168
                 .byte 1,138
 _en21           .text 3,"XIO",200
-                .word xio               ; #225
+                .addr xio               ; #225
                 .byte 6,138,138,138,138,138,17
 _en22           .text 6,"PrintB",200
-                .word prtb              ; #113
+                .addr prtb              ; #113
                 .byte 1,138
 _en23           .text 7,"PrintBE",200
-                .word prtbe             ; #71
+                .addr prtbe             ; #71
                 .byte 1,138
 
 ;:EN24 .BYTE 7,"PrintBD",200
-; .WORD PrtBD ; #70
+; .addr PrtBD ; #70
 ; .BYTE 2,138,138
 
 _en25           .text 8,"PrintBDE",200
-                .word prtbde            ; #241
+                .addr prtbde            ; #241
                 .byte 2,138,138
 _en26           .text 6,"PrintC",200
-                .word prtc              ; #114
+                .addr prtc              ; #114
                 .byte 1,12
 _en27           .text 7,"PrintCE",200
-                .word prtce             ; #73
+                .addr prtce             ; #73
                 .byte 1,12
 _en28           .text 7,"PrintCD",200
-                .word prtcd             ; #72
+                .addr prtcd             ; #72
                 .byte 2,138,12
 _en29           .text 8,"PrintCDE",200
-                .word prtcde            ; #245
+                .addr prtcde            ; #245
                 .byte 2,138,12
 _en30           .text 6,"PrintI",200
-                .word prti              ; #120
+                .addr prti              ; #120
                 .byte 1,11
 _en31           .text 7,"PrintID",200
-                .word prtid             ; #84
+                .addr prtid             ; #84
                 .byte 2,138,11
 _en32           .text 7,"PrintIE",200
-                .word prtie             ; #85
+                .addr prtie             ; #85
                 .byte 1,11
 _en33           .text 8,"PrintIDE",200
-                .word prtide            ; #13
+                .addr prtide            ; #13
                 .byte 2,138,11
 _en34           .text 6,"InputB",202
-                .word input_b           ; #232
+                .addr input_b           ; #232
                 .byte 0
 _en35           .text 7,"InputBD",202
-                .word inbd              ; #53
+                .addr inbd              ; #53
                 .byte 1,138
 _en36           .text 6,"InputI",203
-                .word input_i           ; #239
+                .addr input_i           ; #239
                 .byte 0
 _en37           .text 7,"InputID",203
-                .word inid              ; #67
+                .addr inid              ; #67
                 .byte 1,138
 _en38           .text 6,"InputC",204
-                .word input_c           ; #233
+                .addr input_c           ; #233
                 .byte 0
 _en39           .text 7,"InputCD",204
-                .word incd              ; #55
+                .addr incd              ; #55
                 .byte 1,138
 _en40           .text 4,"ValB",202
-                .word valb              ; #207
+                .addr valb              ; #207
                 .byte 1,17
 _en41           .text 4,"ValI",203
-                .word vali              ; #214
+                .addr vali              ; #214
                 .byte 1,17
 _en42           .text 4,"ValC",204
-                .word valc              ; #208
+                .addr valc              ; #208
                 .byte 1,17
 _en43           .text 4,"StrB",200
-                .word strb              ; #223
+                .addr strb              ; #223
                 .byte 2,138,17
 _en44           .text 4,"StrI",200
-                .word stri              ; #230
+                .addr stri              ; #230
                 .byte 2,11,17
 _en45           .text 4,"StrC",200
-                .word strc              ; #224
+                .addr strc              ; #224
                 .byte 2,12,17
 _en46           .text 4,"Note",200
-                .word note              ; #89
+                .addr note              ; #89
                 .byte 3,138,20,18
 _en47           .text 5,"Point",200
-                .word point             ; #110
+                .addr point             ; #110
                 .byte 3,138,12,138
 _en48           .text 8,"Graphics",200
-                .word graphics          ; #108
+                .addr graphics          ; #108
                 .byte 1,138
 _en49           .text 6,"DrawTo",200
-                .word drawto            ; #231
+                .addr drawto            ; #231
                 .byte 2,12,138
 _en50           .text 8,"Position",200
-                .word position          ; #94
+                .addr position          ; #94
                 .byte 2,12,138
 _en51           .text 6,"Locate",202
-                .word locate            ; #97
+                .addr locate            ; #97
                 .byte 2,12,138
 _en52           .text 4,"Plot",200
-                .word plot              ; #131
+                .addr plot              ; #131
                 .byte 2,12,138
 _en53           .text 8,"SetColor",200
-                .word setcolor          ; #6
+                .addr setcolor          ; #6
                 .byte 3,138,138,138
 _en54           .text 4,"Fill",200
-                .word fill              ; #122
+                .addr fill              ; #122
                 .byte 2,12,138
 _en55           .text 4,"Rand",202
-                .word rand              ; #117
+                .addr rand              ; #117
                 .byte 1,138
 _en56           .text 5,"Sound",200
-                .word sound             ; #31
+                .addr sound             ; #31
                 .byte 4,138,138,138,138
 _en57           .text 6,"SndRst",200
-                .word sndrst            ; #73
+                .addr sndrst            ; #73
                 .byte 0
 _en58           .text 6,"Paddle",202
-                .word paddle            ; #254
+                .addr paddle            ; #254
                 .byte 1,138
 _en59           .text 5,"PTrig",202
-                .word ptrig             ; #164
+                .addr ptrig             ; #164
                 .byte 1,138
 _en60           .text 5,"Stick",202
-                .word stick             ; #8
+                .addr stick             ; #8
                 .byte 1,138
 _en61           .text 5,"STrig",202
-                .word strig             ; #52
+                .addr strig             ; #52
                 .byte 1,138
 
 ;:EN62 .BYTE 4,"Peek",202
-; .WORD Peek ; #73
+; .addr Peek ; #73
 ; .BYTE 1,12
 ;:EN63 .BYTE 5,"PeekC",204
-; .WORD PeekC ; #245
+; .addr PeekC ; #245
 ; .BYTE 1,12
 
 _en64           .text 4,"Poke",200
-                .word poke              ; #120
+                .addr poke              ; #120
                 .byte 2,12,138
 _en65           .text 5,"PokeC",200
-                .word pokec             ; #83
+                .addr pokec             ; #83
                 .byte 2,12,12
 _en66           .text 4,"Zero",200
-                .word mzero             ; #88
+                .addr mzero             ; #88
                 .byte 2,18,12
 _en67           .text 8,"SetBlock",200
-                .word setblock          ; #203
+                .addr setblock          ; #203
                 .byte 3,18,12,138
 
 ;:EN68 .BYTE 9,"MoveBlock",200
@@ -384,18 +384,18 @@ _en67           .text 8,"SetBlock",200
 ; .BYTE 3,18,18,12
 
 _en69           .text 5,"Break",200
-                .word break             ; #183
+                .addr break             ; #183
 _en70           .text 8,"SCompare",203
-                .word scompare          ; #92
+                .addr scompare          ; #92
                 .byte 2,17,17
 _en71           .text 5,"SCopy",200
-                .word scopy             ; #192
+                .addr scopy             ; #192
                 .byte 2,17,17
 _en72           .text 6,"SCopyS",200
-                .word scopys            ; #244
+                .addr scopys            ; #244
                 .byte 4,17,17,138,138
 _en73           .text 7,"SAssign",200
-                .word sassign           ; #23
+                .addr sassign           ; #23
                 .byte 4,17,17,138,138
 
 
@@ -539,7 +539,7 @@ libst           .byte 0                 ; 1
 ;======================================
 strig           .proc
                 tax
-                lda $D010,x ;!! TRIG0,x
+                lda $03_D010,x ;!! TRIG0,x
                 sta args
                 rts
                 .endproc
@@ -555,7 +555,7 @@ strig           .proc
 ;======================================
 paddle          .proc
                 tax
-                lda $0270,x ;!! PADDL0,x
+                lda $03_0270,x ;!! PADDL0,x
                 sta args
                 rts
                 .endproc
@@ -571,7 +571,7 @@ paddle          .proc
 ; .BYTE 0,0,0,0,0,0,0,0,0               ; 17
 
 _en6            .text 6,"PrintF",200
-                .word prtf        ; #117
+                .addr prtf        ; #117
                 .byte 6,17,12,12,12,12,12
 ;
                 .byte <_en61
@@ -583,7 +583,7 @@ _en6            .text 6,"PrintF",200
 ; .BYTE 0                               ; 11
 
 _en63           .text 5,"PeekC",204
-                .word peekc             ; #245
+                .addr peekc             ; #245
                 .byte 1,12
 
                 .byte <_en37
@@ -646,7 +646,7 @@ copyright       .byte 8,99,9,17,25,24,19,33,35,51
 ; .BYTE 0,0,0,0,0,0,0,0 ; 17
 
 _en68           .text 9,"MoveBlock",200
-                .word moveblock         ; #85
+                .addr moveblock         ; #85
                 .byte 3,18,18,12
 
                 .byte <en0
@@ -664,7 +664,7 @@ _en68           .text 9,"MoveBlock",200
 ; .BYTE 0,0,0,0 ; 14
 
 _en24           .text 7,"PrintBD",200
-                .word prtbd             ; #70
+                .addr prtbd             ; #70
                 .byte 2,138,138
 
                 .byte <_en69
@@ -675,7 +675,7 @@ _en24           .text 7,"PrintBD",200
 ; .BYTE 0,0,0,0,0,0,0,0,0,0 ; 10
 
 _en62           .text 4,"Peek",202
-                .word peek              ; #73
+                .addr peek              ; #73
                 .byte 1,12
 
                 .byte <_en67

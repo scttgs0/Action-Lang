@@ -66,19 +66,19 @@ putch           .proc
                 tay
                 lda #0
                 tax
-putch1          stx $02FE ;!! DSPFLG
+putch1          stx $03_02FE ;!! DSPFLG
                 asl a
                 asl a
                 asl a
                 asl a
                 tax
                 lda #$0b                ; PUTCHR
-putch2          sta $0342,x ;!! IOCB0+ICCOM,x
+putch2          sta $03_0342,x ;!! IOCB0+ICCOM,x
                 lda #0
-                sta $0348,x ;!! IOCB0+ICBLL,x
-                sta $0349,x ;!! IOCB0+ICBLH,x
+                sta $03_0348,x ;!! IOCB0+ICBLL,x
+                sta $03_0349,x ;!! IOCB0+ICBLH,x
                 tya
-                jmp $E456 ;!! CIOV
+                jmp $03_E456 ;!! CIOV
 
                 .endproc
 
@@ -736,33 +736,33 @@ _lbuf           lda buf
 ;--------------------------------------
 ;--------------------------------------
 
-lexcmd          .word getnext.getnr2
+lexcmd          .addr getnext.getnr2
                 .byte 41
-                .word lexdig
+                .addr lexdig
                 .byte digit-$80
-                .word lexhex
+                .addr lexhex
                 .byte hex
-                .word lexeq
+                .addr lexeq
                 .byte grid
-                .word lexne
+                .addr lexne
                 .byte lsid
-                .word lexexpand
+                .addr lexexpand
                 .byte defid
-                .word lexcom
+                .addr lexcom
                 .byte scolon
-                .word lexchr
+                .addr lexchr
                 .byte squote
-                .word lexpf
+                .addr lexpf
                 .byte proc
-                .word lexpf
+                .addr lexpf
                 .byte func
-                .word lexpf
+                .addr lexpf
                 .byte modid
-                .word lexstr
+                .addr lexstr
                 .byte quote
-                .word lexget
+                .addr lexget
                 .byte get
-                .word lexset
+                .addr lexset
                 .byte set
 
 lexchars

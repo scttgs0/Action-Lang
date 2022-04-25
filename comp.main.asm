@@ -64,8 +64,8 @@ _spl2           jsr getnext
                 lda #1                  ; save run address
                 jsr cprop
 
-                sta $02E2 ;!! INITAD
-                stx $02E3 ;!! INITAD+1
+                sta $03_02E2 ;!! INITAD
+                stx $03_02E3 ;!! INITAD+1
 
     ; insert return, just in case
 _rtn            lda #$60                ; RTS
@@ -119,17 +119,17 @@ _spl3           ldy #1
 ; BNE _SPL3
 
                 lda qcode
-                cmp $02E5 ;!! MEMTOP
+                cmp $03_02E5 ;!! MEMTOP
                 lda qcode+1
-                sbc $02E6 ;!! MEMTOP+1
+                sbc $03_02E6 ;!! MEMTOP+1
                 bcs enderr._spl5
 
 _splrtn         rts
 
 _spl4           jsr getcdoff            ; no main PROC
 
-                sta $02E2 ;!! INITAD
-                stx $02E3 ;!! INITAD+1
+                sta $03_02E2 ;!! INITAD
+                stx $03_02E3 ;!! INITAD+1
                 jsr stmtlist
 
                 cmp #eofid
@@ -1724,19 +1724,19 @@ _sl0            sta temps-1,x
 ;--------------------------------------
 ;--------------------------------------
 
-stmtlst         .word smtend            ; not found
+stmtlst         .addr smtend            ; not found
                 .byte 20                ; #entries*3 - 1
-                .word ifstmt
+                .addr ifstmt
                 .byte ifid
-                .word forstmt
+                .addr forstmt
                 .byte forid
-                .word whstmt
+                .addr whstmt
                 .byte whileid
-                .word retstmt
+                .addr retstmt
                 .byte retid
-                .word dostmt
+                .addr dostmt
                 .byte do
-                .word exitstmt
+                .addr exitstmt
                 .byte exitid
 
 
@@ -3174,38 +3174,38 @@ cgopscd         .byte $18,$61           ; CLC ADC
                 .byte $f0,$d0           ; BEQ BNE
 
 cgops           .byte 0
-                .word cgadd
+                .addr cgadd
                 .byte 2
-                .word cgadd             ; minus
+                .addr cgadd             ; minus
                 .byte 4
-                .word cgmul             ; multiply
+                .addr cgmul             ; multiply
                 .byte 6
-                .word cgmul.cgdiv       ; divide
+                .addr cgmul.cgdiv       ; divide
                 .byte 5
-                .word cgor
+                .addr cgor
                 .byte 4
-                .word cgand
+                .addr cgand
                 .byte 10
-                .word cgeq
+                .addr cgeq
                 .byte 11
-                .word cgeq.cgne
+                .addr cgeq.cgne
                 .byte 6
-                .word cggr
+                .addr cggr
                 .byte 8
-                .word cgls.cgge
+                .addr cgls.cgge
                 .byte 6
-                .word cgls
+                .addr cgls
                 .byte 8
-                .word cggr.cgle
+                .addr cggr.cgle
                 .byte 8
-                .word cgmul.cgdiv       ; remainder
+                .addr cgmul.cgdiv       ; remainder
                 .byte 3
-                .word cgadd.cgadd1      ; XOR
+                .addr cgadd.cgadd1      ; XOR
                 .byte 0
-                .word cgshift           ; LSH
+                .addr cgshift           ; LSH
                 .byte 2
-                .word cgshift           ; RSH
+                .addr cgshift           ; RSH
                 .byte 12
-                .word cgum              ; unary minus
+                .addr cgum              ; unary minus
                 .byte 0
-                .word cgat
+                .addr cgat

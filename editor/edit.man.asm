@@ -39,7 +39,7 @@ _fm1            lda curch
                 jsr einit.fcmsg1
 
                 lda curch
-                ldy $02F2 ;!! CH1
+                ldy $03_02F2 ;!! CH1
                 cpy #$c0                ; Ctrl-Shft
                 bcs _fmcs
 
@@ -70,88 +70,88 @@ _fmlu           jsr lookup
 ;--------------------------------------
 ;--------------------------------------
 
-fmcmd           .word disptb            ; default routine
+fmcmd           .addr disptb            ; default routine
                 .byte 50                ; table size
-                .word scrlup
+                .addr scrlup
                 .byte $1c
-                .word scrldwn
+                .addr scrldwn
                 .byte $1d
-                .word scrlrt
+                .addr scrlrt
                 .byte $1f
-                .word scrllft
+                .addr scrllft
 zap2            .byte $1e
-                .word delch
+                .addr delch
 zap3            .byte $fe
-                .word backsp
+                .addr backsp
 zap4            .byte $7e
-                .word insrtch
+                .addr insrtch
                 .byte $60
-                .word insrtsp
+                .addr insrtsp
                 .byte $ff
-                .word return
+                .addr return
                 .byte eol
-                .word tab
+                .addr tab
                 .byte $7f
-                .word delete
+                .addr delete
                 .byte $9c
-                .word botln.escape
+                .addr botln.escape
                 .byte $1b
-                .word clear
+                .addr clear
                 .byte $7d
-                .word insrt
+                .addr insrt
                 .byte $9d
-                .word settab
+                .addr settab
                 .byte $9f
-                .word clrtab
+                .addr clrtab
                 .byte $9e
 
-fmcscmd         .word disptb+3          ; default
+fmcscmd         .addr disptb+3          ; default
                 .byte 71                ; table size
-                .word front
+                .addr front
                 .byte $f6
-                .word back
+                .addr back
                 .byte $f7
-                .word pgup
+                .addr pgup
                 .byte $ce
-                .word pgdwn
+                .addr pgdwn
                 .byte $cf
-                .word indntl
+                .addr indntl
                 .byte $e0
-                .word indntr
+                .addr indntr
                 .byte $e2
-                .word fread
+                .addr fread
                 .byte $e8
-                .word fwrite
+                .addr fwrite
                 .byte $ee
-                .word paste
+                .addr paste
                 .byte $ca
-                .word insrtt
+                .addr insrtt
                 .byte $cd
-                .word monitor
+                .addr monitor
                 .byte $e5
-                .word find
+                .addr find
                 .byte $f8
-                .word subst
+                .addr subst
                 .byte $fe
-                .word wind1
+                .addr wind1
                 .byte $df
-                .word wind2
+                .addr wind2
                 .byte $de
-                .word delwd
+                .addr delwd
                 .byte $fa
-                .word csbs
+                .addr csbs
                 .byte $f4
-                .word csret
+                .addr csret
                 .byte $cc
-                .word undo
+                .addr undo
                 .byte $cb
-                .word topln
+                .addr topln
                 .byte $f9
-                .word endln
+                .addr endln
                 .byte $ea
-                .word settag
+                .addr settag
                 .byte $ed
-                .word loctag
+                .addr loctag
                 .byte $fd
 
 outmem          .text 14," "

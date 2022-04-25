@@ -150,7 +150,7 @@ fwrite          .proc
 
 _fw1            jsr ldbuf
 
-    ; INC $02C8 ;!! COLOR4 ; let user know we're here
+    ; INC $03_02C8 ;!! COLOR4 ; let user know we're here
                 nop
                 nop
                 nop
@@ -285,7 +285,7 @@ keybd           .text 2,"K:"
 ;======================================
 gotkey          .proc
     ; Test if key in buffer
-                lda $02FC ;!! CH_                 ; key down?
+                lda $03_02FC ;!! CH_                 ; key down?
                 eor #$ff
                 rts
                 .endproc

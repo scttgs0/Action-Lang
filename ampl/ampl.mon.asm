@@ -27,6 +27,7 @@
 ;======================================
 monitor         .proc
                 jsr savworld
+
                 lda delbuf              ; delete buffer bottom
                 ldx delbuf+1
                 jsr delfree             ; get rid of delete buf
@@ -137,7 +138,7 @@ _md2            lda arg11
                 beq _md1
 
                 ldx #$ff
-                stx $02FC ;!! CH_
+                stx $03_02FC ;!! CH_
                 cmp #$de
                 bne _md1
 
@@ -238,8 +239,8 @@ mrun            .proc
 
                 jsr comp
 
-_mr1            lda $02E2 ;!! INITAD
-                ldx $02E3 ;!! INITAD+1
+_mr1            lda $03_02E2 ;!! INITAD
+                ldx $03_02E3 ;!! INITAD+1
                 bne _mr3
 
 _mwrt1          rts
@@ -261,7 +262,7 @@ mwrite          .proc                   ; write object file
                 cmp #quote
                 bne mrun._mwrt1         ; no output file!
 
-                lda $02E3 ;!! INITAD+1
+                lda $03_02E3 ;!! INITAD+1
                 beq mrun._mwrt1         ; no program!!
 
                 lda #1
@@ -300,19 +301,19 @@ _mw2            dec arg14
     ; write the qcode
                 ldx #$10
                 lda #$0b                ; output command
-                sta $0342,x ;!! IOCB0+ICCOM,x
+                sta $03_0342,x ;!! IOCB0+ICCOM,x
 
                 lda codebase
-                sta $0344,x ;!! IOCB0+ICBAL,x       ; buffer address
+                sta $03_0344,x ;!! IOCB0+ICBAL,x       ; buffer address
                 lda codebase+1
-                sta $0345,x ;!! IOCB0+ICBAH,x
+                sta $03_0345,x ;!! IOCB0+ICBAH,x
 
                 lda codesize
-                sta $0348,x ;!! IOCB0+ICBLL,x       ; size
+                sta $03_0348,x ;!! IOCB0+ICBLL,x       ; size
                 lda codesize+1
-                sta $0349,x ;!! IOCB0+ICBLH,x
+                sta $03_0349,x ;!! IOCB0+ICBLH,x
 
-                jsr $E456 ;!! CIOV
+                jsr $03_E456 ;!! CIOV
                 bmi mwout._mwerr
 
     ; save start address
@@ -322,9 +323,9 @@ _mw3            lda _mwinit,x
                 dex
                 bpl _mw3
 
-                lda $02E2 ;!! INITAD
+                lda $03_02E2 ;!! INITAD
                 sta arg14
-                lda $02E3 ;!! INITAD+1
+                lda $03_02E3 ;!! INITAD+1
                 sta arg15
                 jsr mwout
 
@@ -335,8 +336,8 @@ _mw3            lda _mwinit,x
 ;--------------------------------------
 
 _mwinit         .byte 6
-                .word $02E2 ;!! INITAD
-                .word $02E3 ;!! INITAD+1
+                .addr $03_02E2 ;!! INITAD
+                .addr $03_02E3 ;!! INITAD+1
                 .endproc
 
 
@@ -470,33 +471,33 @@ _ph3            tay
 ;--------------------------------------
 ;--------------------------------------
 
-mcmd            .word disptb+9          ; unknown cmd
+mcmd            .addr disptb+9          ; unknown cmd
                 .byte 35                ; table size
-                .word boot
+                .addr boot
                 .byte 'b'
-                .word comp
+                .addr comp
                 .byte 'c'
-                .word dret
+                .addr dret
                 .byte 'd'
-                .word monitor._mquit
+                .addr monitor._mquit
                 .byte 'e'
 
 ; .WORD Format
 ; .BYTE 'f
 
-                .word options
+                .addr options
                 .byte 'o'
-                .word proceed
+                .addr proceed
                 .byte 'p'
-                .word mrun
+                .addr mrun
                 .byte 'r'
-                .word mwrite
+                .addr mwrite
                 .byte 'w'
-                .word mwout._mx
+                .addr mwout._mx
                 .byte 'x'
-                .word mprint
+                .addr mprint
                 .byte '?'
-                .word mdump
+                .addr mdump
                 .byte '*'
 
 monitorPrompt   .byte 1,">"
