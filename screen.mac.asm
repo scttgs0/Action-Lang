@@ -25,19 +25,21 @@
 ;
 ;======================================
 scrinit         .proc
-                lda #0
-                jsr close               ; close #0, sets X to 0
+                .frsGraphics mcTextOn,mcVideoMode640    ; 80x60 text mode
 
-                lda #$0c
-                sta arg3
-                lda #0
-                ldx #<scred
-                ldy #>scred
-                jmp open
+                ; lda #0
+                ; jsr close               ; close #0, sets X to 0
+
+                ; lda #$0c
+                ; sta arg3
+                ; lda #0
+                ; ldx #<scred
+                ; ldy #>scred
+                ; jmp open
 
 ;--------------------------------------
 
-scred           .text 2,"E:",$9b
+; scred           .text 2,"E:",$9b
                 .endproc
 
 

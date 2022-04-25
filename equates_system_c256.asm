@@ -19,6 +19,8 @@ JOYSTICK0               = $AF_E800              ; (R) Joystick 0 - J7 (next to S
 SIO_JOY                 = $AF_1200
 
 FONT_MEMORY_BANK0       = $AF_8000              ; $AF8000 - $AF87FF
+CS_TEXT_MEM_PTR         = $AF_A000
+CS_COLOR_MEM_PTR        = $AF_C000
 
 MASTER_CTRL_REG_L	    = $AF_0000
 mcTextOn            = $01                       ; Enable the Text Mode

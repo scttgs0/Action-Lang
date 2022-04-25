@@ -1,4 +1,4 @@
-graphics        .macro
+frsGraphics     .macro
                 lda #\1
                 sta MASTER_CTRL_REG_L
 
@@ -6,12 +6,12 @@ graphics        .macro
                 sta MASTER_CTRL_REG_H
                 .endmacro
 
-graphics_s      .macro
+frsGraphics_s   .macro
                 pha
                 php
 
                 .m8
-                .graphics \@
+                .frsGraphics \@
 
                 plp
                 pla
