@@ -94,9 +94,10 @@ _lx1            jmp push2
 
 _lxc            lda (stack),y
 
-; TAX
-; LDA #$A2 ; LDX data
-; BNE _LX1
+        ; tax
+        ; lda #$A2
+        ; ldx data
+        ; bne _LX1
 
                 sta arg12
                 pla
@@ -174,13 +175,13 @@ _opa            bit cnstmode
 
                 jsr loady
 
-; LDA arg7
-; AND #$F7
-; STA arg7 ; flag Y reg used
+        ; lda arg7
+        ; and #$F7
+        ; sta arg7 ; flag Y reg used
 
                 lda #0
                 sta arg12
-                lda #$10                ; (addr),Y
+                lda #$10                ; (addr),y
 _opa1           sta arg10
                 lda (stack),y
                 clc
@@ -207,11 +208,11 @@ _opa2           tya                     ; small array
                 beq _opa2a              ; page zero
 
                 pla
-                ora #$1c                ; addr16,X
+                ora #$1c                ; addr16,x
                 jmp push3
 
 _opa2a          pla
-                ora #$14                ; addr,X
+                ora #$14                ; addr,x
                 jmp push2
 
 _opc            lda #$08                ; data
@@ -509,8 +510,8 @@ stkprop         .proc
 ;======================================
 jsrtable        .proc
 ;.IF RAMzap
-;  LDY LTab+1,X
-;  LDA LTab,X
+;    ldy LTab+1,x
+;    lda LTab,x
 ;.ELSE
 
                 ldy lsh+1,x

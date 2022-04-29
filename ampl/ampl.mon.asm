@@ -405,9 +405,9 @@ comp            .proc
 
 ; see MAIN.BNK now
 ;Dret PROC ; Dret() go to DOS
-; LDA DOSVEC
-; LDX DOSVEC+1
-; JMP JSRInd
+;     lda DOSVEC
+;     ldx DOSVEC+1
+;     jmp JSRInd
 
 
 ;======================================
@@ -417,11 +417,11 @@ proceed         .proc
                 ldx procsp
                 beq _p1
 
-; LDA #< _pmsg
-; LDX #> _pmsg
-; JSR YesNo
-; BNE _p1
-; LDX procSP ; break stack pointer
+        ; lda #<_pmsg
+        ; ldx #>_pmsg
+        ; jsr YesNo
+        ; bne _p1
+        ; ldx procSP  ; break stack pointer
 
                 lda #0
                 sta procsp

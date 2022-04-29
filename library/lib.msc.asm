@@ -97,10 +97,10 @@ _sr1            sta $03_D200,x ;!! AUDF1,x             ; zero sound regs
 ; returns paddle value of port
 ; Assumes port low  8.
 ; see LIB.ST
-;Paddle TAX
-; LDA POT0,X
-; STA args
-; RTS
+;Paddle tax
+;       lda POT0,x
+;       sta args
+;       rts
 ;
 ;BYTE FUNC PTrig(BYTE port)
 ; returns zero if trigger of paddle
@@ -158,10 +158,10 @@ _stk2           and #$0f
 ; port is depressed.  Assumes port<4
 ;
 ; see LIB.ST
-;STrig TAX
-; LDA $03_D010,x ;!! TRIG0,X
-; STA args
-; RTS
+;STrig tax
+;      lda $03_D010,x ;!! TRIG0,x
+;      sta args
+;      rts
 ;======================================
 
 

@@ -294,21 +294,21 @@ _sa2            rts
 
 ;
 ; IToReal(int) -> FR0
-;IToReal STX _sign
-; JSR _SetSign
-; STA FR0
-; STX FR0+1
-; JSR IFP
-;:FSign LDA _sign
-; BPL _Rem1
-; JSR FMOVE
-; JSR ZFR0
-; JMP FSUB
-; RToInt() real in FR0
-;RToInt LDA FR0
-; STA _sign
-; JSR _FSign
-; JSR $03_D9D2 ;!! FPI
-; LDA FR0
-; LDA FR0+1
-; JMP _SetSign
+;IToReal stx _sign
+;        jsr _SetSign
+;        sta FR0
+;        stx FR0+1
+;        jsr IFP
+;:FSign  lda _sign
+;        bpl _Rem1
+;        jsr FMOVE
+;        jsr ZFR0
+;        jmp FSUB
+;RToInt() real in FR0
+;RToInt lda FR0
+;       sta _sign
+;       jsr _FSign
+;       jsr $03_D9D2 ;!! FPI
+;       lda FR0
+;       lda FR0+1
+;       jmp _SetSign

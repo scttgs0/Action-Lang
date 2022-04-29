@@ -343,9 +343,9 @@ _getnr0         sta nxttoken
 
 getnr1          sta nxttoken
 
-;GetNr2 LDA $D0
-; BEQ GetNr3
-; JSR PrintTok
+;GetNr2 lda $D0
+;       beq GetNr3
+;       jsr PrintTok
 
 getnr2          ldx addr
                 ldy addr+1
@@ -586,7 +586,7 @@ _nln1           ldy top+1
                 jsr nextdwn
                 bne _nln2
 
-;    LDA #0
+;    lda #0
                 sta top+1
 
 _nln2           lda list
@@ -794,19 +794,19 @@ lexchars
                 .byte 126               ; ?
                 .byte atid              ; @
 
-;PrintTok LDA token
-; LDX #0
-; JSR PrintC
-; JSR PutSp
-; LDA addr
-; LDX addr+1
-; JSR PrintH
-; JSR PutSp
-; LDA nxtToken
-; LDX #0
-; JSR PrintC
-; JSR PutSp
-; LDA nxtAddr
-; LDX nxtAddr+1
-; JSR PrintH
-; JMP PutEOL
+;PrintTok lda token
+;         ldx #0
+;         jsr PrintC
+;         jsr PutSp
+;         lda addr
+;         ldx addr+1
+;         jsr PrintH
+;         jsr PutSp
+;         lda nxtToken
+;         ldx #0
+;         jsr PrintC
+;         jsr PutSp
+;         lda nxtAddr
+;         ldx nxtAddr+1
+;         jsr PrintH
+;         jmp PutEOL

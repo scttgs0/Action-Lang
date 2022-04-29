@@ -167,7 +167,7 @@ npage1          sta choff
                 lda lmargin
                 sta colcrs
 
-    ; JMP Refresh ; do all the work
+    ; jmp Refresh ; do all the work
                 .endproc
 
 

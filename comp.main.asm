@@ -115,8 +115,8 @@ _spl3           ldy #1
                 sta arrayptr+1
                 bne _spl3
 
-; LDA arrayPtr
-; BNE _SPL3
+        ; lda arrayPtr
+        ; bne _SPL3
 
                 lda qcode
                 cmp MEMTOP
@@ -574,11 +574,11 @@ storprops       .proc
 
 
 ;ChkNext PROC ; ChkNext()
-; LDA nxtToken
-; CMP #undec
-; BNE _ChkN
-; JSR GNlocal
-;:ChkN JMP GetNext
+;      lda nxtToken
+;      cmp #undec
+;      bne _ChkN
+;      jsr GNlocal
+;:ChkN jmp GetNext
 
 
 ;======================================
@@ -618,8 +618,8 @@ _p1             pla
 
 perr            jmp segment.argerr
 
-;:Par1 CMP #varT+realT
-; BEQ PErr
+;:Par1 cmp #varT+realT
+;      beq PErr
 
 _par1           cmp #vart+intt
                 bcc _par3               ; one byte arg
@@ -2028,15 +2028,15 @@ _ef4            inc arg1
                 .endproc
 
 
-;:ExpReal LDX vars
-; LDY vars+1
-; JSR FST0R
-; LDA varsOff
-; LDX varsOff+1
-; JSR SST1
-; LDA #6
-; JSR VarIncr
-; JMP _Exp7
+;:ExpReal ldx vars
+;         ldy vars+1
+;         jsr FST0R
+;         lda varsOff
+;         ldx varsOff+1
+;         jsr SST1
+;         lda #6
+;         jsr VarIncr
+;         jmp _Exp7
 
 experr          ldy #exper
 eerr1           jmp splerr
@@ -2252,10 +2252,8 @@ _ro0            jsr popop               ; see if last op
                 bne _ro1
 
     ; check for increament
-    ; We know at least this is an
-    ; assignment or an array subscript.
-    ; If ChStkEq in CGPlus is true then
-    ; this is an assignment.
+    ; We know at least this is an assignment or an array subscript.
+    ; If ChStkEq in CGPlus is true then this is an assignment.
                 txa
                 cmp #plusid
                 bne _rosh
@@ -2495,10 +2493,10 @@ cgassign        .proc
                 cmp #arrayt             ; simple var
                 bcs _cgav
 
-                ; if STY addr16,X was supported
-                ; BCC _CGC0 ; yes
-                ; BIT tempMode ; lhs temp?
-                ; BNE _CGAV ; yes, large array
+                ; if sty addr16,x was supported
+                ;    bcc _CGC0    ; yes
+                ;    bit tempMode ; lhs temp?
+                ;    bne _CGAV    ; yes, large array
 
 _cgc0           ldx arg4
                 beq _cgc1               ; byte
@@ -2532,10 +2530,10 @@ _ass1           cmp #typet
 _cgav           ldx arg4                ; lhs type=byte?
                 beq _cgavb              ; yes
 
-                ; CPX #3                ; lhs = int?
-                ; BNE _CGAVI            ; yes
+                ; cpx #3                ; lhs = int?
+                ; bne _CGAVI            ; yes
                 ; lhs type = real
-                ; JMP AssErr
+                ; jmp AssErr
 _cgavi          jsr load2h
 
 _avi1           lda #$81                ; STA
@@ -3149,7 +3147,7 @@ _cgat2          and #$f8
                 cmp #typet              ; check for record field
                 beq _cgat1
                                         ; constant or cond. exp. (error)
-_cgaterr        jmp    experr
+_cgaterr        jmp experr
 
                 .endproc
 
@@ -3160,10 +3158,10 @@ _cgaterr        jmp    experr
 vartype         .byte 0,0,1,2,2,3
 
 ; moved to CGU
-;outtype .BYTE $82,3,$84,realT
-; .BYTE 3,3,$84,realT
-; .BYTE $84,$84,$84,realT
-; .BYTE realT,realT,realT,realT
+;outtype .byte $82,3,$84,realT
+;        .byte 3,3,$84,realT
+;        .byte $84,$84,$84,realT
+;        .byte realT,realT,realT,realT
 
 cgopscd         .byte $18,$61           ; CLC ADC
                 .byte $38,$e1           ; SEC SBC

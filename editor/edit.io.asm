@@ -188,7 +188,7 @@ fopen           .proc
                 stx arg11
                 sty opmode
 
-    ; JSR ClnLn ; in SaveWd
+        ; jsr ClnLn ; in SaveWd
                 jsr savewd
                 jsr rstcsr
 

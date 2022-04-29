@@ -107,9 +107,10 @@ _ar1            sta fr1
                 ldy vartype-1,x
                 beq arrerr._arbyte
 
-; CPY #3
-; BEQ _ARReal
-; integer or cardinal
+        ; cpy #3
+        ; beq _ARReal
+
+    ; integer or cardinal
 
 _arint          jsr gettemps
 
