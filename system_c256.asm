@@ -3,18 +3,26 @@
 ; Clear the visible screen
 ;======================================
 ClearScreen     .proc
-                ldx #$00
-                ldy #$12
+v_QtyPages      .var $12                ; 80x60 [w/border 78x58]... 80x58 = $1220... 18 pages + 32 bytes
+                                        ; the 32-byte area that is not cleared will be hidden by the infobar
+v_Empty         .var $00
+v_TextColor     .var $46
+;---
 
-_clearNext      lda #$00
-_setAddr1       sta CS_TEXT_MEM_PTR,x
-                lda #$46
-_setAddr2       sta CS_COLOR_MEM_PTR,x
+                ldx #$00
+                ldy #v_QtyPages
+
+_clearNext      lda #v_Empty
+_setAddr1       sta CS_TEXT_MEM_PTR,x   ; SMC
+
+                lda #v_TextColor
+_setAddr2       sta CS_COLOR_MEM_PTR,x  ; SMC
+
                 inx
                 bne _clearNext
 
-                inc _setAddr1+2
-                inc _setAddr2+2
+                inc _setAddr1+2         ; advance to next memory page
+                inc _setAddr2+2         ; advance to next memory page
                 dey
                 bne _clearNext
 
@@ -26,12 +34,16 @@ _setAddr2       sta CS_COLOR_MEM_PTR,x
 ; Initialize the CHAR_LUT tables
 ;======================================
 InitCharLUT     .proc
+v_LUTSize       .var 64                 ; 4-byte color * 16 colors
+;---
+
                 ldx #$00
 _next1          lda Custom_LUT,x
-                sta FG_CHAR_LUT_PTR,X
-                sta BG_CHAR_LUT_PTR,X
+                sta FG_CHAR_LUT_PTR,x
+                sta BG_CHAR_LUT_PTR,x
+
                 inx
-                cpx #64
+                cpx #v_LUTSize                 
                 bne _next1
 
                 rts
@@ -50,10 +62,10 @@ Custom_LUT      .dword $00143382        ; 0: Saint Patrick Blue
                 .dword $0069C372        ; 9: Mantis Green
                 .dword $00BC3936        ; A: Medium Carmine
                 .dword $0073AA24        ; B: Green
-                .dword $00FFFF00        ; C: Bright Yellow
-                .dword $000000FF        ; D: Bright Blue
-                .dword $00FC7F00        ; E: Bright Orange
-                .dword $00AAAAAA        ; F: Bright White
+                .dword $00FFFF00        ; C: Electric Yellow
+                .dword $000000FF        ; D: Blue
+                .dword $00FC7F00        ; E: Orange
+                .dword $00DDDDDD        ; F: Gainsboro
                 .endproc
 
 
@@ -61,12 +73,16 @@ Custom_LUT      .dword $00143382        ; 0: Saint Patrick Blue
 ; Restore the System CHAR_LUT tables
 ;======================================
 RestoreCharLUT  .proc
+v_LUTSize       .var 64                 ; 4-byte color * 16 colors
+;---
+
                 ldx #$00
 _next1          lda Default_LUT,x
-                sta FG_CHAR_LUT_PTR,X
-                sta BG_CHAR_LUT_PTR,X
+                sta FG_CHAR_LUT_PTR,x
+                sta BG_CHAR_LUT_PTR,x
+
                 inx
-                cpx #64
+                cpx #v_LUTSize
                 bne _next1
 
                 rts
