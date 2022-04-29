@@ -35,18 +35,22 @@ border_off_s    .macro
 border_on       .macro color, xSize, ySize
                 php
 
+                .m8
                 lda #$01
                 sta BORDER_CTRL_REG
 
-                lda #\xSize
+                lda \xSize
                 sta BORDER_X_SIZE
 
-                lda #\ySize
+                lda \ySize
                 sta BORDER_Y_SIZE
 
-                .m16
-                lda #\color
-                sta BORDER_COLOR_B-1
+                lda \color>>16&$FF
+                sta BORDER_COLOR_R
+                lda \color>>8&$FF
+                sta BORDER_COLOR_G
+                lda \color&$FF
+                sta BORDER_COLOR_B
 
                 plp
                 .endmacro
