@@ -32,7 +32,7 @@ getmem          .proc
 
                 inx
 _gm0            stx afsize+1
-_gm1            jsr allocate+4
+_gm1            jsr Allocate._ENTRY
 
                 ldx afcur+1
                 beq gmerr               ; no memory allocated !
@@ -60,7 +60,7 @@ gmerr           .proc
                 bne punt                ; really out of memory
 
                 inc allocerr
-                jsr free
+                jsr Free
 
                 jmp getmem._gm1         ; retry
 
@@ -79,7 +79,7 @@ freemem         ;.proc
                 sbc #4
                 bcs freem1
                 dex
-freem1          jmp free
+freem1          jmp Free
 
                 ;.endproc
 
@@ -276,7 +276,7 @@ _dln4           ldy #0
 
 _dln5           lda arg0
                 ldx arg1
-                jsr free
+                jsr Free
 
                 lda arg2
                 ldx arg3

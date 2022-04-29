@@ -27,10 +27,10 @@ slop            = 7                     ; can't be less than 4
 ;======================================
 ;   Allocate(size)
 ;======================================
-allocate        .proc
+Allocate        .proc
                 sta afsize              ; save size
                 stx afsize+1
-                lda #$ff                ; set best size
+_ENTRY          lda #$ff                ; set best size
                 sta afbsze
                 sta afbsze+1
                 lda #<afbase            ; last = base
@@ -64,7 +64,6 @@ _afl3           ldy #3
                 beq _afl9               ; sizes equal
 
     ; Check for best fit
-
 _afl4           ldy #2
                 lda (afcur),y
                 cmp afbsze
@@ -74,7 +73,6 @@ _afl4           ldy #2
                 bcs _afl5
 
     ; save best guess so far
-
                 lda (afcur),y
                 sta afbsze+1
                 dey
@@ -85,9 +83,7 @@ _afl4           ldy #2
                 lda aflast+1
                 sta afbest+1
 
-    ; get next entry in list and goto
-    ; beginning of loop
-
+    ; get next entry in list and goto beginning of loop
 _afl5           lda afcur
                 sta aflast
                 lda afcur+1
@@ -96,7 +92,6 @@ _afl5           lda afcur
                 bcc _afl1
 
     ; no entry found, use best guess
-
 _afl6           lda afbsze+1
                 cmp #$ff
                 beq _afl10              ; no free block
@@ -143,7 +138,6 @@ _afl9           ldy #0
 _afl10          rts
 
     ; split best block
-
 _afl11          ldy #0
                 lda (afbest),y          ; cur = best(0)
                 sta afcur
@@ -180,7 +174,7 @@ _afl11          ldy #0
 ;======================================
 ;   Free(block)
 ;======================================
-free            .proc
+Free            .proc
                 sta afbest
                 stx afbest+1
 

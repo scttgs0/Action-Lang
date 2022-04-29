@@ -46,7 +46,7 @@ minit           .proc
 
                 lda #0                  ; allocate 2 pages of
                 ldx #2                  ; spare memory
-                jsr allocate
+                jsr Allocate
 
                 lda afcur
                 sta sparem
@@ -110,7 +110,7 @@ einit           .proc
 
                 lda #0
                 ldx #1
-                jsr allocate            ; get edit buffer
+                jsr Allocate            ; get edit buffer
 
                 lda afcur
                 sta buf

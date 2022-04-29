@@ -220,7 +220,7 @@ boot            .proc
 
                 bne mrun._mwrt1
 
-                jmp start.cold
+                jmp Start.cold
 
 _bmsg           .text 6,"Boot? "
                 .endproc

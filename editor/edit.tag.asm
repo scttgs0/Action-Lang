@@ -38,7 +38,7 @@ settag          .proc
 
     ; get a new tag
                 lda #8
-                jsr allocate
+                jsr Allocate
 
                 ldy #1
                 lda taglist+1
@@ -188,7 +188,7 @@ _ft1            sta afbest
                 iny
                 lda (afbest),y
                 sta arg1
-                jsr free.free1
+                jsr Free.free1
 
                 lda arg0
                 ldx arg1

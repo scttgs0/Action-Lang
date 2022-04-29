@@ -63,7 +63,7 @@ ltab            .addr lsh1._lshift      ; LSH
                 jmp insrtch             ; normal char
                 rts                     ; ctrl-shift char
 serial          .word $0A00             ; serial number of ROM
-                                        ; TODO: to be filled in before blowing ROM
+                                        ; TODO: to be filled in before burning ROM
 
                 jmp getnext.ismt        ; STM catch all
                 rts                     ; illegal monitor cmd
@@ -76,7 +76,7 @@ serial          .word $0A00             ; serial number of ROM
 ;======================================
 ;   Init RTS
 ;======================================
-start           .proc
+Start           .proc
                 jsr initkeys            ; get keyboard
 
                 lda warmst
@@ -95,7 +95,7 @@ _w1             jmp gmerr.punt          ; editor
 
 cold            lda #0
                 tay
-_c0             sta $03_0480,y             ; zero RAM
+_c0             sta $03_0480,y          ; zero RAM
                 dey
                 bne _c0
 
@@ -105,8 +105,7 @@ _cold1          lda emjmps-1,y          ; init RAM
                 sta jmps,y
                 bne _cold1
 
-    ; STY ChCvt1 ; Y=0
-
+    ; sty ChCvt1 ; Y=0
                 jsr einit               ; init editor
 
 ;SPLInit PROC ; init compiler RAM
@@ -144,5 +143,3 @@ _si2            inx
                 sta stlocal             ; local hash table
                 stx stlocal+1
                 .endproc
-
-; RTS
