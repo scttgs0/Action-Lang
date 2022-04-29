@@ -81,7 +81,7 @@ _spls3          sta codebase
                 sta codebase+1
                 sta qcode+1
 
-                lda $03_02E6 ;!! MEMTOP+1
+                lda MEMTOP+1
                 sta stmax
                 dec stmax
                 clc

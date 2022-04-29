@@ -119,9 +119,9 @@ _spl3           ldy #1
 ; BNE _SPL3
 
                 lda qcode
-                cmp $03_02E5 ;!! MEMTOP
+                cmp MEMTOP
                 lda qcode+1
-                sbc $03_02E6 ;!! MEMTOP+1
+                sbc MEMTOP+1
                 bcs enderr._spl5
 
 _splrtn         rts

@@ -22,12 +22,12 @@
 
 
 ;======================================
-;
+; Initialize memory
 ;======================================
-minit           .proc                   ; initialize memory
-                lda $03_02E7 ;!! MEMLO
+minit           .proc
+                lda MEMLO
                 sta afbase
-                lda $03_02E8 ;!! MEMLO+1
+                lda MEMLO+1
                 sta afbase+1
                 lda #0
                 tay
@@ -35,11 +35,11 @@ minit           .proc                   ; initialize memory
                 iny
                 sta (afbase),y
                 sec
-                lda $03_02E5 ;!! MEMTOP
+                lda MEMTOP
                 sbc afbase
                 iny
                 sta (afbase),y
-                lda $03_02E6 ;!! MEMTOP+1
+                lda MEMTOP+1
                 sbc afbase+1
                 iny
                 sta (afbase),y
@@ -57,9 +57,9 @@ miret           rts
 
 
 ;======================================
-;
+; Initialize window
 ;======================================
-zerow           .proc                   ; initialize window
+zerow           .proc
                 lda #0
                 ldx #15
 _zw1            dex                     ; zero page0 window table
@@ -75,9 +75,9 @@ _zw1            dex                     ; zero page0 window table
 
 
 ;======================================
-;
+; Initialize secondary window
 ;======================================
-w2init          .proc                   ; W2Init()
+w2init          .proc
                 jsr ctrln
 
                 lda wsize
@@ -97,7 +97,7 @@ w2init          .proc                   ; W2Init()
                 lda #23
                 sbc wsize
                 sta nlines
-                bne einit.fcmsg         ; uncond.
+                bra einit.fcmsg
 
                 .endproc
 
@@ -117,7 +117,7 @@ einit           .proc
                 ldx afcur+1
                 stx buf+1
 
-                lda #$40
+                lda #$40     ; rowSize
                 sta chcvt
 
                 lda #<delbuf
@@ -144,6 +144,5 @@ fcmsg1          lda #<editc
 
 ;--------------------------------------
 
-editc          ;.text 19,"ACTION! (c)1983 ACS"
-                .text 20,"ACTION! (c)2022 GPL3"
+editc           .text 20,"ACTION! (c)2022 GPL3"
                 .endproc
