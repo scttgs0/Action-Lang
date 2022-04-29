@@ -56,8 +56,8 @@ _t3             ldy #0
 
 ;--------------------------------------
 
-_onbit          .byte $80,$40,$20,$10,8,4,2,1,0
-_offbit         .byte $7f,$bf,$df,$ef,$f7,$fb,$fd,$fe,$ff
+_onbit          .byte 128,64,32,16,8,4,2,1,0
+_offbit         .byte $7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE,$FF
                 .endproc
 
 

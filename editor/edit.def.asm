@@ -174,8 +174,8 @@ disptb          = $03_04f2
 smtend          = $03_04f8
 stmradr         = $04fe
 
-subbuf          = $03_0500                 ; 40 bytes
-findbuf         = $03_0528                 ; 40 bytes
+subbuf          = $03_0500                 ; 40 bytes     ; rowSize
+findbuf         = $03_0528                 ; 40 bytes     ; rowSize
 numbuf          = $03_0550                 ; 24 bytes
 stkbase         = $03_0577
 
@@ -185,7 +185,7 @@ opstack         = $03_0580
 ; FASC routine.  Should not exceed
 ; 16 bytes, $58F (worst case?).
 ;---------------------------------
-tempbuf         = $03_0590                 ; 40 bytes
+tempbuf         = $03_0590                 ; 40 bytes     ; rowSize
 argtypes        = $03_05b8                 ;  8 bytes
 eof             = $03_05c0                 ;  8 bytes
 inbuf           = $03_05c8                 ; 36 bytes

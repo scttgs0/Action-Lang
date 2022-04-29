@@ -183,7 +183,7 @@ indntr          .proc
 ;======================================
 ;   InsrtT() insert/replace toggle
 ;======================================
-insrtt          .proc            ; was InsertT
+insrtt          .proc                   ; was InsertT
                 lda #<_rmsg
                 ldx #>_rmsg
                 inc insert
@@ -217,8 +217,8 @@ scrlinit        .proc
                 lda colcrs
                 sta x
 
-    ; LDA choff
-    ; BEQ _SI1
+    ; lda choff
+    ; beq _SI1
 
                 lda #0
                 sta choff
@@ -384,7 +384,7 @@ setsp           .proc
 ;   MoveDwn(cnt, row)
 ;======================================
 movedwn         .proc
-                ldy #+0-40
+                ldy #+0-40     ; rowSize
                 sty arg5
                 ldy #$ff
                 bne move
@@ -396,7 +396,7 @@ movedwn         .proc
 ;   MoveUp(cnt, row)
 ;======================================
 moveup          .proc
-                ldy #40
+                ldy #40     ; rowSize
                 sty arg5
                 ldy #0
                 .endproc
