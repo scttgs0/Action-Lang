@@ -34,17 +34,22 @@
 ;//////////////////////////////////////
 
 
+                .include "equates_action.asm"
                 .include "macros_65816.asm"
                 .include "editor/edit.def.asm"
 
+                * = INIT-8
+                .text "PGX"
+                .byte $01
+                .dword INIT
 
 ;======================================
-; Start of Code
+; Initialization
 ;======================================
                 * = $037FE0
 ;--------------------------------------
 
-                clc
+INIT            clc
                 xce
                 .m8i8
                 .setdp $0000
@@ -57,7 +62,7 @@
 ;--------------------------------------
 
 version         .byte $40
-date            .byte $04,$24,$22        ; assemble date of latest version!
+date            .byte $04,$24,$22        ; TODO: assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -68,7 +73,6 @@ propid          ldx $a0
 
 amplfin
 ;    ACTION! - Editor Routines
-;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
                 .fill 4,$00
                 .include "editor/edit.fnd.asm"
@@ -77,15 +81,12 @@ amplfin
 
 
 ;    "ACTION! - Compiler Routines
-;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
                 .fill 3,$00
                 .include "ampl/ampl.seg.asm"
                 .include "ampl/ampl.pf.asm"
                 .include "ampl/ampl.arr.asm"
                 .include "ampl/ampl.cgu.asm"
-
-
 
 
 ;    ACTION! - S.T.
@@ -98,21 +99,17 @@ amplfin
                 .include "library/lib.gr.asm"
                 .include "library/lib.msc.asm"
                 .include "library/lib.str.asm"
-
                 .include "library/lib.opt.asm"
 
-cpyright
-               ;.text "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  ",$00
-                .text "ACTION! (c)2022 GPL3            Foenix version  April 24, 2022    ",$00
-doc
+cpyright        .text "ACTION! (c)2022 GPL3            Foenix Adaptation          v3.6 April 24, 2022",$00
+
 
 ;    "ACTION! - Compiler
 ;    -----------------------
 main
                 .include "comp.main.asm"
 
-cright         ;.text "ACTION! (c)1983 Action Computer Services",$00,$00
-                .text "ACTION! (c)2022 GPL3      Foenix version",$00,$00
+cright          .text "ACTION! (c)2022 GPL3      Foenix Adaptation",$00,$00
 
 
 ;    ACTION! 3.6 - Editor
