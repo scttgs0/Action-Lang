@@ -439,7 +439,7 @@ _htcok          sta arg5
                 sta fr0
                 stx fr0+1
                 inc cix
-                bne _htc1               ; uncond.
+                bra _htc1
 
                 .endproc
 
@@ -596,7 +596,7 @@ _ps10           lda arg3
                 bne _ps8
 
                 tay
-                beq _ps5                ; uncond.
+                bra _ps5
 
                 .endproc
 
@@ -710,7 +710,7 @@ dsploc          .proc
                 beq _dlocrt
 
 _dloc1          clc
-                adc #40
+                adc #40     ; rowSize
                 bcc _dloc2
 
                 inx

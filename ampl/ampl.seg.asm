@@ -41,7 +41,7 @@ segment         .proc
 
 _proc           lda #funct-vart+char-1
                 sta type
-                bne _func1              ; uncond.
+                bra _func1
 
 _func           clc
                 adc #funct-vart

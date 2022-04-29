@@ -181,7 +181,7 @@ opn             .proc
                 tay
                 iny
                 lda #eol
-                bne _op2                ; uncond.
+                bra _op2
 
 _op1            lda (arg1),y
 _op2            sta (buf),y
@@ -390,7 +390,7 @@ putd1           ldx #$0b
 ;======================================
 putde           .proc
                 ldy #eol
-                bne putd.putd1          ; uncond.
+                bra putd.putd1
 
                 .endproc
 

@@ -60,8 +60,7 @@ pf              lda #0                  ; load arg types flag
                 bne _c4
 
                 jsr getnext
-
-                bne _c7                 ; uncond.
+                bra _c7
 
 _c4             ldx numargs
                 ldy #tempt+bytet

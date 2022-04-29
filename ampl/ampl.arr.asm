@@ -62,7 +62,7 @@ _arptr          ldy #0
                 rts
 
 _arpt1          jsr zerost
-                bne _ar0                ; uncond.
+                bra _ar0
 
 _arr0           jsr pushnext
 

@@ -61,7 +61,7 @@ _gk2            lda $03_02FC ;!! CH_
                 bcc _gk3                ; not Ctrl-Shft
 
 _cskey          jsr click
-                bmi _gk4                ; uncond.
+                bra _gk4
 
 _gk3            and #$3f
                 cmp #$3c                ; caps key

@@ -223,7 +223,7 @@ _fo1            lda inbuf,y
 
                 lda #':'
                 sta inbuf+2
-                bne _fo3                ; uncond.
+                bra _fo3
 
 _fo2            lda inbuf+1
                 cmp #'?'                ; read directory?

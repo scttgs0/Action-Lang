@@ -318,7 +318,7 @@ getnl0          cmp #eofid
                 bpl getnr1
 
                 and #$7f
-                bne _getnr0              ; uncond.
+                bra _getnr0
 
 _getnl1         jsr alpha
                 bne _getnid
@@ -331,7 +331,7 @@ _getnl1         jsr alpha
 
                 cmp #']'
                 beq getnr1
-                bne getnloop            ; uncond.
+                bra getnloop
 
 _getnid         jsr getname
                 bmi getnr1
@@ -359,7 +359,7 @@ ismt            lda token
 ;======================================
 lexcom          .proc
                 jsr nextline
-                bne getnext.getnl0      ; uncond.
+                bra getnext.getnl0
 
                 .endproc
 
@@ -431,7 +431,7 @@ lexne           .proc
                 bne lexeq.leq1
 
                 lda #neid
-                bne getnext.getnr1      ; uncond.
+                bra getnext.getnr1
 
                 .endproc
 
@@ -446,7 +446,7 @@ leq1            cmp #'='
                 bne putback
 
                 inc nxttoken
-                bne getnext.getnr2      ; uncond.
+                bra getnext.getnr2
 
                 .endproc
 
@@ -460,7 +460,7 @@ lexhex          .proc
                 inc choff
                 jsr lexbuf
                 jsr htocar
-                bne lexdig.ldig2        ; uncond.
+                bra lexdig.ldig2
 
                 .endproc
 
@@ -489,7 +489,7 @@ lexpf           .proc
                 sta symtab
                 lda gbase+1
                 sta symtab+1
-                bne putback.pback       ; uncond.
+                bra putback.pback
 
                 .endproc
 
@@ -628,7 +628,7 @@ lexdef          .proc
                 lda defflg
                 sta choff
                 sty defflg
-                bcc nextchar.nxtch0     ; uncond.
+                bra nextchar.nxtch0
 
 ldef1           ldy choff
                 lda (delnxt),y

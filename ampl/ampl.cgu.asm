@@ -103,7 +103,7 @@ _lxc            lda (stack),y
                 pla
                 pla
                 tay
-                bne ophigh._opv         ; uncond.
+                bra ophigh._opv
 
 _optype         and #$20
                 beq ophigh._operr       ; con. exp.
@@ -193,7 +193,7 @@ _opa1           sta arg10
 
                 tax
                 dec temps-args,x        ; free temp
-                bcc _opc3               ; uncond.
+                bra _opc3
 
 _opa2           tya                     ; small array
                 pha
@@ -227,7 +227,7 @@ _opc3           pla
                 jmp push2
 
 _opt            lda #$04                ; addr
-                bne _opa1               ; uncond.
+                bra _opa1
 
 _opz            pla
                 ora #$04                ; addr
@@ -585,7 +585,7 @@ i11             iny
 stemph          .proc
                 inc arg9
                 ldy #12
-                bne stempl.stemp        ; uncond.
+                bra stempl.stemp
 
                 .endproc
 

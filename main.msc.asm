@@ -55,7 +55,7 @@ _lshret         rts
 ;======================================
 nextup          .proc
                 ldy #1
-                bne next                ; uncond.
+                bra next
 
                 .endproc
 
@@ -162,7 +162,7 @@ _mn2a           sta afsize+1
                 bne _mn2b
 
                 jsr getnext
-                bne _mn1                ; uncond.
+                bra _mn1
 
 _mn2b           ldy #0
                 cmp #'^'
@@ -190,7 +190,7 @@ _mn5            jsr getcdoff            ; table reference
                 pha
                 txa
                 pha
-                bne _mn8                ; uncond.
+                bra _mn8
 
 _mnstr          jsr copystr             ; string ref
 
@@ -212,7 +212,7 @@ _mn6            lda nxttoken            ; body of table
 _mn7            tya
                 jsr codeincr
 _mn8            jsr getnext
-                bne _mn6                ; uncond.
+                bra _mn6
 
 _mnundec        lda #1
                 jsr nxtprop
