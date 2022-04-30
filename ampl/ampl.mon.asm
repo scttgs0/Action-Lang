@@ -102,7 +102,7 @@ rstwnd          .proc
 
                 lda #0
 _rw1            jsr paintw
-                jsr einit.fcmsg1
+                jsr EditorInit.fcmsg1
 
                 jmp floop
 
@@ -113,7 +113,7 @@ _rw1            jsr paintw
 ;   PaintW(window)
 ;======================================
 paintw          .proc
-                sta curwdw
+                sta currentWindow
                 jsr rstwd
 
                 jmp found

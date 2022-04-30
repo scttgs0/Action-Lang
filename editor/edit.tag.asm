@@ -80,7 +80,7 @@ _st1            ldy #4
 notag           .proc
                 lda #<_ntmsg
                 ldx #>_ntmsg
-                jmp cmdmsg
+                jmp commandMsg
 
 ;--------------------------------------
 

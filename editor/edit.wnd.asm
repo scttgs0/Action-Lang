@@ -25,7 +25,7 @@
 ;   Wind1()
 ;======================================
 wind1           .proc
-                lda curwdw
+                lda currentWindow
                 beq savworld.wdret
 
                 lda #0
@@ -49,7 +49,7 @@ swapwd          .proc
 ;   Wind2()
 ;======================================
 wind2           .proc
-                lda curwdw
+                lda currentWindow
                 bne savworld.wdret
 
                 lda numwd
@@ -121,7 +121,7 @@ _clr2           jsr delln
 ;   RstWorld(window)
 ;======================================
 rstworld        .proc
-                sta curwdw
+                sta currentWindow
                 jsr rstwd
                 jsr ldbuf
 
@@ -151,14 +151,14 @@ _dw1            jsr clear.clr0
 
                 ldy #0
                 sty numwd
-                cpy curwdw
+                cpy currentWindow
                 bne delwd2
 
                 ldy #w2-w1
-delwd2          sty curwdw
+delwd2          sty currentWindow
                 jsr rstwd
 
-                jmp einit.winit1
+                jmp EditorInit.winit1
 
 ;--------------------------------------
 

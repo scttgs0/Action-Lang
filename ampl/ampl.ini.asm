@@ -40,15 +40,15 @@ splsetup        .proc
                 sta curnxt+1
                 sta procsp
 
-    ; clear qglobal s.t.
-                ldx bigst               ; big s.t. ?
+    ; clear qglobal symbol table
+                ldx isBigSymTbl
                 beq _spls0              ; no
 
-_s0             sta (stg2),y
+_s0             sta (bigSymTblGlobal),y
                 iny
                 bne _s0
 
-_spls0          sta (stglobal),y
+_spls0          sta (symTblGlobal),y
                 iny
                 bne _spls0
 
@@ -85,7 +85,7 @@ _spls3          sta codebase
                 sta stmax
                 dec stmax
                 clc
-                sbc stsp
+                sbc SymTblSizePages
                 sta stbase
                 sta symtab+1
                 inc symtab+1

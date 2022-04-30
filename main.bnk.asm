@@ -48,6 +48,7 @@ cstart          .proc
                 ldy #$03 ;!! ebank
                 sty curbank
                 sty $03_D503 ;!! bank+ebank
+
                 jmp Start
 
                 .endproc

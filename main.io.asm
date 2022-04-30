@@ -87,6 +87,8 @@ input1          stx arg5
                 stx arg3
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   XIOstr(device,,cmd,aux1,aux2,str)
@@ -105,6 +107,7 @@ xiostr          .proc
                 sta $03_034A,x ;!! IOCB0+ICAX1,x
                 lda arg4
                 sta $03_034B,x ;!! IOCB0+ICAX2,x
+
                 lda #0
 _xs1            tay
                 sta $03_0349,x ;!! IOCB0+ICBLH,x
@@ -219,7 +222,7 @@ wrtbuf          .proc
 ;   RstCur()
 ;======================================
 rstcur          .proc
-                ldy curwdw
+                ldy currentWindow
                 lda w1+wcur,y
                 sta cur
                 lda w1+wcur+1,y
@@ -563,7 +566,7 @@ _ps4            lda arg2
                 tax
                 pla
                 and #$9f
-                ora chcvt,x
+                ora chrConvert,x
                 sta (arg0),y
                 dey
                 bpl _ps4

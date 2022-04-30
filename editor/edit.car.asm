@@ -33,7 +33,7 @@ emjmps          rts                     ; Seg catch all
 
                 .byte 18                ; wSize
                 .byte 120               ; line input max
-                .byte $20               ; ChCvt2
+                .byte $20               ; chrConvert2
                 rts                     ; Exp catch all
 
                 .word 0
@@ -57,7 +57,7 @@ ltab            .addr lsh1._lshift      ; LSH
                 .addr divi
                 .addr remi
                 .addr sargs
-                .byte $60               ; ChCvt3
+                .byte $60               ; chrConvert3
                 .byte $22               ; tvDisp
 
                 jmp insrtch             ; normal char
@@ -82,7 +82,7 @@ Start           .proc
                 lda warmst
                 beq cold
 
-                lda chcvt3
+                lda chrConvert3
                 cmp #$60                ; make sure RAM initialized
                 bne cold
 
@@ -105,8 +105,8 @@ _cold1          lda emjmps-1,y          ; init RAM
                 sta jmps,y
                 bne _cold1
 
-    ; sty ChCvt1 ; Y=0
-                jsr einit               ; init editor
+    ; sty chrConvert1 ; Y=0
+                jsr EditorInit          ; init editor
 
 ;SPLInit PROC ; init compiler RAM
 
@@ -119,27 +119,27 @@ _cold1          lda emjmps-1,y          ; init RAM
         .endif
 
                 ldx #8                  ; 2K id space
-                stx stsp
+                stx SymTblSizePages
 
                 lda #0
                 ldx #4
-                ldy bigst               ; big s.t. ?
+                ldy isBigSymTbl
                 beq _si1                ; no
 
                 ldx #6
 _si1            jsr getmem              ; get hash table
 
-                sta stglobal            ; qglobal hash table
-                stx stglobal+1
-                ldy bigst               ; big s.t. ?
+                sta symTblGlobal        ; qglobal hash table
+                stx symTblGlobal+1
+                ldy isBigSymTbl
                 beq _si2                ; no
 
                 inx
                 inx
-                sta stg2                ; big s.t. hash table
-                stx stg2+1
+                sta bigSymTblGlobal     ; big symbol table hash table
+                stx bigSymTblGlobal+1
 _si2            inx
                 inx
-                sta stlocal             ; local hash table
-                stx stlocal+1
+                sta symTblLocal         ; local hash table
+                stx symTblLocal+1
                 .endproc

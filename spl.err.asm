@@ -29,7 +29,7 @@ lsplerr         .proc
                 beq spler1
 
     ; set pointer to error
-                ldx curwdw
+                ldx currentWindow
                 lda spln
                 sta w1+wsp,x
                 lda curln

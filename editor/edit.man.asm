@@ -30,13 +30,13 @@ floop           .proc
 
                 lda #<outmem
                 ldx #>outmem
-                jsr cmdmsg
+                jsr commandMsg
 
 _fm1            lda curch
                 sta lastch
                 jsr getkey
 
-                jsr einit.fcmsg1
+                jsr EditorInit.fcmsg1
 
                 lda curch
                 ldy $03_02F2 ;!! CH1

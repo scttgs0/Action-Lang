@@ -141,7 +141,7 @@ _p1             jsr strptr
 
 _p2             jsr rstcur
 
-                ldy curwdw
+                ldy currentWindow
                 lda w1+wcur+1,y
                 beq _p3
 
@@ -193,7 +193,7 @@ insrtt          .proc                   ; was InsertT
                 sta insert
                 lda #<_imsg
                 ldx #>_imsg
-_it1            jmp cmdmsg
+_it1            jmp commandMsg
 
 ;--------------------------------------
 

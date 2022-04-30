@@ -82,16 +82,16 @@ arg15           = $af
 
 ; compiler vars
 ;---------------
-stbase          = $b0                   ; s.t. base (page)
-stglobal        = $b1                   ; qglobal hash table
-stlocal         = $b3                   ; local hash table
+stbase          = $b0                   ; symbol table base (page)
+symTblGlobal    = $b1                   ; qglobal hash table
+symTblLocal     = $b3                   ; local hash table
 codeoff         = $b5                   ; relocation offset
 device          = $b7                   ; default device
 qglobal         = $b8                   ; qglobal/local flag
 stack           = $b9                   ; value stack
 frame           = $bb                   ; -> current frame
-symtab          = $bd                   ; -> next s.t. entry
-stmax           = $bf                   ; s.t. top (page)
+symtab          = $bd                   ; -> next symbol table entry
+stmax           = $bf                   ; symbol table top (page)
 addr            = $c0                   ; token address
 token           = $c2                   ; token value
 
@@ -106,7 +106,7 @@ nxtaddr         = $c9                   ; next token address
 
         ; note: $CA-$CD never referenced
 
-stg2            = $ce                   ; only used if big s.t.
+bigSymTblGlobal = $ce                   ; only used if big symbol table
 arrayptr        = $d0                   ; array mem. list
 spnxt           = $d2                   ; next error char
 nxttoken        = $d3                   ; next token value
@@ -114,41 +114,41 @@ nxttoken        = $d3                   ; next token value
 
 ; ACTION! vars ($480 - $57D)
 ;----------------------------
-w1              = $03_0480                 ; window 1 data
+w1              = $03_0480              ; window 1 data
 top1            = $03_048f
-chcvt           = $03_0490                 ; char convert
-codebase        = $03_0491                 ; 2 bytes
-codesize        = $03_0493                 ; 2 bytes
-stsp            = $03_0495                 ; s.t. size (pages)
-mpc             = $03_0496                 ; edit/mon flag
-gbase           = $03_0497                 ; 2 bytes
+chrConvert      = $03_0490              ; char convert
+codebase        = $03_0491              ; 2 bytes
+codesize        = $03_0493              ; 2 bytes
+SymTblSizePages = $03_0495              ; symbol table size (pages)
+mpc             = $03_0496              ; edit/mon flag
+gbase           = $03_0497              ; 2 bytes
 type            = $03_0499
-list            = $03_049a                 ; listing flag
+list            = $03_049a              ; listing flag
 numargs         = $03_049b
-cmdln           = $03_049c                 ; command line offset
+cmdln           = $03_049c              ; command line offset
 param           = $03_049d
 opmode          = $03_049e
-curwdw          = $03_049f                 ; window memory offset
-cury            = $03_04a0                 ; current Y reg (0/1/unknown)
-lastch          = $03_04a1                 ; last char
-curch           = $03_04a2                 ; current char
-sparem          = $03_04a3                 ; -> spare mem
-numwd           = $03_04a5                 ; number of windows
-allocerr        = $03_04a6                 ; INC on Alloc error
-delbuf          = $03_04a7                 ; 6 bytes
-frstchar        = $03_04ad                 ; used for big s.t.
-taglist         = $03_04ae                 ; 2 bytes
-chcvt1          = $03_04b0
-w2              = $03_04b1                 ; window 2 data
-bckgrnd         = $03_04c0                 ; background color
-procsp          = $03_04c1                 ; Break stack pointer
+currentWindow   = $03_049f              ; window memory offset
+cury            = $03_04a0              ; current Y reg (0/1/unknown)
+lastch          = $03_04a1              ; last char
+curch           = $03_04a2              ; current char
+sparem          = $03_04a3              ; -> spare mem
+numwd           = $03_04a5              ; number of windows
+allocerr        = $03_04a6              ; INC on Alloc error
+delbuf          = $03_04a7              ; 6 bytes
+frstchar        = $03_04ad              ; used for big symbol table
+taglist         = $03_04ae              ; 2 bytes
+chrConvert1     = $03_04b0              ; char convert
+w2              = $03_04b1              ; window 2 data
+bckgrnd         = $03_04c0              ; background color
+procsp          = $03_04c1              ; Break stack pointer
 argbytes        = $03_04c2
-trace           = $03_04c3                 ; trace flag
-bigst           = $03_04c4                 ; big s.t. flag
+trace           = $03_04c3              ; trace flag
+isBigSymTbl     = $03_04c4              ; big symbol table flag
 
         ; note: $4C5 available
 
-jmps            = $03_04c6                 ; see EDIT.CAR
+jmps            = $03_04c6              ; see EDIT.CAR
 
 ; Jump table goes to $4FF
 ;-------------------------
@@ -158,7 +158,7 @@ stmask          = $03_04ca
 error           = $03_04cb
 wsize           = $03_04ce
 linemax         = $03_04cf
-chcvt2          = $03_04d0
+chrConvert2     = $03_04d0              ; char convert
 expend          = $03_04d1
 dclend          = expend+3
 cgend           = dclend+3
@@ -168,15 +168,15 @@ alarm           = splend+3
 eolch           = alarm+3
 lsh             = eolch+1
 
-chcvt3          = $03_04f0
+chrConvert3     = $03_04f0              ; char convert
 tvdisp          = $03_04f1
 disptb          = $03_04f2
 smtend          = $03_04f8
 stmradr         = $04fe
 
-subbuf          = $03_0500                 ; 40 bytes     ; rowSize
-findbuf         = $03_0528                 ; 40 bytes     ; rowSize
-numbuf          = $03_0550                 ; 24 bytes
+subbuf          = $03_0500              ; 40 bytes     ; rowSize
+findbuf         = $03_0528              ; 40 bytes     ; rowSize
+numbuf          = $03_0550              ; 24 bytes
 stkbase         = $03_0577
 
 opstack         = $03_0580
@@ -185,12 +185,12 @@ opstack         = $03_0580
 ; FASC routine.  Should not exceed
 ; 16 bytes, $58F (worst case?).
 ;---------------------------------
-tempbuf         = $03_0590                 ; 40 bytes     ; rowSize
-argtypes        = $03_05b8                 ;  8 bytes
-eof             = $03_05c0                 ;  8 bytes
-inbuf           = $03_05c8                 ; 36 bytes
-abt             = $03_05ec                 ;  4 bytes
-temps           = $03_05f0                 ; 16 bytes
+tempbuf         = $03_0590              ; 40 bytes     ; rowSize
+argtypes        = $03_05b8              ;  8 bytes
+eof             = $03_05c0              ;  8 bytes
+inbuf           = $03_05c8              ; 36 bytes
+abt             = $03_05ec              ;  4 bytes
+temps           = $03_05f0              ; 16 bytes
 
 
 ; system vars
@@ -220,7 +220,7 @@ cix             = $f2
 inbuff          = $f3
 flptr           = $fc
 
-lbuff           = $03_0580                 ; fp ASCII buf
+lbuff           = $03_0580              ; fp ASCII buf
 
 
 ; window record offsets

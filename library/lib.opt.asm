@@ -155,7 +155,7 @@ _l1             lda linemax
                 tax
                 tya
                 and #$9f
-                ora chcvt,x
+                ora chrConvert,x
                 sta eolch
                 rts
 

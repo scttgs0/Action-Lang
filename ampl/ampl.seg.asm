@@ -66,7 +66,7 @@ _func1          jsr makeentry
                 sta argbytes
 
                 tay
-_funcst         sta (stlocal),y
+_funcst         sta (symTblLocal),y
                 iny                     ; zap local st
                 bne _funcst
 

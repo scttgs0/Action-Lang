@@ -58,7 +58,7 @@ _stm4           inc arg13               ; try next entry
 
                 ldy #ster
                 lda arg3
-                cmp stglobal+1
+                cmp symTblGlobal+1
                 beq _stm5
 
                 iny
@@ -146,27 +146,27 @@ _gname1         iny
                 lda qglobal
                 beq gnglobal
 
-                lda stlocal
-                ldx stlocal+1
+                lda symTblLocal
+                ldx symTblLocal+1
                 jsr stm
                 bne istmres._stmr3      ; return
 
-gnglobal        lda stglobal
-                ldx stglobal+1
+gnglobal        lda symTblGlobal
+                ldx symTblGlobal+1
                 ldy frstchar
-                cpy bigst
+                cpy isBigSymTbl
                 bpl _gng1
 
-                lda stg2
-                ldx stg2+1
+                lda bigSymTblGlobal
+                ldx bigSymTblGlobal+1
 _gng1           jsr stm
                 bne istmres._stmr3      ; return
 
                 lda qglobal
                 beq newentry
 
-lgnlocal        lda stlocal
-                ldx stlocal+1
+lgnlocal        lda symTblLocal
+                ldx symTblLocal+1
                 jsr stm
                 bne istmres._stmr3
 

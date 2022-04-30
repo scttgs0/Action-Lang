@@ -24,16 +24,18 @@
 ;======================================
 ; Initialize memory
 ;======================================
-minit           .proc
+MemoryInit      .proc
                 lda MEMLO
                 sta afbase
                 lda MEMLO+1
                 sta afbase+1
+
                 lda #0
                 tay
                 sta (afbase),y
                 iny
                 sta (afbase),y
+
                 sec
                 lda MEMTOP
                 sbc afbase
@@ -44,27 +46,28 @@ minit           .proc
                 iny
                 sta (afbase),y
 
-                lda #0                  ; allocate 2 pages of
-                ldx #2                  ; spare memory
+                lda #0                  ; allocate 2 pages of spare memory
+                ldx #2
                 jsr Allocate
 
                 lda afcur
                 sta sparem
                 ldx afcur+1
                 stx sparem+1
-miret           rts
+
+                rts
                 .endproc
 
 
 ;======================================
 ; Initialize window
 ;======================================
-zerow           .proc
+ZeroWindow      .proc
                 lda #0
                 ldx #15
-_zw1            dex                     ; zero page0 window table
+_next1          dex                     ; zero page0 window table
                 sta sp,x
-                bne _zw1
+                bne _next1
 
                 sta dirtyf
                 sta inbuf
@@ -87,8 +90,8 @@ w2init          .proc
 
                 lda #w2-w1
                 sta numwd
-                sta curwdw
-                jsr zerow
+                sta currentWindow
+                jsr ZeroWindow
 
                 ldy wsize
                 iny
@@ -97,16 +100,16 @@ w2init          .proc
                 lda #23
                 sbc wsize
                 sta nlines
-                bra einit.fcmsg
+                bra EditorInit.fcmsg
 
                 .endproc
 
 
 ;======================================
-;
+; Initialize the Editor
 ;======================================
-einit           .proc
-                jsr minit
+EditorInit      .proc
+                jsr MemoryInit          ; initialize editor memory
 
                 lda #0
                 ldx #1
@@ -117,8 +120,8 @@ einit           .proc
                 ldx afcur+1
                 stx buf+1
 
-                lda #$40     ; rowSize
-                sta chcvt
+                lda #$40
+                sta chrConvert
 
                 lda #<delbuf
                 sta delbuf
@@ -127,22 +130,24 @@ einit           .proc
                 sta delbuf+1
                 sta delbuf+5
 
-winit           jsr zerow
+    ; initialize window
+                jsr ZeroWindow
 
-winit1          lda #23
+winit1          lda #23     ; rowcount
                 sta nlines
                 sta cmdln
+
                 lda #0
-                sta curwdw
+                sta currentWindow
                 sta ytop
 
 fcmsg           jsr ctrln
 
-fcmsg1          lda #<editc
-                ldx #>editc
-                jmp cmdmsg
+fcmsg1          lda #<editCmdMsg
+                ldx #>editCmdMsg
+                jmp commandMsg
 
 ;--------------------------------------
 
-editc           .text 20,"ACTION! (c)2022 GPL3"
+editCmdMsg      .text 20,"ACTION! (c)2022 GPL3"
                 .endproc

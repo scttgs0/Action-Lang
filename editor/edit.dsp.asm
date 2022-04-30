@@ -22,9 +22,9 @@
 
 
 ;======================================
-;   CmdMsg(msg)
+;   CommandMsg(message)
 ;======================================
-cmdmsg          .proc
+commandMsg      .proc
                 sta arg0
                 jsr cmdcol
 
@@ -68,7 +68,7 @@ savewd          .proc
 savwd1          clc
                 lda #14
                 tax
-                adc curwdw
+                adc currentWindow
                 tay
 _sw1            lda sp,x
                 sta w1,y
@@ -87,7 +87,7 @@ rstwd           .proc
                 clc
                 lda #14
                 tax
-                adc curwdw
+                adc currentWindow
                 tay
 _rw1            lda w1,y
                 sta sp,x

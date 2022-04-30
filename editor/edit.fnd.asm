@@ -86,7 +86,7 @@ _f6             sta curch
 
                 lda #<notfnd
                 ldx #>notfnd
-                jsr cmdmsg
+                jsr commandMsg
 
                 lda #0
 _f7             sta curch
