@@ -296,6 +296,6 @@ prth            .proc                   ; call only from LBANK!
 dret            .proc                   ; Dret()
                 jsr lproceed
 
-                jmp (dosvec)
+                jmp ($0A) ;!! (DOSVEC)
 
                 .endproc

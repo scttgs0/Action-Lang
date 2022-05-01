@@ -401,7 +401,7 @@ ldig3           sta nxtaddr
 
 ldig4           lda #constt+realt
                 sta nxttoken
-                ldy cix
+                ldy $03_00F2 ;!! CIX
                 ldx #$ff                ; for SET cmd
                 bne ldig2
 

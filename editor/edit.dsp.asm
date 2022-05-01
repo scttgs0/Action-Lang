@@ -164,8 +164,8 @@ newpage         .proc
 npage1          sta choff
                 jsr rstcsr              ; for command line
 
-                lda lmargin
-                sta colcrs
+                lda $03_0052 ;!! LMARGN
+                sta $03_0055 ;!! COLCRS
 
     ; jmp Refresh ; do all the work
                 .endproc
@@ -178,11 +178,11 @@ refresh         .proc
                 clc
                 lda ytop
                 adc lnum
-                sta rowcrs
+                sta $03_0054 ;!! ROWCRS
                 jsr savecol
                 jsr savewd
 
-                inc rowcrs
+                inc $03_0054 ;!! ROWCRS
                 jsr nextdwn
 
                 sta arg9
@@ -207,7 +207,7 @@ _cl2            jsr putstr
 
                 tay
                 sta (arg0),y
-_cl3            inc rowcrs
+_cl3            inc $03_0054 ;!! ROWCRS
                 jsr nextdwn
 
                 sta arg9

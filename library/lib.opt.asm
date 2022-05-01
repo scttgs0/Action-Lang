@@ -125,13 +125,13 @@ _l1             lda linemax
                 sta linemax
 
     ; left margin
-                lda lmargin
+                lda $03_0052 ;!! LMARGN
                 jsr _getstr
 
                 ldx #lmmsg-optmsg
                 jsr _getnum
 
-                sta lmargin
+                sta $03_0052 ;!! LMARGN
 
     ; EOL char
                 lda eolch

@@ -65,7 +65,7 @@ _ce2
 ;======================================
 break1          .proc
                 ldx #1
-                stx brkkey
+                stx $03_0011 ;!! BRKKEY
                 pha
                 jsr break
 

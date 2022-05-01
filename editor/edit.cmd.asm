@@ -31,7 +31,7 @@ front           .proc
                 sta choff
                 jsr dspbuf
 
-                lda lmargin
+                lda $03_0052 ;!! LMARGN
                 jmp rstcol+6
 
                 .endproc
@@ -45,9 +45,9 @@ back            .proc
                 lda (buf),y
 back0           pha
                 clc
-                adc lmargin
+                adc $03_0052 ;!! LMARGN
                 sec
-                sbc rmargin
+                sbc $03_0053 ;!! RMARGN
                 bcs _back1
 
                 lda #1
@@ -61,7 +61,7 @@ _back1          sbc indent
                 sec
                 sbc choff
                 clc
-                adc lmargin
+                adc $03_0052 ;!! LMARGN
                 jmp rstcol+6
 
                 .endproc
@@ -214,7 +214,7 @@ scrlinit        .proc
                 jsr next
                 beq _siret              ; EOF
 
-                lda colcrs
+                lda $03_0055 ;!! COLCRS
                 sta x
 
     ; lda choff
@@ -326,8 +326,8 @@ chkc1           rts
 scrllft         .proc
                 jsr chkcol
 
-                lda lmargin
-                cmp colcrs
+                lda $03_0052 ;!! LMARGN
+                cmp $03_0055 ;!! COLCRS
                 bcc _sl1
 
                 clc
@@ -351,8 +351,8 @@ scrlrt          .proc
                 jsr chkcol
                 bcc chkcol.chkc1
 
-                lda colcrs
-                cmp rmargin
+                lda $03_0055 ;!! COLCRS
+                cmp $03_0053 ;!! RMARGN
                 bcc _sr2
 
                 inc choff
@@ -372,9 +372,9 @@ setsp           .proc
                 lda indent
                 adc choff
                 clc
-                adc colcrs
+                adc $03_0055 ;!! COLCRS
                 sec
-                sbc lmargin
+                sbc $03_0052 ;!! LMARGN
                 sta sp
                 rts
                 .endproc
@@ -408,7 +408,7 @@ moveup          .proc
 move            .proc
                 sty arg6
                 sta arg4
-                stx rowcrs
+                stx $03_0054 ;!! ROWCRS
                 jsr rstcsr
                 jsr dsploc              ; get display address
 

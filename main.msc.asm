@@ -519,8 +519,8 @@ rstp            .proc
 ;   JSRInd(addr)
 ;======================================
 jsrind          .proc
-                sta adress
-                stx adress+1
-                jmp (adress)
+                sta $03_0064   ;!! ADRESS
+                stx $03_0064+1 ;!! ADRESS+1
+                jmp ($64)      ;!! (ADRESS)
 
                 .endproc

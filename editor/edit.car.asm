@@ -79,31 +79,31 @@ serial          .word $0A00             ; serial number of ROM
 Start           .proc
                 jsr initkeys            ; get keyboard
 
-                lda warmst
+                lda $03_0008 ;!! WARMST
                 beq cold
 
                 lda chrConvert3
                 cmp #$60                ; make sure RAM initialized
                 bne cold
 
-_warm           lda mpc                 ; see where we were
+_warm           lda isMonitorLive       ; see where we were
                 beq _w1
 
-                jmp monitor._mon1       ; monitor
+                jmp monitor._mon1
 
-_w1             jmp gmerr.punt          ; editor
+_w1             jmp GeneralMemErr.Punt  ; editor
 
 cold            lda #0
                 tay
-_c0             sta $03_0480,y          ; zero RAM
+_nextZero       sta $03_0480,y          ; zero RAM
                 dey
-                bne _c0
+                bne _nextZero
 
                 ldy #$3a
-_cold1          lda emjmps-1,y          ; init RAM
+_nextJmps       lda emjmps-1,y          ; init RAM
                 dey
                 sta jmps,y
-                bne _cold1
+                bne _nextJmps
 
     ; sty chrConvert1 ; Y=0
                 jsr EditorInit          ; init editor
@@ -124,21 +124,21 @@ _cold1          lda emjmps-1,y          ; init RAM
                 lda #0
                 ldx #4
                 ldy isBigSymTbl
-                beq _si1                ; no
+                beq _1                ; no
 
                 ldx #6
-_si1            jsr getmem              ; get hash table
+_1              jsr getmem              ; get hash table
 
                 sta symTblGlobal        ; qglobal hash table
                 stx symTblGlobal+1
                 ldy isBigSymTbl
-                beq _si2                ; no
+                beq _2                ; no
 
                 inx
                 inx
                 sta bigSymTblGlobal     ; big symbol table hash table
                 stx bigSymTblGlobal+1
-_si2            inx
+_2              inx
                 inx
                 sta symTblLocal         ; local hash table
                 stx symTblLocal+1

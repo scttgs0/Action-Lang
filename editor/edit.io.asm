@@ -50,8 +50,8 @@ _gs1a           ldy #0
                 beq _gs3                ; yes, clear line
 
                 stx arg3
-                ldx colcrs
-                cpx rmargin
+                ldx $03_0055 ;!! COLCRS
+                cpx $03_0053 ;!! RMARGN
                 bcs _gs1                ; don't go off screen
 
                 sta (arg12),y

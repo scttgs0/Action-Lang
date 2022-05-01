@@ -153,8 +153,8 @@ dspstr          .proc
 
                 lda arg6                ; PutStr size
                 clc
-                adc lmargin
-                sta colcrs
+                adc $03_0052 ;!! LMARGN
+                sta $03_0055 ;!! COLCRS
                 jsr scrrt
 
                 ldy #0
@@ -268,9 +268,9 @@ sermsg          .text 7,"Error: "
 ;   CToStr(num) - Cardinal to string
 ;======================================
 ctostr          .proc
-                sta fr0
-                stx fr0+1
-                jsr $03_D9AA ;!! IFP                 ; Cardinal to real
+                sta $03_00D4   ;!! FR0
+                stx $03_00D4+1 ;!! FR0+1
+                jsr $03_D9AA   ;!! IFP                 ; Cardinal to real
 
                 .endproc
 
@@ -285,7 +285,7 @@ rtostr          ;.proc
                 ldx #0
 _rts1           iny
                 inx
-                lda (inbuff),y
+                lda ($F3),y  ;!! (INBUFF),y
                 sta numbuf,x
                 bpl _rts1
 
@@ -359,10 +359,10 @@ openchan        .proc
                 clc
                 lda nxtaddr
                 adc #2
-                sta fr0
+                sta $03_00D4   ;!! FR0
                 lda nxtaddr+1
                 adc #0
-                sta fr0+1
+                sta $03_00D4+1 ;!! FR0+1
 
                 ldy #0
                 lda (nxtaddr),y         ; add 2 to length of string
@@ -370,7 +370,7 @@ openchan        .proc
                 sta (nxtaddr),y
                 tay
 _oc1            lda (nxtaddr),y         ; move string up...
-                sta (fr0),y
+                sta ($D4),y  ;!! (FR0),y
                 dey
                 bne _oc1
 
@@ -408,14 +408,14 @@ printbuf        .proc
 ;   HToCar(buf,index)
 ;======================================
 htocar          .proc
-                sty cix
+                sty $03_00F2   ;!! CIX
                 sta arg1
                 stx arg2
                 lda #0
-                sta fr0
-                sta fr0+1
+                sta $03_00D4   ;!! FR0
+                sta $03_00D4+1 ;!! FR0+1
 
-_htc1           ldy cix
+_htc1           ldy $03_00F2   ;!! CIX
                 lda (arg1),y
                 sec
                 sbc #'0'
@@ -432,16 +432,16 @@ _htc1           ldy cix
                 bpl rtocar.htcrtn
 
 _htcok          sta arg5
-                lda fr0
-                ldx fr0+1
+                lda $03_00D4   ;!! FR0
+                ldx $03_00D4+1 ;!! FR0+1
                 ldy #4
                 jsr lsh1
 
                 clc
                 adc arg5
-                sta fr0
-                stx fr0+1
-                inc cix
+                sta $03_00D4   ;!! FR0
+                stx $03_00D4+1 ;!! FR0+1
+                inc $03_00F2   ;!! CIX
                 bra _htc1
 
                 .endproc
@@ -454,9 +454,9 @@ rtocar          .proc
                 jsr $03_D9D2 ;!! FPI
                 bcs rcerr
 
-htcrtn          lda fr0
-                ldx fr0+1
-                ldy cix
+htcrtn          lda $03_00D4   ;!! FR0
+                ldx $03_00D4+1 ;!! FR0+1
+                ldy $03_00F2   ;!! CIX
 htcr1           rts
 
 rcerr           ldy #conster
@@ -469,10 +469,10 @@ rcerr           ldy #conster
 ;   SToReal(str, index)
 ;======================================
 storeal         .proc
-                sty cix
-                sta inbuff
-                stx inbuff+1
-                jmp $03_D800 ;!! AFP
+                sty $03_00F2   ;!! CIX
+                sta $03_00F3   ;!! INBUFF
+                stx $03_00F3+1 ;!! INBUFF+1
+                jmp $03_D800   ;!! AFP
 
                 .endproc
 
@@ -531,7 +531,7 @@ _ps2            sta (arg0),y            ; clear line
 
                 clc                     ; handle left margin
                 lda arg0
-                adc lmargin
+                adc $03_0052 ;!! LMARGN
                 sta arg0
                 bcc _ps3
 
@@ -548,8 +548,8 @@ _ps3            iny                     ; sets Y to 0
                 sta arg7
 
                 sec
-                lda rmargin
-                sbc lmargin
+                lda $03_0053 ;!! RMARGN
+                sbc $03_0052 ;!! LMARGN
                 cmp arg6
                 beq _ps3a               ; handle EOL char
                 bcs _ps4                ; length ok
@@ -612,7 +612,7 @@ cmdcol          .proc
                 jsr rstcsr
 
                 ldy cmdln
-                sty rowcrs
+                sty $03_0054 ;!! ROWCRS
                 rts
                 .endproc
 
@@ -621,9 +621,9 @@ cmdcol          .proc
 ;   SaveCol()
 ;======================================
 savecol         .proc
-                lda rowcrs
+                lda $03_0054 ;!! ROWCRS
                 sta y
-                lda colcrs
+                lda $03_0055 ;!! COLCRS
                 sta x
                 rts
                 .endproc
@@ -634,9 +634,9 @@ savecol         .proc
 ;======================================
 rstcol          .proc
                 lda y
-                sta rowcrs
+                sta $03_0054 ;!! ROWCRS
                 lda x
-                sta colcrs
+                sta $03_0055 ;!! COLCRS
                 jsr zapcsr
 lftrt           jsr scrlft
 
@@ -707,9 +707,9 @@ dspbuf          .proc
 ;   DspLoc() get address of display
 ;======================================
 dsploc          .proc
-                lda savmsc
-                ldx savmsc+1
-                ldy rowcrs
+                lda $03_0058   ;!! SAVMSC
+                ldx $03_0058+1 ;!! SAVMSC+1
+                ldy $03_0054   ;!! ROWCRS
                 beq _dlocrt
 
 _dloc1          clc
@@ -731,9 +731,9 @@ _dlocrt         sta arg0
 ;======================================
 zapcsr          .proc
                 lda #<csrch
-                sta oldadr
+                sta $03_005E   ;!! OLDADR
                 lda #>csrch
-                sta oldadr+1
+                sta $03_005E+1 ;!! OLDADR+1
                 rts
                 .endproc
 
@@ -743,7 +743,7 @@ zapcsr          .proc
 ;======================================
 rstcsr          .proc
                 ldy #0
-                lda oldchr
-                sta (oldadr),y
+                lda $03_005D ;!! OLDCHR
+                sta ($5E),y  ;!! (OLDADR),y
                 rts
                 .endproc

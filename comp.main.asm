@@ -2811,7 +2811,7 @@ cgmul           .proc
                 sta arg7
 
         .if ramzap
-                sta (adress),y
+                sta ($64),y  ;!! (ADRESS),y
         .else
                 nop
                 nop

@@ -93,12 +93,12 @@ _grio           jsr position.pos1
 ; same as BASIC
 ;======================================
 position        .proc
-                sta oldcol              ; Position(col, row)
-                stx oldcol+1
-                sty oldrow
-pos1            sta colcrs
-                stx colcrs+1
-                sty rowcrs
+                sta $03_005B   ;!! OLDCOL              ; Position(col, row)
+                stx $03_005B+1 ;!! OLDCOL+1
+                sty $03_005A   ;!! OLDROW
+pos1            sta $03_0055   ;!! COLCRS
+                stx $03_0055+1 ;!! COLCRS+1
+                sty $03_0054   ;!! ROWCRS
                 rts
                 .endproc
 

@@ -27,26 +27,26 @@
 lgetkey         .proc
     ; Get next key in buffer
                 clc                     ; blink cursor
-                lda rtclok+2
+                lda $03_0012+2 ;!! RTCLOK+2
                 adc #14
                 tax
 _bc1            lda $03_02FC ;!! CH_                 ; key down?
                 eor #$ff
                 bne _gk0
 
-                cpx rtclok+2
+                cpx $03_0012+2 ;!! RTCLOK+2
                 bpl _bc1
 
                 ldy #0
-                lda (oldadr),y
+                lda ($5E),y  ;!! (OLDADR),y
                 eor #$80
-                sta (oldadr),y
+                sta ($5E),y  ;!! (OLDADR),y
                 jmp lgetkey
 
 _gk0            ldy #0
-                lda oldchr
+                lda $03_005D ;!! OLDCHR
                 eor #$80
-                sta (oldadr),y          ; restore cursor
+                sta ($5E),y  ;!! (OLDADR),y          ; restore cursor
                 ldx $03_022B ;!! SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5
@@ -72,7 +72,7 @@ _gk3            and #$3f
 
 _gkey           ldx #$70
                 lda #7                  ; GETCHR
-                sta brkkey              ; ignore BREAK key
+                sta $03_0011 ;!! BRKKEY              ; ignore BREAK key
                 jsr putch.putch2
 
 _gk4            ldx $03_022B ;!! SRTIMR

@@ -37,8 +37,8 @@ monitor         .proc
 _mon1           jsr scrinit
 
                 ldx #1
-                stx rowcrs
-                stx mpc
+                stx $03_0054 ;!! ROWCRS
+                stx isMonitorLive
                 dex
                 stx cmdln
                 stx device
@@ -46,7 +46,7 @@ _mon1           jsr scrinit
 
 _mloop          jsr initkeys
 
-                lda dindex              ; display mode
+                lda $03_0057 ;!! DINDEX              ; display mode
                 beq _mon2
 
                 jsr scrinit             ; get Graphics(0)
@@ -79,7 +79,7 @@ _mon2           jsr alarm
                 jmp _mloop
 
 _mquit          ldy #0
-                sty mpc
+                sty isMonitorLive
                 sty subbuf
                 sty findbuf
                 sty dirtyf
@@ -405,8 +405,8 @@ comp            .proc
 
 ; see MAIN.BNK now
 ;Dret PROC ; Dret() go to DOS
-;     lda DOSVEC
-;     ldx DOSVEC+1
+;     lda $03_000A    ;!! DOSVEC
+;     ldx $03_000A+1  ;!! DOSVEC+1
 ;     jmp JSRInd
 
 

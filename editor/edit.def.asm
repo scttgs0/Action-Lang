@@ -32,17 +32,17 @@ afcur           = $84
 afsize          = $86
 afbest          = $88
 props           = $88
-afbsze          = $8a
-op              = $8a
-lsttoken        = $8b                   ; prev. token value
+afbsze          = $8A
+op              = $8A
+lsttoken        = $8B                   ; prev. token value
 
 ; current window data / comp. vars
 ;----------------------------------
-sp              = $8c
-choff           = $8d
-lnum            = $8e
-curproc         = $8e                   ; 2 bytes
-dirty           = $8f
+sp              = $8C
+choff           = $8D
+lnum            = $8E
+curproc         = $8E                   ; 2 bytes
+dirty           = $8F
 top             = $90                   ; -> top line
 bot             = $92                   ; -> bottom line
 whaddr          = $92                   ; -> current DO frame
@@ -53,113 +53,113 @@ nlines          = $98
 chan            = $98                   ; current input file
 ytop            = $99
 defflg          = $99
-indent          = $9a
-stackptr        = $9a                   ; op stack offset
+indent          = $9A
+stackptr        = $9A                   ; op stack offset
 
-buf             = $9b                   ; -> edit buf
-insert          = $9d                   ; insert/replace flag
-delnxt          = $9e                   ; ->, USED BY LEX
+buf             = $9B                   ; -> edit buf
+insert          = $9D                   ; insert/replace flag
+delnxt          = $9E                   ; ->, USED BY LEX
 
 ; arguments and temps
 ;---------------------
-args            = $a0
-arg0            = $a0
-arg1            = $a1
-arg2            = $a2
-arg3            = $a3
-arg4            = $a4
-arg5            = $a5
-arg6            = $a6
-arg7            = $a7
-arg8            = $a8
-arg9            = $a9
-arg10           = $aa
-arg11           = $ab
-arg12           = $ac
-arg13           = $ad
-arg14           = $ae
-arg15           = $af
+args            = $A0
+arg0            = $A0
+arg1            = $A1
+arg2            = $A2
+arg3            = $A3
+arg4            = $A4
+arg5            = $A5
+arg6            = $A6
+arg7            = $A7
+arg8            = $A8
+arg9            = $A9
+arg10           = $AA
+arg11           = $AB
+arg12           = $AC
+arg13           = $AD
+arg14           = $AE
+arg15           = $AF
 
 ; compiler vars
 ;---------------
-stbase          = $b0                   ; symbol table base (page)
-symTblGlobal    = $b1                   ; qglobal hash table
-symTblLocal     = $b3                   ; local hash table
-codeoff         = $b5                   ; relocation offset
-device          = $b7                   ; default device
-qglobal         = $b8                   ; qglobal/local flag
-stack           = $b9                   ; value stack
-frame           = $bb                   ; -> current frame
-symtab          = $bd                   ; -> next symbol table entry
-stmax           = $bf                   ; symbol table top (page)
-addr            = $c0                   ; token address
-token           = $c2                   ; token value
+stbase          = $B0                   ; symbol table base (page)
+symTblGlobal    = $B1                   ; qglobal hash table
+symTblLocal     = $B3                   ; local hash table
+codeoff         = $B5                   ; relocation offset
+device          = $B7                   ; default device
+qglobal         = $B8                   ; qglobal/local flag
+stack           = $B9                   ; value stack
+frame           = $BB                   ; -> current frame
+symtab          = $BD                   ; -> next symbol table entry
+stmax           = $BF                   ; symbol table top (page)
+addr            = $C0                   ; token address
+token           = $C2                   ; token value
 
 ; following defs can be used during
 ; program execution (user program)
 ;-----------------------------------
-dirtyf          = $c3
-spln            = $c4                   ; error char
-curln           = $c5                   ; error line
-curnxt          = $c7                   ; next error line
-nxtaddr         = $c9                   ; next token address
+dirtyf          = $C3
+spln            = $C4                   ; error char
+curln           = $C5                   ; error line
+curnxt          = $C7                   ; next error line
+nxtaddr         = $C9                   ; next token address
 
         ; note: $CA-$CD never referenced
 
-bigSymTblGlobal = $ce                   ; only used if big symbol table
-arrayptr        = $d0                   ; array mem. list
-spnxt           = $d2                   ; next error char
-nxttoken        = $d3                   ; next token value
+bigSymTblGlobal = $CE                   ; only used if big symbol table
+arrayptr        = $D0                   ; array mem. list
+spnxt           = $D2                   ; next error char
+nxttoken        = $D3                   ; next token value
 
 
 ; ACTION! vars ($480 - $57D)
 ;----------------------------
 w1              = $03_0480              ; window 1 data
-top1            = $03_048f
+top1            = $03_048F
 chrConvert      = $03_0490              ; char convert
 codebase        = $03_0491              ; 2 bytes
 codesize        = $03_0493              ; 2 bytes
 SymTblSizePages = $03_0495              ; symbol table size (pages)
-mpc             = $03_0496              ; edit/mon flag
+isMonitorLive   = $03_0496              ; edit/mon flag
 gbase           = $03_0497              ; 2 bytes
 type            = $03_0499
-list            = $03_049a              ; listing flag
-numargs         = $03_049b
-cmdln           = $03_049c              ; command line offset
-param           = $03_049d
-opmode          = $03_049e
-currentWindow   = $03_049f              ; window memory offset
-cury            = $03_04a0              ; current Y reg (0/1/unknown)
-lastch          = $03_04a1              ; last char
-curch           = $03_04a2              ; current char
-sparem          = $03_04a3              ; -> spare mem
-numwd           = $03_04a5              ; number of windows
-allocerr        = $03_04a6              ; INC on Alloc error
-delbuf          = $03_04a7              ; 6 bytes
-frstchar        = $03_04ad              ; used for big symbol table
-taglist         = $03_04ae              ; 2 bytes
-chrConvert1     = $03_04b0              ; char convert
-w2              = $03_04b1              ; window 2 data
-bckgrnd         = $03_04c0              ; background color
-procsp          = $03_04c1              ; Break stack pointer
-argbytes        = $03_04c2
-trace           = $03_04c3              ; trace flag
-isBigSymTbl     = $03_04c4              ; big symbol table flag
+list            = $03_049A              ; listing flag
+numargs         = $03_049B
+cmdln           = $03_049C              ; command line offset
+param           = $03_049D
+opmode          = $03_049E
+currentWindow   = $03_049F              ; window memory offset
+cury            = $03_04A0              ; current Y reg (0/1/unknown)
+lastch          = $03_04A1              ; last char
+curch           = $03_04A2              ; current char
+sparem          = $03_04A3              ; -> spare mem
+numwd           = $03_04A5              ; number of windows
+allocerr        = $03_04A6              ; INC on Alloc error
+delbuf          = $03_04A7              ; 6 bytes
+frstchar        = $03_04AD              ; used for big symbol table
+taglist         = $03_04AE              ; 2 bytes
+chrConvert1     = $03_04B0              ; char convert
+w2              = $03_04B1              ; window 2 data
+bckgrnd         = $03_04C0              ; background color
+procsp          = $03_04C1              ; Break stack pointer
+argbytes        = $03_04C2
+trace           = $03_04C3              ; trace flag
+isBigSymTbl     = $03_04C4              ; big symbol table flag
 
         ; note: $4C5 available
 
-jmps            = $03_04c6              ; see EDIT.CAR
+jmps            = $03_04C6              ; see EDIT.CAR
 
 ; Jump table goes to $4FF
 ;-------------------------
-segend          = $03_04c6
-curbank         = $03_04c9
-stmask          = $03_04ca
-error           = $03_04cb
-wsize           = $03_04ce
-linemax         = $03_04cf
-chrConvert2     = $03_04d0              ; char convert
-expend          = $03_04d1
+segend          = $03_04C6
+curbank         = $03_04C9
+stmask          = $03_04CA
+error           = $03_04CB
+wsize           = $03_04CE
+linemax         = $03_04CF
+chrConvert2     = $03_04D0              ; char convert
+expend          = $03_04D1
 dclend          = expend+3
 cgend           = dclend+3
 arend           = cgend+3
@@ -168,11 +168,11 @@ alarm           = splend+3
 eolch           = alarm+3
 lsh             = eolch+1
 
-chrConvert3     = $03_04f0              ; char convert
-tvdisp          = $03_04f1
-disptb          = $03_04f2
-smtend          = $03_04f8
-stmradr         = $04fe
+chrConvert3     = $03_04F0              ; char convert
+tvdisp          = $03_04F1
+disptb          = $03_04F2
+smtend          = $03_04F8
+stmradr         = $04FE
 
 subbuf          = $03_0500              ; 40 bytes     ; rowSize
 findbuf         = $03_0528              ; 40 bytes     ; rowSize
@@ -186,39 +186,17 @@ opstack         = $03_0580
 ; 16 bytes, $58F (worst case?).
 ;---------------------------------
 tempbuf         = $03_0590              ; 40 bytes     ; rowSize
-argtypes        = $03_05b8              ;  8 bytes
-eof             = $03_05c0              ;  8 bytes
-inbuf           = $03_05c8              ; 36 bytes
-abt             = $03_05ec              ;  4 bytes
-temps           = $03_05f0              ; 16 bytes
+argtypes        = $03_05B8              ;  8 bytes
+eof             = $03_05C0              ;  8 bytes
+inbuf           = $03_05C8              ; 36 bytes
+abt             = $03_05EC              ;  4 bytes
+temps           = $03_05F0              ; 16 bytes
 
 
 ; system vars
 ;-------------
-warmst          = $08
-dosvec          = $0a
-dosini          = $0c
-qcode           = $0e                   ; ap. high mem.
-brkkey          = $11
-rtclok          = $12
-adress          = $64
-lmargin         = $52
-rmargin         = $53
-rowcrs          = $54
-colcrs          = $55
-dindex          = $57
-savmsc          = $58
-oldrow          = $5a
-oldcol          = $5b
-oldadr          = $5e
-oldchr          = $5d
-csrch           = $5d
-ramtop          = $6a
-fr0             = $d4
-fr1             = $e0
-cix             = $f2
-inbuff          = $f3
-flptr           = $fc
+qcode           = $0E                   ; ap. high mem.
+csrch           = $5D
 
 lbuff           = $03_0580              ; fp ASCII buf
 
@@ -241,10 +219,10 @@ windent         = 14
 
 ; system defs
 ;-------------
-eol             = $9b
-esc             = $1b
+eol             = $9B
+esc             = $1B
 
 
 ; bank switching defs
 ;---------------------
-bank            = $03_d500
+bank            = $03_D500

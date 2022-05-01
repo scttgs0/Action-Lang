@@ -35,7 +35,7 @@ _gm0            stx afsize+1
 _gm1            jsr Allocate._ENTRY
 
                 ldx afcur+1
-                beq gmerr               ; no memory allocated !
+                beq GeneralMemErr       ; no memory allocated !
 
                 clc
                 lda afcur
@@ -48,23 +48,23 @@ _gm2            rts
 
 
 ;======================================
-;
+; General Memory Error
 ;======================================
-gmerr           .proc
+GeneralMemErr   .proc
                 ldy #0
                 jsr syserr
 
                 lda sparem
                 ldx sparem+1
                 ldy allocerr
-                bne punt                ; really out of memory
+                bne Punt                ; really out of memory
 
                 inc allocerr
                 jsr Free
 
                 jmp getmem._gm1         ; retry
 
-punt            jsr savewd              ; we're in big trouble
+Punt            jsr savewd              ; we're in big trouble
 
                 jmp rstwnd
 

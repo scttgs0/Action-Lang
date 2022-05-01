@@ -1,3 +1,25 @@
+; system vars
+;-------------
+WARMST          = $08
+DOSVEC          = $0A
+BRKKEY          = $11
+RTCLOK          = $12
+LMARGIN         = $52
+RMARGN          = $53
+ROWCRS          = $54
+COLCRS          = $55
+DINDEX          = $57
+SAVMSC          = $58
+OLDROW          = $5A
+OLDCOL          = $5B
+OLDCHR          = $5D
+OLDADR          = $5E
+ADRESS          = $64
+FR0             = $D4
+FR1             = $E0
+CIX             = $F2
+INBUFF          = $F3
+
 CH_             = $02FC                 ; character buffer
 DSPFLG          = $02FE                 ; display flag
 
