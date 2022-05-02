@@ -69,7 +69,7 @@ _next1          dex                     ; zero page0 window table
                 sta sp,x
                 bne _next1
 
-                sta dirtyf
+                sta isDirty
                 sta inbuf
                 tay
                 sta (buf),y
@@ -80,13 +80,13 @@ _next1          dex                     ; zero page0 window table
 ;======================================
 ; Initialize secondary window
 ;======================================
-w2init          .proc
-                jsr ctrln
+Window2Init     .proc
+                jsr CenterLine
 
                 lda wsize
                 sta nlines
                 sta cmdln
-                jsr savworld
+                jsr SaveWorld
 
                 lda #w2-w1
                 sta numwd
@@ -141,13 +141,13 @@ winit1          lda #23     ; rowcount
                 sta currentWindow
                 sta ytop
 
-fcmsg           jsr ctrln
+fcmsg           jsr CenterLine
 
 fcmsg1          lda #<editCmdMsg
                 ldx #>editCmdMsg
-                jmp commandMsg
+                jmp CommandMsg
 
 ;--------------------------------------
 
-editCmdMsg      .text 20,"ACTION! (c)2022 GPL3"
+editCmdMsg      .text 21,"ACTION! (c) 2022 GPL3"
                 .endproc

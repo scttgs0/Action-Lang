@@ -24,9 +24,9 @@
 ;======================================
 ;   Find()
 ;======================================
-find            .proc
-                jsr setsp
-                jsr savewd
+Find            .proc
+                jsr SetSpacing
+                jsr SaveWindow
 
                 lda lastch
                 cmp #$f8
@@ -37,7 +37,7 @@ find            .proc
 find1           ldy #>findbuf
                 sty arg3
                 ldy #<findbuf
-                jsr cmdstr
+                jsr CommandString
 
                 lda #$f8
                 sta curch
@@ -66,7 +66,7 @@ _f4             lda (buf),y
 
                 iny
                 cpx findbuf
-                beq found
+                beq Found
 
                 cpy arg0
                 bcc _f4
@@ -86,7 +86,7 @@ _f6             sta curch
 
                 lda #<notfnd
                 ldx #>notfnd
-                jsr commandMsg
+                jsr CommandMsg
 
                 lda #0
 _f7             sta curch
@@ -98,13 +98,13 @@ _f7             sta curch
 ;
 ;======================================
 
-found           .proc
-                jsr ctrln
+Found           .proc
+                jsr CenterLine
 
                 ldy sp
                 dey
                 tya
-                jsr back.back0
+                jsr Back.back0
 
                 lda #$fe
                 rts

@@ -26,25 +26,25 @@
 ; Monitor for ACTION!
 ;======================================
 monitor         .proc
-                jsr savworld
+                jsr SaveWorld
 
                 lda delbuf              ; delete buffer bottom
                 ldx delbuf+1
-                jsr delfree             ; get rid of delete buf
+                jsr DeleteFree             ; get rid of delete buf
 
                 lda top+1
                 sta top1
 _mon1           jsr scrinit
 
                 ldx #1
-                stx $03_0054 ;!! ROWCRS
+                stx ROWCRS
                 stx isMonitorLive
                 dex
                 stx cmdln
                 stx device
                 jsr splsetup
 
-_mloop          jsr initkeys
+_mloop          jsr InitKeys
 
                 lda $03_0057 ;!! DINDEX              ; display mode
                 beq _mon2
@@ -55,7 +55,7 @@ _mon2           jsr alarm
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
-                jsr gettemp
+                jsr GetTemp
 
                 ldy tempbuf
                 beq _mloop
@@ -82,7 +82,7 @@ _mquit          ldy #0
                 sty isMonitorLive
                 sty subbuf
                 sty findbuf
-                sty dirtyf
+                sty isDirty
                 .endproc
 
 
@@ -114,9 +114,9 @@ _rw1            jsr paintw
 ;======================================
 paintw          .proc
                 sta currentWindow
-                jsr rstwd
+                jsr RestoreWindow
 
-                jmp found
+                jmp Found
 
                 .endproc
 
@@ -134,11 +134,11 @@ _md1            inc arg11
 _md2            lda arg11
                 ldx arg12
                 jsr mprint._mp1
-                jsr gotkey
+                jsr GotKey
                 beq _md1
 
                 ldx #$ff
-                stx $03_02FC ;!! CH_
+                stx CH_
                 cmp #$de
                 bne _md1
 
@@ -216,7 +216,7 @@ mpsave          .proc
 boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
-                jsr yesno
+                jsr YesNo
 
                 bne mrun._mwrt1
 
@@ -239,8 +239,8 @@ mrun            .proc
 
                 jsr comp
 
-_mr1            lda $03_02E2 ;!! INITAD
-                ldx $03_02E3 ;!! INITAD+1
+_mr1            lda INITAD
+                ldx INITAD+1
                 bne _mr3
 
 _mwrt1          rts
@@ -262,7 +262,7 @@ mwrite          .proc                   ; write object file
                 cmp #quote
                 bne mrun._mwrt1         ; no output file!
 
-                lda $03_02E3 ;!! INITAD+1
+                lda INITAD+1
                 beq mrun._mwrt1         ; no program!!
 
                 lda #1
@@ -323,9 +323,9 @@ _mw3            lda _mwinit,x
                 dex
                 bpl _mw3
 
-                lda $03_02E2 ;!! INITAD
+                lda INITAD
                 sta arg14
-                lda $03_02E3 ;!! INITAD+1
+                lda INITAD+1
                 sta arg15
                 jsr mwout
 
@@ -336,8 +336,8 @@ _mw3            lda _mwinit,x
 ;--------------------------------------
 
 _mwinit         .byte 6
-                .addr $03_02E2 ;!! INITAD
-                .addr $03_02E3 ;!! INITAD+1
+                .addr INITAD
+                .addr INITAD+1
                 .endproc
 
 

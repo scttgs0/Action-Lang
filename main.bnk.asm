@@ -49,7 +49,53 @@ cstart          .proc
                 sty curbank
                 sty $03_D503 ;!! bank+ebank
 
+    ; initialize memory boundries
+                lda #<$03_7FFF
+                sta MEMTOP
+                lda #>$03_7FFF
+                sta MEMTOP+1
+
+                lda #<$03_0600
+                sta MEMLO
+                lda #>$03_0600
+                sta MEMLO+1
+
+    ; initialize left and right margins
+                stz LMARGN
+                lda #97
+                sta RMARGN
+
+    ; initialize cursor location
+                stz COLCRS
+                stz ROWCRS
+
+    ; initialize Tab positions
+                ldy #$00
+_nextBatch      ldx #$00
+_nextTab        lda InitialTabs,x
+                sta TABMAP,y
+
+                iny
+                inx
+                cpx #$03
+                bne _nextTab
+
+                cpy #$10
+                bne _nextBatch
+
+                lda #<$037FE0
+                sta INITAD
+                lda #>$037FE0
+                sta INITAD+1
+
+                stz WARMST
                 jmp Start
+
+;--------------------------------------
+
+InitialTabs     .byte %00100100
+                .byte %10010010
+                .byte %01001001
 
                 .endproc
 
@@ -83,11 +129,13 @@ rbank1          sta bank,y
 ;======================================
 ;   Run(address)
 ;======================================
-run             .proc                   ; reset Error routine
+run             .proc
+    ; reset Error routine
                 ldy #<splerr
                 sty error+1
                 ldy #>splerr
                 sty error+2
+
                 jsr lproceed
                 jsr jsrind
 
@@ -177,7 +225,7 @@ cstmtlst        .proc
 ;======================================
 mgett1          .proc
                 jsr editbank
-                jsr gettemp.gett1
+                jsr GetTemp.gett1
 
                 .endproc
 

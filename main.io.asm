@@ -153,8 +153,8 @@ dspstr          .proc
 
                 lda arg6                ; PutStr size
                 clc
-                adc $03_0052 ;!! LMARGN
-                sta $03_0055 ;!! COLCRS
+                adc LMARGN
+                sta COLCRS
                 jsr scrrt
 
                 ldy #0
@@ -531,7 +531,7 @@ _ps2            sta (arg0),y            ; clear line
 
                 clc                     ; handle left margin
                 lda arg0
-                adc $03_0052 ;!! LMARGN
+                adc LMARGN
                 sta arg0
                 bcc _ps3
 
@@ -548,8 +548,8 @@ _ps3            iny                     ; sets Y to 0
                 sta arg7
 
                 sec
-                lda $03_0053 ;!! RMARGN
-                sbc $03_0052 ;!! LMARGN
+                lda RMARGN
+                sbc LMARGN
                 cmp arg6
                 beq _ps3a               ; handle EOL char
                 bcs _ps4                ; length ok
@@ -612,7 +612,7 @@ cmdcol          .proc
                 jsr rstcsr
 
                 ldy cmdln
-                sty $03_0054 ;!! ROWCRS
+                sty ROWCRS
                 rts
                 .endproc
 
@@ -621,9 +621,9 @@ cmdcol          .proc
 ;   SaveCol()
 ;======================================
 savecol         .proc
-                lda $03_0054 ;!! ROWCRS
+                lda ROWCRS
                 sta y
-                lda $03_0055 ;!! COLCRS
+                lda COLCRS
                 sta x
                 rts
                 .endproc
@@ -634,9 +634,9 @@ savecol         .proc
 ;======================================
 rstcol          .proc
                 lda y
-                sta $03_0054 ;!! ROWCRS
+                sta ROWCRS
                 lda x
-                sta $03_0055 ;!! COLCRS
+                sta COLCRS
                 jsr zapcsr
 lftrt           jsr scrlft
 
@@ -709,7 +709,7 @@ dspbuf          .proc
 dsploc          .proc
                 lda $03_0058   ;!! SAVMSC
                 ldx $03_0058+1 ;!! SAVMSC+1
-                ldy $03_0054   ;!! ROWCRS
+                ldy ROWCRS
                 beq _dlocrt
 
 _dloc1          clc
@@ -731,9 +731,9 @@ _dlocrt         sta arg0
 ;======================================
 zapcsr          .proc
                 lda #<csrch
-                sta $03_005E   ;!! OLDADR
+                sta OLDADR      ; TODO:
                 lda #>csrch
-                sta $03_005E+1 ;!! OLDADR+1
+                sta OLDADR+1
                 rts
                 .endproc
 
@@ -743,7 +743,7 @@ zapcsr          .proc
 ;======================================
 rstcsr          .proc
                 ldy #0
-                lda $03_005D ;!! OLDCHR
+                lda OLDCHR
                 sta ($5E),y  ;!! (OLDADR),y
                 rts
                 .endproc

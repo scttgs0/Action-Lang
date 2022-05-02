@@ -22,11 +22,11 @@
 
 
 ;======================================
-;   Subst()
+;   Substitute()
 ;======================================
-subst           .proc
-                jsr setsp
-                jsr savewd
+Substitute      .proc
+                jsr SetSpacing
+                jsr SaveWindow
 
                 lda lastch
                 cmp #$7d
@@ -38,7 +38,7 @@ subst           .proc
                 ldy #>subbuf
                 sty arg3
                 ldy #<subbuf
-                jsr cmdstr
+                jsr CommandString
 
                 pla
 
@@ -55,17 +55,17 @@ _s0             cmp #$f8
 
                 lda #<formsg
                 ldx #>formsg
-                jsr find.find1
+                jsr Find.find1
                 bne _s3
 
 _s1             rts
 
-_s2             jsr find.find2
+_s2             jsr Find.find2
                 beq _s1
 
 _s3             lda #$7d
                 sta curch
-                sta dirtyf              ; flag line as dirty
+                sta isDirty             ; flag line as dirty
                 sec
                 lda subbuf
                 sbc findbuf             ; get delta size
@@ -121,7 +121,7 @@ _s10            cpx subbuf
                 lda (buf),y
                 adc arg3
                 sta (buf),y
-                jmp rfrshbuf
+                jmp RefreshBuf
 
                 .endproc
 

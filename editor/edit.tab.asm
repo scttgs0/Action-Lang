@@ -24,11 +24,11 @@
 ;======================================
 ;   Tab()
 ;======================================
-tab             .proc
-                jsr setsp
-                jsr tabloc._tabpos
+Tab_             .proc
+                jsr SetSpacing
+                jsr TabLocation._tabpos
 
-_t1             lda $03_02A3,x ;!! TABMAP,x
+_t1             lda TABMAP,x
                 beq _t3
 
                 and _onbit,y
@@ -41,7 +41,7 @@ _t1             lda $03_02A3,x ;!! TABMAP,x
                 asl a
                 asl a
                 ora arg0
-                jmp back.back0          ; do the tab
+                jmp Back.back0          ; do the tab
 
 _t2             iny
                 cpy #8
@@ -64,12 +64,12 @@ _offbit         .byte $7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE,$FF
 ;======================================
 ;
 ;======================================
-settab          .proc
-                jsr tabloc
+SetTab          .proc
+                jsr TabLocation
 
-                lda $03_02A3,x ;!! TABMAP,x
-                ora tab._onbit,y
-                sta $03_02A3,x ;!! TABMAP,x
+                lda TABMAP,x
+                ora Tab_._onbit,y
+                sta TABMAP,x
                 rts
                 .endproc
 
@@ -77,12 +77,12 @@ settab          .proc
 ;======================================
 ;
 ;======================================
-clrtab          .proc
-                jsr tabloc
+ClearTab        .proc
+                jsr TabLocation
 
-                lda $03_02A3,x ;!! TABMAP,x
-                and tab._offbit,y
-                sta $03_02A3,x ;!! TABMAP,x
+                lda TABMAP,x
+                and Tab_._offbit,y
+                sta TABMAP,x
                 rts
                 .endproc
 
@@ -90,8 +90,8 @@ clrtab          .proc
 ;======================================
 ;
 ;======================================
-tabloc         .proc
-                jsr setsp
+TabLocation     .proc
+                jsr SetSpacing
 
                 sec
                 sbc #1

@@ -24,16 +24,16 @@
 ;======================================
 ;   SetTag()
 ;======================================
-settag          .proc
+SetTag          .proc
                 jsr tagid
 
                 lda tempbuf
                 beq notag
 
-                jsr clnln
+                jsr CleanLine
 
                 lda tempbuf+1
-                jsr gettag
+                jsr GetTag
                 bne _st1                ; tag already exists
 
     ; get a new tag
@@ -61,7 +61,7 @@ _st1            ldy #4
                 lda cur+1
                 sta (afcur),y
                 iny
-                jsr setsp
+                jsr SetSpacing
 
                 sta (afcur),y
 
@@ -80,7 +80,7 @@ _st1            ldy #4
 notag           .proc
                 lda #<_ntmsg
                 ldx #>_ntmsg
-                jmp commandMsg
+                jmp CommandMsg
 
 ;--------------------------------------
 
@@ -94,7 +94,7 @@ _ntmsg          .text 11,"tag not set"
 tagid           .proc
                 lda #<_stmsg
                 ldx #>_stmsg
-                jmp gettemp
+                jmp GetTemp
 
 ;--------------------------------------
 
@@ -103,18 +103,18 @@ _stmsg          .text 8,"tag id: "
 
 
 ;======================================
-;   LocTag()
+;   LocateTag()
 ;======================================
-loctag          .proc
+LocateTag       .proc
                 jsr tagid
 
                 lda tempbuf
-                beq gettag._ltret
+                beq GetTag._ltret
 
-                jsr clnln
+                jsr CleanLine
 
                 lda tempbuf+1
-                jsr gettag
+                jsr GetTag
                 beq notag
 
                 ldy #6
@@ -122,7 +122,7 @@ loctag          .proc
                 tax
                 dey
                 lda (afcur),y
-                jsr findln
+                jsr FindLine
                 beq notag
 
                 ldy #3
@@ -136,15 +136,15 @@ loctag          .proc
                 sta cur
                 ldx arg3
                 stx cur+1
-                jmp found
+                jmp Found
 
                 .endproc
 
 
 ;======================================
-;   GetTag PROC ; GetTag(tag)
+;   GetTag(tag)
 ;======================================
-gettag          .proc
+GetTag          .proc
                 sta arg0
                 lda taglist
                 ldx taglist+1
@@ -175,7 +175,7 @@ _gt3            ldx afcur+1
 ;======================================
 ;   FreeTags()
 ;======================================
-freetags        .proc
+FreeTags        .proc
                 lda taglist
                 ldx taglist+1
                 beq _ft2
@@ -199,9 +199,9 @@ _ft2            rts
 
 
 ;======================================
-;   FindLn(line)
+;   FindLine(line)
 ;======================================
-findln          .proc
+FindLine        .proc
                 sta arg0
                 stx arg1
                 lda top

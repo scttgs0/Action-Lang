@@ -30,7 +30,7 @@ lgetkey         .proc
                 lda $03_0012+2 ;!! RTCLOK+2
                 adc #14
                 tax
-_bc1            lda $03_02FC ;!! CH_                 ; key down?
+_bc1            lda CH_                 ; key down?
                 eor #$ff
                 bne _gk0
 
@@ -44,7 +44,7 @@ _bc1            lda $03_02FC ;!! CH_                 ; key down?
                 jmp lgetkey
 
 _gk0            ldy #0
-                lda $03_005D ;!! OLDCHR
+                lda OLDCHR  ; TODO:
                 eor #$80
                 sta ($5E),y  ;!! (OLDADR),y          ; restore cursor
                 ldx $03_022B ;!! SRTIMR              ; faster repeat
@@ -56,7 +56,7 @@ _gk0            ldy #0
 
                 ldx #3
 _gk1            stx $03_022B ;!! SRTIMR
-_gk2            lda $03_02FC ;!! CH_
+_gk2            lda CH_
                 cmp #$c0
                 bcc _gk3                ; not Ctrl-Shft
 
@@ -87,7 +87,7 @@ _gkret          sta curch
 _gk5            ldx #20
                 bne _gk1
 
-_caps           lda $03_02FC ;!! CH_
+_caps           lda CH_
                 and #$c0
                 sta $03_02BE ;!! SHFLOC
 _caps1          jsr click
@@ -111,6 +111,6 @@ _click1         stx $03_D01F ;!! CONSOL
                 dex
                 bpl _click1
 
-                stx $03_02FC ;!! CH_
+                stx CH_
                 rts
                 .endproc

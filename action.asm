@@ -103,7 +103,7 @@ amplfin
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .text "ACTION! (c)2022 GPL3            Foenix Adaptation          v3.6 April 24, 2022",$00
+cpyright        .text "ACTION! (c) 2022 GPL3           Foenix Adaptation          v3.6 April 24, 2022",$00
 
 
 ;    "ACTION! - Compiler
@@ -111,7 +111,7 @@ cpyright        .text "ACTION! (c)2022 GPL3            Foenix Adaptation        
 main
                 .include "comp.main.asm"
 
-cright          .text "ACTION! (c)2022 GPL3      Foenix Adaptation",$00,$00
+cright          .text "ACTION! (c) 2022 GPL3      Foenix Adaptation",$00,$00
 
 
 ;    ACTION! 3.6 - Editor

@@ -30,7 +30,7 @@ splsetup        .proc
                 sta sp
                 sta chan
                 sta symtab
-                sta $03_02E3 ;!! INITAD+1
+                sta INITAD+1
                 sta (buf),y
                 sta param
                 sta qglobal

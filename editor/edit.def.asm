@@ -98,7 +98,7 @@ token           = $C2                   ; token value
 ; following defs can be used during
 ; program execution (user program)
 ;-----------------------------------
-dirtyf          = $C3
+isDirty         = $C3
 spln            = $C4                   ; error char
 curln           = $C5                   ; error line
 curnxt          = $C7                   ; next error line
