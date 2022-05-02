@@ -60,7 +60,7 @@ ltab            .addr lsh1._lshift      ; LSH
                 .byte $60               ; chrConvert3
                 .byte $22               ; tvDisp
 
-                jmp insrtch             ; normal char
+                jmp InsertChar          ; normal char
                 rts                     ; ctrl-shift char
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
@@ -77,9 +77,9 @@ serial          .word $0A00             ; serial number of ROM
 ;   Init RTS
 ;======================================
 Start           .proc
-                jsr initkeys            ; get keyboard
+                jsr InitKeys            ; get keyboard
 
-                lda $03_0008 ;!! WARMST
+                lda WARMST
                 beq cold
 
                 lda chrConvert3
@@ -124,15 +124,15 @@ _nextJmps       lda emjmps-1,y          ; init RAM
                 lda #0
                 ldx #4
                 ldy isBigSymTbl
-                beq _1                ; no
+                beq _1                  ; no
 
                 ldx #6
-_1              jsr getmem              ; get hash table
+_1              jsr GetMemory           ; get hash table
 
                 sta symTblGlobal        ; qglobal hash table
                 stx symTblGlobal+1
                 ldy isBigSymTbl
-                beq _2                ; no
+                beq _2                  ; no
 
                 inx
                 inx

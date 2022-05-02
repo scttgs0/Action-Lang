@@ -22,9 +22,9 @@
 
 
 ;======================================
-;   GetStr(prompt, str, invert)
+;   GetString(prompt, str, invert)
 ;======================================
-getstr          .proc
+GetString       .proc
                 jsr dspstr
 _gs1            jsr getkey
 
@@ -50,8 +50,8 @@ _gs1a           ldy #0
                 beq _gs3                ; yes, clear line
 
                 stx arg3
-                ldx $03_0055 ;!! COLCRS
-                cpx $03_0053 ;!! RMARGN
+                ldx COLCRS
+                cpx RMARGN
                 bcs _gs1                ; don't go off screen
 
                 sta (arg12),y
@@ -102,19 +102,19 @@ _gs5            cpx #$7d
 ;======================================
 ;   FRead()
 ;======================================
-fread           .proc
+FRead           .proc
                 lda #0
                 sta inbuf
                 lda #<rdmsg
                 ldx #>rdmsg
                 ldy #4
-                jsr fopen
+                jsr FOpen
 
 _frd1           lda #1
                 jsr rdbuf
                 bmi _fr3
 
-                jsr instb
+                jsr InsertByte
 
                 lda allocerr
                 beq _frd1
@@ -126,9 +126,9 @@ _fr3            cpy #$88                ; EOF
                 beq _fr5
 
 _fr4            jsr syserr
-_fr5            jsr fwrite._fw2
+_fr5            jsr FWrite._fw2
 
-                jmp ctrln
+                jmp CenterLine
 
 ;--------------------------------------
 
@@ -139,11 +139,11 @@ rdmsg           .text 6,"Read? "
 ;======================================
 ;   FWrite()
 ;======================================
-fwrite          .proc
+FWrite          .proc
                 lda #<wrtmsg
                 ldx #>wrtmsg
                 ldy #8
-                jsr fopen
+                jsr FOpen
 
                 jsr chkcur._ldtop
                 beq _fw3
@@ -183,13 +183,13 @@ wrtmsg          .text 7,"Write? "
 ;======================================
 ;   FOpen(prompt, mode)
 ;======================================
-fopen           .proc
+FOpen           .proc
                 sta arg10
                 stx arg11
                 sty opmode
 
         ; jsr ClnLn ; in SaveWd
-                jsr savewd
+                jsr SaveWindow
                 jsr rstcsr
 
                 ldy #<inbuf
@@ -197,7 +197,7 @@ fopen           .proc
                 sta arg3
                 lda arg10
                 ldx arg11
-                jsr cmdstr
+                jsr CommandString
 
                 lda #1
                 jsr close
@@ -263,7 +263,7 @@ _fo7            pla
 ;======================================
 ;
 ;======================================
-initkeys        .proc
+InitKeys        .proc
                 lda #7
                 jsr close
 
@@ -283,9 +283,9 @@ keybd           .text 2,"K:"
 ;======================================
 ;
 ;======================================
-gotkey          .proc
+GotKey          .proc
     ; Test if key in buffer
-                lda $03_02FC ;!! CH_                 ; key down?
+                lda CH_                 ; key down?
                 eor #$ff
                 rts
                 .endproc

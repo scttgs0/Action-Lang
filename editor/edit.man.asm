@@ -30,7 +30,7 @@ floop           .proc
 
                 lda #<outmem
                 ldx #>outmem
-                jsr commandMsg
+                jsr CommandMsg
 
 _fm1            lda curch
                 sta lastch
@@ -39,7 +39,7 @@ _fm1            lda curch
                 jsr EditorInit.fcmsg1
 
                 lda curch
-                ldy $03_02F2 ;!! CH1
+                ldy CH1
                 cpy #$c0                ; Ctrl-Shft
                 bcs _fmcs
 
@@ -50,7 +50,7 @@ _fm1            lda curch
                 cmp #eol
                 beq floop
 
-                jsr insrtch
+                jsr InsertChar
 
                 jmp floop
 
@@ -72,86 +72,86 @@ _fmlu           jsr lookup
 
 fmcmd           .addr disptb            ; default routine
                 .byte 50                ; table size
-                .addr scrlup
+                .addr ScrollUp
                 .byte $1c
-                .addr scrldwn
+                .addr ScrollDown
                 .byte $1d
-                .addr scrlrt
+                .addr ScrollRight
                 .byte $1f
-                .addr scrllft
+                .addr ScrollLeft
 zap2            .byte $1e
-                .addr delch
+                .addr DeleteChar
 zap3            .byte $fe
-                .addr backsp
+                .addr BackSpc
 zap4            .byte $7e
-                .addr insrtch
+                .addr InsertChar
                 .byte $60
-                .addr insrtsp
+                .addr InsertSpace
                 .byte $ff
-                .addr return
+                .addr Return_
                 .byte eol
-                .addr tab
+                .addr Tab_
                 .byte $7f
-                .addr delete
+                .addr Delete_
                 .byte $9c
-                .addr botln.escape
+                .addr BottomLine._XIT
                 .byte $1b
-                .addr clear
+                .addr Clear_
                 .byte $7d
-                .addr insrt
+                .addr Insert_
                 .byte $9d
-                .addr settab
+                .addr SetTab
                 .byte $9f
-                .addr clrtab
+                .addr ClearTab
                 .byte $9e
 
 fmcscmd         .addr disptb+3          ; default
                 .byte 71                ; table size
-                .addr front
+                .addr Front
                 .byte $f6
-                .addr back
+                .addr Back
                 .byte $f7
-                .addr pgup
+                .addr PageUp
                 .byte $ce
-                .addr pgdwn
+                .addr PageDown
                 .byte $cf
-                .addr indntl
+                .addr IndentLeft
                 .byte $e0
-                .addr indntr
+                .addr IndentRight
                 .byte $e2
-                .addr fread
+                .addr FRead
                 .byte $e8
-                .addr fwrite
+                .addr FWrite
                 .byte $ee
-                .addr paste
+                .addr Paste
                 .byte $ca
-                .addr insrtt
+                .addr InsertToggle
                 .byte $cd
                 .addr monitor
                 .byte $e5
-                .addr find
+                .addr Find
                 .byte $f8
-                .addr subst
+                .addr Substitute
                 .byte $fe
-                .addr wind1
+                .addr Window1
                 .byte $df
-                .addr wind2
+                .addr Window2
                 .byte $de
-                .addr delwd
+                .addr DeleteWindow
                 .byte $fa
                 .addr csbs
                 .byte $f4
                 .addr csret
                 .byte $cc
-                .addr undo
+                .addr Undo
                 .byte $cb
-                .addr topln
+                .addr TopLine
                 .byte $f9
-                .addr endln
+                .addr EndLine
                 .byte $ea
-                .addr settag
+                .addr SetTag
                 .byte $ed
-                .addr loctag
+                .addr LocateTag
                 .byte $fd
 
 outmem          .text 14," "

@@ -64,8 +64,8 @@ _spl2           jsr getnext
                 lda #1                  ; save run address
                 jsr cprop
 
-                sta $03_02E2 ;!! INITAD
-                stx $03_02E3 ;!! INITAD+1
+                sta INITAD
+                stx INITAD+1
 
     ; insert return, just in case
 _rtn            lda #$60                ; RTS
@@ -128,8 +128,8 @@ _splrtn         rts
 
 _spl4           jsr getcdoff            ; no main PROC
 
-                sta $03_02E2 ;!! INITAD
-                stx $03_02E3 ;!! INITAD+1
+                sta INITAD
+                stx INITAD+1
                 jsr stmtlist
 
                 cmp #eofid

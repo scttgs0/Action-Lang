@@ -24,9 +24,9 @@
 ;======================================
 ;   Wind1()
 ;======================================
-wind1           .proc
+Window1         .proc
                 lda currentWindow
-                beq savworld.wdret
+                beq SaveWorld.wdret
 
                 lda #0
                 pha
@@ -36,11 +36,11 @@ wind1           .proc
 ;======================================
 ;   SwapWd()
 ;======================================
-swapwd          .proc
-                jsr savworld
+SwapWindows     .proc
+                jsr SaveWorld
 
                 pla
-                jmp rstworld
+                jmp RestoreWorld
 
                 .endproc
 
@@ -48,32 +48,32 @@ swapwd          .proc
 ;======================================
 ;   Wind2()
 ;======================================
-wind2           .proc
+Window2         .proc
                 lda currentWindow
-                bne savworld.wdret
+                bne SaveWorld.wdret
 
                 lda numwd
                 bne _w2
 
-                jmp w2init
+                jmp Window2Init
 
 _w2             lda #w2-w1
                 pha
-                bra swapwd
+                bra SwapWindows
 
                 .endproc
 
 
 ;======================================
-;   SavWorld()
+;   SaveWorld()
 ;======================================
-savworld        .proc
-                jsr clnln
+SaveWorld       .proc
+                jsr CleanLine
                 jsr savecol
                 jsr rstcsr
-                jsr setsp
+                jsr SetSpacing
 
-                jmp savewd
+                jmp SaveWindow
 
 wdret           rts
                 .endproc
@@ -82,47 +82,47 @@ wdret           rts
 ;======================================
 ;   Clear()
 ;======================================
-clear           .proc
+Clear_           .proc
                 jsr alarm
 
-                lda #<delwd.clearmsg
-                ldx #>delwd.clearmsg
-                jsr yesno
-                bne savworld.wdret
+                lda #<DeleteWindow.clearmsg
+                ldx #>DeleteWindow.clearmsg
+                jsr YesNo
+                bne SaveWorld.wdret
 
-clr0            jsr clnln
+clr0            jsr CleanLine
 
                 lda dirty
                 beq clr1
 
     ; JSR Alarm
-                lda #<delwd.dirtymsg
-                ldx #>delwd.dirtymsg
-                jsr yesno
-                bne savworld.wdret
+                lda #<DeleteWindow.dirtymsg
+                ldx #>DeleteWindow.dirtymsg
+                jsr YesNo
+                bne SaveWorld.wdret
 
-clr1            jsr freetags            ; get rid of tags
+clr1            jsr FreeTags            ; get rid of tags
 
                 lda bot
                 ldx bot+1
-_clr2           jsr delln
+_clr2           jsr DeleteLine
                 bne _clr2
 
                 stx cur+1
                 stx dirty
-                stx dirtyf
+                stx isDirty
                 stx inbuf
-                jmp newpage
+                jmp NewPage
 
                 .endproc
 
 
 ;======================================
-;   RstWorld(window)
+;   RestoreWorld(window)
 ;======================================
-rstworld        .proc
+RestoreWorld    .proc
                 sta currentWindow
-                jsr rstwd
+                jsr RestoreWindow
                 jsr ldbuf
 
                 jmp rstcol
@@ -131,23 +131,23 @@ rstworld        .proc
 
 
 ;======================================
-;   DelWd()
+;   DeleteWindow()
 ;======================================
-delwd           .proc
+DeleteWindow    .proc
                 lda numwd
-                beq savworld.wdret
+                beq SaveWorld.wdret
 
                 jsr alarm
 
                 lda #<delmsg
                 ldx #>delmsg
-                jsr yesno
-                bne savworld.wdret
+                jsr YesNo
+                bne SaveWorld.wdret
 
-_dw1            jsr clear.clr0
+_dw1            jsr Clear_.clr0
 
                 lda dirty
-                bne savworld.wdret
+                bne SaveWorld.wdret
 
                 ldy #0
                 sty numwd
@@ -156,7 +156,7 @@ _dw1            jsr clear.clr0
 
                 ldy #w2-w1
 delwd2          sty currentWindow
-                jsr rstwd
+                jsr RestoreWindow
 
                 jmp EditorInit.winit1
 
@@ -171,7 +171,7 @@ dirtymsg        .text 19,"Not saved, Delete? "
 ;======================================
 ;   GetTemp(msg)
 ;======================================
-gettemp         .proc
+GetTemp         .proc
                 ldy #0
 gett1           sty tempbuf
                 ldy #>tempbuf
@@ -183,7 +183,7 @@ gett1           sty tempbuf
 ;======================================
 ;   CmdStr(msg, buf)
 ;======================================
-cmdstr          .proc
+CommandString   .proc
                 sta arg0
                 sty arg2
                 jsr cmdcol
@@ -192,7 +192,7 @@ cmdstr          .proc
                 sta arg4
                 lda arg0
                 ldy arg2
-                jsr getstr
+                jsr GetString
                 jsr rstcsr
 
                 jmp rstcol
@@ -203,8 +203,8 @@ cmdstr          .proc
 ;======================================
 ;   YesNo(msg)
 ;======================================
-yesno           .proc
-                jsr gettemp
+YesNo           .proc
+                jsr GetTemp
 
                 ldy tempbuf
                 bne _yn1

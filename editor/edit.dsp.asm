@@ -24,7 +24,7 @@
 ;======================================
 ;   CommandMsg(message)
 ;======================================
-commandMsg      .proc
+CommandMsg      .proc
                 sta arg0
                 jsr cmdcol
 
@@ -40,19 +40,20 @@ commandMsg      .proc
 
 
 ;======================================
-;   ClnLn()
+;   CleanLine()
 ;======================================
-clnln           .proc
+CleanLine       .proc
                 jsr chkcur
 
-                lda dirtyf
+                lda isDirty
                 beq _cll1
 
                 sta dirty
                 lda #0
-                sta dirtyf
-                jsr delcur
-                jsr instb
+                sta isDirty
+
+                jsr DeleteCurrentLine
+                jsr InsertByte
 
 _cll1           jmp chkcur
 
@@ -60,10 +61,10 @@ _cll1           jmp chkcur
 
 
 ;======================================
-;   SaveWd()
+;   SaveWindow()
 ;======================================
-savewd          .proc
-                jsr clnln
+SaveWindow      .proc
+                jsr CleanLine
 
 savwd1          clc
                 lda #14
@@ -81,9 +82,9 @@ _sw1            lda sp,x
 
 
 ;======================================
-;   RstWd() restore window
+;   RestoreWindow() restore window
 ;======================================
-rstwd           .proc
+RestoreWindow   .proc
                 clc
                 lda #14
                 tax
@@ -95,32 +96,33 @@ _rw1            lda w1,y
                 dex
                 bpl _rw1
 
-rw2             rts
+_XIT            rts
                 .endproc
 
 
 ;======================================
 ;
 ;======================================
-endln           .proc
-                jsr clnln
+EndLine         .proc
+                jsr CleanLine
 
                 lda bot
                 sta cur
                 lda bot+1
                 sta cur+1
 
-    ; falls into CtrLn
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
-;   CtrLn() center line
+;   CenterLine() center line
 ;======================================
-ctrln           .proc
+CenterLine      .proc
                 lda #0
                 sta temps
-                jsr clnln
+                jsr CleanLine
                 beq _cl0
 
                 jsr nextup
@@ -131,12 +133,12 @@ ctrln           .proc
                 beq _cl0
 
                 inc temps
-_cl0            jsr newpage
+_cl0            jsr NewPage
 
 _cl1            lda temps
-                beq rstwd.rw2
+                beq RestoreWindow._XIT
 
-                jsr scrldwn
+                jsr ScrollDown
 
                 dec temps
                 jmp _cl1
@@ -145,44 +147,45 @@ _cl1            lda temps
 
 
 ;======================================
-;   TopLn()
+;   TopLine()
 ;======================================
-topln           .proc
-                jsr clnln
+TopLine         .proc
+                jsr CleanLine
                 jsr chkcur._ldtop
 
-    ; falls into NewPage
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
 ;   NewPage()
 ;======================================
-newpage         .proc
+NewPage         .proc
                 lda #0
                 sta lnum
 npage1          sta choff
                 jsr rstcsr              ; for command line
 
-                lda $03_0052 ;!! LMARGN
-                sta $03_0055 ;!! COLCRS
-
-    ; jmp Refresh ; do all the work
+                lda LMARGN
+                sta COLCRS
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
 ;   Refresh()
 ;======================================
-refresh         .proc
+Refresh         .proc
                 clc
                 lda ytop
                 adc lnum
-                sta $03_0054 ;!! ROWCRS
+                sta ROWCRS
                 jsr savecol
-                jsr savewd
+                jsr SaveWindow
 
-                inc $03_0054 ;!! ROWCRS
+                inc ROWCRS
                 jsr nextdwn
 
                 sta arg9
@@ -207,7 +210,7 @@ _cl2            jsr putstr
 
                 tay
                 sta (arg0),y
-_cl3            inc $03_0054 ;!! ROWCRS
+_cl3            inc ROWCRS
                 jsr nextdwn
 
                 sta arg9
@@ -217,7 +220,7 @@ _cl3            inc $03_0054 ;!! ROWCRS
 _cl4            jsr rstcur
                 jsr rstcol
 
-                jmp rfrshbuf
+                jmp RefreshBuf
 
 _cl5            lda #<zero
                 ldx #>zero

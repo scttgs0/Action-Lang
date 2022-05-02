@@ -22,9 +22,9 @@
 
 
 ;======================================
-;   GetMem(size)
+;   GetMemory(size)
 ;======================================
-getmem          .proc
+GetMemory       .proc
                 clc
                 adc #4
                 sta afsize
@@ -62,9 +62,9 @@ GeneralMemErr   .proc
                 inc allocerr
                 jsr Free
 
-                jmp getmem._gm1         ; retry
+                jmp GetMemory._gm1      ; retry
 
-Punt            jsr savewd              ; we're in big trouble
+Punt            jsr SaveWindow          ; we're in big trouble
 
                 jmp rstwnd
 
@@ -74,7 +74,7 @@ Punt            jsr savewd              ; we're in big trouble
 ;======================================
 ;   FreeMem(addr)
 ;======================================
-freemem         ;.proc
+FreeMemory      ;.proc
                 sec
                 sbc #4
                 bcs freem1
@@ -85,14 +85,14 @@ freem1          jmp Free
 
 
 ;======================================
-;   InstB()
+;   InsertByte()
 ;======================================
-instb           .proc
+InsertByte      .proc
                 lda cur
                 sta arg3
                 lda cur+1
                 sta arg4
-                jsr instbuf
+                jsr InsertBuffer
 
                 sta cur
                 stx cur+1
@@ -101,9 +101,9 @@ instb           .proc
 
 
 ;======================================
-;   InstBuf(,,up)
+;   InsertBuffer(,,up)
 ;======================================
-instbuf         .proc
+InsertBuffer    .proc
                 ldy #0
                 lda (buf),y
                 ldx buf
@@ -112,16 +112,16 @@ instbuf         .proc
 
 
 ;======================================
-;   InstLn(sze,sloc,up)
+;   InsertLine(sze,sloc,up)
 ;======================================
-instln          ;.proc
+InsertLine      ;.proc
                 sta arg0                ; save sze
                 stx arg1                ; save sloc
                 sty arg2
                 clc
                 adc #3
                 ldx #0
-                jsr getmem
+                jsr GetMemory
 
                 clc
                 adc #2
@@ -207,12 +207,12 @@ _il4            ldy #4
 
 
 ;======================================
-;   DelCur()
+;   DeleteCurrentLine()
 ;======================================
-delcur          .proc
+DeleteCurrentLine .proc
                 lda cur
                 ldx cur+1
-                jsr delln
+                jsr DeleteLine
 
                 sta cur
                 stx cur+1
@@ -221,11 +221,11 @@ dln1            rts
 
 
 ;======================================
-;   DelLn(lineptr)
+;   DeleteLine(lineptr)
 ;======================================
-delln           .proc
+DeleteLine      .proc
                 cpx #0
-                beq delcur.dln1
+                beq DeleteCurrentLine.dln1
 
                 sta arg0
                 stx arg1
