@@ -109,6 +109,16 @@ Window2Init     .proc
 ; Initialize the Editor
 ;======================================
 EditorInit      .proc
+                lda #<$03_7FFF
+                sta MEMTOP
+                lda #>$03_7FFF
+                sta MEMTOP+1
+
+                lda #<$03_0600
+                sta MEMLO
+                lda #>$03_0600
+                sta MEMLO+1
+
                 jsr MemoryInit          ; initialize editor memory
 
                 lda #0
