@@ -26,28 +26,17 @@
 ;======================================
 lgetkey         .proc
     ; Get next key in buffer
-                clc                     ; blink cursor
-                lda $03_0012+2 ;!! RTCLOK+2
-                adc #14
-                tax
-_bc1            lda CH_                 ; key down?
+_waitForKey     lda CH_                 ; key down?
                 eor #$ff
                 bne _gk0
 
-                cpx $03_0012+2 ;!! RTCLOK+2
-                bpl _bc1
-
-                ldy #0
-                lda ($5E),y  ;!! (OLDADR),y
-                eor #$80
-                sta ($5E),y  ;!! (OLDADR),y
-                jmp lgetkey
+                bra _waitForKey
 
 _gk0            ldy #0
                 lda OLDCHR  ; TODO:
                 eor #$80
-                sta ($5E),y  ;!! (OLDADR),y          ; restore cursor
-                ldx $03_022B ;!! SRTIMR              ; faster repeat
+                ;sta (OLDADR),y          ; restore cursor
+                ldx SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5
 
@@ -55,7 +44,7 @@ _gk0            ldy #0
                 bcc _gk2
 
                 ldx #3
-_gk1            stx $03_022B ;!! SRTIMR
+_gk1            stx SRTIMR
 _gk2            lda CH_
                 cmp #$c0
                 bcc _gk3                ; not Ctrl-Shft
@@ -72,15 +61,15 @@ _gk3            and #$3f
 
 _gkey           ldx #$70
                 lda #7                  ; GETCHR
-                sta $03_0011 ;!! BRKKEY              ; ignore BREAK key
+                sta BRKKEY              ; ignore BREAK key
                 jsr putch.putch2
 
-_gk4            ldx $03_022B ;!! SRTIMR
+_gk4            ldx SRTIMR
                 cpx #10
                 bcs _gkret
 
                 ldx #3
-                stx $03_022B ;!! SRTIMR
+                stx SRTIMR
 _gkret          sta curch
                 rts
 
@@ -88,14 +77,14 @@ _gk5            ldx #20
                 bne _gk1
 
 _caps           lda CH_
-                and #$c0
-                sta $03_02BE ;!! SHFLOC
+                and #$c0                ; isolate control (128) and uppercase (64)
+                sta SHFLOK
 _caps1          jsr click
                 bmi lgetkey
 
-_atari          lda $03_02B6 ;!! INVFLG
+_atari          lda INVFLG
                 eor #$80
-                sta $03_02B6 ;!! INVFLG
+                sta INVFLG
                 jmp _caps1
 
                 .endproc
@@ -106,8 +95,8 @@ _atari          lda $03_02B6 ;!! INVFLG
 ;======================================
 click           .proc
                 ldx #$7f
-_click1         stx $03_D01F ;!! CONSOL
-                stx $03_D40A ;!! WSYNC
+_click1         stx CONSOL
+                stx WSYNC
                 dex
                 bpl _click1
 

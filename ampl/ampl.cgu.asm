@@ -88,7 +88,7 @@ loadx           .proc
 
 _lxt            lda (stack),y
                 tax
-                dec temps-args,x
+                dec temps-(args-DPBASE),x
 _lxz            lda #$a6                ; LDX addr
 _lx1            jmp push2
 
@@ -186,14 +186,14 @@ _opa1           sta arg10
                 lda (stack),y
                 clc
                 adc arg12
-                cmp #args
+                cmp #(args-DPBASE)
                 bcc _opc2
 
-                cmp #args+16
+                cmp #(args-DPBASE)+16
                 bcs _opc2
 
                 tax
-                dec temps-args,x        ; free temp
+                dec temps-(args-DPBASE),x ; free temp
                 bra _opc3
 
 _opa2           tya                     ; small array
@@ -325,21 +325,21 @@ outtype         .byte $82,3,$84,realt
 ;   GetTemps()
 ;======================================
 gettemps        .proc
-                ldx #args+16
+                ldx #(args-DPBASE)+16
                 ldy #7
 _gtl1           dex
                 dex
                 dey
                 bmi _gtlerr             ; exp. too complex
 
-                lda temps-args,x
+                lda temps-(args-DPBASE),x
                 bne _gtl1
 
-                inc temps-args,x
+                inc temps-(args-DPBASE),x
                 lda arg5                ; see if byte temp
                 beq _gt2                ; yes
 
-                inc temps-args+1,x
+                inc temps-(args-DPBASE)+1,x
         .if ramzap
                 inc sargs,x
         .else

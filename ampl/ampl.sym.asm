@@ -82,7 +82,7 @@ _stmr0          lda #$ff                ; if name too long!
 
                 iny
                 sty arg0
-                ldx rwstrt-2,y
+                ldx tblReserveWords-2,y
 _stmr1          stx arg1
                 ldy #1
 _stmr2          lda resw1,x
@@ -218,7 +218,7 @@ newentry        .proc
 ;--------------------------------------
 ;--------------------------------------
 
-rwstrt          .byte 0
+tblReserveWords .byte 0
                 .byte resw2-resw1
                 .byte resw3-resw1
                 .byte resw4-resw1

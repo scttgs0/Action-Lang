@@ -65,7 +65,7 @@ _ce2
 ;======================================
 break1          .proc
                 ldx #1
-                stx $03_0011 ;!! BRKKEY
+                stx BRKKEY
                 pha
                 jsr break
 
@@ -335,12 +335,12 @@ ccio            stx arg4
                 asl a
                 tax
                 lda arg4
-                sta $03_0342,x ;!! IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,x
                 lda #0
-                sta $03_0348,x ;!! IOCB0+ICBLL,x
-                sta $03_0349,x ;!! IOCB0+ICBLH,x
+                sta IOCB0+ICBLL,x
+                sta IOCB0+ICBLH,x
                 tya
-                jsr $03_E456 ;!! CIOV
+                jsr CIOV
 
                 sta args
                 jmp chkerr
@@ -783,16 +783,16 @@ note            .proc
                 asl a
                 tax
                 lda #$26                ; NOTE
-                sta $03_0342,x ;!! IOCB0+ICCOM,x
-                jsr $03_E456 ;!! CIOV
+                sta IOCB0+ICCOM,x
+                jsr CIOV
                 jsr chkerr
 
                 ldy #0
-                lda $03_034E,x ;!! IOCB0+ICAX5,x       ; offset
+                lda IOCB0+ICAX5,x       ; offset
                 sta (arg3),y
-                lda $03_034C,x ;!! IOCB0+ICAX3,x       ; low byte of sector
+                lda IOCB0+ICAX3,x       ; low byte of sector
                 sta (arg1),y
-                lda $03_034D,x ;!! IOCB0+ICAX4,x       ; high byte of sector
+                lda IOCB0+ICAX4,x       ; high byte of sector
                 iny
                 sta (arg1),y
                 rts
@@ -814,14 +814,14 @@ point           .proc
                 asl a
                 tax
                 tya                     ; sector+1
-                sta $03_034D,x ;!! IOCB0+ICAX4,x
+                sta IOCB0+ICAX4,x
                 lda arg1                ; sector
-                sta $03_034C,x ;!! IOCB0+ICAX3,x
+                sta IOCB0+ICAX3,x
                 lda arg3                ; offset
-                sta $03_034E,x ;!! IOCB0+ICAX5,x
+                sta IOCB0+ICAX5,x
                 lda #$25                ; POINT
-                sta $03_0342,x ;!! IOCB0+ICCOM,x
-                jsr $03_E456 ;!! CIOV
+                sta IOCB0+ICCOM,x
+                jsr CIOV
 
                 jmp chkerr
 

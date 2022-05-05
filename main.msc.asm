@@ -223,10 +223,10 @@ _mnundec        lda #1
                 beq _varerr
 
                 tay
-                sta $03_D500 ;!! bank+lbank
+                sta bank+lbank
                 lda #1
                 jsr gprop
-                jsr rstbank
+                jsr RestoreBank
 
                 jmp _mnv1
 
@@ -430,7 +430,7 @@ _c1             lda stbase
                 cmp qcode+1
                 bcs alpha._alpha2       ; return
 
-cderr           sta $03_D503 ;!! bank+ebank
+cderr           sta bank+ebank
                 jsr splsetup            ; reset compiler
 
                 ldy #cder               ; out of qcode space
@@ -519,8 +519,8 @@ rstp            .proc
 ;   JSRInd(addr)
 ;======================================
 jsrind          .proc
-                sta $03_0064   ;!! ADRESS
-                stx $03_0064+1 ;!! ADRESS+1
-                jmp ($64)      ;!! (ADRESS)
+                sta ADRESS
+                stx ADRESS+1
+                jmp (ADRESS)
 
                 .endproc

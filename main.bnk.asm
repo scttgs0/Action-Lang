@@ -29,7 +29,7 @@ en1             .text 3,"EOF",$9a
                 .addr eof
 
 en2             .text 5,"color",$8a
-                .addr $03_02FD ;!! FILDAT
+                .addr FILDAT
 
 en3             .text 4,"LIST",$8a
                 .addr list
@@ -45,81 +45,38 @@ en5             .text 5,"TRACE",$8a
 ;   CStrt()
 ;======================================
 cstart          .proc
-                ldy #$03 ;!! ebank
+                ldy #ebank
                 sty curbank
-                sty $03_D503 ;!! bank+ebank
-
-    ; initialize memory boundries
-                lda #<$03_7FFF
-                sta MEMTOP
-                lda #>$03_7FFF
-                sta MEMTOP+1
-
-                lda #<$03_0600
-                sta MEMLO
-                lda #>$03_0600
-                sta MEMLO+1
-
-    ; initialize left and right margins
-                stz LMARGN
-                lda #97
-                sta RMARGN
-
-    ; initialize cursor location
-                stz COLCRS
-                stz ROWCRS
-
-    ; initialize Tab positions
-                ldy #$00
-_nextBatch      ldx #$00
-_nextTab        lda InitialTabs,x
-                sta TABMAP,y
-
-                iny
-                inx
-                cpx #$03
-                bne _nextTab
-
-                cpy #$10
-                bne _nextBatch
-
-                lda #<$037FE0
-                sta INITAD
-                lda #>$037FE0
-                sta INITAD+1
-
-                stz WARMST
-                jmp Start
-
-;--------------------------------------
-
-InitialTabs     .byte %00100100
-                .byte %10010010
-                .byte %01001001
-
+                sty bank+ebank
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
 ;   GetName(char)
 ;======================================
-getname         .proc
-                sta $03_D500 ;!! bank+lbank
+GetName         .proc
+                sta bank+lbank
                 jsr lgetname
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
-;   RstBank()
+;   RestoreBank()
 ;======================================
-rstbank         .proc
+RestoreBank     .proc
                 php
                 pha
+
                 tya
                 ldy curbank
 rbank1          sta bank,y
                 tay
+
                 pla
                 plp
                 rts
@@ -139,7 +96,7 @@ run             .proc
                 jsr lproceed
                 jsr jsrind
 
-                jmp editbank
+                jmp EditBank
 
                 .endproc
 
@@ -148,9 +105,9 @@ run             .proc
 ;   Compile()
 ;======================================
 compile         .proc
-                ldy #$09 ;!! cbank
+                ldy #cbank
                 sty curbank
-                sty $03_D509 ;!! bank+cbank
+                sty bank+cbank
                 jsr ccompile
 
                 .endproc
@@ -159,13 +116,13 @@ compile         .proc
 ;======================================
 ;   EditBank()
 ;======================================
-editbank        .proc
+EditBank        .proc
                 php
                 pha
                 tya
-                ldy #$03 ;!! ebank
+                ldy #ebank
                 sty curbank
-                jmp rstbank.rbank1
+                jmp RestoreBank.rbank1
 
                 .endproc
 
@@ -173,7 +130,7 @@ editbank        .proc
 ;======================================
 ;   GetAlias()
 ;======================================
-getalias        .proc
+GetAlias        .proc
                 lda #1
                 jsr getprop
 
@@ -182,12 +139,12 @@ getalias        .proc
 
                 sta addr
                 stx addr+1
-                sta $03_D500 ;!! bank+lbank
+                sta bank+lbank
                 lda #0
                 jsr getprop
 
                 sta token
-                jmp rstbank
+                jmp RestoreBank
 
 _gal1           jmp mnum._varerr
 
@@ -198,10 +155,10 @@ _gal1           jmp mnum._varerr
 ;   GNlocal()
 ;======================================
 gnlocal         .proc
-                sta $03_D500 ;!! bank+lbank
+                sta bank+lbank
                 jsr lgetname.lgnlocal
 
-                jmp rstbank
+                jmp RestoreBank
 
                 .endproc
 
@@ -210,12 +167,12 @@ gnlocal         .proc
 ;   CStmtList()
 ;======================================
 cstmtlst        .proc
-                ldy #$09 ;!! cbank
+                ldy #cbank
                 sty curbank
-                sta $03_D509 ;!! bank+cbank
+                sta bank+cbank
                 jsr stmtlist
 
-                jmp editbank
+                jmp EditBank
 
                 .endproc
 
@@ -224,7 +181,7 @@ cstmtlst        .proc
 ;
 ;======================================
 mgett1          .proc
-                jsr editbank
+                jsr EditBank
                 jsr GetTemp.gett1
 
                 .endproc
@@ -234,9 +191,9 @@ mgett1          .proc
 ;   LProceed()
 ;======================================
 lproceed        .proc
-                ldy #$00 ;!! lbank
+                ldy #lbank
                 sty curbank
-                sty $03_D500 ;!! bank+lbank
+                sty bank+lbank
                 rts
                 .endproc
 
@@ -248,18 +205,18 @@ options         .proc
                 jsr lproceed
                 jsr setopts
 
-                jmp editbank
+                jmp EditBank
                 .endproc
 
 
 ;======================================
 ;
 ;======================================
-getkey          .proc
-                sta $03_D500 ;!! bank+lbank
+GetKey          .proc
+                sta bank+lbank
                 jsr lgetkey
 
-                jmp rstbank
+                jmp RestoreBank
 
                 .endproc
 
@@ -268,7 +225,7 @@ getkey          .proc
 ;
 ;======================================
 splerr          .proc
-                sta $03_D500 ;!! bank+lbank
+                sta bank+lbank
                 jmp lsplerr
 
                 .endproc
@@ -278,7 +235,7 @@ splerr          .proc
 ;
 ;======================================
 emloop          .proc
-                jsr editbank
+                jsr EditBank
 
                 jmp monitor._mloop
 
@@ -288,9 +245,9 @@ emloop          .proc
 ;======================================
 ;
 ;======================================
-getargs         .proc
+GetArgs         .proc
                 pha                     ; save arg type load flag
-                sty $03_D500 ;!! bank+lbank
+                sty bank+lbank
                 lda #1
                 jsr getprop
 
@@ -319,7 +276,7 @@ _ga1            iny
                 sta argtypes,x          ; args inverted
                 bne _ga1
 
-_ga2            jmp rstbank
+_ga2            jmp RestoreBank
 
                 .endproc
 
@@ -328,10 +285,10 @@ _ga2            jmp rstbank
 ;
 ;======================================
 prth            .proc                   ; call only from LBANK!
-                sty $03_D503 ;!! bank+ebank
+                sty bank+ebank
                 jsr printh
 
-                sty $03_D500 ;!! bank+lbank
+                sty bank+lbank
                 jmp chkerr
 
                 .endproc
@@ -344,6 +301,6 @@ prth            .proc                   ; call only from LBANK!
 dret            .proc                   ; Dret()
                 jsr lproceed
 
-                jmp ($0A) ;!! (DOSVEC)
+                jmp (DOSVEC)
 
                 .endproc

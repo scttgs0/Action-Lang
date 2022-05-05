@@ -30,12 +30,15 @@
 
                 .include "equates_system_c256.asm"
                 .include "macros_frs_graphic.asm"
+                .include "macros_frs_text.asm"
 
 ;//////////////////////////////////////
 
 
+                .include "equates_directpage.asm"
                 .include "equates_action.asm"
                 .include "macros_65816.asm"
+
                 .include "editor/edit.def.asm"
 
                 * = INIT-8
@@ -54,9 +57,9 @@
 INIT            clc
                 xce
                 .m8i8
-                .setdp $0000
+                .setdp $0800
                 .setbank $03
-                jmp cstart
+                jmp PLAT_INIT
 
 ;--------------------------------------
 ;--------------------------------------
@@ -68,7 +71,7 @@ date            .byte $04,$24,$22        ; TODO: assemble date of latest version
 
 
                 .include "main.io.asm"
-propid          ldx $a0
+propid          ldx arg0
                 .include "screen.mac.asm"
                 .include "main.msc.asm"
                 .include "main.bnk.asm"
@@ -130,6 +133,8 @@ cright          .text "ACTION! (c) 2022 GPL3      Foenix Adaptation",$00,$00
 
                 .include "ampl/ampl.mon.asm"
                 .include "ampl/ampl.ini.asm"
+
+                .include "system_c256.asm"
 
                 .text "ces",$00,$00
 

@@ -281,10 +281,10 @@ _sa1            .databank $00
                 bpl _sa1
 
     ; check for break key
-                lda $03_0011 ;!! BRKKEY
+                lda BRKKEY
                 bne _sa2
 
-                inc $03_0011 ;!! BRKKEY
+                inc BRKKEY
                 jmp break
 
 _sa2            rts
@@ -296,8 +296,8 @@ _sa2            rts
 ; IToReal(int) -> FR0
 ;IToReal stx _sign
 ;        jsr _SetSign
-;        sta $03_00D4   ;!! FR0
-;        stx $03_00D4+1 ;!! FR0+1
+;        sta FR0
+;        stx FR0+1
 ;        jsr IFP
 ;:FSign  lda _sign
 ;        bpl _Rem1
@@ -305,10 +305,10 @@ _sa2            rts
 ;        jsr ZFR0
 ;        jmp FSUB
 ;RToInt() real in FR0
-;RToInt lda $03_00D4   ;!! FR0
+;RToInt lda FR0
 ;       sta _sign
 ;       jsr _FSign
-;       jsr $03_D9D2   ;!! FPI
-;       lda $03_00D4   ;!! FR0
-;       lda $03_00D4+1 ;!! FR0+1
+;       jsr FPI
+;       lda FR0
+;       lda FR0+1
 ;       jmp _SetSign

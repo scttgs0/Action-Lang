@@ -46,7 +46,7 @@ _mon1           jsr scrinit
 
 _mloop          jsr InitKeys
 
-                lda $03_0057 ;!! DINDEX              ; display mode
+                lda DINDEX              ; display mode
                 beq _mon2
 
                 jsr scrinit             ; get Graphics(0)
@@ -301,19 +301,19 @@ _mw2            dec arg14
     ; write the qcode
                 ldx #$10
                 lda #$0b                ; output command
-                sta $03_0342,x ;!! IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,x
 
                 lda codebase
-                sta $03_0344,x ;!! IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,x       ; buffer address
                 lda codebase+1
-                sta $03_0345,x ;!! IOCB0+ICBAH,x
+                sta IOCB0+ICBAH,x
 
                 lda codesize
-                sta $03_0348,x ;!! IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLL,x       ; size
                 lda codesize+1
-                sta $03_0349,x ;!! IOCB0+ICBLH,x
+                sta IOCB0+ICBLH,x
 
-                jsr $03_E456 ;!! CIOV
+                jsr CIOV
                 bmi mwout._mwerr
 
     ; save start address
@@ -346,7 +346,7 @@ _mwinit         .byte 6
 ;======================================
 mwout           .proc
                 lda #1
-                ldx #arg9
+                ldx #(arg9-DPBASE)
                 ldy #0
                 jsr output
 
@@ -405,8 +405,8 @@ comp            .proc
 
 ; see MAIN.BNK now
 ;Dret PROC ; Dret() go to DOS
-;     lda $03_000A    ;!! DOSVEC
-;     ldx $03_000A+1  ;!! DOSVEC+1
+;     lda DOSVEC
+;     ldx DOSVEC+1
 ;     jmp JSRInd
 
 

@@ -703,7 +703,7 @@ _sl5            ldx nxttoken
 _sl6            cmp #undec
                 bne _sl7
 
-                jsr getalias
+                jsr GetAlias
                 bra _sl5
 
 _sl7            cmp #typet
@@ -776,13 +776,13 @@ _a1a            and #$20
                 lda (stack),y
                 tax
     ; incr temps
-                cpx #args               ;
+                cpx #(args-DPBASE)      ;
                 bcc _a1b                ; are these 4 instr.
 
-                cpx #args+16            ; needed?
+                cpx #(args-DPBASE)+16   ; needed?
                 bcs _a1b                ;
 
-                inc temps-args,x
+                inc temps-(args-DPBASE),x
 _a1b            jsr getnext
 _ass2           jsr exp.exp1
                 jsr cgassign
@@ -1425,7 +1425,7 @@ retstmt         .proc
 
                 ora #tempt
                 tay
-                lda #args
+                lda #(args-DPBASE)
                 jsr storst
 
                 ldx nxttoken
@@ -1907,7 +1907,7 @@ _exp9           lda token
                 rts
 
 _expund
-                jsr getalias
+                jsr GetAlias
                 bra _exp3a
 
 _expproc
@@ -1964,7 +1964,7 @@ _expfunc
 
     ; save temps
                 sty arg0
-                lda #args+15
+                lda #(args-DPBASE)+15
                 sta arg1
 _ef1            dec arg0
                 ldy arg0
@@ -1991,7 +1991,7 @@ _ef2            dec arg1
                 ldy #1
                 sty temps               ; flag result reg.
                 sty arg0
-                lda #args+2
+                lda #(args-DPBASE)+2
                 sta arg1
 _ef3            inc arg0
                 ldy arg0
@@ -2020,7 +2020,7 @@ _ef4            inc arg1
                 lda (stack),y
                 and #7
                 ora #tempt
-                ldx #args
+                ldx #(args-DPBASE)
                 jsr savecd.savstk
 
                 jmp eerr._exp7
@@ -2190,7 +2190,7 @@ procref         .proc
                 cmp #funct+8
                 bcc stconst._pr1
 
-stconst         jsr getargs             ; A#0, no arg types
+stconst         jsr GetArgs             ; A#0, no arg types
 
                 ldy #constt+cardt       ; sys proc
 _pr1            sty token
@@ -2552,7 +2552,7 @@ _cgat           and #$10                ; rhs array?
     ; special case for arg0
                 ldy #1
                 lda (stack),y
-                cmp #args
+                cmp #(args-DPBASE)
                 beq cgassign._cgav      ; function return value
 
                 lda arg4                ; lhs byte?
@@ -2811,7 +2811,7 @@ cgmul           .proc
                 sta arg7
 
         .if ramzap
-                sta ($64),y  ;!! (ADRESS),y
+                sta (ADRESS),y
         .else
                 nop
                 nop
@@ -2820,13 +2820,13 @@ cgmul           .proc
 cgdiv           jsr load2h
 
                 lda #$85                ; STA AFcur+1
-                ldx #afcur+1
+                ldx #(afcur-DPBASE)+1
                 jsr push2
 cgmd            jsr gettemps
                 jsr load2l
 
                 lda #$85                ; STA AFcur
-                ldx #afcur
+                ldx #(afcur-DPBASE)
                 jsr push2
 
                 lda arg4

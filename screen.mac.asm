@@ -26,6 +26,7 @@
 ;======================================
 scrinit         .proc
                 .frsGraphics mcTextOn,mcVideoMode640    ; 80x60 text mode
+                stz DINDEX              ; text mode
 
                 ; lda #0
                 ; jsr close               ; close #0, sets X to 0
@@ -68,19 +69,19 @@ putch           .proc
                 tay
                 lda #0
                 tax
-putch1          stx $03_02FE ;!! DSPFLG
+putch1          stx DSPFLG
                 asl a
                 asl a
                 asl a
                 asl a
                 tax
                 lda #$0b                ; PUTCHR
-putch2          sta $03_0342,x ;!! IOCB0+ICCOM,x
+putch2          sta IOCB0+ICCOM,x
                 lda #0
-                sta $03_0348,x ;!! IOCB0+ICBLL,x
-                sta $03_0349,x ;!! IOCB0+ICBLH,x
+                sta IOCB0+ICBLL,x
+                sta IOCB0+ICBLH,x
                 tya
-                jmp $03_E456 ;!! CIOV
+                jmp CIOV
 
                 .endproc
 
@@ -333,7 +334,7 @@ _getnl1         jsr alpha
                 beq getnr1
                 bra getnloop
 
-_getnid         jsr getname
+_getnid         jsr GetName
                 bmi getnr1
 
 _getnr0         sta nxttoken
@@ -401,7 +402,7 @@ ldig3           sta nxtaddr
 
 ldig4           lda #constt+realt
                 sta nxttoken
-                ldy $03_00F2 ;!! CIX
+                ldy CIX
                 ldx #$ff                ; for SET cmd
                 bne ldig2
 

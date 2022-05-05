@@ -27,7 +27,7 @@
 emjmps          rts                     ; Seg catch all
 
                 .word 0
-                .byte $03 ;!! ebank     ; curBank
+                .byte ebank             ; curBank
                 .byte $df               ; stMask
                 jmp splerr              ; Error
 

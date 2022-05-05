@@ -26,7 +26,7 @@
 ;======================================
 GetString       .proc
                 jsr dspstr
-_gs1            jsr getkey
+_gs1            jsr GetKey
 
                 tax
                 cpx #$7e
@@ -150,7 +150,7 @@ FWrite          .proc
 
 _fw1            jsr ldbuf
 
-    ; INC $03_02C8 ;!! COLOR4 ; let user know we're here
+    ; INC COLOR4                        ; let user know we're here
                 nop
                 nop
                 nop

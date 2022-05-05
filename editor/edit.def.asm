@@ -21,95 +21,7 @@
 ;
 
 
-ramzap          = 1                     ; to zap or not to zap, that is the question?
-
-; Page Zero defs
-;----------------
-; Alloc/Free defs, also used by compiler
-afbase          = $80
-aflast          = $82
-afcur           = $84
-afsize          = $86
-afbest          = $88
-props           = $88
-afbsze          = $8A
-op              = $8A
-lsttoken        = $8B                   ; prev. token value
-
-; current window data / comp. vars
-;----------------------------------
-sp              = $8C
-choff           = $8D
-lnum            = $8E
-curproc         = $8E                   ; 2 bytes
-dirty           = $8F
-top             = $90                   ; -> top line
-bot             = $92                   ; -> bottom line
-whaddr          = $92                   ; -> current DO frame
-cur             = $94                   ; -> current line
-x               = $96                   ; don't use in comp.
-y               = $97                   ; don't use in comp.
-nlines          = $98
-chan            = $98                   ; current input file
-ytop            = $99
-defflg          = $99
-indent          = $9A
-stackptr        = $9A                   ; op stack offset
-
-buf             = $9B                   ; -> edit buf
-insert          = $9D                   ; insert/replace flag
-delnxt          = $9E                   ; ->, USED BY LEX
-
-; arguments and temps
-;---------------------
-args            = $A0
-arg0            = $A0
-arg1            = $A1
-arg2            = $A2
-arg3            = $A3
-arg4            = $A4
-arg5            = $A5
-arg6            = $A6
-arg7            = $A7
-arg8            = $A8
-arg9            = $A9
-arg10           = $AA
-arg11           = $AB
-arg12           = $AC
-arg13           = $AD
-arg14           = $AE
-arg15           = $AF
-
-; compiler vars
-;---------------
-stbase          = $B0                   ; symbol table base (page)
-symTblGlobal    = $B1                   ; qglobal hash table
-symTblLocal     = $B3                   ; local hash table
-codeoff         = $B5                   ; relocation offset
-device          = $B7                   ; default device
-qglobal         = $B8                   ; qglobal/local flag
-stack           = $B9                   ; value stack
-frame           = $BB                   ; -> current frame
-symtab          = $BD                   ; -> next symbol table entry
-stmax           = $BF                   ; symbol table top (page)
-addr            = $C0                   ; token address
-token           = $C2                   ; token value
-
-; following defs can be used during
-; program execution (user program)
-;-----------------------------------
-isDirty         = $C3
-spln            = $C4                   ; error char
-curln           = $C5                   ; error line
-curnxt          = $C7                   ; next error line
-nxtaddr         = $C9                   ; next token address
-
-        ; note: $CA-$CD never referenced
-
-bigSymTblGlobal = $CE                   ; only used if big symbol table
-arrayptr        = $D0                   ; array mem. list
-spnxt           = $D2                   ; next error char
-nxttoken        = $D3                   ; next token value
+ramzap          = 0                     ; to zap or not to zap, that is the question?
 
 
 ; ACTION! vars ($480 - $57D)
@@ -195,7 +107,7 @@ temps           = $03_05F0              ; 16 bytes
 
 ; system vars
 ;-------------
-qcode           = $0E                   ; ap. high mem.
+qcode           = DPBASE+$0E                   ; ap. high mem.
 csrch           = $5D
 
 lbuff           = $03_0580              ; fp ASCII buf
@@ -221,8 +133,3 @@ windent         = 14
 ;-------------
 eol             = $9B
 esc             = $1B
-
-
-; bank switching defs
-;---------------------
-bank            = $03_D500

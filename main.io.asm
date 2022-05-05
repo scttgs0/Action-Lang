@@ -48,9 +48,9 @@ print           .proc
                 bne print1
 
                 lda #$0b
-                sta $03_0342,x ;!! IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,x
                 lda #eol
-                jmp $03_E456 ;!! CIOV
+                jmp CIOV
 
 print1          rts
                 .endproc
@@ -60,7 +60,7 @@ print1          rts
 ;   Close(device)
 ;======================================
 close           .proc
-                ldx #>$03_B000 ;!! ml
+                ldx #>$03_B000          ; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
@@ -100,30 +100,30 @@ xiostr          .proc
                 asl a
                 tax
                 tya
-                sta $03_0342,x ;!! IOCB0+ICCOM,x       ; command
+                sta IOCB0+ICCOM,x       ; command
                 lda arg3
                 beq _xs1
 
-                sta $03_034A,x ;!! IOCB0+ICAX1,x
+                sta IOCB0+ICAX1,x
                 lda arg4
-                sta $03_034B,x ;!! IOCB0+ICAX2,x
+                sta IOCB0+ICAX2,x
 
                 lda #0
 _xs1            tay
-                sta $03_0349,x ;!! IOCB0+ICBLH,x
+                sta IOCB0+ICBLH,x
                 lda (arg5),y
-                sta $03_0348,x ;!! IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLL,x       ; size
 
                 beq print.print1        ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta $03_0344,x ;!! IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,x       ; buffer address
                 lda arg6
                 adc #0
-                sta $03_0345,x ;!! IOCB0+ICBAH,x
-                jmp $03_E456 ;!! CIOV
+                sta IOCB0+ICBAH,x
+                jmp CIOV
 
                 .endproc
 
@@ -181,7 +181,7 @@ _ds2            rts
 ;   RdBuf(device)
 ;======================================
 rdbuf           .proc
-    ; INC $03_02C8 ;!! COLOR4
+    ; INC COLOR4
                 nop
                 nop
                 nop
@@ -195,7 +195,7 @@ rdbuf           .proc
 inputs          jsr input
 
                 sty arg0
-                lda $03_0348,x ;!! IOCB0+ICBLL,x       ; size
+                lda IOCB0+ICBLL,x       ; size
                 beq _rb1
 
                 sec
@@ -268,9 +268,9 @@ sermsg          .text 7,"Error: "
 ;   CToStr(num) - Cardinal to string
 ;======================================
 ctostr          .proc
-                sta $03_00D4   ;!! FR0
-                stx $03_00D4+1 ;!! FR0+1
-                jsr $03_D9AA   ;!! IFP                 ; Cardinal to real
+                sta FR0
+                stx FR0+1
+                jsr IFP                 ; Cardinal to real
 
                 .endproc
 
@@ -279,13 +279,13 @@ ctostr          .proc
 ;   RToStr() - real in FR0
 ;======================================
 rtostr          ;.proc
-                jsr $03_D8E6 ;!! FASC
+                jsr FASC
 
                 ldy #$ff
                 ldx #0
 _rts1           iny
                 inx
-                lda ($F3),y  ;!! (INBUFF),y
+                lda (INBUFF),y
                 sta numbuf,x
                 bpl _rts1
 
@@ -301,8 +301,8 @@ _rts1           iny
 ;======================================
 dspoff          .proc
                 lda tvdisp
-                sta $03_022F ;!! SDMCTL
-                sta $03_D400 ;!! DMACTL
+                sta SDMCTL
+                sta DMACTL
                 rts
                 .endproc
 
@@ -312,10 +312,10 @@ dspoff          .proc
 ;======================================
 dspon           .proc
                 lda #$22
-                sta $03_022F ;!! SDMCTL
-                sta $03_D400 ;!! DMACTL
+                sta SDMCTL
+                sta DMACTL
                 lda bckgrnd             ; background color
-                sta $03_02C8 ;!! COLOR4              ; restore background
+                sta COLOR4              ; restore background
                 rts
                 .endproc
 
@@ -359,10 +359,10 @@ openchan        .proc
                 clc
                 lda nxtaddr
                 adc #2
-                sta $03_00D4   ;!! FR0
+                sta FR0
                 lda nxtaddr+1
                 adc #0
-                sta $03_00D4+1 ;!! FR0+1
+                sta FR0+1
 
                 ldy #0
                 lda (nxtaddr),y         ; add 2 to length of string
@@ -370,7 +370,7 @@ openchan        .proc
                 sta (nxtaddr),y
                 tay
 _oc1            lda (nxtaddr),y         ; move string up...
-                sta ($D4),y  ;!! (FR0),y
+                sta (FR0),y
                 dey
                 bne _oc1
 
@@ -408,14 +408,14 @@ printbuf        .proc
 ;   HToCar(buf,index)
 ;======================================
 htocar          .proc
-                sty $03_00F2   ;!! CIX
+                sty CIX
                 sta arg1
                 stx arg2
                 lda #0
-                sta $03_00D4   ;!! FR0
-                sta $03_00D4+1 ;!! FR0+1
+                sta FR0
+                sta FR0+1
 
-_htc1           ldy $03_00F2   ;!! CIX
+_htc1           ldy CIX
                 lda (arg1),y
                 sec
                 sbc #'0'
@@ -432,16 +432,16 @@ _htc1           ldy $03_00F2   ;!! CIX
                 bpl rtocar.htcrtn
 
 _htcok          sta arg5
-                lda $03_00D4   ;!! FR0
-                ldx $03_00D4+1 ;!! FR0+1
+                lda FR0
+                ldx FR0+1
                 ldy #4
                 jsr lsh1
 
                 clc
                 adc arg5
-                sta $03_00D4   ;!! FR0
-                stx $03_00D4+1 ;!! FR0+1
-                inc $03_00F2   ;!! CIX
+                sta FR0
+                stx FR0+1
+                inc CIX
                 bra _htc1
 
                 .endproc
@@ -451,12 +451,12 @@ _htcok          sta arg5
 ;   RToCar()
 ;======================================
 rtocar          .proc
-                jsr $03_D9D2 ;!! FPI
+                jsr FPI
                 bcs rcerr
 
-htcrtn          lda $03_00D4   ;!! FR0
-                ldx $03_00D4+1 ;!! FR0+1
-                ldy $03_00F2   ;!! CIX
+htcrtn          lda FR0
+                ldx FR0+1
+                ldy CIX
 htcr1           rts
 
 rcerr           ldy #conster
@@ -469,10 +469,10 @@ rcerr           ldy #conster
 ;   SToReal(str, index)
 ;======================================
 storeal         .proc
-                sty $03_00F2   ;!! CIX
-                sta $03_00F3   ;!! INBUFF
-                stx $03_00F3+1 ;!! INBUFF+1
-                jmp $03_D800   ;!! AFP
+                sty CIX
+                sta INBUFF
+                stx INBUFF+1
+                jmp AFP
 
                 .endproc
 
@@ -520,7 +520,7 @@ putstr          .proc
 
                 inx
 _ps1            stx arg5
-                jsr dsploc
+                jsr DisplayLocation
                 jsr zapcsr
 
                 ldy #39
@@ -704,16 +704,16 @@ dspbuf          .proc
 
 
 ;======================================
-;   DspLoc() get address of display
+;   DisplayLocation() get address of display
 ;======================================
-dsploc          .proc
-                lda $03_0058   ;!! SAVMSC
-                ldx $03_0058+1 ;!! SAVMSC+1
+DisplayLocation .proc
+                lda #<CS_TEXT_MEM_PTR
+                ldx #>CS_TEXT_MEM_PTR
                 ldy ROWCRS
                 beq _dlocrt
 
 _dloc1          clc
-                adc #40     ; rowSize
+                adc #CharResX           ; TODO: fragile
                 bcc _dloc2
 
                 inx
@@ -731,9 +731,9 @@ _dlocrt         sta arg0
 ;======================================
 zapcsr          .proc
                 lda #<csrch
-                sta OLDADR      ; TODO:
+                ;sta OLDADR      ; TODO:
                 lda #>csrch
-                sta OLDADR+1
+                ;sta OLDADR+1
                 rts
                 .endproc
 
@@ -744,6 +744,6 @@ zapcsr          .proc
 rstcsr          .proc
                 ldy #0
                 lda OLDCHR
-                sta ($5E),y  ;!! (OLDADR),y
+                ;sta (OLDADR),y
                 rts
                 .endproc

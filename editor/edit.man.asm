@@ -34,7 +34,7 @@ floop           .proc
 
 _fm1            lda curch
                 sta lastch
-                jsr getkey
+                jsr GetKey
 
                 jsr EditorInit.fcmsg1
 

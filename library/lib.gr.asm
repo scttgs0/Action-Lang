@@ -93,9 +93,6 @@ _grio           jsr position.pos1
 ; same as BASIC
 ;======================================
 position        .proc
-                sta OLDCOL              ; Position(col, row)
-                stx OLDCOL+1
-                sty OLDROW
 pos1            sta COLCRS
                 stx COLCRS+1
                 sty ROWCRS
@@ -149,8 +146,8 @@ setcolor        .proc
                 asl a
                 ora arg2
                 ldx arg0
-                sta $03_02C4,x ;!! COLOR0,x
-                sta $03_D016,x ;!! COLPF0,x
+                sta COLOR0,x
+                sta COLPF0,x
 _sc1            rts
                 .endproc
 

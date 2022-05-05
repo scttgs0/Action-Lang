@@ -101,7 +101,7 @@ arra0           pha
                 lda (stack),y
                 iny
                 ora (stack),y
-_ar1            sta $03_00E0 ;!! FR1
+_ar1            sta FR1
                 beq _arint              ; pointer
 
                 ldy vartype-1,x
@@ -115,7 +115,7 @@ _ar1            sta $03_00E0 ;!! FR1
 _arint          jsr gettemps
 
                 lda #$a1                ; LDA
-                ldx $03_00E0 ;!! FR1
+                ldx FR1
                 beq _ari1
 
                 jsr load2l
@@ -136,7 +136,7 @@ _ari1           jsr loadx.op1l
                 jsr stempl
 
                 lda #$a1                ; LDA
-                ldx $03_00E0 ;!! FR1
+                ldx FR1
                 beq _ari2
 
                 jsr load2h

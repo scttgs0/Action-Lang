@@ -410,7 +410,7 @@ MoveContent     .proc
                 sta arg4
                 stx ROWCRS
                 jsr rstcsr
-                jsr dsploc              ; get display address
+                jsr DisplayLocation    ; get display address
 
                 ldx arg4
                 dex

@@ -539,11 +539,10 @@ libst           .byte 0                 ; 1
 ;======================================
 strig           .proc
                 tax
-                lda $03_D010,x ;!! TRIG0,x
+                lda TRIG0,x
                 sta args
                 rts
                 .endproc
-
 
                 .byte <_en73
 
@@ -555,7 +554,7 @@ strig           .proc
 ;======================================
 paddle          .proc
                 tax
-                lda $03_0270,x ;!! PADDL0,x
+                lda PADDL0,x
                 sta args
                 rts
                 .endproc

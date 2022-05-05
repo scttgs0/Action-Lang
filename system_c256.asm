@@ -1,3 +1,90 @@
+;--------------------------------------
+;
+;--------------------------------------
+PLAT_INIT       .proc
+    ; initialize the BREAK key flag
+                lda #1
+                sta BRKKEY              ; BREAK key = not pressed
+
+    ; initialize text mode
+                sta DINDEX              ; 0=Text mode; setting to 1 to trigger initialization
+                stz INVFLG              ; Normal
+                lda #64
+                sta SHFLOK              ; Uppercase
+
+    ; initialize Function Keys state
+                lda #8
+                sta CONSOL
+
+    ; initialize memory boundries
+                lda #<$03_7FFF
+                sta MEMTOP
+                lda #>$03_7FFF
+                sta MEMTOP+1
+
+                lda #<$03_0600
+                sta MEMLO
+                lda #>$03_0600
+                sta MEMLO+1
+
+    ; initialize left and right margins
+                stz LMARGN
+                lda #CharResX-3         ; -1 for 0-based index, -2 for border space
+                sta RMARGN
+
+    ; initialize cursor location
+                stz COLCRS
+                stz ROWCRS
+                stz OLDCHR
+
+    ; initialize Tabstop positions
+                ldy #$00
+_nextBatch      ldx #$00
+_nextTab        lda InitialTabs,x
+                sta TABMAP,y
+
+                iny
+                inx
+                cpx #$03
+                bne _nextTab
+
+                cpy #$0F
+                bne _nextBatch
+
+                lda #<$037FE0
+                sta INITAD
+                lda #>$037FE0
+                sta INITAD+1
+
+    ; cold-start boot
+                stz WARMST
+
+    ; initialize DOS vector
+                lda #<DOS_Entry
+                sta DOSVEC
+                lda #>DOS_Entry
+                sta DOSVEC+1
+                lda `DOS_Entry
+                sta DOSVEC+2
+
+                jsr cstart
+                jmp Start
+
+;--------------------------------------
+
+InitialTabs     .byte %00100100
+                .byte %10010010
+                .byte %01001001
+
+DOS_Entry       rtl
+                .endproc
+
+;--------------------------------------
+;--------------------------------------
+
+InsertMode      .byte 1
+CapsLock        .byte 0
+
 
 ;======================================
 ; Clear the visible screen
