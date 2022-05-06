@@ -121,25 +121,25 @@ mnum            .proc
                 sta afsize+1
 
 _mn1            lda nxttoken
-                cmp #timesid
+                cmp #tokMULT
                 beq _mn4                ; qcode reference
 
-                cmp #lbrack
+                cmp #tokLBracket
                 beq _mn5
 
-                cmp #record
+                cmp #tokRECORD
                 beq _mnvar
 
-                cmp #typet
+                cmp #tokTYPE_t
                 beq _mnvar
 
-                cmp #typet+8
+                cmp #tokTYPE_t+8
                 beq _mnvar
 
-                cmp #quote
+                cmp #tokQuote
                 beq _mnstr
 
-                cmp #undec
+                cmp #tokUNDEC
                 beq _mnundec
                 bcs _mnvar
 
@@ -161,7 +161,7 @@ _mn2a           sta afsize+1
                 cmp #'+'
                 bne _mn2b
 
-                jsr getnext
+                jsr GetNext
                 bra _mn1
 
 _mn2b           ldy #0
@@ -197,7 +197,7 @@ _mnstr          jsr copystr             ; string ref
                 jmp _mn2
 
 _mn6            lda nxttoken            ; body of table
-                cmp #rbrack
+                cmp #tokRBracket
                 beq _mn9
 
                 jsr getconst
@@ -211,7 +211,7 @@ _mn6            lda nxttoken            ; body of table
                 iny                     ; no, word
 _mn7            tya
                 jsr codeincr
-_mn8            jsr getnext
+_mn8            jsr GetNext
                 bra _mn6
 
 _mnundec        lda #1
@@ -230,7 +230,7 @@ _mnundec        lda #1
 
                 jmp _mnv1
 
-_varerr         ldy #varer
+_varerr         ldy #varERR
 _adrerr         jmp splerr
 
 _mn9            pla                     ; end of table
@@ -245,11 +245,11 @@ _mn9            pla                     ; end of table
 ;   GetConst(token)
 ;======================================
 getconst        .proc
-                ldy #conster
+                ldy #constERR
                 cmp #$81
                 bcc mnum._adrerr
 
-                cmp #constt+strt
+                cmp #tokCONST_t+tokSTR_t
                 bcs mnum._adrerr
 
                 lda nxtaddr
@@ -285,7 +285,7 @@ _cs1            lda (nxtaddr),y
                 inc qcode+1
 _cs2            jsr codeincr
 
-                inc choff               ; get rid of end quote
+                inc choff               ; get rid of end tokQuote
                 pla
                 tax
                 pla
@@ -431,9 +431,9 @@ _c1             lda stbase
                 bcs alpha._alpha2       ; return
 
 cderr           sta bank+ebank
-                jsr splsetup            ; reset compiler
+                jsr SPLsetup            ; reset compiler
 
-                ldy #cder               ; out of qcode space
+                ldy #qcodeERR           ; out of qcode space
                 jmp splerr
 
                 .endproc

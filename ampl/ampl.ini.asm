@@ -24,11 +24,11 @@
 ;======================================
 ;   SPLsetup()
 ;======================================
-splsetup        .proc
+SPLsetup        .proc
                 lda #0
                 tay
                 sta sp
-                sta chan
+                sta Channel
                 sta symtab
                 sta INITAD+1
                 sta (buf),y
@@ -98,7 +98,7 @@ _spls3          sta codebase
                 sta symtab
                 lda sparem+1
                 sta symtab+1
-_alcerr         ldy #alcer
+_alcerr         ldy #allocateERR
                 jmp splerr
 
 _spls4          lda sparem

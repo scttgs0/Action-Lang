@@ -29,14 +29,14 @@ scrinit         .proc
                 stz DINDEX              ; text mode
 
                 ; lda #0
-                ; jsr close               ; close #0, sets X to 0
+                ; jsr close             ; close #0, sets X to 0
 
                 ; lda #$0c
                 ; sta arg3
                 ; lda #0
                 ; ldx #<scred
                 ; ldy #>scred
-                ; jmp open
+                ; jmp Open
 
 ;--------------------------------------
 
@@ -140,101 +140,101 @@ scrrt           .proc
 ;    Compiler tokens
 ;=============================
 
-plusid          = 1
-minusid         = 2
-timesid         = 3
-divideid        = 4
-orid            = 5
-andid           = 6
-equalid         = 7
-neid            = 8
-grid            = 9
-geid            = 10
-lsid            = 11
-leid            = 12
-remid           = 13
-xorid           = 14
-lshid           = 15
-rshid           = 16
-uminusid        = 17
-atid            = 18
+tokPLUS         = 1
+tokMINUS        = 2
+tokMULT         = 3
+tokDIVD         = 4
+tokOR           = 5
+tokAND          = 6
+tokEQU          = 7
+tokNOTEQU       = 8
+tokGRTR         = 9
+tokGRTREQU      = 10
+tokLESS         = 11
+tokLESSEQU      = 12
+tokREM          = 13
+tokXOR          = 14
+tokLSH          = 15
+tokRSH          = 16
+tokUMINUS       = 17
+tokAT           = 18
 
-scolon          = 21
-squote          = 22
-period          = 23
-rparen          = 24
-lparen          = 25
-comma           = 26
-defid           = 27
-digit           = 28+$80
-hex             = 29
-quote           = 30
+tokSColon       = 21
+tokSQuote       = 22
+tokPeriod       = 23
+tokRParen       = 24
+tokLParen       = 25
+tokComma        = 26
+tokDef          = 27
+tokDigit        = 28+$80
+tokHex          = 29
+tokQuote        = 30
 
-char            = 32
-byte            = 33
-int             = 34
-card            = 35
-string          = 36
-real            = 37
-define          = 38
-record          = 39
+tokCHAR         = 32
+tokBYTE         = 33
+tokINT          = 34
+tokCARD         = 35
+tokSTRING       = 36
+tokREAL         = 37
+tokDEFINE       = 38
+tokRECORD       = 39
 
-array           = 64
-func            = 65
-proc            = 66
-get             = 67
-set             = 68
-pointer         = 69
-typeid          = 70
+tokARRAY        = 64
+tokFUNC         = 65
+tokPROC         = 66
+tokGET          = 67
+tokSET          = 68
+tokPOINTER      = 69
+tokTYPE         = 70
 
-ifid            = 80
-whileid         = 81
-retid           = 82
-exitid          = 83
-forid           = 84
-caseid          = 85
-codeid          = 86
-modid           = 87
-untilid         = 88
+tokIF           = 80
+tokWHILE        = 81
+tokRET          = 82
+tokEXIT         = 83
+tokFOR          = 84
+tokCASE         = 85
+tokCode         = 86
+tokMOD          = 87
+tokUNTIL        = 88
 
-lbrack          = 91
-rbrack          = 93
-uparrow         = 94
+tokLBracket     = 91
+tokRBracket     = 93
+tokUpArrow      = 94
 
-then            = 96
-else            = 97
-do              = 98
-fi              = 99
-od              = 100
-to              = 101
-step            = 102
-of              = 103
-esac            = 104
-edoc            = 105
-elseif          = 106
-downto          = 107
+tokTHEN         = 96
+tokELSE         = 97
+tokDO           = 98
+tokFI           = 99
+tokOD           = 100
+tokTO           = 101
+tokSTEP         = 102
+tokOF           = 103
+tokESAC         = 104
+tokEDOC         = 105
+tokELSEIF       = 106
+tokDOWNTO       = 107
 
-typet           = $70                   ; 112
+tokTYPE_t       = $70                   ; 112
 
-eofid           = 127
+tokEOF          = 127
 
-constt          = $80
-vart            = $88
-arrayt          = $90
-tempt           = $a8
-funct           = $c0
-condt           = $48
+tokCONST_t      = $80
+tokVAR_t        = $88
+tokARRAY_t      = $90
+tokTEMP_t       = $A8
+tokFUNC_t       = $C0
+tokCOND_t       = $48
 
 ;    types
 ;    -----
-chart           = 1
-bytet           = 2
-intt            = 3
-cardt           = 4
-strt            = 5
-realt           = 6
+tokCHAR_t       = 1
+tokBYTE_t       = 2
+tokINT_t        = 3
+tokCARD_t       = 4
+tokSTR_t        = 5
+tokREAL_t       = 6
 
-undec           = $88
+tokUNDEC        = $88
 
 
 ;========================
@@ -242,36 +242,36 @@ undec           = $88
 ;========================
 
 ; 0 - out of system memory
-strer           = 1                     ; missing " at end
-dfner           = 2                     ; nested defines
-ster            = 3                     ; too many qglobal st
+strERR          = 1                     ; missing " at end
+dfnERR          = 2                     ; nested defines
+symtblERR           = 3                 ; too many qglobal st
 ; 4 - too many local st entries
-seter           = 5                     ; SET syntax error
-dcler           = 6                     ; declaration error
-arger           = 7                     ; bad argument list
-varer           = 8                     ; var not declared
-conster         = 9                     ; not int const
-asser           = 10                    ; bad assignment
-ender           = 11                    ; unknown error
-thener          = 12                    ; missing THEN
-fier            = 13                    ; missing FI
-cder            = 14                    ; out of qcode space
-doer            = 15                    ; missing DO
-toer            = 16                    ; missing TO
-exper           = 17                    ; bad expression
-parer           = 18                    ; unmatched ()s
-oder            = 19                    ; missing OD
-alcer           = 20                    ; can't alloc mem.
-arrer           = 21                    ; bad array ref.
+setERR          = 5                     ; SET syntax error
+declERR          = 6                    ; declaration error
+argERR          = 7                     ; bad argument list
+varERR          = 8                     ; var not declared
+constERR        = 9                     ; not int const
+assgnERR        = 10                    ; bad assignment
+endERR          = 11                    ; unknown error
+thenERR         = 12                    ; missing THEN
+fiERR           = 13                    ; missing FI
+qcodeERR           = 14                 ; out of qcode space
+doERR           = 15                    ; missing DO
+toERR           = 16                    ; missing TO
+exprERR          = 17                   ; bad expression
+parenthERR        = 18                  ; unmatched ()s
+odERR           = 19                    ; missing OD
+allocateERR     = 20                    ; can't alloc mem.
+arrayERR          = 21                  ; bad array ref.
 ; 22 - file too large on input
-cnder           = 23                    ; illegal cond. exp.
-forer           = 24                    ; illegal FOR stmt
-exiter          = 25                    ; no loop for EXIT
-nster           = 26                    ; nesting level too deep
-typer           = 27                    ; illegal type ref.
-reter           = 28                    ; illegal RETURN stmt.
+condtERR         = 23                   ; illegal cond. exp.
+forERR          = 24                    ; illegal FOR stmt
+exitERR         = 25                    ; no loop for EXIT
+nestERR         = 26                    ; nesting level too deep
+typERR          = 27                    ; illegal type ref.
+retrnERR          = 28                  ; illegal RETURN stmt.
 ;61 - out of st space
-brker           = $80                   ; Break key depressed
+brkERR          = $80                   ; Break key depressed
 
 
 ;======================================
@@ -281,7 +281,7 @@ brker           = $80                   ; Break key depressed
 ;======================================
 ;   GetNext()
 ;======================================
-getnext         .proc
+GetNext         .proc
                 lda spnxt
                 ldx curnxt
                 ldy curnxt+1
@@ -300,7 +300,7 @@ getnext         .proc
 getnloop
                 jsr nextchar
 
-getnl0          cmp #eofid
+getnl0          cmp #tokEOF
                 beq getnr1
 
                 cmp #'!'
@@ -358,9 +358,9 @@ ismt            lda token
 ;======================================
 ;   LexCom()
 ;======================================
-lexcom          .proc
-                jsr nextline
-                bra getnext.getnl0
+LexCom          .proc
+                jsr NextLine
+                bra GetNext.getnl0
 
                 .endproc
 
@@ -368,8 +368,8 @@ lexcom          .proc
 ;======================================
 ;   LexDig()
 ;======================================
-lexdig          .proc
-                lda #constt+intt
+LexDig          .proc
+                lda #tokCONST_t+tokINT_t
                 sta nxttoken
                 jsr lexbuf              ; get buf ptr
                 jsr storeal
@@ -387,7 +387,7 @@ ldig1           jsr nextchar            ; cardinal?
                 jsr rtocar
                 bcc ldig3
 
-cnsterr         ldy #conster
+cnsterr         ldy #constERR
                 jmp splerr
 
 ldig2           dey
@@ -395,12 +395,12 @@ ldig2           dey
 ldig3           sta nxtaddr
                 stx nxtaddr+1
                 cpx #0
-                bne getnext.getnr2
+                bne GetNext.getnr2
 
-                lda #constt+bytet
-                bne getnext.getnr1
+                lda #tokCONST_t+tokBYTE_t
+                bne GetNext.getnr1
 
-ldig4           lda #constt+realt
+ldig4           lda #tokCONST_t+tokREAL_t
                 sta nxttoken
                 ldy CIX
                 ldx #$ff                ; for SET cmd
@@ -412,12 +412,12 @@ ldig4           lda #constt+realt
 ;======================================
 ;   LexChr()
 ;======================================
-lexchr          .proc
+LexChr          .proc
                 jsr nextchar
 
                 sta nxtaddr
-                lda #constt+chart
-                bne getnext.getnr1
+                lda #tokCONST_t+tokCHAR_t
+                bne GetNext.getnr1
 
                 .endproc
 
@@ -425,14 +425,14 @@ lexchr          .proc
 ;======================================
 ;   LexNE()
 ;======================================
-lexne           .proc
+LexNE           .proc
                 jsr nextchar
 
                 cmp #'>'
-                bne lexeq.leq1
+                bne LexEq.leq1
 
-                lda #neid
-                bra getnext.getnr1
+                lda #tokNOTEQU
+                bra GetNext.getnr1
 
                 .endproc
 
@@ -440,14 +440,14 @@ lexne           .proc
 ;======================================
 ;   LexEq()
 ;======================================
-lexeq           .proc
+LexEq           .proc
                 jsr nextchar
 
 leq1            cmp #'='
                 bne putback
 
                 inc nxttoken
-                bra getnext.getnr2
+                bra GetNext.getnr2
 
                 .endproc
 
@@ -455,13 +455,13 @@ leq1            cmp #'='
 ;======================================
 ;   LexHex()
 ;======================================
-lexhex          .proc
-                lda #constt+cardt
+LexHex          .proc
+                lda #tokCONST_t+tokCARD_t
                 sta nxttoken
                 inc choff
                 jsr lexbuf
                 jsr htocar
-                bra lexdig.ldig2
+                bra LexDig.ldig2
 
                 .endproc
 
@@ -471,7 +471,7 @@ lexhex          .proc
 ;======================================
 putback         .proc
                 dec choff
-pback           jmp getnext.getnr2
+pback           jmp GetNext.getnr2
 
                 .endproc
 
@@ -500,7 +500,7 @@ lexpf           .proc
 ;======================================
 lexstr          .proc
                 lda token
-                cmp #quote
+                cmp #tokQuote
                 beq putback.pback       ; zap local st
 
                 lda #0
@@ -515,10 +515,10 @@ _lstr1          jsr nextchar
 
 _lstr2          ldy arg9
                 sta (symtab),y
-                lda chan
+                lda Channel
                 bpl _lstr1              ; if not EOF
 
-_lstr3          ldy #strer
+_lstr3          ldy #strERR
                 jmp splerr
 
 _lstr4          jsr nextchar
@@ -538,7 +538,7 @@ _lstr4          jsr nextchar
                 ldx symtab+1
                 ldy choff
                 dey
-                jmp lexdig.ldig2
+                jmp LexDig.ldig2
 
                 .endproc
 
@@ -552,31 +552,33 @@ nextchar        .proc
 
 nxtch0          ldy choff
                 cpy sp
-                bcc nextline._nxtch1
+                bcc NextLine._nxtch1
 
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
 ;   NextLine()
 ;======================================
-nextline        .proc
-                lda chan
-                beq _nln1
-                bmi _nln4               ; eof
+NextLine        .proc
+                lda Channel
+                beq _1
+                bmi _4                  ; eof
 
-                jsr rdbuf
-                bpl _nln2
+                jsr ReadBuffer
+                bpl _2
 
                 cpy #$88                ; EOF
-                beq _nln0
+                beq _next1
                 jmp splerr
 
-_nln0           dec chan
-                bne nextline
+_next1          dec Channel
+                bne NextLine
 
-_nln1           ldy top+1
-                beq _nln0               ; set eof, tricky qcode
+_1              ldy top+1
+                beq _next1              ; set eof, tricky qcode
 
                 jsr ldbuf
 
@@ -585,18 +587,18 @@ _nln1           ldy top+1
                 ldx cur+1
                 stx curnxt+1
                 jsr nextdwn
-                bne _nln2
+                bne _2
 
-;    lda #0
+        ;    lda #0
                 sta top+1
 
-_nln2           lda list
-                beq _nln3               ; don't list
+_2              lda list
+                beq _3                  ; don't list
 
                 lda device
-                jsr wrtbuf
+                jsr WriteBuffer
 
-_nln3           ldy #0
+_3              ldy #0
                 sty choff
                 lda (buf),y
                 tay
@@ -611,7 +613,7 @@ _nxtch1         iny
                 sty choff
                 rts
 
-_nln4           lda #eofid
+_4              lda #tokEOF
                 rts
                 .endproc
 
@@ -641,16 +643,16 @@ ldef1           ldy choff
 ;   LexGet()
 ;======================================
 lexget          .proc
-                jsr getnext.getnloop
+                jsr GetNext.getnloop
 
 lget            lda #0
                 sta defflg
-                inc chan
+                inc Channel
                 lda #4
                 jsr openchan
-                jsr nextline
+                jsr NextLine
 
-                jmp getnext.getnl0
+                jmp GetNext.getnl0
 
                 .endproc
 
@@ -664,10 +666,10 @@ lexset          .proc
                 sta arg11
                 stx arg12
 
-                jsr getnext.getnloop
+                jsr GetNext.getnloop
 
                 lda nxttoken
-                cmp #equalid
+                cmp #tokEQU
                 bne lseterr
 
                 jsr getadr
@@ -679,12 +681,12 @@ lexset          .proc
 
                 iny
                 sta (arg11),y
-lset1           jmp getnext.getnloop
+lset1           jmp GetNext.getnloop
 
-lseterr         ldy #seter
+lseterr         ldy #setERR
                 jmp splerr
 
-getadr          jsr getnext.getnloop
+getadr          jsr GetNext.getnloop
 
                 jmp mnum
 
@@ -698,7 +700,7 @@ lexexpand       .proc
                 lda defflg
                 beq lexp
 
-                ldy #dfner
+                ldy #dfnERR
                 jmp splerr
 
 lexp            lda #3
@@ -714,7 +716,7 @@ lexp1           sta delnxt
                 sty defflg
                 lda #0
                 sta choff
-                jmp getnext.getnloop
+                jmp GetNext.getnloop
 
                 .endproc
 
@@ -739,61 +741,61 @@ _lbuf           lda buf
 ;--------------------------------------
 ;--------------------------------------
 
-lexcmd          .addr getnext.getnr2
+lexcmd          .addr GetNext.getnr2
                 .byte 41
-                .addr lexdig
-                .byte digit-$80
-                .addr lexhex
-                .byte hex
-                .addr lexeq
-                .byte grid
-                .addr lexne
-                .byte lsid
+                .addr LexDig
+                .byte tokDigit-$80
+                .addr LexHex
+                .byte tokHex
+                .addr LexEq
+                .byte tokGRTR
+                .addr LexNE
+                .byte tokLESS
                 .addr lexexpand
-                .byte defid
-                .addr lexcom
-                .byte scolon
-                .addr lexchr
-                .byte squote
+                .byte tokDef
+                .addr LexCom
+                .byte tokSColon
+                .addr LexChr
+                .byte tokSQuote
                 .addr lexpf
-                .byte proc
+                .byte tokPROC
                 .addr lexpf
-                .byte func
+                .byte tokFUNC
                 .addr lexpf
-                .byte modid
+                .byte tokMOD
                 .addr lexstr
-                .byte quote
+                .byte tokQuote
                 .addr lexget
-                .byte get
+                .byte tokGET
                 .addr lexset
-                .byte set
+                .byte tokSET
 
 lexchars
-                .byte xorid             ; !
-                .byte quote+$80         ; "
-                .byte neid              ; #
-                .byte hex+$80           ; $
-                .byte orid              ; %
-                .byte andid             ; &
-                .byte squote+$80        ; '
-                .byte lparen
-                .byte rparen
-                .byte timesid
-                .byte plusid
-                .byte comma
-                .byte minusid
-                .byte period            ; .
-                .byte divideid+$80      ; /
-                .byte digit,digit,digit,digit
-                .byte digit,digit,digit,digit
-                .byte digit,digit       ; 0 thru 9
+                .byte tokXOR            ; !
+                .byte tokQuote+$80      ; "
+                .byte tokNOTEQU         ; #
+                .byte tokHex+$80        ; $
+                .byte tokOR             ; %
+                .byte tokAND            ; &
+                .byte tokSQuote+$80     ; '
+                .byte tokLParen
+                .byte tokRParen
+                .byte tokMULT
+                .byte tokPLUS
+                .byte tokComma
+                .byte tokMINUS
+                .byte tokPeriod         ; .
+                .byte tokDIVD+$80       ; /
+                .byte tokDigit,tokDigit,tokDigit,tokDigit
+                .byte tokDigit,tokDigit,tokDigit,tokDigit
+                .byte tokDigit,tokDigit ; 0 thru 9
                 .byte 0                 ; :
-                .byte scolon+$80        ; ;
-                .byte lsid+$80          ; low
-                .byte equalid           ; =
-                .byte grid+$80          ; high
+                .byte tokSColon+$80     ; ;
+                .byte tokLESS+$80       ; low
+                .byte tokEQU            ; =
+                .byte tokGRTR+$80       ; high
                 .byte 126               ; ?
-                .byte atid              ; @
+                .byte tokAT             ; @
 
 ;PrintTok lda token
 ;         ldx #0

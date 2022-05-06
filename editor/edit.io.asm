@@ -111,7 +111,7 @@ FRead           .proc
                 jsr FOpen
 
 _frd1           lda #1
-                jsr rdbuf
+                jsr ReadBuffer
                 bmi _fr3
 
                 jsr InsertByte
@@ -156,7 +156,7 @@ _fw1            jsr ldbuf
                 nop
 
                 lda #1
-                jsr wrtbuf
+                jsr WriteBuffer
                 bmi _fw3
 
                 jsr nextdwn
@@ -240,7 +240,7 @@ _fo4            stx arg3
                 sta arg4                ; clear high bit for cassette
                 ldx #<inbuf
                 ldy #>inbuf
-                jsr open
+                jsr Open
                 bmi _fo6
 
                 lda arg3                ; see if directory
@@ -261,7 +261,7 @@ _fo7            pla
 
 
 ;======================================
-;
+;   InitKeys()
 ;======================================
 InitKeys        .proc
                 lda #7
@@ -272,7 +272,7 @@ InitKeys        .proc
                 lda #7
                 ldx #<keybd
                 ldy #>keybd
-                jmp open
+                jmp Open
 
 ;--------------------------------------
 
@@ -281,7 +281,7 @@ keybd           .text 2,"K:"
 
 
 ;======================================
-;
+;   GotKey()
 ;======================================
 GotKey          .proc
     ; Test if key in buffer

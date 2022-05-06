@@ -29,24 +29,24 @@
 ;======================================
 ;
 ;======================================
-segment         .proc
-                cmp #proc
+Segment         .proc
+                cmp #tokPROC
                 beq _proc
 
                 ldx nxttoken
-                cpx #func
+                cpx #tokFUNC
                 beq _func
 
                 rts                     ; end of segment list
 
-_proc           lda #funct-vart+char-1
+_proc           lda #tokFUNC_t-tokVAR_t+tokCHAR-1
                 sta type
                 bra _func1
 
 _func           clc
-                adc #funct-vart
+                adc #tokFUNC_t-tokVAR_t
                 sta type
-                jsr getnext
+                jsr GetNext
 
 _func1          jsr makeentry
                 jsr segend
@@ -82,10 +82,10 @@ _funcst         sta (symTblLocal),y
 ; see Params
                 lda #32
                 jsr stincr              ; arg list space
-                jsr trashy
+                jsr TrashY
 
                 lda nxttoken
-                eor #equalid
+                eor #tokEQU
                 sta param               ; this is very tricky!!
                 bne _funchd
                 jsr ideq                ; param must = 0 here
@@ -98,33 +98,33 @@ _funcst         sta (symTblLocal),y
                 ora #8
                 sta (props),y           ; set Sys flag
                 sta param
-                jsr getnext
-_funchd         jsr getnext
+                jsr GetNext
+_funchd         jsr GetNext
 
-                cmp #lparen
-                bne argerr
+                cmp #tokLParen
+                bne argerror
 
 
 ; low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
 ; low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
 
 
-                jsr getnext
+                jsr GetNext
 
-                cmp #rparen
-                beq argerr._func2
+                cmp #tokRParen
+                beq argerror._func2
 
 _heading        jsr declare
 
                 ldx lsttoken
                 inc lsttoken            ; in case 2 ,'s
-                cpx #comma
+                cpx #tokComma
                 beq _heading
 
-                cmp #rparen
-                beq argerr._func2
+                cmp #tokRParen
+                beq argerror._func2
 
-argerr          ldy #arger
+argerror        ldy #argERR
                 jmp splerr
 
 _func2          lda param
@@ -132,7 +132,7 @@ _func2          lda param
                 lda #0
                 sta param
 
-                jsr getnext
+                jsr GetNext
                 jsr declare             ; locals
 
     ; handle procedure setup here
@@ -151,14 +151,14 @@ _func2          lda param
 
     ; get space for proc variable
                 lda #$4c                ; JMP
-                jsr push1
+                jsr Push1
                 jsr getcdoff            ; fill in address
 
                 adc #2
                 bcc _fh2
 
                 inx
-_fh2            jsr push2
+_fh2            jsr Push2
 
     ; qcode to transfer arguments to
     ; local frame
@@ -179,28 +179,28 @@ _fh3            lda argbytes
                 bne _fh4
 
                 iny
-_fh4            jsr push3
+_fh4            jsr Push3
                 dec argbytes
                 jmp _fh3
 
 _f4             jmp _func4
 
 _fh5            ldx #10
-                jsr jsrtable
+                jsr JSRTable
 
                 lda arg0
                 ldx arg1
                 ldy argbytes
                 dey
-                jsr push3
+                jsr Push3
 
 _func3          lda trace               ; check for trace
                 beq _func4              ; no trace
 
                 lda #$20                ; JSR CTrace
-                ldx #<ctrace
-                ldy #>ctrace
-                jsr push3
+                ldx #<libMscCTrace
+                ldy #>libMscCTrace
+                jsr Push3
 
                 ldy #0
                 lda (curproc),y
@@ -217,7 +217,7 @@ _f3a            lda (curproc),y
 
                 lda arg0
                 ldx arg1
-                jsr push2
+                jsr Push2
 
                 lda #3
                 jsr cprop
@@ -235,6 +235,6 @@ _f3b            lda (props),y
 
 _func4          jsr stmtlist
 
-                jmp segment
+                jmp Segment
 
                 .endproc

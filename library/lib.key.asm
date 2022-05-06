@@ -24,7 +24,7 @@
 ;======================================
 ;
 ;======================================
-lgetkey         .proc
+libKeyGetKey    .proc
     ; Get next key in buffer
 _waitForKey     lda CH_                 ; key down?
                 eor #$ff
@@ -49,7 +49,7 @@ _gk2            lda CH_
                 cmp #$c0
                 bcc _gk3                ; not Ctrl-Shft
 
-_cskey          jsr click
+_cskey          jsr libKeyClick
                 bra _gk4
 
 _gk3            and #$3f
@@ -79,8 +79,8 @@ _gk5            ldx #20
 _caps           lda CH_
                 and #$c0                ; isolate control (128) and uppercase (64)
                 sta SHFLOK
-_caps1          jsr click
-                bmi lgetkey
+_caps1          jsr libKeyClick
+                bmi libKeyGetKey
 
 _atari          lda INVFLG
                 eor #$80
@@ -93,7 +93,7 @@ _atari          lda INVFLG
 ;======================================
 ;   Click() click the keyboard
 ;======================================
-click           .proc
+libKeyClick     .proc
                 ldx #$7f
 _click1         stx CONSOL
                 stx WSYNC

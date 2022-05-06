@@ -58,7 +58,7 @@ cstart          .proc
 ;======================================
 GetName         .proc
                 sta bank+lbank
-                jsr lgetname
+                jsr lGetName
 
                 .endproc
 
@@ -156,7 +156,7 @@ _gal1           jmp mnum._varerr
 ;======================================
 gnlocal         .proc
                 sta bank+lbank
-                jsr lgetname.lgnlocal
+                jsr lGetName.lgnlocal
 
                 jmp RestoreBank
 
@@ -203,7 +203,7 @@ lproceed        .proc
 ;======================================
 options         .proc
                 jsr lproceed
-                jsr setopts
+                jsr libOptSetOpts
 
                 jmp EditBank
                 .endproc
@@ -214,7 +214,7 @@ options         .proc
 ;======================================
 GetKey          .proc
                 sta bank+lbank
-                jsr lgetkey
+                jsr libKeyGetKey
 
                 jmp RestoreBank
 
@@ -237,7 +237,7 @@ splerr          .proc
 emloop          .proc
                 jsr EditBank
 
-                jmp monitor._mloop
+                jmp Monitor._mloop
 
                 .endproc
 
@@ -286,10 +286,10 @@ _ga2            jmp RestoreBank
 ;======================================
 prth            .proc                   ; call only from LBANK!
                 sty bank+ebank
-                jsr printh
+                jsr PrintH
 
                 sty bank+lbank
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 

@@ -62,7 +62,7 @@ _offbit         .byte $7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE,$FF
 
 
 ;======================================
-;
+;   SetTab()
 ;======================================
 SetTab          .proc
                 jsr TabLocation
@@ -75,7 +75,7 @@ SetTab          .proc
 
 
 ;======================================
-;
+;   ClearTab()
 ;======================================
 ClearTab        .proc
                 jsr TabLocation
@@ -88,7 +88,7 @@ ClearTab        .proc
 
 
 ;======================================
-;
+;   TabLocation()
 ;======================================
 TabLocation     .proc
                 jsr SetSpacing

@@ -127,7 +127,7 @@ fmcscmd         .addr disptb+3          ; default
                 .byte $ca
                 .addr InsertToggle
                 .byte $cd
-                .addr monitor
+                .addr Monitor
                 .byte $e5
                 .addr Find
                 .byte $f8

@@ -25,21 +25,21 @@
 ; PROC Graphics(BYTE mode)
 ; same as BASIC
 ;======================================
-graphics        .proc                   ; Graphics(mode)
+libGrGraphics   .proc                   ; Graphics(mode)
                 pha
                 lda #0
-                jsr clos
+                jsr libIOClose
 
                 lda #$0c
                 sta arg3
                 lda #0
                 ldx #<_e
                 ldy #>_e
-                jsr open
-                jsr chkerr
+                jsr Open
+                jsr libIOChkErr
 
                 lda #6
-                jsr clos
+                jsr libIOClose
 
                 pla
                 sta arg4
@@ -49,9 +49,9 @@ graphics        .proc                   ; Graphics(mode)
                 lda #6
                 ldx #<_devs
                 ldy #>_devs
-                jsr open
+                jsr Open
 
-                jmp chkerr
+                jmp libIOChkErr
 
 ;--------------------------------------
 
@@ -66,19 +66,19 @@ _atachr         = $03_02FB
 ; PROC DrawTo(CARD col, BYTE row)
 ; same as BASIC
 ;======================================
-drawto          .proc
+libGrDrawTo     .proc
                 jsr _grio               ; DrawTo(col, row)
 
                 ldy #$11
-                jmp xio
+                jmp libIOXIO
 
-_grio           jsr position.pos1
+_grio           jsr libGrPosition.pos1
 
-                lda graphics._color
-                sta graphics._atachr
-                lda #<graphics._devs
+                lda libGrGraphics._color
+                sta libGrGraphics._atachr
+                lda #<libGrGraphics._devs
                 sta arg5
-                lda #>graphics._devs
+                lda #>libGrGraphics._devs
                 sta arg6
                 lda #0
                 sta arg3
@@ -92,7 +92,7 @@ _grio           jsr position.pos1
 ; PROC Position(CARD col, BYTE row)
 ; same as BASIC
 ;======================================
-position        .proc
+libGrPosition   .proc
 pos1            sta COLCRS
                 stx COLCRS+1
                 sty ROWCRS
@@ -104,11 +104,11 @@ pos1            sta COLCRS
 ; BYTE FUNC Locate(CARD col, BYTE row)
 ; same as BASIC
 ;======================================
-locate          .proc
-                jsr position            ; Locate(col, row)
+libGrLocate     .proc
+                jsr libGrPosition       ; Locate(col, row)
 
                 lda #6
-                jmp getd
+                jmp libIOGetD
 
                 .endproc
 
@@ -117,12 +117,12 @@ locate          .proc
 ; PROC Plot(CARD col, BYTE row)
 ; same as BASIC
 ;======================================
-plot            .proc
-                jsr position.pos1       ; Plot(col, row)
+libGrPlot       .proc
+                jsr libGrPosition.pos1  ; Plot(col, row)
 
                 lda #6
-                ldx graphics._color
-                jmp putd
+                ldx libGrGraphics._color
+                jmp libIOPutD
 
                 .endproc
 
@@ -131,7 +131,7 @@ plot            .proc
 ; PROC SetColor(BYTE reg, hue, lum)
 ; same as BASIC
 ;======================================
-setcolor        .proc
+libGrSetColor   .proc
                 cmp #5                  ; SetColor(reg, hue, lum)
                 bpl _sc1
 
@@ -160,10 +160,10 @@ _sc1            rts
 ;   XIO 18,#6,0,0,"S:"
 ; in BASIC
 ;======================================
-fill            .proc
-                jsr drawto._grio
+libGrFill       .proc
+                jsr libGrDrawTo._grio
 
                 ldy #$12
-                jmp xio
+                jmp libIOXIO
 
                 .endproc

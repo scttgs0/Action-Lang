@@ -26,7 +26,7 @@
 ;--------------------------------------
 ; returns status
 ;======================================
-open            .proc
+Open            .proc
                 stx arg5
                 sty arg6
                 ldy #3
@@ -178,13 +178,13 @@ _ds2            rts
 
 
 ;======================================
-;   RdBuf(device)
+;   ReadBuffer(device)
 ;======================================
-rdbuf           .proc
-    ; INC COLOR4
+ReadBuffer      .proc
                 nop
                 nop
                 nop
+
                 ldy #0
                 tax
                 lda #240
@@ -196,11 +196,11 @@ inputs          jsr input
 
                 sty arg0
                 lda IOCB0+ICBLL,x       ; size
-                beq _rb1
+                beq _1
 
                 sec
                 sbc #1
-_rb1            ldy #0
+_1              ldy #0
                 sta (arg5),y
                 ldy arg0
                 rts
@@ -210,7 +210,7 @@ _rb1            ldy #0
 ;======================================
 ;   WrtBuf(device)
 ;======================================
-wrtbuf          .proc
+WriteBuffer     .proc
                 ldx buf
                 ldy buf+1
                 jmp print
@@ -339,7 +339,7 @@ pnum            lda device
 ;======================================
 openchan        .proc
                 pha
-                lda chan
+                lda Channel
                 jsr close
 
                 pla
@@ -381,13 +381,13 @@ _oc1            lda (nxtaddr),y         ; move string up...
                 lda #':'
                 sta (nxtaddr),y
 
-_oc2            lda chan
+_oc2            lda Channel
                 ldx nxtaddr
                 ldy nxtaddr+1
-                jsr open
+                jsr Open
                 bpl printbuf
 
-                jmp splerr              ; oopps error in open
+                jmp splerr              ; oopps error in Open
 
                 .endproc
 
@@ -399,7 +399,7 @@ printbuf        .proc
                 lda list
                 bne rtocar.htcr1        ; return
 
-                jmp wrtbuf
+                jmp WriteBuffer
 
                 .endproc
 
@@ -459,7 +459,7 @@ htcrtn          lda FR0
                 ldy CIX
 htcr1           rts
 
-rcerr           ldy #conster
+rcerr           ldy #constERR
                 jmp splerr
 
                 .endproc

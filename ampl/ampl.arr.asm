@@ -24,17 +24,17 @@
 ;======================================
 ;   ArrRef()
 ;======================================
-arrref          .proc
+ArrRef          .proc
                 ldx nxttoken
-                cpx #lparen
+                cpx #tokLParen
                 beq arrconst._arr0
 
-                cpx #uparrow
+                cpx #tokUpArrow
                 beq arrconst._arr0
 
-arrvar          ldy #vart+cardt         ; no index!
+arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
                 sty token
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcc arrconst._arr1
 
 arrconst        jsr procref.stconst
@@ -43,11 +43,11 @@ _arr1           jmp pushst
 
 _arptr          ldy #0
                 lda (stack),y
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcs _arpt1              ; small array
 
                 iny
-                jsr stkp
+                jsr StkP
 
                 cpx #0
                 bne _arpt1
@@ -66,12 +66,12 @@ _arpt1          jsr zerost
 
 _arr0           jsr pushnext
 
-                cmp #uparrow
+                cmp #tokUpArrow
                 beq _arptr
 
                 jsr getexp
 
-                cmp #rparen
+                cmp #tokRParen
                 bne arrerr
 
                 ldx op
@@ -80,13 +80,13 @@ _arr0           jsr pushnext
 _ar0            ldy #7
                 lda (stack),y
 arra0           pha
-                lda #vart+cardt
+                lda #tokVAR_t+tokCARD_t
                 sta (stack),y
-                lda #plusid
+                lda #tokPLUS
                 jsr genops
 
                 pla
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcs arrerr._arsmall
 
                 and #7
@@ -94,7 +94,7 @@ arra0           pha
                 ora #$b0                ; temp array mode
                 sta arg7
                 ldy arg1
-                cpy #constt+strt
+                cpy #tokCONST_t+tokSTR_t
                 ldy #1                  ; clear Z flag if we branch
                 bcs _ar1
 
@@ -112,18 +112,18 @@ _ar1            sta FR1
 
     ; integer or cardinal
 
-_arint          jsr gettemps
+_arint          jsr GetTemps
 
                 lda #$a1                ; LDA
                 ldx FR1
                 beq _ari1
 
-                jsr load2l
+                jsr Load2L
 
                 lda #$0a                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
-                jsr push3
+                jsr Push3
 
                 lda #$61                ; ADC
         .if ramzap
@@ -132,24 +132,24 @@ _arint          jsr gettemps
                 nop
                 nop
         .endif
-_ari1           jsr loadx.op1l
-                jsr stempl
+_ari1           jsr LoadX.Op1L
+                jsr STempL
 
                 lda #$a1                ; LDA
                 ldx FR1
                 beq _ari2
 
-                jsr load2h
+                jsr Load2H
 
                 lda #$2a                ; ROL A
                 ldx #$28                ; PLP, restore carry
-                jsr push2
+                jsr Push2
 
                 lda #$61                ; ADC
-_ari2           jsr op1h
+_ari2           jsr Op1H
                 jmp cgadd.cgadd2
 
-arrerr          ldy #arrer              ; bad array ref
+arrerr          ldy #arrayERR           ; bad array ref
                 jmp splerr
 
 _arbyte         jmp codegen.cg1
@@ -165,10 +165,10 @@ _arsmall        ldy #7
                 ldy #10
                 sta (stack),y
                 ldy #2
-                jsr loadi
+                jsr LoadI
 
                 ldy #11
-                jsr savecd.savstk
+                jsr SaveCd.savstk
                 jmp popst
 
                 .endproc

@@ -13,7 +13,7 @@ PLAT_INIT       .proc
                 sta SHFLOK              ; Uppercase
 
     ; initialize Function Keys state
-                lda #8
+                lda #7                  ; bit value 0=pressed; 1=not pressed
                 sta CONSOL
 
     ; initialize memory boundries

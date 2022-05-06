@@ -30,7 +30,7 @@
 ; range-1.  If range=0, then a random
 ; number between 0 and 255 is returned
 ;======================================
-rand            .proc
+libMscRand      .proc
                 ldx RANDOM
                 cmp #0
                 beq _rand1
@@ -38,7 +38,7 @@ rand            .proc
                 stx afcur
                 ldx #0
                 stx afcur+1
-                jsr multi
+                jsr MultI
 
 _rand1          stx args
                 rts
@@ -50,7 +50,7 @@ _rand1          stx args
 ; set voice to specified pitch, distortion,
 ; and volume.  Assumes volume low  16.
 ;======================================
-sound           .proc
+libMscSound     .proc
                 asl a
                 sty arg2
                 tay
@@ -77,7 +77,7 @@ _snd1           txa
 ;PROC SndRst()
 ; reset sound channels
 ;======================================
-sndrst          .proc
+libMscSndRst    .proc
                 lda SSKCTL
                 and #$ef                ; turn off two tone bit
                 sta SSKCTL
@@ -101,12 +101,13 @@ _sr1            sta AUDF1,x             ; zero sound regs
 ;       lda POT0,x
 ;       sta args
 ;       rts
-;
+
+
 ;BYTE FUNC PTrig(BYTE port)
 ; returns zero if trigger of paddle
 ; port is depressed.  Assumes port<8
 ;======================================
-ptrig           .proc
+libMscPTrig     .proc
                 ldx #0
                 cmp #4
                 bmi _pt1
@@ -130,7 +131,7 @@ _pt2            .byte $04,$08,$40,$80
 ; returns current value of joystick
 ; controller port.  Assumes port<4
 ;======================================
-stick           .proc
+libMscStick     .proc
                 ldx #0
                 cmp #2
                 bmi _stk1
@@ -169,7 +170,7 @@ _stk2           and #$0f
 ;BYTE FUNC Peek(CARD address)
 ; returns value stored at address
 ;======================================
-peek            .proc
+libMscPeek      .proc
                 .endproc
 
                 ;[fall-through]
@@ -179,7 +180,7 @@ peek            .proc
 ;CARD FUNC PeekC(CARD address)
 ; returns value stored at address
 ;======================================
-peekc           .proc
+libMscPeekC     .proc
                 sta arg2
                 stx arg3
                 ldy #0
@@ -197,7 +198,7 @@ peekc           .proc
 ; store byte or char value at address
 ; (single byte store)
 ;======================================
-poke            .proc
+libMscPoke      .proc
                 sta arg0
                 stx arg1
                 tya
@@ -212,8 +213,8 @@ poke            .proc
 ; store cardinal or integer value at
 ; address (2 byte store)
 ;======================================
-pokec           .proc
-                jsr poke
+libMscPokeC     .proc
+                jsr libMscPoke
 
                 iny
                 lda arg3
@@ -229,7 +230,7 @@ pokec           .proc
 ; to zero.  Note this modifies size
 ; bytes of memory.
 ;======================================
-mzero           .proc
+libMscZero      .proc
                 pha
                 lda #0
                 sta arg4
@@ -246,7 +247,7 @@ mzero           .proc
 ; to value.  Note this modifies size
 ; bytes of memory.
 ;======================================
-setblock        .proc
+libMscSetBlock  .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -280,7 +281,7 @@ _sb3            cpy arg2
 ; If dest>src and dest<=src+size-1 then
 ; transfer will not work properly!
 ;======================================
-moveblock       .proc
+libMscMoveBlock .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -311,13 +312,13 @@ _mb4            cpy arg4
 
 ;======================================
 ;PROC Break()
-; returns to monitor after saving
+; returns to Monitor after saving
 ; stack pointer in procSP
 ;======================================
-break           .proc
+libMscBreak     .proc
                 tsx
                 stx procsp
-                ldy #brker
+                ldy #brkERR
                 tya
                 jmp error
 
@@ -325,9 +326,9 @@ break           .proc
 
 
 ;======================================
-;
+;   Call Trace handler
 ;======================================
-ctrace          .proc                   ; Call Trace handler
+libMscCTrace    .proc
     ; name passed following JSR
                 clc
                 pla
@@ -341,10 +342,10 @@ ctrace          .proc                   ; Call Trace handler
     ; ok, let's print the name
                 lda arg10
                 ldx arg11
-                jsr prt
+                jsr libIOPrint
 
                 lda #'('
-                jsr put
+                jsr libIOPut
 
     ; now get addr of args
                 sec
@@ -373,7 +374,7 @@ _ct2            inc arg14
                 lda (arg10),y
                 bmi _ct4                ; byte
 
-                cmp #cardt
+                cmp #tokCARD_t
                 inc arg15
                 ldy arg15
                 lda (arg12),y
@@ -383,21 +384,21 @@ _ct2            inc arg14
 
     ; integer
                 lda (arg12),y
-                jsr prti
+                jsr libIOPrintI
 
                 jmp _ct6
 
 _ct4            ldx #0
                 ldy arg15
 _ct5            lda (arg12),y
-                jsr prtc
+                jsr libIOPrintC
 
 _ct6            inc arg15
                 dec arg9
                 beq _ct7                ; all done
 
                 lda #','
-                jsr put
+                jsr libIOPut
 
                 jmp _ct2
 
@@ -412,9 +413,9 @@ _ct7            clc
                 txa
                 pha
                 lda #')'
-                jsr put
+                jsr libIOPut
 
-                jmp pute
+                jmp libIOPutE
 
                 .endproc
 

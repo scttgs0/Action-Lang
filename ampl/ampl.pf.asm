@@ -21,19 +21,18 @@
 ;
 
 
-
 ;======================================
 ;   PF()
 ;======================================
 ld1             ldy #0
                 lda (stack),y
-                cmp #arrayt
+                cmp #tokARRAY_t
                 bcs pf._c5a
 
                 inc abt-(args-DPBASE),x
                 ldy #7
                 lda (stack),y
-                cmp #tempt+bytet
+                cmp #tokTEMP_t+tokBYTE_t
                 beq pf._c5b
 
                 dec abt+1-(args-DPBASE),x
@@ -41,29 +40,29 @@ ld1             ldy #0
                 bcc pf._c5b
 
                 jsr genops.gops
-                jsr load2h
+                jsr Load2H
 
                 lda #$81                ; STA
-                jsr op1h
+                jsr Op1H
 
                 jmp pf._c5b
 
 pf              lda #0                  ; load arg types flag
                 jsr GetArgs
                 jsr pushst
-                jsr getnext
+                jsr GetNext
 
                 ldx #(args-DPBASE)
                 stx argbytes
                 ldx nxttoken
-                cpx #rparen
+                cpx #tokRParen
                 bne _c4
 
-                jsr getnext
+                jsr GetNext
                 bra _c7
 
 _c4             ldx numargs
-                ldy #tempt+bytet
+                ldy #tokTEMP_t+tokBYTE_t
                 lda argtypes-1,x
                 ldx argbytes
                 stx abt+3
@@ -89,10 +88,10 @@ _c5             sta temps-(args-DPBASE),x
 _c5a            jsr cgassign
 
 _c5b            lda token
-                cmp #comma
+                cmp #tokComma
                 beq _c4
 
-                cmp #rparen
+                cmp #tokRParen
                 bne callerr
 
 _c6             lda argbytes
@@ -105,13 +104,13 @@ _c6             lda argbytes
                 cmp #(args-DPBASE)+1
                 bcs _c10
 
-_c7             jsr trashy
+_c7             jsr TrashY
 
                 ldy #1
-                jsr stkaddr
+                jsr StkAddr
 
                 lda #$20                ; JSR
-                jmp push3
+                jmp Push3
 
 _c8             ldx #(args-DPBASE)+2
                 jsr callerr._push
@@ -124,14 +123,14 @@ _c10            ldx #(args-DPBASE)
 
                 jmp _c7
 
-callerr         jmp segment.argerr
+callerr         jmp Segment.argerror
 
 _push           lda abt-(args-DPBASE),x
                 bne _p1
 
                 lda _ops-(args-DPBASE),x
                 ora #$04
-                jmp push2
+                jmp Push2
 
 _p1             stx arg0
                 jsr genops.gops
@@ -148,26 +147,26 @@ _p1             stx arg0
                 ldy arg1
                 bpl _p3a                ; record element
 
-                cpy #vart
+                cpy #tokVAR_t
                 ldy abt-(args-DPBASE),x
                 bcs _p3                 ; not const.
 
                 pha
                 sty arg0
                 ldy #2
-                jsr loadi
+                jsr LoadI
 
                 ldy arg0
                 bmi _p2
 
                 tax
                 pla
-                jsr push2               ; low byte of const
+                jsr Push2               ; low byte of const
 
                 jmp cgassign.cga1
 
 _p2             pla
-_p2a            jmp push2               ; high byte
+_p2a            jmp Push2               ; high byte
 
 _p3a            ldy abt-(args-DPBASE),x
 _p3             bpl _p4
@@ -175,9 +174,9 @@ _p3             bpl _p4
                 ldx arg3
                 beq _p2a
 
-                jmp op2h
+                jmp Op2H
 
-_p4             jsr op2l
+_p4             jsr Op2L
 
                 jmp cgassign.cga1
 

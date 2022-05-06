@@ -28,7 +28,7 @@
 ; does not call Error if EOF error ($88)
 ; see Hardware manual for CIO details
 ;======================================
-chkerr          .proc
+libIOChkErr     .proc
                 bpl _ce2
 
                 cpy #$88                ; EOF
@@ -36,7 +36,7 @@ chkerr          .proc
 
                 tya
                 cpy #$80                ; break key
-                beq break1
+                beq libIOBreak1
 
                 jmp error
 
@@ -50,7 +50,7 @@ _ce1            txa
                 sta eof,x
 _ce2
         .if ramzap
-                dec chkerr-$10,x
+                dec libIOChkErr-$10,x
         .else
                 nop
                 nop
@@ -63,11 +63,11 @@ _ce2
 ;======================================
 ;   Break1(error)
 ;======================================
-break1          .proc
+libIOBreak1     .proc
                 ldx #1
                 stx BRKKEY
                 pha
-                jsr break
+                jsr libMscBreak
 
                 pla
                 tay
@@ -92,7 +92,7 @@ pfe             rts
 ; any other char after % is treated
 ; the same as %U.
 ;======================================
-prtf            .proc
+libIOPrintF     .proc
                 sta addr
                 stx addr+1
                 sty temps
@@ -111,7 +111,7 @@ _pf1            lda args+2,x
 _pf2            inc op
                 ldy op
                 cpy token
-                bcs break1.pfe
+                bcs libIOBreak1.pfe
 
                 lda (addr),y
                 cmp #'%'
@@ -127,7 +127,7 @@ _pf2            inc op
                 bne _pf4
 
                 lda #eol
-_pf3            jsr put
+_pf3            jsr libIOPut
 
                 jmp _pf2
 ;
@@ -144,13 +144,13 @@ _pf4            ldy lsttoken
                 cpy #'S'
                 bne _pf5
 
-                jsr prt
+                jsr libIOPrint
                 jmp _pf2
 
 _pf5            cpy #'I'
                 bne _pf6
 
-                jsr prti
+                jsr libIOPrintI
                 jmp _pf2
 
 _pf6            cpy #'H'
@@ -159,7 +159,7 @@ _pf6            cpy #'H'
                 jsr prth
                 jmp _pf2
 
-_pf7            jsr prtc
+_pf7            jsr libIOPrintC
                 jmp _pf2
                 .endproc
 
@@ -168,7 +168,7 @@ _pf7            jsr prtc
 ;PROC Open(BYTE dev, STRING fileSpec, BYTE mode, aux2)
 ; opens fileSpec and assigns it to IOCB dev
 ;======================================
-opn             .proc
+libIOOpen       .proc
                 pha
                 stx arg1
                 sty arg2
@@ -191,9 +191,9 @@ _op2            sta (buf),y
                 pla
                 ldx buf
                 ldy buf+1
-                jsr open
+                jsr Open
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -202,7 +202,7 @@ _op2            sta (buf),y
 ;PROC PrintE(STRING str)
 ; outputs str to default IOCB with EOL
 ;======================================
-prte            .proc
+libIOPrintE     .proc
                 stx arg1
                 tax
                 ldy arg1
@@ -216,10 +216,10 @@ prte            .proc
 ;PROC PrintDE(BYTE dev, STRING str)
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
-prtde           .proc
+libIOPrintDE    .proc
                 jsr print
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -228,10 +228,10 @@ prtde           .proc
 ;PROC Close(BYTE dev)
 ; closes IOCB dev
 ;======================================
-clos            .proc
+libIOClose      .proc
                 jsr close
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -240,7 +240,7 @@ clos            .proc
 ;PROC Print(STRING str)
 ; outputs str to default IOCB
 ;======================================
-prt             .proc
+libIOPrint      .proc
                 stx arg1
                 tax
                 ldy arg1
@@ -254,10 +254,10 @@ prt             .proc
 ;PROC PrintD(BYTE dev, STRING str)
 ; outputs str to IOCB dev
 ;======================================
-prtd            .proc
+libIOPrintD     .proc
                 jsr output
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -266,7 +266,7 @@ prtd            .proc
 ;PROC InputS(STRING str)
 ; same as InputSD, but uses default IOCB
 ;======================================
-ins             .proc
+libIOInputS     .proc
                 stx arg2
                 tax
                 ldy arg2
@@ -280,7 +280,7 @@ ins             .proc
 ;PROC InputSD(BYTE dev, STRING str)
 ; see Input, size set to 255
 ;======================================
-insd            .proc
+libIOInputSD    .proc
                 pha
                 lda #255
                 sta arg3
@@ -294,7 +294,7 @@ insd            .proc
 ;PROC InputMD(BYTE dev, STRING str, BYTE max)
 ; see Input, size set to max
 ;======================================
-inmd            .proc
+libIOInputMD    .proc
                 pha
                 stx arg1
                 sty arg2
@@ -314,10 +314,10 @@ inmd            .proc
 ; first byte must be set to maximum size
 ; on return, first byte set to size of string input
 ;======================================
-ind             .proc
-                jsr rdbuf.inputs
+libIOInputD     .proc
+                jsr ReadBuffer.inputs
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -326,7 +326,7 @@ ind             .proc
 ;BYTE FUNC GetD(BYTE dev)
 ; inputs character from IOCB dev
 ;======================================
-getd            .proc
+libIOGetD       .proc
                 ldx #$07
 ccio            stx arg4
                 asl a
@@ -343,7 +343,7 @@ ccio            stx arg4
                 jsr CIOV
 
                 sta args
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -352,7 +352,7 @@ ccio            stx arg4
 ;PROC PutE()
 ; output EOL do default IOCB
 ;======================================
-pute            .proc
+libIOPutE       .proc
                 lda #eol
                 .endproc
 
@@ -363,7 +363,7 @@ pute            .proc
 ;PROC Put(CHAR ch)
 ; outputs ch to default IOCB
 ;======================================
-put             .proc
+libIOPut        .proc
                 tax
                 lda device
                 .endproc
@@ -375,11 +375,11 @@ put             .proc
 ;PROC PutD(BYTE dev, CHAR ch)
 ; outputs ch to IOCB dev
 ;======================================
-putd            .proc
+libIOPutD       .proc
                 stx arg1
                 ldy arg1
 putd1           ldx #$0b
-                jmp getd.ccio
+                jmp libIOGetD.ccio
 
                 .endproc
 
@@ -388,9 +388,9 @@ putd1           ldx #$0b
 ;PROC PutDE(BYTE dev)
 ; outputs EOL to IOCD dev
 ;======================================
-putde           .proc
+libIOPutDE      .proc
                 ldy #eol
-                bra putd.putd1
+                bra libIOPutD.putd1
 
                 .endproc
 
@@ -408,10 +408,10 @@ putde           .proc
 ; CIO is not called if str(0)=0
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
-xio             .proc
+libIOXIO        .proc
                 jsr xiostr
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -420,7 +420,7 @@ xio             .proc
 ;PROC PrintB(BYTE num)
 ; outputs byte num to default IOCB
 ;======================================
-prtb            .proc
+libIOPrintB     .proc
                 ldx #0
                 .endproc
 
@@ -429,10 +429,10 @@ prtb            .proc
 ;PROC PrintC(CARD num)
 ; outputs cardinal num to default IOCB
 ;======================================
-prtc            .proc
+libIOPrintC     .proc
                 jsr printc
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -441,7 +441,7 @@ prtc            .proc
 ;PROC PrintBE(BYTE num)
 ; same as PrintB except EOL appended
 ;======================================
-prtbe           .proc
+libIOPrintBE    .proc
                 ldx #0
                 .endproc
 
@@ -450,10 +450,10 @@ prtbe           .proc
 ;PROC PrintCE(CARD num)
 ; same as PrintC except EOL appended
 ;======================================
-prtce           .proc
-                jsr prtc
+libIOPrintCE    .proc
+                jsr libIOPrintC
 
-                jmp pute
+                jmp libIOPutE
 
                 .endproc
 
@@ -462,7 +462,7 @@ prtce           .proc
 ;PROC PrintBD(BYTE dev, BYTE num)
 ; output byte num to IOCB dev
 ;======================================
-prtbd           .proc
+libIOPrintBD    .proc
                 ldy #0
                 .endproc
 
@@ -471,7 +471,7 @@ prtbd           .proc
 ;PROC PrintCD(BYTE dev, CARD num)
 ; output cardinal num to IOCB dev
 ;======================================
-prtcd           .proc
+libIOPrintCD    .proc
                 sta arg0
                 txa
                 sty arg2
@@ -481,7 +481,7 @@ prtcd           .proc
                 lda arg0
                 jsr printc.pnum+2
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
@@ -490,7 +490,7 @@ prtcd           .proc
 ;PROC PrintBDE(BYTE dev, BYTE num)
 ; output num to IOCB dev with EOL
 ;======================================
-prtbde          .proc
+libIOPrintBDE   .proc
                 ldy #0
                 .endproc
 
@@ -499,11 +499,11 @@ prtbde          .proc
 ;PROC PrintCDE(BYTE dev, CARD num)
 ; output num to IOCB dev with EOL
 ;======================================
-prtcde          .proc
-                jsr prtcd
+libIOPrintCDE   .proc
+                jsr libIOPrintCD
 
                 lda arg0
-                jmp putde
+                jmp libIOPutDE
 
                 .endproc
 
@@ -512,7 +512,7 @@ prtcde          .proc
 ;PROC PrintI(INT num)
 ; outputs integer num to default IOCB
 ;======================================
-prti            .proc
+libIOPrintI     .proc
                 stx arg2
                 tax
                 ldy arg2
@@ -526,15 +526,15 @@ prti            .proc
 ;PROC PrintID(BYTE dev, INT num)
 ; outputs integer num to IOCB dev
 ;======================================
-prtid           .proc
+libIOPrintID    .proc
                 cpy #0
-                bpl prtcd
+                bpl libIOPrintCD
 
                 pha
                 stx arg1
                 sty arg2
                 ldy #'-'
-                jsr putd.putd1
+                jsr libIOPutD.putd1
 
                 sec
                 lda #0
@@ -544,7 +544,7 @@ prtid           .proc
                 sbc arg2
                 tay
                 pla
-                jmp prtcd
+                jmp libIOPrintCD
 
                 .endproc
 
@@ -553,10 +553,10 @@ prtid           .proc
 ;PROC PrintIE(INT num)
 ; same as PrintI with EOL
 ;======================================
-prtie           .proc
-                jsr prti
+libIOPrintIE    .proc
+                jsr libIOPrintI
 
-                jmp pute
+                jmp libIOPutE
 
                 .endproc
 
@@ -565,11 +565,11 @@ prtie           .proc
 ;PROC PrintIDE(BYTE dev, INT num)
 ; same as PrintID with EOL
 ;======================================
-prtide          .proc
-                jsr prtid
+libIOPrintIDE   .proc
+                jsr libIOPrintID
 
                 lda arg0
-                jmp putde
+                jmp libIOPutDE
 
                 .endproc
 
@@ -578,7 +578,7 @@ prtide          .proc
 ;PROC StrB(BYTE n, STRING s)
 ; convert number to string
 ;======================================
-strb            .proc
+libIOStrB       .proc
                 stx arg2
                 sty arg3
                 ldx #0
@@ -592,7 +592,7 @@ strb            .proc
 ;PROC StrC(CARD n, STRING s)
 ; convert number to string
 ;======================================
-strc            .proc
+libIOStrC       .proc
                 sty arg2
                 jsr ctostr
 
@@ -610,9 +610,9 @@ _strc1          lda numbuf,y
 ;PROC StrI(INT n, STRING s)
 ; convert number to string
 ;======================================
-stri            .proc
+libIOStrI       .proc
                 cpx #0
-                bpl strc
+                bpl libIOStrC
 
                 sta arg0
                 stx arg1
@@ -651,9 +651,9 @@ _s1             lda numbuf-1,y
 ; input number from default IOCB
 ; number must be terminated with EOL
 ;======================================
-input_b
-input_c
-input_i
+libIOInputB
+libIOInputC
+libIOInputI
                 lda    device
 
                 ;[fall-through]
@@ -665,14 +665,14 @@ input_i
 ;INT FUNC InputID(BYTE dev)
 ; same as InputI, but from IOCB dev
 ;======================================
-inbd
-incd
-inid
+libIOInputBD
+libIOInputCD
+libIOInputID
                 ldx #19
                 stx numbuf
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr ind
+                jsr libIOInputD
 
                 lda #<numbuf
                 ldx #>numbuf
@@ -686,9 +686,9 @@ inid
 ; CARD FUNC ValC(STRING s)
 ; returns numeric value of s
 ;======================================
-valb
-vali
-valc
+libIOValB
+libIOValI
+libIOValC
                 sta arg4
                 stx arg5
                 ldy #0
@@ -774,7 +774,7 @@ _i7             rts
 ; example:  Note(1, @sect, @pos)
 ; see Hardware manual
 ;======================================
-note            .proc
+libIONote       .proc
                 stx arg1
                 sty arg2
                 asl a
@@ -785,7 +785,7 @@ note            .proc
                 lda #$26                ; NOTE
                 sta IOCB0+ICCOM,x
                 jsr CIOV
-                jsr chkerr
+                jsr libIOChkErr
 
                 ldy #0
                 lda IOCB0+ICAX5,x       ; offset
@@ -806,7 +806,7 @@ note            .proc
 ; must be open for update (mode=12)
 ; see Hardware manual
 ;======================================
-point           .proc
+libIOPoint      .proc
                 stx arg1
                 asl a
                 asl a
@@ -823,6 +823,6 @@ point           .proc
                 sta IOCB0+ICCOM,x
                 jsr CIOV
 
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc

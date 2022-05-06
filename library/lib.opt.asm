@@ -22,9 +22,9 @@
 
 
 ;======================================
-;
+;   SetOpts()
 ;======================================
-setopts         .proc
+libOptSetOpts   .proc
     ; Display On?
                 ldx #domsg-optmsg
                 ldy tvdisp
@@ -167,7 +167,7 @@ _yn             beq _yn1
 _yn1            ldy #'N'
 _yn2            sty tempbuf+1
                 ldy #1
-                jsr gettmpbuf
+                jsr libOptGetTmpBuf
 
                 lda tempbuf+1
                 ldy tempbuf
@@ -188,10 +188,10 @@ _getstr         ldx #0
                 ldy #>tempbuf
                 sty arg3
                 ldy #<tempbuf
-                jmp strc
+                jmp libIOStrC
 
 _getnum         ldy tempbuf
-                jsr gettmpbuf
+                jsr libOptGetTmpBuf
 
                 ldy tempbuf
                 bne _gn0
@@ -202,7 +202,7 @@ _getnum         ldy tempbuf
 
 _gn0            lda #<tempbuf
                 ldx #>tempbuf
-                jsr valb
+                jsr libIOValB
 
                 lda args
 _gn1            rts
@@ -228,9 +228,9 @@ stoa_           .byte $20,$40,$00,$60
 
 
 ;======================================
-;
+;   GetTmpBuf()
 ;======================================
-gettmpbuf       .proc
+libOptGetTmpBuf .proc
                 sty arg2
 
     ; copy string to tempBuf+10

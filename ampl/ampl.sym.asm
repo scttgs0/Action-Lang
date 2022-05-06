@@ -24,7 +24,7 @@
 ;======================================
 ;   STM(table)
 ;======================================
-stm             .proc
+STM             .proc
                 sta arg2
                 stx arg3
                 sta arg4
@@ -56,7 +56,7 @@ _stm4           inc arg13               ; try next entry
                 cpy arg15
                 bne _stm1
 
-                ldy #ster
+                ldy #symtblERR
                 lda arg3
                 cmp symTblGlobal+1
                 beq _stm5
@@ -74,7 +74,7 @@ stmres          jmp (stmradr)
 ;======================================
 ;   STMres() lookup reserved names
 ;======================================
-istmres         .proc
+iSTMres         .proc
                 ldy arg14
                 cpy #8
 _stmr0          lda #$ff                ; if name too long!
@@ -113,13 +113,13 @@ _stmr4          clc
 ;======================================
 ;   GetName(char)
 ;======================================
-lgetname        .proc
+lGetName        .proc
                 ldy #0
-                sta frstchar
-                tax
+                sta FirstChar           ; indicates a big symbol table is not needed (yet)
+                tax                     ; preserve A
                 ora #$20
                 sta arg15               ; initial hash
-                txa
+                txa                     ; restore A
 _gname1         iny
                 sty arg14
                 sta (symtab),y
@@ -140,38 +140,38 @@ _gname1         iny
                 ldy #0
                 sta (symtab),y
                 dec choff               ; put character back
-                jsr stm.stmres          ; check for res. name
-                bpl istmres._stmr3      ; return
+                jsr STM.stmres          ; check for res. name
+                bpl iSTMres._stmr3      ; return
 
                 lda qglobal
                 beq gnglobal
 
                 lda symTblLocal
                 ldx symTblLocal+1
-                jsr stm
-                bne istmres._stmr3      ; return
+                jsr STM
+                bne iSTMres._stmr3      ; return
 
 gnglobal        lda symTblGlobal
                 ldx symTblGlobal+1
-                ldy frstchar
+                ldy FirstChar
                 cpy isBigSymTbl
                 bpl _gng1
 
                 lda bigSymTblGlobal
                 ldx bigSymTblGlobal+1
-_gng1           jsr stm
-                bne istmres._stmr3      ; return
+_gng1           jsr STM
+                bne iSTMres._stmr3      ; return
 
                 lda qglobal
-                beq newentry
+                beq NewEntry
 
 lgnlocal        lda symTblLocal
                 ldx symTblLocal+1
-                jsr stm
-                bne istmres._stmr3
+                jsr STM
+                bne iSTMres._stmr3
 
         .if ramzap
-                inc stm,x
+                inc STM,x
         .else
                 nop
                 nop
@@ -183,7 +183,7 @@ lgnlocal        lda symTblLocal
 ;======================================
 ;
 ;======================================
-newentry        .proc
+NewEntry        .proc
     ; Make new entry in symbol table
                 lda symtab+1
                 sta (arg2),y
@@ -191,9 +191,9 @@ newentry        .proc
                 sta (arg4),y
                 lda #<libst
                 ldx #>libst
-                jsr stm                 ; lookup shadow name
+                jsr STM                 ; lookup shadow name
 
-                lda #undec
+                lda #tokUNDEC
                 ldy arg14
                 iny
                 sta (symtab),y
@@ -211,7 +211,7 @@ newentry        .proc
                 tya
                 jsr stincr
 
-                lda #undec
+                lda #tokUNDEC
                 rts
                 .endproc
 
@@ -228,55 +228,55 @@ tblReserveWords .byte 0
 ;
 resw1           .byte $ff
 
-resw2           .text "DO",do
-                .text "FI",fi
-    ; .BYTE "FO",esac
-                .text "IF",ifid
-                .text "OD",od
+resw2           .text "DO",tokDO
+                .text "FI",tokFI
+    ; .BYTE "FO",tokESAC
+                .text "IF",tokIF
+                .text "OD",tokOD
     ; .BYTE "OF",of
-                .text "OR",orid
-                .text "TO",to
+                .text "OR",tokOR
+                .text "TO",tokTO
                 .byte $ff
 
-resw3           .text "AND",andid
-                .text "FOR",forid
+resw3           .text "AND",tokAND
+                .text "FOR",tokFOR
     ; .BYTE "GET",get
-                .text "INT",int
-                .text "LSH",lshid
-                .text "MOD",remid
+                .text "INT",tokINT
+                .text "LSH",tokLSH
+                .text "MOD",tokREM
     ; .BYTE "NOT",notId
-                .text "RSH",rshid
-                .text "SET",set
-                .text "XOR",xorid
+                .text "RSH",tokRSH
+                .text "SET",tokSET
+                .text "XOR",tokXOR
                 .byte $ff
 
-resw4           .text "BYTE",byte
-                .text "CARD",card
+resw4           .text "BYTE",tokBYTE
+                .text "CARD",tokCARD
     ; .BYTE "CASE",caseId
-                .text "CHAR",char
-                .text "ELSE",else
-    ; .BYTE "ESAC",esac
-                .text "EXIT",exitid
-                .text "FUNC",func
-                .text "PROC",proc
-    ; .BYTE "REAL",real
-                .text "STEP",step
-                .text "THEN",then
-                .text "TYPE",typeid
+                .text "CHAR",tokCHAR
+                .text "ELSE",tokELSE
+    ; .BYTE "ESAC",tokESAC
+                .text "EXIT",tokEXIT
+                .text "FUNC",tokFUNC
+                .text "PROC",tokPROC
+    ; .BYTE "REAL",tokREAL
+                .text "STEP",tokSTEP
+                .text "THEN",tokTHEN
+                .text "TYPE",tokTYPE
                 .byte $ff
 
-resw5           .text "ARRAY",array
-                .text "UNTIL",untilid
-                .text "WHILE",whileid
+resw5           .text "ARRAY",tokARRAY
+                .text "UNTIL",tokUNTIL
+                .text "WHILE",tokWHILE
                 .byte $ff
 
-resw6           .text "DEFINE",define
-    ; .BYTE "DOWNTO",downto
-                .text "ELSEIF",elseif
-                .text "MODULE",modid
-                .text "RETURN",retid
+resw6           .text "DEFINE",tokDEFINE
+    ; .BYTE "DOWNTO",tokDOWNTO
+                .text "ELSEIF",tokELSEIF
+                .text "MODULE",tokMOD
+                .text "RETURN",tokRET
                 .byte $ff
 
-resw7           .text "INCLUDE",get
-                .text "POINTER",pointer
+resw7           .text "INCLUDE",tokGET
+                .text "POINTER",tokPOINTER
                 .byte $ff

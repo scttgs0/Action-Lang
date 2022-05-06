@@ -52,11 +52,11 @@ zero            .word 0
 
                 .byte 0                 ; EOLch (default = space)
 ltab            .addr lsh1._lshift      ; LSH
-                .addr rshift
-                .addr multi
-                .addr divi
+                .addr RShift
+                .addr MultI
+                .addr DivC
                 .addr remi
-                .addr sargs
+                .addr SArgs
                 .byte $60               ; chrConvert3
                 .byte $22               ; tvDisp
 
@@ -65,12 +65,12 @@ ltab            .addr lsh1._lshift      ; LSH
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
 
-                jmp getnext.ismt        ; STM catch all
-                rts                     ; illegal monitor cmd
+                jmp GetNext.ismt        ; STM catch all
+                rts                     ; illegal Monitor cmd
 
                 .byte $86
                 .byte $9d
-                .addr istmres           ; STMrAdr in EDIT.DEF
+                .addr iSTMres           ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -89,7 +89,7 @@ Start           .proc
 _warm           lda isMonitorLive       ; see where we were
                 beq _w1
 
-                jmp monitor._mon1
+                jmp Monitor._mon1
 
 _w1             jmp GeneralMemErr.Punt  ; editor
 

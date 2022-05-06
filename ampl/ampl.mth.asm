@@ -37,11 +37,11 @@ _sign          = token
 ;======================================
 ;   MultI(op1, op2)
 ;======================================
-multi           .proc
+MultI           .proc
 ; op2 is in c & d
 ;  r = ab * cd
 ;  r = (a*d + c*b)*2^8 + b*d
-                jsr smops
+                jsr SMOps
 
                 ldx math._b
                 beq _mc5
@@ -67,18 +67,18 @@ _mc4            dex
 _mc5            sta math._rl
                 lda math._b
                 ldx math._c
-                jsr mulb                ; b*c, 8 bit result
+                jsr MulB                ; b*c, 8 bit result
 
                 lda math._a
                 ldx math._d
-                jsr mulb                ; a*d, 8 bit result
+                jsr MulB                ; a*d, 8 bit result
 
 
 _setsign        ldy math._sign
                 bpl _ss2
 
         .if ramzap
-                sta mulb,x
+                sta MulB,x
         .else
                 nop
                 nop
@@ -99,9 +99,9 @@ _ss2            rts
 
 
 ;======================================
-;
+;   MulB()
 ;======================================
-mulb            .proc
+MulB            .proc
                 beq _mb3
 
                 dex
@@ -132,12 +132,12 @@ _mb3            lda math._rl
 ;======================================
 ;
 ;======================================
-smops           .proc
+SMOps           .proc
                 stx math._sign
                 cpx #0                  ; check signs
                 bpl _smo1
 
-                jsr multi._ss1
+                jsr MultI._ss1
 
 _smo1           sta math._b
                 stx math._a
@@ -148,7 +148,7 @@ _smo1           sta math._b
                 eor math._sign
                 sta math._sign
                 lda math._d
-                jsr multi._ss1
+                jsr MultI._ss1
 
                 sta math._d
                 stx math._c
@@ -161,8 +161,8 @@ _smo2           lda #0
 ;======================================
 ;   DivC(op1, op2)
 ;======================================
-divi            .proc
-                jsr smops
+DivC            .proc
+                jsr SMOps
 
     ; see MultC above
                 lda math._c
@@ -189,8 +189,8 @@ _dl2            dex
                 rol a
                 ldx #0
                 ldy math._a
-                sty math._rl                 ; save low byte of REM
-                jmp multi._setsign
+                sty math._rl            ; save low byte of REM
+                jmp MultI._setsign
 
 _dsmall         ldx #16
 _ds1            rol math._b
@@ -211,7 +211,7 @@ _ds2            dex
                 sta math._rl
                 lda math._b
                 ldx math._a
-                jmp multi._setsign
+                jmp MultI._setsign
 
                 .endproc
 
@@ -220,7 +220,7 @@ _ds2            dex
 ;
 ;======================================
 remi            .proc
-                jsr divi
+                jsr DivC
 
                 lda math._rl
                 ldx math._rh
@@ -231,7 +231,7 @@ _rem1           rts
 ;======================================
 ;   RShift(val, cnt)
 ;======================================
-rshift          .proc
+RShift          .proc
                 ldy math._d
                 beq _rshret
 
@@ -247,9 +247,9 @@ _rshret         rts
 
 
 ;======================================
-;
+;   SArgs()
 ;======================================
-sargs           .proc                   ; saves args for call
+SArgs           .proc                   ; saves args for call
                 sta arg0
                 stx arg1
                 sty arg2
@@ -285,7 +285,7 @@ _sa1            .databank $00
                 bne _sa2
 
                 inc BRKKEY
-                jmp break
+                jmp libMscBreak
 
 _sa2            rts
                 .endproc
