@@ -29,7 +29,7 @@ InsertChar      .proc
 
 _padbuf         ldy #0
                 lda (buf),y
-                cmp linemax
+                cmp jt_linemax
                 bcc _pbuf0              ; test line too long
 
                 jsr scrbell

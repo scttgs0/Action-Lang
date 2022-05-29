@@ -58,7 +58,7 @@ libMscSound     .proc
                 bmi _snd1
 
                 ldy #100
-                jsr error
+                jsr jt_error
 
 _snd1           txa
                 sta AUDF1,y
@@ -320,7 +320,7 @@ libMscBreak     .proc
                 stx procsp
                 ldy #brkERR
                 tya
-                jmp error
+                jmp jt_error
 
                 .endproc
 

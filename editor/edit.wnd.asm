@@ -70,7 +70,6 @@ _w2             lda #w2-w1
 SaveWorld       .proc
                 jsr CleanLine
                 jsr savecol
-                jsr rstcsr
                 jsr SetSpacing
 
                 jmp SaveWindow
@@ -83,7 +82,7 @@ wdret           rts
 ;   Clear()
 ;======================================
 Clear_           .proc
-                jsr alarm
+                jsr jt_alarm
 
                 lda #<DeleteWindow.clearmsg
                 ldx #>DeleteWindow.clearmsg
@@ -137,7 +136,7 @@ DeleteWindow    .proc
                 lda numwd
                 beq SaveWorld.wdret
 
-                jsr alarm
+                jsr jt_alarm
 
                 lda #<delmsg
                 ldx #>delmsg
@@ -193,7 +192,6 @@ CommandString   .proc
                 lda arg0
                 ldy arg2
                 jsr GetString
-                jsr rstcsr
 
                 jmp rstcol
 

@@ -22,7 +22,7 @@
 
 
 en0             .text 5,"Error",$c0
-                .addr error
+                .addr jt_error
                 .byte 3,138,138,138
 
 en1             .text 3,"EOF",$9a
@@ -46,7 +46,7 @@ en5             .text 5,"TRACE",$8a
 ;======================================
 cstart          .proc
                 ldy #ebank
-                sty curbank
+                sty jt_curbank
                 sty bank+ebank
                 .endproc
 
@@ -73,7 +73,7 @@ RestoreBank     .proc
                 pha
 
                 tya
-                ldy curbank
+                ldy jt_curbank
 rbank1          sta bank,y
                 tay
 
@@ -89,9 +89,9 @@ rbank1          sta bank,y
 run             .proc
     ; reset Error routine
                 ldy #<splerr
-                sty error+1
+                sty jt_error+1
                 ldy #>splerr
-                sty error+2
+                sty jt_error+2
 
                 jsr lproceed
                 jsr jsrind
@@ -106,7 +106,7 @@ run             .proc
 ;======================================
 compile         .proc
                 ldy #cbank
-                sty curbank
+                sty jt_curbank
                 sty bank+cbank
                 jsr ccompile
 
@@ -121,7 +121,7 @@ EditBank        .proc
                 pha
                 tya
                 ldy #ebank
-                sty curbank
+                sty jt_curbank
                 jmp RestoreBank.rbank1
 
                 .endproc
@@ -168,7 +168,7 @@ gnlocal         .proc
 ;======================================
 cstmtlst        .proc
                 ldy #cbank
-                sty curbank
+                sty jt_curbank
                 sta bank+cbank
                 jsr stmtlist
 
@@ -192,7 +192,7 @@ mgett1          .proc
 ;======================================
 lproceed        .proc
                 ldy #lbank
-                sty curbank
+                sty jt_curbank
                 sty bank+lbank
                 rts
                 .endproc

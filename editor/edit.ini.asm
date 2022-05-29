@@ -83,7 +83,7 @@ _next1          dex                     ; zero page0 window table
 Window2Init     .proc
                 jsr CenterLine
 
-                lda wsize
+                lda jt_wsize
                 sta nlines
                 sta cmdln
                 jsr SaveWorld
@@ -93,12 +93,12 @@ Window2Init     .proc
                 sta currentWindow
                 jsr ZeroWindow
 
-                ldy wsize
+                ldy jt_wsize
                 iny
                 sty ytop
                 sec
                 lda #23
-                sbc wsize
+                sbc jt_wsize
                 sta nlines
                 bra EditorInit.fcmsg
 

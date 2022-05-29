@@ -49,7 +49,7 @@ _func           clc
                 jsr GetNext
 
 _func1          jsr makeentry
-                jsr segend
+                jsr jt_segend
 
                 lda addr
                 sta curproc

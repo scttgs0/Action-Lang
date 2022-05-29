@@ -31,7 +31,7 @@ ccompile
 ;
 ;======================================
 spl             ;.proc
-                jsr splend
+                jsr jt_splend
 
                 lda nxttoken
                 cmp #tokQuote
@@ -224,7 +224,7 @@ _t2             jsr makeentry
                 tay
                 jsr LoadCd
                 jsr GetNext
-declare         jsr dclend
+declare         jsr jt_dclend
 
                 cmp #tokCHAR
                 bcs _dcl0
@@ -658,7 +658,7 @@ stmtlist        .proc
                 jsr clrtemps
 
                 sta op
-                jsr smtend
+                jsr jt_smtend
 
                 cmp #tokLBracket
                 bne _sl5
@@ -1723,7 +1723,7 @@ _sl0            sta temps-1,x
 ;--------------------------------------
 ;--------------------------------------
 
-stmtlst         .addr smtend            ; not found
+stmtlst         .addr jt_smtend         ; not found
                 .byte 20                ; #entries*3 - 1
                 .addr ifstmt
                 .byte tokIF
@@ -1782,7 +1782,7 @@ exp             .proc
 
                 lda token               ; always non-zero
                 sta op
-exp1            jsr expend
+exp1            jsr jt_expend
 
                 cmp #tokSColon
                 bcc eerr._expop
@@ -2412,7 +2412,7 @@ _cgs5           jmp popst
 ;======================================
 codegen         .proc
                 jsr genops
-cg1             jsr cgend
+cg1             jsr jt_cgend
 
                 lda arg0
                 asl a
@@ -2475,7 +2475,7 @@ cgexperr
 cgassign        .proc
                 lda #0
                 jsr genops
-                jsr cgend
+                jsr jt_cgend
                 jsr chasseq.chstkeq     ; see if INC
                 bne cga1                ; yes, just return
 

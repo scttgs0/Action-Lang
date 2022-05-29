@@ -38,7 +38,7 @@ libIOChkErr     .proc
                 cpy #$80                ; break key
                 beq libIOBreak1
 
-                jmp error
+                jmp jt_error
 
 _ce1            txa
                 lsr a

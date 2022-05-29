@@ -50,8 +50,7 @@ _mloop          jsr InitKeys
                 beq _mon2
 
                 jsr scrinit             ; get Graphics(0)
-_mon2           jsr alarm
-                jsr rstcsr
+_mon2           jsr jt_alarm
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
@@ -95,7 +94,7 @@ RSTwnd          .proc
                 lda numwd
                 beq _rw1
 
-                lda wsize
+                lda jt_wsize
                 sta cmdln
                 lda #w2-w1
                 jsr PaintW
@@ -471,7 +470,7 @@ _ph3            tay
 ;--------------------------------------
 ;--------------------------------------
 
-mcmd            .addr disptb+9          ; unknown cmd
+mcmd            .addr jt_disptb+9          ; unknown cmd
                 .byte 35                ; table size
                 .addr Boot
                 .byte 'b'

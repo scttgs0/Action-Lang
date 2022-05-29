@@ -70,7 +70,7 @@ _fmlu           jsr lookup
 ;--------------------------------------
 ;--------------------------------------
 
-fmcmd           .addr disptb            ; default routine
+fmcmd           .addr jt_disptb         ; default routine
                 .byte 50                ; table size
                 .addr ScrollUp
                 .byte $1c
@@ -105,7 +105,7 @@ zap4            .byte $7e
                 .addr ClearTab
                 .byte $9e
 
-fmcscmd         .addr disptb+3          ; default
+fmcscmd         .addr jt_disptb+3       ; default
                 .byte 71                ; table size
                 .addr Front
                 .byte $f6

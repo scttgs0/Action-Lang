@@ -165,7 +165,6 @@ NewPage         .proc
                 lda #0
                 sta lnum
 npage1          sta choff
-                jsr rstcsr              ; for command line
 
                 lda LMARGN
                 sta COLCRS

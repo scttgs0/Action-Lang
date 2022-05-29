@@ -406,11 +406,11 @@ MoveUp          .proc
 ;
 ;--------------------------------------
 MoveContent     .proc
-                sty arg6
+                sty arg6                ; save registers
                 sta arg4
+
                 stx ROWCRS
-                jsr rstcsr
-                jsr DisplayLocation    ; get display address
+                jsr DisplayLocation     ; get display address
 
                 ldx arg4
                 dex

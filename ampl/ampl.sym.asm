@@ -41,7 +41,7 @@ _stm1           lda (arg2),y
                 ldy #0
 _stm2           lda (nxtaddr),y
                 eor (symtab),y
-                and stmask
+                and jt_stmask
                 bne _stm4
 
                 cpy arg14
@@ -64,7 +64,7 @@ _stm4           inc arg13               ; try next entry
                 iny
 _stm5           jmp splerr
 
-stmres          jmp (stmradr)
+stmres          jmp [jt_stmradr]
 
                 .endproc
 
@@ -89,7 +89,7 @@ _stmr2          lda resw1,x
                 bmi _stmr3
 
                 eor (symtab),y
-                and stmask
+                and jt_stmask
                 bne _stmr4
 
                 inx

@@ -514,8 +514,8 @@ JSRTable        .proc
 ;    lda LTab,x
 ;.ELSE
 
-                ldy lsh+1,x
-                lda lsh,x
+                ldy jt_lsh+1,x
+                lda jt_lsh,x
 ;.ENDIF
                 tax
                 lda #$20                ; JSR

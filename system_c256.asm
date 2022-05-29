@@ -35,7 +35,6 @@ PLAT_INIT       .proc
     ; initialize cursor location
                 stz COLCRS
                 stz ROWCRS
-                stz OLDCHR
 
     ; initialize Tabstop positions
                 ldy #$00

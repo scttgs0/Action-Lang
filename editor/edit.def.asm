@@ -48,7 +48,7 @@ sparem          = $03_04A3              ; -> spare mem
 numwd           = $03_04A5              ; number of windows
 allocerr        = $03_04A6              ; INC on Alloc error
 delbuf          = $03_04A7              ; 6 bytes
-FirstChar        = $03_04AD             ; used for big symbol table
+FirstChar       = $03_04AD              ; used for big symbol table
 taglist         = $03_04AE              ; 2 bytes
 chrConvert1     = $03_04B0              ; char convert
 w2              = $03_04B1              ; window 2 data
@@ -60,31 +60,31 @@ isBigSymTbl     = $03_04C4              ; big symbol table flag
 
         ; note: $4C5 available
 
-jmps            = $03_04C6              ; see EDIT.CAR
+jt_jmps         = $03_04C6              ; see EDIT.CAR
 
 ; Jump table goes to $4FF
 ;-------------------------
-segend          = $03_04C6
-curbank         = $03_04C9
-stmask          = $03_04CA
-error           = $03_04CB
-wsize           = $03_04CE
-linemax         = $03_04CF
-chrConvert2     = $03_04D0              ; char convert
-expend          = $03_04D1
-dclend          = expend+3
-cgend           = dclend+3
-arend           = cgend+3
-splend          = arend+3
-alarm           = splend+3
-eolch           = alarm+3
-lsh             = eolch+1
+jt_segend       = $03_04C6
+jt_curbank      = $03_04C9
+jt_stmask       = $03_04CA
+jt_error        = $03_04CB
+jt_wsize        = $03_04CE
+jt_linemax      = $03_04CF
+jt_chrConvert2  = $03_04D0              ; char convert
+jt_expend       = $03_04D1
+jt_dclend       = jt_expend+3
+jt_cgend        = jt_dclend+3
+jt_arend        = jt_cgend+3
+jt_splend       = jt_arend+3
+jt_alarm        = jt_splend+3
+jt_eolch        = jt_alarm+3
+jt_lsh          = jt_eolch+1
 
-chrConvert3     = $03_04F0              ; char convert
-tvdisp          = $03_04F1
-disptb          = $03_04F2
-smtend          = $03_04F8
-stmradr         = $04FE
+jt_chrConvert3  = $03_04F0              ; char convert
+jt_tvdisp       = $03_04F1
+jt_disptb       = $03_04F2
+jt_smtend       = $03_04F8
+;jt_stmradr      = $03_04FE
 
 subbuf          = $03_0500              ; 40 bytes     ; rowSize
 findbuf         = $03_0528              ; 40 bytes     ; rowSize

@@ -190,7 +190,6 @@ FOpen           .proc
 
         ; jsr ClnLn ; in SaveWd
                 jsr SaveWindow
-                jsr rstcsr
 
                 ldy #<inbuf
                 lda #>inbuf

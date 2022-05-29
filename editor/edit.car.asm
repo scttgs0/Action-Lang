@@ -33,7 +33,7 @@ emjmps          rts                     ; Seg catch all
 
                 .byte 18                ; wSize
                 .byte 120               ; line input max
-                .byte $20               ; chrConvert2
+                .byte $20               ; jt_chrConvert2
                 rts                     ; Exp catch all
 
                 .word 0
@@ -57,7 +57,7 @@ ltab            .addr lsh1._lshift      ; LSH
                 .addr DivC
                 .addr remi
                 .addr SArgs
-                .byte $60               ; chrConvert3
+                .byte $60               ; jt_chrConvert3
                 .byte $22               ; tvDisp
 
                 jmp InsertChar          ; normal char
@@ -82,7 +82,7 @@ Start           .proc
                 lda WARMST
                 beq cold
 
-                lda chrConvert3
+                lda jt_chrConvert3
                 cmp #$60                ; make sure RAM initialized
                 bne cold
 
@@ -102,8 +102,15 @@ _nextZero       sta $03_0480,y          ; zero RAM
                 ldy #$3a
 _nextJmps       lda emjmps-1,y          ; init RAM
                 dey
-                sta jmps,y
+                sta jt_jmps,y
                 bne _nextJmps
+
+                lda #<iSTMres
+                sta jt_stmradr
+                lda #>iSTMres
+                sta jt_stmradr+1
+                lda #`iSTMres
+                sta jt_stmradr+2
 
     ; sty chrConvert1 ; Y=0
                 jsr EditorInit          ; init editor

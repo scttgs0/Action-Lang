@@ -27,7 +27,7 @@
 libOptSetOpts   .proc
     ; Display On?
                 ldx #domsg-optmsg
-                ldy tvdisp
+                ldy jt_tvdisp
                 jsr _yn
                 beq _do1
 
@@ -35,11 +35,11 @@ libOptSetOpts   .proc
                 beq _do2
 
 _do1            lda #$22
-_do2            sta tvdisp
+_do2            sta jt_tvdisp
 
     ; Alarm?
                 ldx #amsg-optmsg
-                ldy alarm
+                ldy jt_alarm
                 cpy #$60
                 jsr _yn
                 beq _a1
@@ -48,11 +48,11 @@ _do2            sta tvdisp
                 bne _a2
 
 _a1             lda #$4c                ; JMP
-_a2             sta alarm
+_a2             sta jt_alarm
 
     ; Case sensitive?
                 ldx #cmsg-optmsg
-                ldy stmask
+                ldy jt_stmask
                 cpy #$df
                 jsr _yn
                 beq _c1
@@ -61,7 +61,7 @@ _a2             sta alarm
                 bne _c2
 
 _c1             lda #$ff
-_c2             sta stmask
+_c2             sta jt_stmask
 
     ; Trace On?
                 ldx #tmsg-optmsg
@@ -88,7 +88,7 @@ _lst1           lda #$ff
 _lst2           sta list
 
     ; window size
-                lda wsize
+                lda jt_wsize
                 jsr _getstr
 
                 ldx #wmsg-optmsg
@@ -102,7 +102,7 @@ _w0             cmp #19
                 bcc _w1                 ; make sure less than 19
 
                 lda #18
-_w1             sta wsize
+_w1             sta jt_wsize
                 ldx numwd
                 beq _l1
 
@@ -112,17 +112,17 @@ _w1             sta wsize
                 sty w2+wytop
                 sec
                 lda #23
-                sbc wsize
+                sbc jt_wsize
                 sta w2+wnlns
 
     ; line size
-_l1             lda linemax
+_l1             lda jt_linemax
                 jsr _getstr
 
                 ldx #lmsg-optmsg
                 jsr _getnum
 
-                sta linemax
+                sta jt_linemax
 
     ; left margin
                 lda LMARGN
@@ -134,7 +134,7 @@ _l1             lda linemax
                 sta LMARGN
 
     ; EOL char
-                lda eolch
+                lda jt_eolch
                 tay
                 rol a
                 rol a
@@ -156,7 +156,7 @@ _l1             lda linemax
                 tya
                 and #$9f
                 ora chrConvert,x
-                sta eolch
+                sta jt_eolch
                 rts
 
 _yn             beq _yn1
