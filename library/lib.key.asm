@@ -32,11 +32,7 @@ _waitForKey     lda CH_                 ; key down?
 
                 bra _waitForKey
 
-_gk0            ldy #0
-                lda OLDCHR  ; TODO:
-                eor #$80
-                ;sta (OLDADR),y          ; restore cursor
-                ldx SRTIMR              ; faster repeat
+_gk0            ldx SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5
 
