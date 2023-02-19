@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: ampl.pf.asm
 ;======================================
@@ -29,14 +30,14 @@ ld1             ldy #0
                 cmp #tokARRAY_t
                 bcs pf._c5a
 
-                inc abt-(args-DPBASE),x
+                inc abt-args,x
                 ldy #7
                 lda (stack),y
                 cmp #tokTEMP_t+tokBYTE_t
                 beq pf._c5b
 
-                dec abt+1-(args-DPBASE),x
-                cpx #(args-DPBASE)+2
+                dec abt+1-args,x
+                cpx #args+2
                 bcc pf._c5b
 
                 jsr genops.gops
@@ -52,7 +53,7 @@ pf              lda #0                  ; load arg types flag
                 jsr pushst
                 jsr GetNext
 
-                ldx #(args-DPBASE)
+                ldx #args
                 stx argbytes
                 ldx nxttoken
                 cpx #tokRParen
@@ -69,10 +70,10 @@ _c4             ldx numargs
                 cmp #$7f
                 bcs _c5                 ; one byte arg
 
-                sta temps-(args-DPBASE)+1,x
+                sta temps-args+1,x
                 inc argbytes
                 iny
-_c5             sta temps-(args-DPBASE),x
+_c5             sta temps-args,x
                 inc argbytes
                 txa
                 jsr storst
@@ -82,7 +83,7 @@ _c5             sta temps-(args-DPBASE),x
                 bmi callerr
 
                 ldx abt+3
-                cpx #(args-DPBASE)+3
+                cpx #args+3
                 bcc ld1
 
 _c5a            jsr cgassign
@@ -95,13 +96,13 @@ _c5b            lda token
                 bne callerr
 
 _c6             lda argbytes
-                cmp #(args-DPBASE)+3
+                cmp #args+3
                 bcs _c8
 
-                cmp #(args-DPBASE)+2
+                cmp #args+2
                 bcs _c9
 
-                cmp #(args-DPBASE)+1
+                cmp #args+1
                 bcs _c10
 
 _c7             jsr TrashY
@@ -112,23 +113,23 @@ _c7             jsr TrashY
                 lda #$20                ; JSR
                 jmp Push3
 
-_c8             ldx #(args-DPBASE)+2
+_c8             ldx #args+2
                 jsr callerr._push
 
-_c9             ldx #(args-DPBASE)+1
+_c9             ldx #args+1
                 jsr callerr._push
 
-_c10            ldx #(args-DPBASE)
+_c10            ldx #args
                 jsr callerr._push
 
                 jmp _c7
 
 callerr         jmp Segment.argerror
 
-_push           lda abt-(args-DPBASE),x
+_push           lda abt-args,x
                 bne _p1
 
-                lda _ops-(args-DPBASE),x
+                lda _ops-args,x
                 ora #$04
                 jmp Push2
 
@@ -136,19 +137,19 @@ _p1             stx arg0
                 jsr genops.gops
 
                 ldx arg0
-                lda _ops-(args-DPBASE),x
+                lda _ops-args,x
 
 ; all of this for LDX # and LDY #
 ; can't use OpXX for these instr.
 
-                cpx #(args-DPBASE)
+                cpx #args
                 beq _p4                 ; LDA instr.
 
                 ldy arg1
                 bpl _p3a                ; record element
 
                 cpy #tokVAR_t
-                ldy abt-(args-DPBASE),x
+                ldy abt-args,x
                 bcs _p3                 ; not const.
 
                 pha
@@ -168,7 +169,7 @@ _p1             stx arg0
 _p2             pla
 _p2a            jmp Push2               ; high byte
 
-_p3a            ldy abt-(args-DPBASE),x
+_p3a            ldy abt-args,x
 _p3             bpl _p4
 
                 ldx arg3

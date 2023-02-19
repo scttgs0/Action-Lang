@@ -1,3 +1,4 @@
+
 ; Action! Programming Language
 ; Copyright 1983 by Clinton W Parker
 
@@ -16,28 +17,25 @@
 ; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-                .cpu "65816"
+                .cpu "65c02"
 
 ;///  Platform  ///////////////////////
 
                 .enc "atari-screen-inverse"
-                .cdef " z", $A0
+                    .cdef " z", $A0
                 .enc "none"
-
-                ;.include "equates_system_atari8.asm"
 
 ;--------------------------------------
 
-                .include "equates_system_c256.asm"
-                .include "macros_frs_graphic.asm"
-                .include "macros_frs_text.asm"
+                .include "equates_system_f256jr.inc"
+                .include "frs_jr_graphic.mac"
+                .include "frs_jr_text.mac"
 
 ;//////////////////////////////////////
 
 
-                .include "equates_directpage.asm"
-                .include "equates_action.asm"
-                .include "macros_65816.asm"
+                .include "equates_zeropage.inc"
+                .include "equates_action.inc"
 
                 .include "editor/edit.def.asm"
 
@@ -51,19 +49,15 @@
 ; Initialization code
 ;--------------------------------------
 ;--------------------------------------
-                * = $037FE0
+                * = $7FE0
 ;--------------------------------------
 
 INIT            clc
-                xce
-                .m8i8
-                .setdp $0800
-                .setbank $03
-                jmp PLAT_INIT
+                ;jmp PLAT_INIT
 
 ;--------------------------------------
 ;--------------------------------------
-                * = $038000
+                * = $8000
 ;--------------------------------------
 
 version         .byte $40
@@ -106,7 +100,7 @@ amplfin
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .text "ACTION! (c) 2022 GPL3           Foenix Adaptation          v3.6 April 24, 2022",$00
+cpyright        .text "ACTION! (c) 2023 GPL3           Foenix Adaptation          v3.6 April 24, 2022",$00
 
 
 ;    "ACTION! - Compiler
@@ -114,7 +108,7 @@ cpyright        .text "ACTION! (c) 2022 GPL3           Foenix Adaptation        
 main
                 .include "comp.main.asm"
 
-cright          .text "ACTION! (c) 2022 GPL3      Foenix Adaptation",$00,$00
+cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
 
 
 ;    ACTION! 3.6 - Editor
@@ -134,7 +128,7 @@ cright          .text "ACTION! (c) 2022 GPL3      Foenix Adaptation",$00,$00
                 .include "ampl/ampl.mon.asm"
                 .include "ampl/ampl.ini.asm"
 
-                .include "system_c256.asm"
+                .include "platform_f256jr.asm"
 
                 .text "ces",$00,$00
 

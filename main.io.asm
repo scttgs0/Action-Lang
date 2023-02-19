@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: main.io.asm
 ;======================================
@@ -60,7 +61,7 @@ print1          rts
 ;   Close(device)
 ;======================================
 close           .proc
-                ldx #>$03_B000          ; ml
+                ldx #>$B000             ; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
@@ -300,7 +301,7 @@ _rts1           iny
 ;   DspOff()
 ;======================================
 dspoff          .proc
-                lda tvdisp
+                lda jt_tvdisp
                 sta SDMCTL
                 sta DMACTL
                 rts
@@ -387,7 +388,7 @@ _oc2            lda Channel
                 jsr Open
                 bpl printbuf
 
-                jmp splerr              ; oopps error in Open
+                jmp splerr              ; oops, error in Open
 
                 .endproc
 
@@ -579,7 +580,7 @@ _ps4            lda arg2
                 bne _ps7                ; no EOL char if inverted
 
                 iny
-_ps5            lda eolch
+_ps5            lda eol
                 sta (arg0),y
                 jmp _ps7
 

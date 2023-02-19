@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: screen.mac.asm
 ;======================================
@@ -25,7 +26,7 @@
 ;
 ;======================================
 scrinit         .proc
-                .frsGraphics mcTextOn,mcVideoMode640    ; 80x60 text mode
+                .frsGraphics mcTextOn,mcVideoMode240    ; 40x30 text mode
                 stz DINDEX              ; text mode
 
                 ; lda #0
@@ -40,7 +41,7 @@ scrinit         .proc
 
 ;--------------------------------------
 
-; scred           .text 2,"E:",$9b
+; scred         .text 2,"E:",$9b
                 .endproc
 
 
@@ -244,10 +245,10 @@ tokUNDEC        = $88
 ; 0 - out of system memory
 strERR          = 1                     ; missing " at end
 dfnERR          = 2                     ; nested defines
-symtblERR           = 3                 ; too many qglobal st
+symtblERR       = 3                     ; too many qglobal st
 ; 4 - too many local st entries
 setERR          = 5                     ; SET syntax error
-declERR          = 6                    ; declaration error
+declERR         = 6                     ; declaration error
 argERR          = 7                     ; bad argument list
 varERR          = 8                     ; var not declared
 constERR        = 9                     ; not int const
@@ -255,21 +256,21 @@ assgnERR        = 10                    ; bad assignment
 endERR          = 11                    ; unknown error
 thenERR         = 12                    ; missing THEN
 fiERR           = 13                    ; missing FI
-qcodeERR           = 14                 ; out of qcode space
+qcodeERR        = 14                    ; out of qcode space
 doERR           = 15                    ; missing DO
 toERR           = 16                    ; missing TO
-exprERR          = 17                   ; bad expression
-parenthERR        = 18                  ; unmatched ()s
+exprERR         = 17                    ; bad expression
+parenthERR      = 18                    ; unmatched ()s
 odERR           = 19                    ; missing OD
 allocateERR     = 20                    ; can't alloc mem.
-arrayERR          = 21                  ; bad array ref.
+arrayERR        = 21                    ; bad array ref.
 ; 22 - file too large on input
-condtERR         = 23                   ; illegal cond. exp.
+condtERR        = 23                    ; illegal cond. exp.
 forERR          = 24                    ; illegal FOR stmt
 exitERR         = 25                    ; no loop for EXIT
 nestERR         = 26                    ; nesting level too deep
 typERR          = 27                    ; illegal type ref.
-retrnERR          = 28                  ; illegal RETURN stmt.
+retrnERR        = 28                    ; illegal RETURN stmt.
 ;61 - out of st space
 brkERR          = $80                   ; Break key depressed
 

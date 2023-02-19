@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: edit.car.asm
 ;======================================
@@ -95,7 +96,7 @@ _w1             jmp GeneralMemErr.Punt  ; editor
 
 cold            lda #0
                 tay
-_nextZero       sta $03_0480,y          ; zero RAM
+_nextZero       sta $0480,y             ; zero RAM
                 dey
                 bne _nextZero
 

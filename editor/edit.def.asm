@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: edit.def.asm
 ;======================================
@@ -26,52 +27,52 @@ ramzap          = 0                     ; to zap or not to zap, that is the ques
 
 ; ACTION! vars ($480 - $57D)
 ;----------------------------
-w1              = $03_0480              ; window 1 data
-top1            = $03_048F
-chrConvert      = $03_0490              ; char convert
-codebase        = $03_0491              ; 2 bytes
-codesize        = $03_0493              ; 2 bytes
-SymTblSizePages = $03_0495              ; symbol table size (pages)
-isMonitorLive   = $03_0496              ; edit/mon flag
-gbase           = $03_0497              ; 2 bytes
-type            = $03_0499
-list            = $03_049A              ; listing flag
-numargs         = $03_049B
-cmdln           = $03_049C              ; command line offset
-param           = $03_049D
-opmode          = $03_049E
-currentWindow   = $03_049F              ; window memory offset
-cury            = $03_04A0              ; current Y reg (0/1/unknown)
-lastch          = $03_04A1              ; last char
-curch           = $03_04A2              ; current char
-sparem          = $03_04A3              ; -> spare mem
-numwd           = $03_04A5              ; number of windows
-allocerr        = $03_04A6              ; INC on Alloc error
-delbuf          = $03_04A7              ; 6 bytes
-FirstChar       = $03_04AD              ; used for big symbol table
-taglist         = $03_04AE              ; 2 bytes
-chrConvert1     = $03_04B0              ; char convert
-w2              = $03_04B1              ; window 2 data
-bckgrnd         = $03_04C0              ; background color
-procsp          = $03_04C1              ; Break stack pointer
-argbytes        = $03_04C2
-trace           = $03_04C3              ; trace flag
-isBigSymTbl     = $03_04C4              ; big symbol table flag
+w1              = $0480              ; window 1 data
+top1            = $048F
+chrConvert      = $0490              ; char convert
+codebase        = $0491              ; 2 bytes
+codesize        = $0493              ; 2 bytes
+SymTblSizePages = $0495              ; symbol table size (pages)
+isMonitorLive   = $0496              ; edit/mon flag
+gbase           = $0497              ; 2 bytes
+type            = $0499
+list            = $049A              ; listing flag
+numargs         = $049B
+cmdln           = $049C              ; command line offset
+param           = $049D
+opmode          = $049E
+currentWindow   = $049F              ; window memory offset
+cury            = $04A0              ; current Y reg (0/1/unknown)
+lastch          = $04A1              ; last char
+curch           = $04A2              ; current char
+sparem          = $04A3              ; -> spare mem
+numwd           = $04A5              ; number of windows
+allocerr        = $04A6              ; INC on Alloc error
+delbuf          = $04A7              ; 6 bytes
+FirstChar       = $04AD              ; used for big symbol table
+taglist         = $04AE              ; 2 bytes
+chrConvert1     = $04B0              ; char convert
+w2              = $04B1              ; window 2 data
+bckgrnd         = $04C0              ; background color
+procsp          = $04C1              ; Break stack pointer
+argbytes        = $04C2
+trace           = $04C3              ; trace flag
+isBigSymTbl     = $04C4              ; big symbol table flag
 
         ; note: $4C5 available
 
-jt_jmps         = $03_04C6              ; see EDIT.CAR
+jt_jmps         = $04C6              ; see EDIT.CAR
 
 ; Jump table goes to $4FF
 ;-------------------------
-jt_segend       = $03_04C6
-jt_curbank      = $03_04C9
-jt_stmask       = $03_04CA
-jt_error        = $03_04CB
-jt_wsize        = $03_04CE
-jt_linemax      = $03_04CF
-jt_chrConvert2  = $03_04D0              ; char convert
-jt_expend       = $03_04D1
+jt_segend       = $04C6
+jt_curbank      = $04C9
+jt_stmask       = $04CA
+jt_error        = $04CB
+jt_wsize        = $04CE
+jt_linemax      = $04CF
+jt_chrConvert2  = $04D0              ; char convert
+jt_expend       = $04D1
 jt_dclend       = jt_expend+3
 jt_cgend        = jt_dclend+3
 jt_arend        = jt_cgend+3
@@ -80,37 +81,37 @@ jt_alarm        = jt_splend+3
 jt_eolch        = jt_alarm+3
 jt_lsh          = jt_eolch+1
 
-jt_chrConvert3  = $03_04F0              ; char convert
-jt_tvdisp       = $03_04F1
-jt_disptb       = $03_04F2
-jt_smtend       = $03_04F8
-;jt_stmradr      = $03_04FE
+jt_chrConvert3  = $04F0              ; char convert
+jt_tvdisp       = $04F1
+jt_disptb       = $04F2
+jt_smtend       = $04F8
+jt_stmradr      = $04FE
 
-subbuf          = $03_0500              ; 40 bytes     ; rowSize
-findbuf         = $03_0528              ; 40 bytes     ; rowSize
-numbuf          = $03_0550              ; 24 bytes
-stkbase         = $03_0577
+subbuf          = $0500              ; 40 bytes     ; rowSize
+findbuf         = $0528              ; 40 bytes     ; rowSize
+numbuf          = $0550              ; 24 bytes
+stkbase         = $0577
 
-opstack         = $03_0580
+opstack         = $0580
 
 ; $580 TO ? is used for output of
 ; FASC routine.  Should not exceed
 ; 16 bytes, $58F (worst case?).
 ;---------------------------------
-tempbuf         = $03_0590              ; 40 bytes     ; rowSize
-argtypes        = $03_05B8              ;  8 bytes
-eof             = $03_05C0              ;  8 bytes
-inbuf           = $03_05C8              ; 36 bytes
-abt             = $03_05EC              ;  4 bytes
-temps           = $03_05F0              ; 16 bytes
+tempbuf         = $0590              ; 40 bytes     ; rowSize
+argtypes        = $05B8              ;  8 bytes
+eof             = $05C0              ;  8 bytes
+inbuf           = $05C8              ; 36 bytes
+abt             = $05EC              ;  4 bytes
+temps           = $05F0              ; 16 bytes
 
 
 ; system vars
 ;-------------
-qcode           = DPBASE+$0E                   ; ap. high mem.
+qcode           = $0E            ; ap. high mem.
 csrch           = $5D
 
-lbuff           = $03_0580              ; fp ASCII buf
+lbuff           = $0580              ; fp ASCII buf
 
 
 ; window record offsets

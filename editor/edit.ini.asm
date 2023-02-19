@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: edit.ini.asm
 ;======================================
@@ -109,14 +110,14 @@ Window2Init     .proc
 ; Initialize the Editor
 ;======================================
 EditorInit      .proc
-                lda #<$03_7FFF
+                lda #<$7FFF
                 sta MEMTOP
-                lda #>$03_7FFF
+                lda #>$7FFF
                 sta MEMTOP+1
 
-                lda #<$03_0600
+                lda #<$0600
                 sta MEMLO
-                lda #>$03_0600
+                lda #>$0600
                 sta MEMLO+1
 
                 jsr MemoryInit          ; initialize editor memory
@@ -143,7 +144,7 @@ EditorInit      .proc
     ; initialize window
                 jsr ZeroWindow
 
-winit1          lda #23     ; rowcount
+winit1          lda #23                 ; rowcount
                 sta nlines
                 sta cmdln
 
@@ -159,5 +160,5 @@ fcmsg1          lda #<editCmdMsg
 
 ;--------------------------------------
 
-editCmdMsg      .text 21,"ACTION! (c) 2022 GPL3"
+editCmdMsg      .ptext "ACTION! (c) 2023 GPL3"
                 .endproc

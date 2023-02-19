@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: ampl.cgu.asm
 ;======================================
@@ -88,16 +89,16 @@ LoadX           .proc
 
 _lxt            lda (stack),y
                 tax
-                dec temps-(args-DPBASE),x
+                dec temps-args,x
 _lxz            lda #$a6                ; LDX addr
 _lx1            jmp Push2
 
 _lxc            lda (stack),y
 
-        ; tax
-        ; lda #$A2
-        ; ldx data
-        ; bne _LX1
+                ; tax
+                ; lda #$A2
+                ; ldx data
+                ; bne _LX1
 
                 sta arg12
                 pla
@@ -175,9 +176,9 @@ _opa            bit cnstmode
 
                 jsr LoadY
 
-        ; lda arg7
-        ; and #$F7
-        ; sta arg7 ; flag Y reg used
+                ; lda arg7
+                ; and #$F7
+                ; sta arg7 ; flag Y reg used
 
                 lda #0
                 sta arg12
@@ -186,14 +187,14 @@ _opa1           sta arg10
                 lda (stack),y
                 clc
                 adc arg12
-                cmp #(args-DPBASE)
+                cmp #args
                 bcc _opc2
 
-                cmp #(args-DPBASE)+16
+                cmp #args+16
                 bcs _opc2
 
                 tax
-                dec temps-(args-DPBASE),x ; free temp
+                dec temps-args,x        ; free temp
                 bra _opc3
 
 _opa2           tya                     ; small array
@@ -325,21 +326,21 @@ outtype         .byte $82,3,$84,tokREAL_t
 ;   GetTemps()
 ;======================================
 GetTemps        .proc
-                ldx #(args-DPBASE)+16
+                ldx #args+16
                 ldy #7
 _gtl1           dex
                 dex
                 dey
                 bmi _gtlerr             ; exp. too complex
 
-                lda temps-(args-DPBASE),x
+                lda temps-args,x
                 bne _gtl1
 
-                inc temps-(args-DPBASE),x
+                inc temps-args,x
                 lda arg5                ; see if byte temp
                 beq _gt2                ; yes
 
-                inc temps-(args-DPBASE)+1,x
+                inc temps-args+1,x
         .if ramzap
                 inc SArgs,x
         .else
@@ -666,10 +667,11 @@ i31             txa
 
 ;======================================
 ;   AddCdSp()
+;--------------------------------------
+; AddCdSp(,,size) add qcode space
+; does NOT change qcode or codeOff
 ;======================================
 AddCdSp         .proc
-    ; AddCdSp(,,size) add qcode space
-    ; does NOT change qcode or codeOff
                 pha
                 clc
                 tya

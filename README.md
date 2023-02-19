@@ -12,6 +12,8 @@ This requires [64tass](https://sourceforge.net/projects/tass64/) to assemble fro
 
 ---
 
+The **f256jr** code branch contains a port for the 65c02-based [Foenix Retro Systems](https://c256foenix.com/) platform.
+
 The **foenix** code branch contains a port for the 65816-based [Foenix Retro Systems](https://c256foenix.com/) platform.
 
 ![Action!](media/Action!SplitWindowDOS.png)

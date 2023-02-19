@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: ampl.mon.asm
 ;======================================
@@ -345,7 +346,7 @@ _mwinit         .byte 6
 ;======================================
 MWOut           .proc
                 lda #1
-                ldx #(arg9-DPBASE)
+                ldx #arg9
                 ldy #0
                 jsr output
 
@@ -470,7 +471,7 @@ _ph3            tay
 ;--------------------------------------
 ;--------------------------------------
 
-mcmd            .addr jt_disptb+9          ; unknown cmd
+mcmd            .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
                 .addr Boot
                 .byte 'b'

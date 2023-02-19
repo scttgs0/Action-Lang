@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: ampl.mth.asm
 ;======================================
@@ -273,9 +274,7 @@ SArgs           .proc                   ; saves args for call
                 iny
                 lda (afcur),y           ; # of bytes
                 tay
-_sa1            .databank $00
-                lda args,y
-                .databank $03
+_sa1            lda args,y
                 sta (aflast),y
                 dey
                 bpl _sa1

@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: edit.cmd.asm
 ;======================================
@@ -384,7 +385,7 @@ SetSpacing      .proc
 ;   MoveDown(cnt, row)
 ;======================================
 MoveDown        .proc
-                ldy #+0-40     ; rowSize
+                ldy #+0-40              ; rowSize
                 sty arg5
                 ldy #$ff
                 bne MoveContent
@@ -396,7 +397,7 @@ MoveDown        .proc
 ;   MoveUp(cnt, row)
 ;======================================
 MoveUp          .proc
-                ldy #40     ; rowSize
+                ldy #40                 ; rowSize
                 sty arg5
                 ldy #0
                 .endproc

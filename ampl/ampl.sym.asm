@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: ampl.sym.asm
 ;======================================
@@ -64,7 +65,7 @@ _stm4           inc arg13               ; try next entry
                 iny
 _stm5           jmp splerr
 
-stmres          jmp [jt_stmradr]
+stmres          jmp (jt_stmradr)
 
                 .endproc
 

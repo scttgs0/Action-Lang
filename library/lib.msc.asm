@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: lib.msc.asm
 ;======================================
@@ -98,9 +99,9 @@ _sr1            sta AUDF1,x             ; zero sound regs
 ; Assumes port low  8.
 ; see LIB.ST
 ;Paddle tax
-;       lda POT0,x
-;       sta args
-;       rts
+;                lda POT0,x
+;                sta args
+;                rts
 
 
 ;BYTE FUNC PTrig(BYTE port)
@@ -160,9 +161,9 @@ _stk2           and #$0f
 ;
 ; see LIB.ST
 ;STrig tax
-;      lda TRIG0,x
-;      sta args
-;      rts
+;                lda TRIG0,x
+;                sta args
+;                rts
 ;======================================
 
 

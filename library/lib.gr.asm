@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: lib.gr.asm
 ;======================================
@@ -57,8 +58,8 @@ libGrGraphics   .proc                   ; Graphics(mode)
 
 _e              .text 2,"E:",eol
 _devs           .text 2,"S:",eol
-_color          = $03_02FD
-_atachr         = $03_02FB
+_color          = $02FD
+_atachr         = $02FB
                 .endproc
 
 

@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: main.msc.asm
 ;======================================
@@ -285,7 +286,7 @@ _cs1            lda (nxtaddr),y
                 inc qcode+1
 _cs2            jsr codeincr
 
-                inc choff               ; get rid of end tokQuote
+                inc choff               ; get rid of end quote
                 pla
                 tax
                 pla

@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: comp.main.asm
 ;======================================
@@ -115,8 +116,8 @@ _spl3           ldy #1
                 sta arrayptr+1
                 bne _spl3
 
-        ; lda arrayPtr
-        ; bne _SPL3
+                ; lda arrayPtr
+                ; bne _SPL3
 
                 lda qcode
                 cmp MEMTOP
@@ -137,7 +138,7 @@ _spl4           jsr getcdoff            ; no main PROC
 
 ;EndErr LDY #0
 ; STY $2E3                              ; zap run address
-enderror          ldy #endERR
+enderror        ldy #endERR
                 jmp dostmt.fierr
 
 _spl5           jmp codeincr.cderr      ; out of qcode space
@@ -776,13 +777,13 @@ _a1a            and #$20
                 lda (stack),y
                 tax
     ; incr temps
-                cpx #(args-DPBASE)      ;
+                cpx #args               ;
                 bcc _a1b                ; are these 4 instr.
 
-                cpx #(args-DPBASE)+16   ; needed?
+                cpx #args+16            ; needed?
                 bcs _a1b                ;
 
-                inc temps-(args-DPBASE),x
+                inc temps-args,x
 _a1b            jsr GetNext
 _ass2           jsr exp.exp1
                 jsr cgassign
@@ -1425,7 +1426,7 @@ retstmt         .proc
 
                 ora #tokTEMP_t
                 tay
-                lda #(args-DPBASE)
+                lda #args
                 jsr storst
 
                 ldx nxttoken
@@ -1964,7 +1965,7 @@ _expfunc
 
     ; save temps
                 sty arg0
-                lda #(args-DPBASE)+15
+                lda #args+15
                 sta arg1
 _ef1            dec arg0
                 ldy arg0
@@ -1991,7 +1992,7 @@ _ef2            dec arg1
                 ldy #1
                 sty temps               ; flag result reg.
                 sty arg0
-                lda #(args-DPBASE)+2
+                lda #args+2
                 sta arg1
 _ef3            inc arg0
                 ldy arg0
@@ -2020,7 +2021,7 @@ _ef4            inc arg1
                 lda (stack),y
                 and #7
                 ora #tokTEMP_t
-                ldx #(args-DPBASE)
+                ldx #args
                 jsr SaveCd.savstk
 
                 jmp eerr._exp7
@@ -2534,6 +2535,7 @@ _cgav           ldx arg4                ; lhs type=byte?
                 ; bne _CGAVI            ; yes
                 ; lhs type = real
                 ; jmp AssErr
+
 _cgavi          jsr Load2H
 
 _avi1           lda #$81                ; STA
@@ -2552,7 +2554,7 @@ _cgat           and #$10                ; rhs array?
     ; special case for arg0
                 ldy #1
                 lda (stack),y
-                cmp #(args-DPBASE)
+                cmp #args
                 beq cgassign._cgav      ; function return value
 
                 lda arg4                ; lhs byte?
@@ -2820,13 +2822,13 @@ cgmul           .proc
 cgdiv           jsr Load2H
 
                 lda #$85                ; STA AFcur+1
-                ldx #(afcur-DPBASE)+1
+                ldx #afcur+1
                 jsr Push2
 cgmd            jsr GetTemps
                 jsr Load2L
 
                 lda #$85                ; STA AFcur
-                ldx #(afcur-DPBASE)
+                ldx #afcur
                 jsr Push2
 
                 lda arg4

@@ -1,3 +1,4 @@
+
 ;======================================
 ;       FILE: ampl.arr.asm
 ;======================================
@@ -107,8 +108,8 @@ _ar1            sta FR1
                 ldy vartype-1,x
                 beq arrerr._arbyte
 
-        ; cpy #3
-        ; beq _ARReal
+                ; cpy #3
+                ; beq _ARReal
 
     ; integer or cardinal
 
