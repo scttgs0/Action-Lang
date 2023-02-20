@@ -346,7 +346,7 @@ openchan        .proc
                 pla
                 sta arg3
 
-    ; check for default device
+;   check for default device
                 lda #':'
                 ldy #2
                 cmp (nxtaddr),y
@@ -356,7 +356,7 @@ openchan        .proc
                 cmp (nxtaddr),y
                 beq _oc2
 
-    ; stuff in D: for device
+;   stuff in D: for device
                 clc
                 lda nxtaddr
                 adc #2

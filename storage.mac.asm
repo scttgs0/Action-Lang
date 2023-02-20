@@ -64,7 +64,7 @@ _afl3           ldy #3
                 bcc _afl5               ; size too small
                 beq _afl9               ; sizes equal
 
-    ; Check for best fit
+;   Check for best fit
 _afl4           ldy #2
                 lda (afcur),y
                 cmp afbsze
@@ -73,7 +73,7 @@ _afl4           ldy #2
                 sbc afbsze+1
                 bcs _afl5
 
-    ; save best guess so far
+;   save best guess so far
                 lda (afcur),y
                 sta afbsze+1
                 dey
@@ -84,7 +84,7 @@ _afl4           ldy #2
                 lda aflast+1
                 sta afbest+1
 
-    ; get next entry in list and goto beginning of loop
+;   get next entry in list and goto beginning of loop
 _afl5           lda afcur
                 sta aflast
                 lda afcur+1
@@ -92,12 +92,12 @@ _afl5           lda afcur
                 clc
                 bcc _afl1
 
-    ; no entry found, use best guess
+;   no entry found, use best guess
 _afl6           lda afbsze+1
                 cmp #$ff
                 beq _afl10              ; no free block
 
-    ; see if we need to split block
+;   see if we need to split block
                 sec
                 lda afbsze
                 sbc #slop
@@ -114,7 +114,7 @@ _afl7           lda afbsze+1
                 cmp afsize
                 bcs _afl11              ; split it
 
-    ; don't split
+;   don't split
 _afl8           ldy #0
                 lda (afbest),y          ; cur =  best(0)
                 sta afcur
@@ -129,7 +129,7 @@ _afl8           ldy #0
                 sta (afbest),y
                 rts
 
-    ; found entry of right size
+;   found entry of right size
 _afl9           ldy #0
                 lda (afcur),y
                 sta (aflast),y
@@ -138,7 +138,7 @@ _afl9           ldy #0
                 sta (aflast),y
 _afl10          rts
 
-    ; split best block
+;   split best block
 _afl11          ldy #0
                 lda (afbest),y          ; cur = best(0)
                 sta afcur

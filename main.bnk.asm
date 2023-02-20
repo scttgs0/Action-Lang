@@ -88,7 +88,7 @@ rbank1          sta bank,y
 ;   Run(address)
 ;======================================
 run             .proc
-    ; reset Error routine
+;   reset Error routine
                 ldy #<splerr
                 sty jt_error+1
                 ldy #>splerr

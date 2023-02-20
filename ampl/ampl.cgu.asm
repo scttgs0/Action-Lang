@@ -69,8 +69,8 @@ TrashY          .proc
 ;   LoadX(,,offset)
 ;======================================
 LoadX           .proc
-    ; NOTE:  this proc can only be called
-    ; from Op below, see _LXC
+;   NOTE:  this proc can only be called
+;   from Op below, see _LXC
                 lda (stack),y
                 iny
                 bit tempmode
@@ -79,7 +79,7 @@ LoadX           .proc
                 bit cnstmode
                 beq _lxc
 
-    ; var to load
+;   var to load
                 jsr StkProp
 
                 beq _lxz
@@ -155,12 +155,12 @@ ophigh          stx arg12
                 bit cnstmode
                 beq _opc                ; constant
 
-    ; var if we get here
+;   var if we get here
 _opv            jsr StkProp
 
                 beq _opz                ; page zero var
 
-    ; 16 bit address
+;   16 bit address
 _opv1           pla
                 ora #$0c                ; addr16
                 jmp Push3

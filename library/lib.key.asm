@@ -26,7 +26,7 @@
 ;
 ;======================================
 libKeyGetKey    .proc
-    ; Get next key in buffer
+;   get next key in buffer
 _waitForKey     lda CH_                 ; key down?
                 eor #$ff
                 bne _gk0

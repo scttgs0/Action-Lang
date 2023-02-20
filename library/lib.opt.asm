@@ -26,7 +26,7 @@
 ;   SetOpts()
 ;======================================
 libOptSetOpts   .proc
-    ; Display On?
+;   Display On?
                 ldx #domsg-optmsg
                 ldy jt_tvdisp
                 jsr _yn
@@ -38,7 +38,7 @@ libOptSetOpts   .proc
 _do1            lda #$22
 _do2            sta jt_tvdisp
 
-    ; Alarm?
+;   Alarm?
                 ldx #amsg-optmsg
                 ldy jt_alarm
                 cpy #$60
@@ -51,7 +51,7 @@ _do2            sta jt_tvdisp
 _a1             lda #$4c                ; JMP
 _a2             sta jt_alarm
 
-    ; Case sensitive?
+;   Case sensitive?
                 ldx #cmsg-optmsg
                 ldy jt_stmask
                 cpy #$df
@@ -64,7 +64,7 @@ _a2             sta jt_alarm
 _c1             lda #$ff
 _c2             sta jt_stmask
 
-    ; Trace On?
+;   Trace On?
                 ldx #tmsg-optmsg
                 ldy trace
                 jsr _yn
@@ -76,7 +76,7 @@ _c2             sta jt_stmask
 _t1             lda #$ff
 _t2             sta trace
 
-    ; List On?
+;   List On?
                 ldx #lstmsg-optmsg
                 ldy list
                 jsr _yn
@@ -88,7 +88,7 @@ _t2             sta trace
 _lst1           lda #$ff
 _lst2           sta list
 
-    ; window size
+;   window size
                 lda jt_wsize
                 jsr _getstr
 
@@ -116,7 +116,7 @@ _w1             sta jt_wsize
                 sbc jt_wsize
                 sta w2+wnlns
 
-    ; line size
+;   line size
 _l1             lda jt_linemax
                 jsr _getstr
 
@@ -125,7 +125,7 @@ _l1             lda jt_linemax
 
                 sta jt_linemax
 
-    ; left margin
+;   left margin
                 lda LMARGN
                 jsr _getstr
 
@@ -134,7 +134,7 @@ _l1             lda jt_linemax
 
                 sta LMARGN
 
-    ; EOL char
+;   EOL char
                 lda jt_eolch
                 tay
                 rol a
@@ -234,7 +234,7 @@ stoa_           .byte $20,$40,$00,$60
 libOptGetTmpBuf .proc
                 sty arg2
 
-    ; copy string to tempBuf+10
+;   copy string to tempBuf+10
                 ldy #20
 _gt1            lda optmsg+20,x
                 sta tempbuf+10,y
@@ -242,7 +242,7 @@ _gt1            lda optmsg+20,x
                 dey
                 bpl _gt1
 
-    ; put space at end
+;   put space at end
                 tay
                 lda #' '
                 sta tempbuf+10,y

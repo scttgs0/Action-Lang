@@ -141,7 +141,7 @@ EditorInit      .proc
                 sta delbuf+1
                 sta delbuf+5
 
-    ; initialize window
+;   initialize window
                 jsr ZeroWindow
 
 winit1          lda #23                 ; rowcount

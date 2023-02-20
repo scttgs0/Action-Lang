@@ -307,7 +307,7 @@ getnl0          cmp #tokEOF
                 cmp #'!'
                 bcc getnloop
 
-    ; save line index for debugging
+;   save line index for debugging
                 ldx choff
                 stx spnxt
 

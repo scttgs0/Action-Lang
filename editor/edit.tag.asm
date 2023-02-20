@@ -37,7 +37,7 @@ SetTag          .proc
                 jsr GetTag
                 bne _st1                ; tag already exists
 
-    ; get a new tag
+;   get a new tag
                 lda #8
                 jsr Allocate
 
@@ -66,7 +66,7 @@ _st1            ldy #4
 
                 sta (afcur),y
 
-    ; flag line as taged
+;   flag line as tagged
                 ldy #3
                 lda (cur),y
                 ora #$80

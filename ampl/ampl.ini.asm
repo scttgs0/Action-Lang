@@ -41,7 +41,7 @@ SPLsetup        .proc
                 sta curnxt+1
                 sta procsp
 
-    ; clear qglobal symbol table
+;   clear qglobal symbol table
                 ldx isBigSymTbl
                 beq _spls0              ; no
 
@@ -53,7 +53,7 @@ _spls0          sta (symTblGlobal),y
                 iny
                 bne _spls0
 
-    ; get last block in heap
+;   get last block in heap
                 lda afbase
                 ldx afbase+1
                 sta arg0
@@ -94,7 +94,7 @@ _spls3          sta codebase
                 cmp qcode+1
                 bcs _spls4
 
-    ; can't allocate memory
+;   can't allocate memory
                 lda sparem
                 sta symtab
                 lda sparem+1

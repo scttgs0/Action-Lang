@@ -136,12 +136,12 @@ _func2          lda param
                 jsr GetNext
                 jsr declare             ; locals
 
-    ; handle procedure setup here
+;   handle procedure setup here
                 pla
                 bmi _f4                 ; system proc
 
-    ; get beginning of arguments and
-    ; save actual procedure address
+;   get beginning of arguments and
+;   save actual procedure address
                 lda #1
                 jsr cprop
 
@@ -150,7 +150,7 @@ _func2          lda param
                 jsr getcdoff
                 jsr storprops
 
-    ; get space for proc variable
+;   get space for proc variable
                 lda #$4c                ; JMP
                 jsr Push1
                 jsr getcdoff            ; fill in address
@@ -161,8 +161,8 @@ _func2          lda param
                 inx
 _fh2            jsr Push2
 
-    ; qcode to transfer arguments to
-    ; local frame
+;   qcode to transfer arguments to
+;   local frame
 _fh3            lda argbytes
                 beq _func3              ; no arguments
 

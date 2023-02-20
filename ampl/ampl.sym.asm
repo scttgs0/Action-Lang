@@ -98,7 +98,7 @@ _stmr2          lda resw1,x
                 cpy arg0
                 bcc _stmr2
 
-    ; we have a match
+;   we have a match
                 lda resw1,x             ; get token value
 _stmr3          rts
 
@@ -185,7 +185,7 @@ lgnlocal        lda symTblLocal
 ;
 ;======================================
 NewEntry        .proc
-    ; Make new entry in symbol table
+;   Make new entry in symbol table
                 lda symtab+1
                 sta (arg2),y
                 lda symtab

@@ -43,7 +43,7 @@ Substitute      .proc
 
                 pla
 
-    ; check for ESC key
+;   check for ESC key
                 ldx subbuf
                 bne _s0
 
@@ -88,7 +88,7 @@ _s4             clc
                 bcc _s6                 ; need to remove space
                 beq _s8                 ; same size
 
-    ; need to add space
+;   need to add space
                 tay
 _s5             lda (buf),y
                 sta (arg0),y

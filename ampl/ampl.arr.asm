@@ -53,7 +53,7 @@ _arptr          ldy #0
                 cpx #0
                 bne _arpt1
 
-    ; page zero pointer
+;   page zero pointer
                 ldy #1
                 sta (stack),y
                 dey
@@ -111,7 +111,7 @@ _ar1            sta FR1
                 ; cpy #3
                 ; beq _ARReal
 
-    ; integer or cardinal
+;   integer or cardinal
 
 _arint          jsr GetTemps
 

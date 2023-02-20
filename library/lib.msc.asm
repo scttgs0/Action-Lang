@@ -330,7 +330,7 @@ libMscBreak     .proc
 ;   Call Trace handler
 ;======================================
 libMscCTrace    .proc
-    ; name passed following JSR
+;   name passed following JSR
                 clc
                 pla
                 adc #1
@@ -339,8 +339,8 @@ libMscCTrace    .proc
                 adc #0
                 sta arg11
 
-    ; address of name now in arg10-11
-    ; ok, let's print the name
+;   address of name now in arg10-11
+;   ok, let's print the name
                 lda arg10
                 ldx arg11
                 jsr libIOPrint
@@ -348,7 +348,7 @@ libMscCTrace    .proc
                 lda #'('
                 jsr libIOPut
 
-    ; now get addr of args
+;   now get addr of args
                 sec
                 lda arg10
                 ldy #0
@@ -363,7 +363,7 @@ _ct1            lda (arg10),y
                 iny
                 lda (arg10),y
                 sta arg13
-    ; get number of args
+;   get number of args
                 iny
                 lda (arg10),y
                 sta arg9
@@ -383,7 +383,7 @@ _ct2            inc arg14
                 dey
                 bcs _ct5                ; cardinal
 
-    ; integer
+;   integer
                 lda (arg12),y
                 jsr libIOPrintI
 
@@ -403,7 +403,7 @@ _ct6            inc arg15
 
                 jmp _ct2
 
-    ; setup return
+;   setup return
 _ct7            clc
                 lda arg10
                 adc arg14

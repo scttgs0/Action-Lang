@@ -113,7 +113,7 @@ _nextJmps       lda emjmps-1,y          ; init RAM
                 lda #`iSTMres
                 sta jt_stmradr+2
 
-    ; sty chrConvert1 ; Y=0
+                ; sty chrConvert1       ; Y=0
                 jsr EditorInit          ; init editor
 
 ;SPLInit PROC ; init compiler RAM

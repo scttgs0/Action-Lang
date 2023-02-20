@@ -151,7 +151,7 @@ FWrite          .proc
 
 _fw1            jsr ldbuf
 
-    ; INC COLOR4                        ; let user know we're here
+                ; inc COLOR4            ; let user know we're here
                 nop
                 nop
                 nop
@@ -284,7 +284,7 @@ keybd           .text 2,"K:"
 ;   GotKey()
 ;======================================
 GotKey          .proc
-    ; Test if key in buffer
+;   test if key in buffer
                 lda CH_                 ; key down?
                 eor #$ff
                 rts

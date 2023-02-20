@@ -209,7 +209,7 @@ libIOPrintE     .proc
                 ldy arg1
                 lda device
 
-    ; falls into PrintDE
+;   falls into PrintDE
                 .endproc
 
 
@@ -727,7 +727,7 @@ _i4             lda (arg4),y
                 sec
                 sbc #'0'
                 tax
-    ; arg01*10
+;   arg01*10
                 lda arg1
                 pha
                 lda arg0

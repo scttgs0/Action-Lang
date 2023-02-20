@@ -270,7 +270,7 @@ MWrite          .proc                   ; write object file
                 lda #8                  ; output
                 jsr openchan
 
-    ; write header
+;   write header
                 lda #6
                 sta arg9
                 lda #$ff
@@ -298,7 +298,7 @@ _mw2            dec arg14
                 sta arg15
                 jsr MWOut
 
-    ; write the qcode
+;   write the qcode
                 ldx #$10
                 lda #$0b                ; output command
                 sta IOCB0+ICCOM,x
@@ -316,7 +316,7 @@ _mw2            dec arg14
                 jsr CIOV
                 bmi MWOut._mwerr
 
-    ; save start address
+;   save start address
                 ldx #4
 _mw3            lda _mwinit,x
                 sta arg9,x
@@ -329,7 +329,7 @@ _mw3            lda _mwinit,x
                 sta arg15
                 jsr MWOut
 
-    ; close file
+;   close file
                 lda #1
                 jmp close
 
@@ -453,7 +453,7 @@ _ph2            asl arg0
                 dex
                 bne _ph2
 
-    ; CLC
+                ; clc
                 adc #'0'
                 cmp #':'
                 bmi _ph3

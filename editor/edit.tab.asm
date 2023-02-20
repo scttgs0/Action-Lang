@@ -35,7 +35,7 @@ _t1             lda TABMAP,x
                 and _onbit,y
                 beq _t2
 
-    ; found tab setting
+;   found tab setting
                 sty arg0
                 txa
                 asl a

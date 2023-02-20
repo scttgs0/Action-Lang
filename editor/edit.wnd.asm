@@ -95,7 +95,7 @@ clr0            jsr CleanLine
                 lda dirty
                 beq clr1
 
-    ; JSR Alarm
+;               jsr Alarm
                 lda #<DeleteWindow.dirtymsg
                 ldx #>DeleteWindow.dirtymsg
                 jsr YesNo

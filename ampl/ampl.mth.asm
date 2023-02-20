@@ -165,7 +165,7 @@ _smo2           lda #0
 DivC            .proc
                 jsr SMOps
 
-    ; see MultC above
+;   see MultC above
                 lda math._c
                 beq _dsmall
 
@@ -279,7 +279,7 @@ _sa1            lda args,y
                 dey
                 bpl _sa1
 
-    ; check for break key
+;   check for break key
                 lda BRKKEY
                 bne _sa2
 

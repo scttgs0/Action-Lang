@@ -218,8 +218,8 @@ ScrollInit      .proc
                 lda COLCRS
                 sta x
 
-    ; lda choff
-    ; beq _SI1
+                ; lda choff
+                ; beq _SI1
 
                 lda #0
                 sta choff
