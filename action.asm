@@ -1,9 +1,8 @@
 
 ; SPDX-FileName: action.asm
-; SPX-FileComment: Action! Programming Language
+; SPDX-FileComment: Action! Programming Language
 ; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
-
 
                 .cpu "65c02"
 

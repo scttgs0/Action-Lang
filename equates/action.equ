@@ -1,4 +1,10 @@
 
+; SPDX-FileName: action.equ
+; SPDX-FileComment: Action! Programming Language
+; SPDX-FileCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
+
+
 SRTIMR          = $022B                 ; key repeat delay [default:$30 -- reset with each keystroke]
 SDMCTL          = $022F
 SSKCTL          = $0232                 ; Serial port control register

@@ -1,4 +1,9 @@
 
+; SPDX-FileName: frs_jr_graphic.mac
+; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-License-Identifier: GPL-3.0-or-later
+
+
 frsGraphics     .macro
                 pha
 

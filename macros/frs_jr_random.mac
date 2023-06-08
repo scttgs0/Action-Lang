@@ -1,4 +1,9 @@
 
+; SPDX-FileName: frs_jr_random.mac
+; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-License-Identifier: GPL-3.0-or-later
+
+
 randomByte      .macro
                 lda RNG_DAT_LO
                 and #$FF
