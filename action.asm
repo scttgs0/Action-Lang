@@ -1,21 +1,9 @@
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
+; SPDX-FileName: action.asm
+; SPX-FileComment: Action! Programming Language
+; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
 
                 .cpu "65c02"
 
@@ -27,15 +15,14 @@
 
 ;--------------------------------------
 
-                .include "equates_system_f256jr.inc"
-                .include "frs_jr_graphic.mac"
-                .include "frs_jr_text.mac"
+                .include "equates/system_f256jr.equ"
+                .include "equates/zeropage.equ"
+                .include "equates/action.equ"
+
+                .include "macros/frs_jr_graphic.mac"
+                .include "macros/frs_jr_text.mac"
 
 ;//////////////////////////////////////
-
-
-                .include "equates_zeropage.inc"
-                .include "equates_action.inc"
 
                 .include "editor/edit.def.asm"
 
@@ -53,7 +40,8 @@
 ;--------------------------------------
 
 INIT            clc
-                ;jmp PLAT_INIT
+                jsr cstart
+                jmp Start
 
 ;--------------------------------------
 ;--------------------------------------
