@@ -1,0 +1,17 @@
+
+frsCursor       .macro
+                lda #\1
+                sta CURSOR_CTRL
+                .endmacro
+
+frsSetCursor    .macro
+                lda #<\1
+                sta CURSOR_X
+                lda #>\1
+                sta CURSOR_X+1
+
+                lda #<\2
+                sta CURSOR_Y
+                lda #>\2
+                sta CURSOR_Y+1
+                .endmacro

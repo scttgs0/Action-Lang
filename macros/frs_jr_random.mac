@@ -5,9 +5,7 @@ randomByte      .macro
                 .endmacro
 
 randomByteY     .macro
-                .setbank $AF
                 ldy RNG_DAT_LO
-                .setbank $00
                 .endmacro
 
 randomWord      .macro
