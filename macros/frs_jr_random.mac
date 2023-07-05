@@ -4,19 +4,24 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-randomByte      .macro
-                lda RNG_DAT_LO
-                and #$FF
+frsRandomREG    = RNG_DAT
+
+frsRandomByte   .macro
+                lda frsRandomREG
                 .endmacro
 
-randomByteY     .macro
-                ldy RNG_DAT_LO
+frsRandomByteX  .macro
+                ldx frsRandomREG
                 .endmacro
 
-randomWord      .macro
-                lda RNG_DAT_LO
+frsRandomByteY  .macro
+                ldy frsRandomREG
                 .endmacro
 
-random          .macro clamp
+frsRandomWord   .macro
+                ; lda frsRandomREG
+                .endmacro
+
+frsRandomClamp  .macro clamp
                 ; TODO:
                 .endmacro

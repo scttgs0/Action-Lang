@@ -6,8 +6,6 @@
 
                 .cpu "65c02"
 
-;///  Platform  ///////////////////////
-
                 .enc "atari-screen-inverse"
                     .cdef " z", $A0
                 .enc "none"
@@ -19,20 +17,39 @@
                 .include "equates/action.equ"
 
                 .include "macros/frs_jr_graphic.mac"
+                .include "macros/frs_jr_random.mac"
                 .include "macros/frs_jr_text.mac"
-
-;//////////////////////////////////////
 
                 .include "editor/edit.def.asm"
 
-                * = INIT-8
-                .text "PGX"
-                .byte $01
-                .dword INIT
+
+;--------------------------------------
+;--------------------------------------
+                * = $6000
+;--------------------------------------
+
+;   Boot from RAM data block
+
+                .byte $F2,$56           ; signature
+                .byte $03               ; slot count
+                .byte $03               ; start slot
+                .addr BOOT_             ; execute address
+                .word $0306             ; version       ; TODO: assemble date of latest version!
+                .word $0000             ; kernel
+                .null 'Action!'         ; binary name
+
+
+;--------------------------------------
+
+BOOT_           ldx #$FF                ; initialize the stack
+                txs
+                jmp INIT
+
 
 ;--------------------------------------
 ;--------------------------------------
 ; Initialization code
+
 ;--------------------------------------
 ;--------------------------------------
                 * = $7FE0
@@ -48,7 +65,7 @@ INIT            clc
 ;--------------------------------------
 
 version         .byte $40
-date            .byte $04,$24,$22        ; TODO: assemble date of latest version!
+date            .byte $07,$05,$23        ; TODO: assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -58,8 +75,10 @@ propid          ldx arg0
                 .include "main.bnk.asm"
 
 amplfin
+
 ;    ACTION! - Editor Routines
-;    ------------------------------
+;    ----------------------------------
+
                 .fill 4,$00
                 .include "editor/edit.fnd.asm"
                 .include "editor/edit.sub.asm"
@@ -67,7 +86,8 @@ amplfin
 
 
 ;    "ACTION! - Compiler Routines
-;    ---------------------------------------
+;    ----------------------------------
+
                 .fill 3,$00
                 .include "ampl/ampl.seg.asm"
                 .include "ampl/ampl.pf.asm"
@@ -76,7 +96,8 @@ amplfin
 
 
 ;    ACTION! - Symbol Table
-;    ------------------
+;    ----------------------------------
+
                 .include "ampl/ampl.mth.asm"
                 .include "ampl/ampl.sym.asm"
                 .include "library/lib.key.asm"
@@ -87,11 +108,12 @@ amplfin
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .text "ACTION! (c) 2023 GPL3           Foenix Adaptation          v3.6 April 24, 2022",$00
+cpyright        .null " ACTION! (c) 2023 GPL3           Foenix Adaptation           v3.6 July 05, 2022 "
 
 
 ;    "ACTION! - Compiler
 ;    -----------------------
+
 main
                 .include "comp.main.asm"
 
@@ -100,6 +122,7 @@ cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
 
 ;    ACTION! 3.6 - Editor
 ;    --------------------
+
                 .include "storage.mac.asm"
                 .include "editor/edit.mem.asm"
                 .include "editor/edit.car.asm"

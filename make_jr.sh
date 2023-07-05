@@ -2,7 +2,7 @@
 64tass  --m65c02 \
         --flat \
         --nostart \
-        -o action.pgx \
-        --list=action_pgx.lst \
-        --labels=action_pgx.lbl \
+        -o actionJR.bin \
+        --list=actionJR.lst \
+        --labels=actionJR.lbl \
         action.asm

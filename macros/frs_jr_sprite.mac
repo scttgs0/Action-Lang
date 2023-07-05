@@ -4,28 +4,108 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-spr_addr        .sfunction num, $AF_0C01+(num*8)
-spr_xpos        .sfunction num, $AF_0C04+(num*8)
-spr_ypos        .sfunction num, $AF_0C06+(num*8)
+sprite_t        .struct
+CTRL            .byte ?
+ADDR            .long ?
+X               .word ?
+Y               .word ?
+                .endstruct
 
-sta_spr_xpos    .function num
-                sta $AF_0C04+(num*8)
-                .endfunction
 
-sta_spr_ypos    .function num
-                sta $AF_0C06+(num*8)
-                .endfunction
+SPR             .sfunction field,idx,(SPRITE_BASE+field+(idx<<3))
+SPR_FIELD       .sfunction field,(SPRITE_BASE+field)
 
-sta_ix_spr_xpos .macro
+frsSpriteInit   .macro source,attr,idx
+                lda #<\source
+                sta SPR(sprite_t.ADDR, \idx)
+                lda #>\source
+                sta SPR(sprite_t.ADDR+1, \idx)
+                stz SPR(sprite_t.ADDR+2, \idx)
+
+                stz SPR(sprite_t.X, \idx)
+                stz SPR(sprite_t.X+1, \idx)
+                stz SPR(sprite_t.Y, \idx)
+                stz SPR(sprite_t.Y+1, \idx)
+
+                lda #\attr
+                sta SPR(sprite_t.CTRL, \idx)
+                .endmacro
+
+
+frsSpriteShow   .macro idx
+                lda SPR(sprite_t.CTRL, \idx)
+                ora #scEnable
+                sta SPR(sprite_t.CTRL, \idx)
+                .endmacro
+
+
+frsSpriteHide   .macro idx
+                lda SPR(sprite_t.CTRL, \idx)
+                and #~scEnable
+                sta SPR(sprite_t.CTRL, \idx)
+                .endmacro
+
+
+frsSpriteClear  .macro idx
+                stz SPR(sprite_t.X, \idx)
+                stz SPR(sprite_t.X+1, \idx)
+                stz SPR(sprite_t.Y, \idx)
+                stz SPR(sprite_t.Y+1, \idx)
+                .endmacro
+
+
+frsSpriteClearX .macro idx
+                stz SPR(sprite_t.X, \idx)
+                stz SPR(sprite_t.X+1, \idx)
+                .endmacro
+
+
+frsSpriteClearY .macro idx
+                stz SPR(sprite_t.Y, \idx)
+                stz SPR(sprite_t.Y+1, \idx)
+                .endmacro
+
+
+frsSpriteSetX   .macro val,idx
+                lda #<\val
+                sta SPR(sprite_t.X, \idx)
+                lda #>\val
+                sta SPR(sprite_t.X+1, \idx)
+                .endmacro
+
+
+frsSpriteSetY   .macro val,idx
+                lda #<\val
+                sta SPR(sprite_t.Y, \idx)
+                lda #>\val
+                sta SPR(sprite_t.Y+1, \idx)
+                .endmacro
+
+frsSpriteSetX_ix .macro
                 pha
                 phx
 
                 txa
-                asl
+                asl                     ; *8
                 asl
                 asl
                 tax
-                sta $AF_0C04,x
+                sta $D904,X
+
+                plx
+                pla
+                .endmacro
+
+frsSpriteSetY_ix .macro
+                pha
+                phx
+
+                txa
+                asl                     ; *8
+                asl
+                asl
+                tax
+                sta $D906,X
 
                 plx
                 pla

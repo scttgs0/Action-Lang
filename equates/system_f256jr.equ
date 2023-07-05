@@ -4,9 +4,9 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-;---------------------------------------
-; System Equates for Foenix C256jr
-;---------------------------------------
+;--------------------------------------
+; System Equates for Foenix F256 JR/K
+;--------------------------------------
 
 MMU_CTRL                = $0000
 mmuPage0            = $00
@@ -30,16 +30,52 @@ MMU_Block5              = $000D
 MMU_Block6              = $000E
 MMU_Block7              = $000F
 
-;---------------------------------------
+;--------------------------------------
 
 IOPAGE_CTRL             = $0001
-iopPage0            = $00
-iopPage1            = $01
-iopPage2            = $02
-iopPage3            = $03
+iopPage0            = $00               ; system
+iopPage1            = $01               ; charset, gfx LUT
+iopPage2            = $02               ; text map
+iopPage3            = $03               ; text color map
 iopDisable          = $04
 
-;---------------------------------------
+
+;--------------------------------------
+;--------------------------------------
+;   IO Bank 01
+;--------------------------------------
+
+FONT_MEMORY_BANK0       = $C000         ; [C000:C7FF]
+FONT_MEMORY_BANK1       = $C800         ; [C800:CFFF]
+
+;--------------------------------------
+
+GRPH_LUT0_PTR	        = $D000         ; [D000:D3FF]
+GRPH_LUT1_PTR	        = $D400         ; [D400:D7FF]
+GRPH_LUT2_PTR	        = $D800         ; [D800:DBFF]
+GRPH_LUT3_PTR	        = $DC00         ; [DC00:DFFF]
+
+
+;--------------------------------------
+;--------------------------------------
+;   IO Bank 02
+;--------------------------------------
+
+CS_TEXT_MEM_PTR         = $C000         ; [C000:DFFF]   ascii code for text character
+
+
+;--------------------------------------
+;--------------------------------------
+;   IO Bank 03
+;--------------------------------------
+CS_COLOR_MEM_PTR        = $C000         ; [C000:DFFF]   HiNibble = Foreground; LoNibble = Background
+                                        ;               0-15 = index into the CHAR_LUT tables
+
+
+;--------------------------------------
+;--------------------------------------
+;   IO Bank 00
+;--------------------------------------
 
 MASTER_CTRL_L           = $D000
 mcTextOn            = $01               ; Enable Text Mode
@@ -61,7 +97,7 @@ mcDisableVideo      = $08               ; [rev B] Disable the scanning of the vi
 mcTransparent       = $10               ; [rev B]
 mcFontSet1          = $20
 
-;---------------------------------------
+;--------------------------------------
 
 LAYER_ORDER_CTRL_0      = $D002
 locLayer0_BM0       = $00
@@ -85,7 +121,7 @@ locLayer2_TL0       = $04
 locLayer2_TL1       = $05
 locLayer2_TL2       = $06
 
-;---------------------------------------
+;--------------------------------------
 
 BORDER_CTRL             = $D004         ; Bit[0] - Enable (1 by default)
 bcEnable            = $01               ; Bit[4..6]: X Scroll Offset (Will scroll Left)
@@ -97,13 +133,13 @@ BORDER_COLOR_R          = $D007
 BORDER_SIZE_X           = $D008         ; Values: 0 - 31 (Default: 31)
 BORDER_SIZE_Y           = $D009         ; Values: 0 - 31 (Default: 31)
 
-;---------------------------------------
+;--------------------------------------
 
 BACKGROUND_COLOR_B      = $D00D         ; When in Graphic Mode, if a pixel is "0" then the background pixel is chosen
 BACKGROUND_COLOR_G      = $D00E
 BACKGROUND_COLOR_R      = $D00F
 
-;---------------------------------------
+;--------------------------------------
 
 CURSOR_CTRL             = $D010         ; Bit[0] enable, Bit[1..2] flash rate, Bit[3] no flash
 ccEnable            = $01
@@ -117,7 +153,7 @@ CURSOR_CHAR_CODE        = $D012
 CURSOR_X                = $D014         ; [word]
 CURSOR_Y                = $D016         ; [word]
 
-;---------------------------------------
+;--------------------------------------
 
 ; Line Interrupt (SOL)
 LINE_IRQ_CTRL           = $D018         ; [W] Bit[0] - Enable
@@ -128,7 +164,7 @@ LINE_IRQ_VALUE          = $D019         ; [W] [word] Write Only Bits[11:0]
 RASTER_X                = $D018         ; [R] [word] pixel displacement on raster line Bits[11:0]
 RASTER_Y                = $D01A         ; [R] [word] raster line Bits[11:0]
 
-;---------------------------------------
+;--------------------------------------
 
 BITMAP0_CTRL            = $D100
 bmcEnable           = $01
@@ -145,7 +181,7 @@ BITMAP1_ADDR            = $D109         ; [long] Bits[18:0]
 BITMAP2_CTRL            = $D110
 BITMAP2_ADDR            = $D111         ; [long] Bits[18:0]
 
-;---------------------------------------
+;--------------------------------------
 
 TILE0_CTRL              = $D200
 tcEnable            = $01
@@ -204,7 +240,7 @@ TILESET6_ADDR_CFG       = $D29B
 TILESET7_ADDR           = $D29C         ; [long] Bits[18:0]
 TILESET7_ADDR_CFG       = $D29F
 
-;---------------------------------------
+;--------------------------------------
 
 XY_BASE_ADDR            = $D301         ; [long] [W] Bits[17:0]
 XY_POS_X                = $D304
@@ -214,7 +250,7 @@ XY_OFFSET               = $D308         ; [word] [R]
 XY_BANK                 = $D30A         ; [R]
 XY_ADDR                 = $D30B         ; [long] [R] Bits[17:0]
 
-;---------------------------------------
+;--------------------------------------
 
 SID1_BASE               = $D400
 SID1_FREQ1              = $D400         ; [word]
@@ -266,31 +302,21 @@ SID2_SIGVOL             = $D518
 SID2_RANDOM             = $D51B
 SID2_ENV3               = $D51C
 
-;---------------------------------------
+;--------------------------------------
 
-PSG1_BASE               = $D600     ; TODO:
-;PSG1_T1_FREQ            = $D600
-;PSG1_T1_ATTN            = $D601
-;PSG1_T2_FREQ            = $D602
-;PSG1_T2_ATTN            = $D603
-;PSG1_T3_FREQ            = $D604
-;PSG1_T3_ATTN            = $D605
-;PSG1_NOISE_CTRL         = $D606
-;PSG1_NOISE_ATTN         = $D607
-
-PSG_DUAL_BASE           = $D608
-
+PSG1_BASE               = $D600
 PSG2_BASE               = $D610
-;PSG2_T1_FREQ            = $D610
-;PSG2_T1_ATTN            = $D611
-;PSG2_T2_FREQ            = $D612
-;PSG2_T2_ATTN            = $D613
-;PSG2_T3_FREQ            = $D614
-;PSG2_T3_ATTN            = $D615
-;PSG2_NOISE_CTRL         = $D616
-;PSG2_NOISE_ATTN         = $D617
+PSG_DUAL_BASE           = $D608
+psgT1_FREQ          = $00
+psgT1_ATTN          = $01
+psgT2_FREQ          = $02
+psgT2_ATTN          = $03
+psgT3_FREQ          = $04
+psgT3_ATTN          = $05
+psgNOISE_CTRL       = $06
+psgNOISE_ATTN       = $07
 
-;---------------------------------------
+;--------------------------------------
 
 UART_DATA               = $D630
 UART_IER                = $D631
@@ -306,7 +332,7 @@ UART_DLL                = $D630
 UART_DLH                = $D631
 UART_PSD                = $D632
 
-;---------------------------------------
+;--------------------------------------
 
 PS2_CTRL                = $D640
 ps2KeybdWrite       = $02
@@ -326,38 +352,122 @@ ps2MouseAck         = $20
 ps2KeybdErr         = $40
 ps2KeybdAck         = $80
 
-;---------------------------------------
+;--------------------------------------
+
+TIMER0_CTRL             = $D650         ; [write-only]
+tmrcDown            = $00
+tmrcEnable          = $01
+tmrcClear           = $02
+tmrcLoad            = $04
+tmrcUp              = $08
+
+TIMER0_STATUS           = $D650         ; [read-only]
+tmrsNotEqual        = $00
+tmrsEqual           = $01
+
+TIMER0_VALUE            = $D651         ; [long]
+TIMER0_CMP_CTRL         = $D654
+tmrccClear          = $01
+tmrccLoad           = $02
+
+TIMER0_CMP              = $D655         ; [long]
+
+TIMER1_CTRL             = $D658         ; [write-only]
+TIMER1_STATUS           = $D658         ; [read-only]
+TIMER1_VALUE            = $D659         ; [long]
+TIMER1_CMP_CTRL         = $D65C
+TIMER1_CMP              = $D65D         ; [long]
+
+;--------------------------------------
 
 INT_PENDING_REG0        = $D660
+INT00_SOF           = $01
+INT00_SOL           = $02
+INT00_PS2_KBD       = $04
+INT00_PS2_MOUSE     = $08
+INT00_TIMER0        = $10
+INT00_TIMER1        = $20
+INT00_DMA           = $40
+INT00_CARTRIDGE     = $80
+
 INT_PENDING_REG1        = $D661
-INT_PENDING_REG2        = $D662 ; NOT USED
-INT_PENDING_REG3        = $D663 ; NOT USED
-FNX0_INT00_SOF      = $01
-FNX0_INT01_SOL      = $02
+INT01_UART          = $01
+INT01_COLL0         = $02
+INT01_COLL1         = $04
+INT01_COLL2         = $08
+INT01_RTC           = $10
+INT01_VIA0          = $20
+INT01_VIA1          = $40
+INT01_SDC           = $80
+
+INT_PENDING_REG2        = $D662
+INT02_DATA          = $01
+INT02_CLK           = $02
+INT02_ATN           = $04
+INT02_SREC          = $08
+
+INT_POL_REG0            = $D664
+INT_POL_REG1            = $D665
+INT_POL_REG2            = $D666
 
 INT_EDGE_REG0           = $D668
 INT_EDGE_REG1           = $D669
-INT_EDGE_REG2           = $D66A ; NOT USED
+INT_EDGE_REG2           = $D66A
 
 INT_MASK_REG0           = $D66C
 INT_MASK_REG1           = $D66D
-INT_MASK_REG2           = $D66E ; NOT USED
+INT_MASK_REG2           = $D66E
 
-FNX1_INT00_KBD      = $01
-FNX1_INT01_COL0     = $02               ; collision detection
-FNX1_INT02_COL1     = $04
-FNX1_INT03_COL2     = $08
+;--------------------------------------
 
-;---------------------------------------
+DIP_SWITCH              = $D670
+
+;--------------------------------------
+
+IEC_PORT_IN             = $D680
+iecI_DATA           = $01
+iecI_CLK            = $02
+iecI_ATN            = $10
+iecI_SREQ           = $80
+
+IEC_PORT_OUT            = $D681
+iecO_DATA           = $01
+iecO_CLK            = $02
+iecO_ATN            = $10
+iecO_NMI_EN         = $20
+iecO_RST            = $40
+iecO_SREQ           = $80
+
+;--------------------------------------
 
 RTC_SEC                 = $D690
+RTC_SEC_ALARM           = $D691
 RTC_MIN                 = $D692
+RTC_MIN_ALARM           = $D693
 RTC_HRS                 = $D694
+RTC_HRS_ALARM           = $D695
 RTC_DAY                 = $D696
+RTC_DAY_ALARM           = $D697
+RTC_DOW                 = $D698
+RTC_MON                 = $D699
+RTC_YEAR                = $D69A
+RTC_RATE                = $D69B
+RTC_EN                  = $D69C
+RTC_FLAG                = $D69D
+RTC_CTRL                = $D69E
+RTC_CENT                = $D69F
 
-;---------------------------------------
+;--------------------------------------
 
-MACHINE_ID              = $D6A7
+RNG_DAT                 = $D6A4         ; [word] [read-only]    16Bit RNG Generator
+RNG_SEED                = $D6A4         ; [word] [write-only]   16Bit RNG Generator
+RNG_CTRL                = $D6A6         ; [write-only]
+rcEnable        = $01                   ; Enable the LFSR BLOCK_LEN
+rcDV            = $02                   ; After setting the Seed value, Toggle this bit for it be registered
+
+;--------------------------------------
+
+MACHINE_ID              = $D6A7         ; [read-only]
 macC256_FMX         = $00
 macC256_U           = $01
 macF256_JR          = $02
@@ -370,7 +480,21 @@ macA2560M           = $0A
 macA2560K           = $0B
 macF256K            = $12
 
-;---------------------------------------
+;--------------------------------------
+
+LED_POWER_B             = $D6A7         ; [write-only]
+LED_POWER_G             = $D6A8
+LED_POWER_R             = $D6A9
+
+LED_MEDIA_B             = $D6AA
+LED_MEDIA_G             = $D6AB
+LED_MEDIA_R             = $D6AC
+
+LED_SHIFTLOCK_B         = $D6AD
+LED_SHIFTLOCK_G         = $D6AE
+LED_SHIFTLOCK_R         = $D6AF
+
+;--------------------------------------
 
 MOUSE_CTRL              = $D6E0
 mcEnable            = $01
@@ -378,22 +502,24 @@ mcLegacyMode        = $02
 
 MOUSE_X                 = $D6E2         ; [word]
 MOUSE_Y                 = $D6E4         ; [word]
-MOUSE_PACKET            = $D6E6         ; [3-byte] [legacy mode only]
+MOUSE_PACKET            = $D6E6         ; [long] [legacy mode only]
 
-;---------------------------------------
+;--------------------------------------
 
 C256F_MODEL_MAJOR       = $D70B
 C256F_MODEL_MINOR       = $D70C
 
-;--- IO PAGE 0 -------------------------
+;--------------------------------------
 
 FG_CHAR_LUT_PTR         = $D800         ; 16 entries = ARGB     $008060FF (medium slate blue)
                                         ;                       $00108020 (la salle green)
-BG_CHAR_LUT_PTR		    = $D840         ; 16 entries = ARGB
+BG_CHAR_LUT_PTR         = $D840         ; 16 entries = ARGB
 
-;---------------------------------------
+;--------------------------------------
 
-SP00_CTRL               = $D900
+SPRITE_BASE             = $D900
+
+; SP00_CTRL             = $D900
 scEnable            = $01
 scLUT0              = $00
 scLUT1              = $02
@@ -410,24 +536,24 @@ scSIZE_24           = $20
 scSIZE_16           = $40
 scSIZE_8            = $60
 
-SP00_ADDR               = $D901      ; [long] Bits[18:0]
-SP00_X                  = $D904      ; [word]
-SP00_Y                  = $D906      ; [word]
+; SP00_ADDR             = $D901      ; [long] Bits[18:0]
+; SP00_X                = $D904      ; [word]
+; SP00_Y                = $D906      ; [word]
 
-SP01_CTRL               = $D908
-SP01_ADDR               = $D909
-SP01_X                  = $D90C
-SP01_Y                  = $D90E
+; SP01_CTRL             = $D908
+; SP01_ADDR             = $D909
+; SP01_X                = $D90C
+; SP01_Y                = $D90E
 
-SP02_CTRL               = $D910
-SP02_ADDR               = $D911
-SP02_X                  = $D914
-SP02_Y                  = $D916
+; SP02_CTRL             = $D910
+; SP02_ADDR             = $D911
+; SP02_X                = $D914
+; SP02_Y                = $D916
 
-SP03_CTRL               = $D918
-SP03_ADDR               = $D919
-SP03_X                  = $D91C
-SP03_Y                  = $D91E
+; SP03_CTRL             = $D918
+; SP03_ADDR             = $D919
+; SP03_X                = $D91C
+; SP03_Y                = $D91E
 
 ;...
 
@@ -436,48 +562,7 @@ SP03_Y                  = $D91E
 ; SP63_X                = $DAFC
 ; SP63_Y                = $DAFE
 
-;---------------------------------------
-;---------------------------------------
-;   IO Bank 01
-;---------------------------------------
-
-FONT_MEMORY_BANK0       = $C000         ; [C000:C7FF]
-
 ;--------------------------------------
-
-GRPH_LUT0_PTR	        = $D000         ; [D000:D3FF]
-GRPH_LUT1_PTR	        = $D400         ; [D400:D7FF]
-GRPH_LUT2_PTR	        = $D800         ; [D800:DBFF]
-GRPH_LUT3_PTR	        = $DC00         ; [DC00:DFFF]
-
-
-;---------------------------------------
-;---------------------------------------
-;   IO Bank 02
-;---------------------------------------
-
-CS_TEXT_MEM_PTR         = $C000         ; [C000:DFFF]   ascii code for text character
-
-
-;---------------------------------------
-;---------------------------------------
-;   IO Bank 02
-;---------------------------------------
-CS_COLOR_MEM_PTR        = $C000         ; [C000:DFFF]   HiNibble = Foreground; LoNibble = Background
-                                        ;               0-15 = index into the CHAR_LUT tables
-
-
-;--------------------------------------
-
-JOYSTICK0               = $DC00         ; (R) Joystick 0
-JOYSTICK1               = $DC01
-JOY_UP              = $01               ;           1110            bit-0   UP
-JOY_DOWN            = $02               ;      1010   |   0110      bit-1   DOWN
-JOY_LEFT            = $04               ;          \  |  /          bit-2   LEFT
-JOT_RIGHT           = $08               ;   1011----1111----0111    bit-3   RIGHT
-JOT_BUTTON0         = $10               ;          /  |  \
-JOY_BUTTON1         = $20               ;      1001   |   0101
-JOY_BUTTON2         = $40               ;           1101
 
 LUTBkColor          = 0
 LUTPfColor0         = 1
@@ -498,48 +583,108 @@ LUTSprColor6        = 15
 LUTSprColor7        = 16
 
 ;--------------------------------------
+;   VIA #1 (F256K only)
 
-; READ
-RNG_DAT_LO              = $D6A4         ; Low-byte of 16Bit RNG Generator
-RNG_DAT_HI              = $D6A5         ; Hi-byte of 16Bit RNG Generator
+VIA1_IO_PORTB           = $DB00
+VIA1_IO_PORTA           = $DB01
+VIA1_DD_PORTB           = $DB02
+VIA1_DD_PORTA           = $DB03
+vddInput            = $00
+vddOuput            = $FF
+VIA1_COUNT_TIMER1       = $DB04         ; [word]
+VIA1_LATCH_TIMER1       = $DB06         ; [word]
+VIA1_COUNT_TIMER2       = $DB08         ; [word]
+VIA1_SDR                = $DB0A
+VIA1_ACR                = $DB0B
+vacLatchEnableA     = $01
+vacLatchEnableB     = $02
+VIA1_PCR                = $DB0C
+VIA1_IFR                = $DB0D
+VIA1_IER                = $DB0E
+VIA1_IO2_PORTA          = $DB0F
 
-; WRITE
-RNG_SEED_LO             = $D6A4         ; Low-byte of 16Bit RNG Generator
-RNG_SEED_HI             = $D6A5         ; Hi-byte of 16Bit RNG Generator
+;--------------------------------------
+;   VIA #0
 
-; WRITE
-RNG_CTRL                = $D6A6
-rcEnable        = $01                   ; Enable the LFSR BLOCK_LEN
-rcDV            = $02                   ; After Setting the Seed Value, Toggle that Bit for it be registered
+VIA0_IO_PORTB           = $DC00
+VIA0_IO_PORTA           = $DC01
+VIA0_DD_PORTB           = $DC02
+VIA0_DD_PORTA           = $DC03
+VIA0_COUNT_TIMER1       = $DC04         ; [word]
+VIA0_LATCH_TIMER1       = $DC06         ; [word]
+VIA0_COUNT_TIMER2       = $DC08         ; [word]
+VIA0_SDR                = $DC0A
+VIA0_ACR                = $DC0B
+VIA0_PCR                = $DC0C
+VIA0_IFR                = $DC0D
+VIA0_IER                = $DC0E
+VIA0_IO2_PORTA          = $DC0F
 
-;---------------------------------------
+; - - - - - - - - - - - - - - - - - - -
+
+JOYSTICK0               = $DC00         ; (R) Joystick 0
+JOYSTICK1               = $DC01
+joyUP               = $01               ;           1110            bit-0   UP
+joyDOWN             = $02               ;      1010   |   0110      bit-1   DOWN
+joyLEFT             = $04               ;          \  |  /          bit-2   LEFT
+joyRIGHT            = $08               ;   1011----1111----0111    bit-3   RIGHT
+joyButton0          = $10               ;          /  |  \
+joyButton1          = $20               ;      1001   |   0101
+joyButton2          = $40               ;           1101
+
+;--------------------------------------
+
+SDC_CTRL                = $DD00
+SDC_DATA                = $DD01
+
+;--------------------------------------
+
+MULU_A                  = $DE00         ; [word]
+MULU_B                  = $DE02         ; [word]
+MULU_RESULT             = $DE10         ; [dword]
+
+DIVU_DENOM              = $DE04         ; [word]
+DIVU_NUMR               = $DE06         ; [word]
+DIVU_RESULT             = $DE14         ; [dword]
+DIVU_RESULT_Q           = $DE14         ; [word]
+DIVU_RESULT_R           = $DE16         ; [word]
+
+ADD_A                   = $DE08         ; [dword]
+ADD_B                   = $DE0C         ; [dword]
+ADD_RESULT              = $DE18         ; [dword]
+
+;--------------------------------------
 
 DMA_CTRL                = $DF00         ; DMA Control Register
-dmaDISABLE      = $00
-dmaENABLE       = $01                   ; DMA engine is enabled
-dma2D           = $02                   ; DMA is 2D operation (otherwise it is 1D)
-dmaFILL         = $04                   ; DMA is a fill operation (otherwise DMA is a copy)
-dmaINT_EN       = $08                   ; Enable DMA interrupts
-dmaSTART        = $80                   ; Start the DMA operation
+dmaDisable      = $00
+dmaEnable       = $01                   ; DMA Engine is enabled
+dma2D           = $02                   ; DMA 2D operation (otherwise it is 1D)
+dmaFill         = $04                   ; DMA Fill operation (otherwise DMA Copy)
+dmaIntEnable    = $08                   ; Enable DMA interrupts
+dmaStart        = $80                   ; Start the DMA operation
 
-DMA_STATUS              = $DF01         ; DMA status register (Read Only)
-dmaBUSY         = $80                   ; DMA engine is busy with an operation
+DMA_STATUS              = $DF01         ; [read-only]   DMA status
+dmaBusy         = $80                   ; DMA Engine is busy with an operation
 
-DMA_FILL_VAL            = $DF01         ; Byte value to use for fill operations
+DMA_FILL_VAL            = $DF01         ; Byte value to use for Fill operations
 
-DMA_SRC_ADDR            = $DF04         ; Source address (system bus) for copy operations
-DMA_DST_ADDR            = $DF08         ; Destination address (system bus) for fill and copy operations
+DMA_SRC_ADDR            = $DF04         ; Source address (system bus) for Copy operations
+DMA_DST_ADDR            = $DF08         ; Destination address (system bus) for Fill/Copy operations
 
-DMA_COUNT               = $DF0C         ; Number of bytes to fill or copy (1D operations, 24 bit value)
-DMA_WIDTH               = $DF0C         ; Width of rectangle to fill or copy (2D operations, 16 bit value)
-DMA_HEIGHT              = $DF0E         ; Height of rectangle to fill or copy (2D operations, 16 bit value)
-DMA_STRIDE_SRC          = $DF10         ; Width of the source bitmap image in bytes (2D operations, 16 bit value)
-DMA_STRIDE_DST          = $DF12         ; Width of the destination bitmap image in bytes (2D operations, 16 bit value)
+;   1D operations
+DMA_COUNT               = $DF0C         ; [long]    Number of bytes to fill or copy
 
-;---------------------------------------
+;   2D operations
+DMA_WIDTH               = $DF0C         ; [word]    Width of rectangle to fill or copy
+DMA_HEIGHT              = $DF0E         ; [word]    Height of rectangle to fill or copy
+DMA_STRIDE_SRC          = $DF10         ; [word]    Width of the source bitmap image (bytes)
+DMA_STRIDE_DST          = $DF12         ; [word]    Width of the destination bitmap image (bytes)
 
-vecCOP                  = $FFF4
-vecABORT                = $FFF8
-vecNMI                  = $FFFA
-vecRESET                = $FFFC
-vecIRQ_BRK              = $FFFE
+;--------------------------------------
+
+vecCOP                  = $FFF4         ; [word]
+vecABORT                = $FFF8         ; [word]
+vecNMI                  = $FFFA         ; [word]
+vecRESET                = $FFFC         ; [word]
+vecIRQ_BRK              = $FFFE         ; [word]
+

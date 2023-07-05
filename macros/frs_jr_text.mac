@@ -20,3 +20,15 @@ frsSetCursor    .macro
                 lda #>\2
                 sta CURSOR_Y+1
                 .endmacro
+
+frsFont0        .macro
+                lda MASTER_CTRL_H
+                and #~mcFontSet1
+                sta MASTER_CTRL_H
+                .endmacro
+
+frsFont1        .macro
+                lda MASTER_CTRL_H
+                ora #mcFontSet1
+                sta MASTER_CTRL_H
+                .endmacro
