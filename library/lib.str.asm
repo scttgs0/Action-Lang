@@ -523,7 +523,7 @@ libst           .byte 0                 ; 1
 ;======================================
 libStrSTrig     .proc
                 tax
-                lda TRIG0,x
+                ;!!lda TRIG0,x
                 sta args
                 rts
                 .endproc
@@ -538,7 +538,7 @@ libStrSTrig     .proc
 ;======================================
 libStrPaddle    .proc
                 tax
-                lda PADDL0,x
+                ;!!lda PADDL0,x
                 sta args
                 rts
                 .endproc

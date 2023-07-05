@@ -37,7 +37,7 @@ MultI           .proc
                 dex
                 stx math._t2
                 ldx #8
-_mc3            asl a                   ; b*d, 16 bit result
+_mc3            asl                     ; b*d, 16 bit result
                 rol math._rh
                 asl math._t1
                 bcc _mc4
@@ -96,7 +96,7 @@ MulB            .proc
                 stx math._t1
                 lda #0
                 ldx #8
-_mb1            asl a
+_mb1            asl
                 asl math._t1
                 bcc _mb2
 

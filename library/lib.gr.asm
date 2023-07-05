@@ -124,14 +124,14 @@ libGrSetColor   .proc
                 and #$0f
                 sta arg2
                 txa
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 ora arg2
                 ldx arg0
-                sta COLOR0,x
-                sta COLPF0,x
+                ;!!sta COLOR0,x
+                ;!!sta COLPF0,x
 _sc1            rts
                 .endproc
 

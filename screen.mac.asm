@@ -53,19 +53,19 @@ putch           .proc
                 tay
                 lda #0
                 tax
-putch1          stx DSPFLG
-                asl a
-                asl a
-                asl a
-                asl a
+putch1          ;!!stx DSPFLG
+                asl
+                asl
+                asl
+                asl
                 tax
                 lda #$0b                ; PUTCHR
-putch2          sta IOCB0+ICCOM,x
+putch2          ;!!sta IOCB0+ICCOM,x
                 lda #0
-                sta IOCB0+ICBLL,x
-                sta IOCB0+ICBLH,x
+                ;!!sta IOCB0+ICBLL,x
+                ;!!sta IOCB0+ICBLH,x
                 tya
-                jmp CIOV
+                ;!!jmp CIOV
 
                 .endproc
 

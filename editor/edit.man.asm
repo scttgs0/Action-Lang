@@ -23,7 +23,7 @@ _fm1            lda curch
                 jsr EditorInit.fcmsg1
 
                 lda curch
-                ldy CH1
+                ;!!ldy CH1
                 cpy #$c0                ; Ctrl-Shft
                 bcs _fmcs
 

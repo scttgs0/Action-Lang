@@ -24,7 +24,7 @@ _lshift         ldy _d
                 beq _lshret
 
                 stx _c
-_lsh1           asl a
+_lsh1           asl
                 rol _c
                 dey
                 bne _lsh1
@@ -207,7 +207,7 @@ _mnundec        lda #1
                 beq _varerr
 
                 tay
-                sta bank+lbank
+                ;!!sta bank+lbank
                 lda #1
                 jsr gprop
                 jsr RestoreBank
@@ -414,7 +414,7 @@ _c1             lda stbase
                 cmp qcode+1
                 bcs alpha._alpha2       ; return
 
-cderr           sta bank+ebank
+cderr           ;!!sta bank+ebank
                 jsr SPLsetup            ; reset compiler
 
                 ldy #qcodeERR           ; out of qcode space

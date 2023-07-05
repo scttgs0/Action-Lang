@@ -10,13 +10,13 @@
 ;======================================
 libKeyGetKey    .proc
 ;   get next key in buffer
-_waitForKey     lda CH_                 ; key down?
+_waitForKey     ;!!lda CH_                 ; key down?
                 eor #$ff
                 bne _gk0
 
                 bra _waitForKey
 
-_gk0            ldx SRTIMR              ; faster repeat
+_gk0            ;!!ldx SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5
 
@@ -24,8 +24,8 @@ _gk0            ldx SRTIMR              ; faster repeat
                 bcc _gk2
 
                 ldx #3
-_gk1            stx SRTIMR
-_gk2            lda CH_
+_gk1            ;!!stx SRTIMR
+_gk2            ;!!lda CH_
                 cmp #$c0
                 bcc _gk3                ; not Ctrl-Shft
 
@@ -44,27 +44,27 @@ _gkey           ldx #$70
                 sta BRKKEY              ; ignore BREAK key
                 jsr putch.putch2
 
-_gk4            ldx SRTIMR
+_gk4            ;!!ldx SRTIMR
                 cpx #10
                 bcs _gkret
 
                 ldx #3
-                stx SRTIMR
+                ;!!stx SRTIMR
 _gkret          sta curch
                 rts
 
 _gk5            ldx #20
                 bne _gk1
 
-_caps           lda CH_
+_caps           ;!!lda CH_
                 and #$c0                ; isolate control (128) and uppercase (64)
-                sta SHFLOK
+                ;!!sta SHFLOK
 _caps1          jsr libKeyClick
                 bmi libKeyGetKey
 
-_atari          lda INVFLG
+_atari          ;!!lda INVFLG
                 eor #$80
-                sta INVFLG
+                ;!!sta INVFLG
                 jmp _caps1
 
                 .endproc
@@ -76,10 +76,10 @@ _atari          lda INVFLG
 libKeyClick     .proc
                 ldx #$7f
 _click1         stx CONSOL
-                stx WSYNC
+                ;!!stx WSYNC
                 dex
                 bpl _click1
 
-                stx CH_
+                ;!!stx CH_
                 rts
                 .endproc

@@ -9,9 +9,9 @@
 ; Initialize memory
 ;======================================
 MemoryInit      .proc
-                lda MEMLO
+                ;!!lda MEMLO
                 sta afbase
-                lda MEMLO+1
+                ;!!lda MEMLO+1
                 sta afbase+1
 
                 lda #0
@@ -21,11 +21,11 @@ MemoryInit      .proc
                 sta (afbase),y
 
                 sec
-                lda MEMTOP
+                ;!!lda MEMTOP
                 sbc afbase
                 iny
                 sta (afbase),y
-                lda MEMTOP+1
+                ;!!lda MEMTOP+1
                 sbc afbase+1
                 iny
                 sta (afbase),y
@@ -94,14 +94,14 @@ Window2Init     .proc
 ;======================================
 EditorInit      .proc
                 lda #<$7FFF
-                sta MEMTOP
+                ;!!sta MEMTOP
                 lda #>$7FFF
-                sta MEMTOP+1
+                ;!!sta MEMTOP+1
 
                 lda #<$0600
-                sta MEMLO
+                ;!!sta MEMLO
                 lda #>$0600
-                sta MEMLO+1
+                ;!!sta MEMLO+1
 
                 jsr MemoryInit          ; initialize editor memory
 

@@ -32,9 +32,9 @@ print           .proc
                 bne print1
 
                 lda #$0b
-                sta IOCB0+ICCOM,x
+                ;!!sta IOCB0+ICCOM,x
                 lda #eol
-                jmp CIOV
+                ;!!jmp CIOV
 
 print1          rts
                 .endproc
@@ -69,6 +69,7 @@ input           .proc
 input1          stx arg5
                 ldx #0
                 stx arg3
+
                 .endproc
 
                 ;[fall-through]
@@ -78,36 +79,36 @@ input1          stx arg5
 ;   XIOstr(device,,cmd,aux1,aux2,str)
 ;======================================
 xiostr          .proc
-                asl a
-                asl a
-                asl a
-                asl a
+                asl                     ; *16
+                asl
+                asl
+                asl
                 tax
                 tya
-                sta IOCB0+ICCOM,x       ; command
+                ;!!sta IOCB0+ICCOM,x       ; command
                 lda arg3
                 beq _xs1
 
-                sta IOCB0+ICAX1,x
+                ;!!sta IOCB0+ICAX1,x
                 lda arg4
-                sta IOCB0+ICAX2,x
+                ;!!sta IOCB0+ICAX2,x
 
                 lda #0
 _xs1            tay
-                sta IOCB0+ICBLH,x
+                ;!!sta IOCB0+ICBLH,x
                 lda (arg5),y
-                sta IOCB0+ICBLL,x       ; size
+                ;!!sta IOCB0+ICBLL,x       ; size
 
                 beq print.print1        ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta IOCB0+ICBAL,x       ; buffer address
+                ;!!sta IOCB0+ICBAL,x       ; buffer address
                 lda arg6
                 adc #0
-                sta IOCB0+ICBAH,x
-                jmp CIOV
+                ;!!sta IOCB0+ICBAH,x
+                ;!!jmp CIOV
 
                 .endproc
 
@@ -117,7 +118,7 @@ _xs1            tay
 ;======================================
 output          .proc
                 sty arg6
-                ldy #$0b
+                ldy #$0B
                 bne input.input1
 
                 .endproc
@@ -179,7 +180,7 @@ ReadBuffer      .proc
 inputs          jsr input
 
                 sty arg0
-                lda IOCB0+ICBLL,x       ; size
+                ;!!lda IOCB0+ICBLL,x       ; size
                 beq _1
 
                 sec
@@ -254,7 +255,7 @@ sermsg          .text 7,"Error: "
 ctostr          .proc
                 sta FR0
                 stx FR0+1
-                jsr IFP                 ; Cardinal to real
+                ;!!jsr IFP                 ; Cardinal to real
 
                 .endproc
 
@@ -263,7 +264,7 @@ ctostr          .proc
 ;   RToStr() - real in FR0
 ;======================================
 rtostr          ;.proc
-                jsr FASC
+                ;!!jsr FASC
 
                 ldy #$ff
                 ldx #0
@@ -285,8 +286,8 @@ _rts1           iny
 ;======================================
 dspoff          .proc
                 lda jt_tvdisp
-                sta SDMCTL
-                sta DMACTL
+                ;!!sta SDMCTL
+                ;!!sta DMACTL
                 rts
                 .endproc
 
@@ -296,10 +297,10 @@ dspoff          .proc
 ;======================================
 dspon           .proc
                 lda #$22
-                sta SDMCTL
-                sta DMACTL
+                ;!!sta SDMCTL
+                ;!!sta DMACTL
                 lda bckgrnd             ; background color
-                sta COLOR4              ; restore background
+                ;!!sta COLOR4              ; restore background
                 rts
                 .endproc
 
@@ -435,7 +436,7 @@ _htcok          sta arg5
 ;   RToCar()
 ;======================================
 rtocar          .proc
-                jsr FPI
+                ;!!jsr FPI
                 bcs rcerr
 
 htcrtn          lda FR0
@@ -456,7 +457,7 @@ storeal         .proc
                 sty CIX
                 sta INBUFF
                 stx INBUFF+1
-                jmp AFP
+                ;!!jmp AFP
 
                 .endproc
 

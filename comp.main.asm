@@ -47,8 +47,8 @@ _spl2           jsr GetNext
                 lda #1                  ; save run address
                 jsr cprop
 
-                sta INITAD
-                stx INITAD+1
+                ;!!sta INITAD
+                ;!!stx INITAD+1
 
 ;   insert return, just in case
 _rtn            lda #$60                ; RTS
@@ -102,17 +102,17 @@ _spl3           ldy #1
                 ; bne _SPL3
 
                 lda qcode
-                cmp MEMTOP
+                ;!!cmp MEMTOP
                 lda qcode+1
-                sbc MEMTOP+1
+                ;!!sbc MEMTOP+1
                 bcs enderror._spl5
 
 _splrtn         rts
 
 _spl4           jsr getcdoff            ; no main PROC
 
-                sta INITAD
-                stx INITAD+1
+                ;!!sta INITAD
+                ;!!stx INITAD+1
                 jsr stmtlist
 
                 cmp #tokEOF
@@ -2318,8 +2318,8 @@ gops            ldy #0
                 tax
                 lda vartype-1,x
                 sta arg3
-                asl a
-                asl a
+                asl
+                asl
                 sta arg5
                 ldy #7
                 lda (stack),y
@@ -2398,7 +2398,7 @@ codegen         .proc
 cg1             jsr jt_cgend
 
                 lda arg0
-                asl a
+                asl
                 clc
                 adc arg0
                 tay

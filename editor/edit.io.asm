@@ -268,7 +268,7 @@ keybd           .text 2,"K:"
 ;======================================
 GotKey          .proc
 ;   test if key in buffer
-                lda CH_                 ; key down?
+                ;!!lda CH_                 ; key down?
                 eor #$ff
                 rts
                 .endproc

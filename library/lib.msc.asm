@@ -15,7 +15,7 @@
 ; number between 0 and 255 is returned
 ;======================================
 libMscRand      .proc
-                ldx RANDOM
+                .frsRandomByteX
                 cmp #0
                 beq _rand1
 
@@ -35,7 +35,7 @@ _rand1          stx args
 ; and volume.  Assumes volume low  16.
 ;======================================
 libMscSound     .proc
-                asl a
+                asl
                 sty arg2
                 tay
                 cmp #7
@@ -45,14 +45,14 @@ libMscSound     .proc
                 jsr jt_error
 
 _snd1           txa
-                sta AUDF1,y
+                ;!!sta AUDF1,y
                 lda arg2
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 ora arg3
-                sta AUDC1,y
+                ;!!sta AUDC1,y
                 rts
                 .endproc
 
@@ -62,13 +62,13 @@ _snd1           txa
 ; reset sound channels
 ;======================================
 libMscSndRst    .proc
-                lda SSKCTL
+                ;!!lda SSKCTL
                 and #$ef                ; turn off two tone bit
-                sta SSKCTL
-                sta SKCTL
+                ;!!sta SSKCTL
+                ;!!sta SKCTL
                 lda #0
                 ldx #8
-_sr1            sta AUDF1,x             ; zero sound regs
+_sr1            ;!!sta AUDF1,x             ; zero sound regs
                 dex
                 bpl _sr1
 
@@ -99,7 +99,7 @@ libMscPTrig     .proc
                 inx
                 and #3
 _pt1            tay
-                lda PORTA,x
+                ;!!lda PORTA,x
                 and _pt2,y
                 sta args
                 rts
@@ -123,14 +123,14 @@ libMscStick     .proc
                 inx
                 and #1
 _stk1           tay
-                lda PORTA,x
+                ;!!lda PORTA,x
                 dey
                 bne _stk2
 
-                lsr a
-                lsr a
-                lsr a
-                lsr a
+                lsr
+                lsr
+                lsr
+                lsr
 _stk2           and #$0f
                 sta args
                 rts
@@ -144,7 +144,7 @@ _stk2           and #$0f
 ;
 ; see LIB.ST
 ;STrig tax
-;                lda TRIG0,x
+;                ;!!lda TRIG0,x
 ;                sta args
 ;                rts
 ;======================================

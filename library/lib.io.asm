@@ -25,10 +25,10 @@ libIOChkErr     .proc
                 jmp jt_error
 
 _ce1            txa
-                lsr a
-                lsr a
-                lsr a
-                lsr a
+                lsr
+                lsr
+                lsr
+                lsr
                 tax
                 tya
                 sta eof,x
@@ -313,18 +313,18 @@ libIOInputD     .proc
 libIOGetD       .proc
                 ldx #$07
 ccio            stx arg4
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 tax
                 lda arg4
-                sta IOCB0+ICCOM,x
+                ;!!sta IOCB0+ICCOM,x
                 lda #0
-                sta IOCB0+ICBLL,x
-                sta IOCB0+ICBLH,x
+                ;!!sta IOCB0+ICBLL,x
+                ;!!sta IOCB0+ICBLH,x
                 tya
-                jsr CIOV
+                ;!!jsr CIOV
 
                 sta args
                 jmp libIOChkErr
@@ -714,9 +714,9 @@ _i4             lda (arg4),y
                 lda arg1
                 pha
                 lda arg0
-                asl a
+                asl
                 rol arg1
-                asl a
+                asl
                 rol arg1
                 clc
                 adc arg0
@@ -761,22 +761,22 @@ _i7             rts
 libIONote       .proc
                 stx arg1
                 sty arg2
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 tax
                 lda #$26                ; NOTE
-                sta IOCB0+ICCOM,x
-                jsr CIOV
+                ;!!sta IOCB0+ICCOM,x
+                ;!!jsr CIOV
                 jsr libIOChkErr
 
                 ldy #0
-                lda IOCB0+ICAX5,x       ; offset
+                ;!!lda IOCB0+ICAX5,x       ; offset
                 sta (arg3),y
-                lda IOCB0+ICAX3,x       ; low byte of sector
+                ;!!lda IOCB0+ICAX3,x       ; low byte of sector
                 sta (arg1),y
-                lda IOCB0+ICAX4,x       ; high byte of sector
+                ;!!lda IOCB0+ICAX4,x       ; high byte of sector
                 iny
                 sta (arg1),y
                 rts
@@ -792,20 +792,20 @@ libIONote       .proc
 ;======================================
 libIOPoint      .proc
                 stx arg1
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 tax
                 tya                     ; sector+1
-                sta IOCB0+ICAX4,x
+                ;!!sta IOCB0+ICAX4,x
                 lda arg1                ; sector
-                sta IOCB0+ICAX3,x
+                ;!!sta IOCB0+ICAX3,x
                 lda arg3                ; offset
-                sta IOCB0+ICAX5,x
+                ;!!sta IOCB0+ICAX5,x
                 lda #$25                ; POINT
-                sta IOCB0+ICCOM,x
-                jsr CIOV
+                ;!!sta IOCB0+ICCOM,x
+                ;!!jsr CIOV
 
                 jmp libIOChkErr
 
