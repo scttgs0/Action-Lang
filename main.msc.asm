@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: main.msc.asm
 ;======================================
@@ -410,7 +411,7 @@ _s1             lda stmax
                 cmp symtab+1
                 bcs alpha._alpha2       ; return
 
-                ldy #61                 ; out of s.t. space
+                ldy #61                 ; out of symbol table space
                 jmp splerr
 
                 .endproc

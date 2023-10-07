@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: edit.ini.asm
 ;======================================
@@ -29,11 +30,13 @@ minit           .proc                   ; initialize memory
                 sta afbase
                 lda MEMLO+1
                 sta afbase+1
+
                 lda #0
                 tay
                 sta (afbase),y
                 iny
                 sta (afbase),y
+
                 sec
                 lda MEMTOP
                 sbc afbase

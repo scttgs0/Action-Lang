@@ -1,3 +1,4 @@
+
 ;======================================
 ;   FILE: main.io.asm
 ;======================================
@@ -105,6 +106,7 @@ xiostr          .proc
                 sta IOCB0+ICAX1,x
                 lda arg4
                 sta IOCB0+ICAX2,x
+
                 lda #0
 _xs1            tay
                 sta IOCB0+ICBLH,x
@@ -182,6 +184,7 @@ rdbuf           .proc
                 nop
                 nop
                 nop
+
                 ldy #0
                 tax
                 lda #240
@@ -384,7 +387,7 @@ _oc2            lda chan
                 jsr open
                 bpl printbuf
 
-                jmp splerr              ; oopps error in open
+                jmp splerr              ; oops, error in Open
 
                 .endproc
 
