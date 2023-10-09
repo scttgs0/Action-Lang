@@ -13,7 +13,7 @@ Find            .proc
                 jsr SaveWindow
 
                 lda lastch
-                cmp #$f8
+                cmp #$F8
                 beq find2
 
                 lda #<findmsg
@@ -23,7 +23,7 @@ find1           ldy #>findbuf
                 ldy #<findbuf
                 jsr CommandString
 
-                lda #$f8
+                lda #$F8
                 sta curch
 
 find2           lda findbuf
@@ -90,7 +90,7 @@ Found           .proc
                 tya
                 jsr Back.back0
 
-                lda #$fe
+                lda #$FE
                 rts
                 .endproc
 

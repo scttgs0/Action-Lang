@@ -36,7 +36,7 @@ _pbuf1          iny
 _pbret          ldy sp
                 lda curch
                 sta (buf),y
-                lda #$ff
+                lda #$FF
                 sta isDirty
                 jsr dspbuf
 
@@ -178,7 +178,7 @@ Delete_         .proc
                 ldx delbuf+1
                 stx dirty
                 ldy lastch
-                cpy #$9c
+                cpy #$9C
                 beq _del1
 
                 jsr DeleteFree

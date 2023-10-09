@@ -63,7 +63,7 @@ _snd1           txa
 ;======================================
 libMscSndRst    .proc
                 ;!!lda SSKCTL
-                and #$ef                ; turn off two tone bit
+                and #$EF                ; turn off two tone bit
                 ;!!sta SSKCTL
                 ;!!sta SKCTL
                 lda #0
@@ -131,7 +131,7 @@ _stk1           tay
                 lsr
                 lsr
                 lsr
-_stk2           and #$0f
+_stk2           and #$0F
                 sta args
                 rts
                 .endproc

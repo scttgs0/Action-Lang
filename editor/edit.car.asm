@@ -73,7 +73,7 @@ Start           .proc
 _warm           lda isMonitorLive       ; see where we were
                 beq _w1
 
-                jmp Monitor._mon1
+                jmp Monitor._ENTRY1
 
 _w1             jmp GeneralMemErr.Punt  ; editor
 
@@ -83,7 +83,7 @@ _nextZero       sta $0480,y             ; zero RAM
                 dey
                 bne _nextZero
 
-                ldy #$3a
+                ldy #$3A
 _nextJmps       lda emjmps-1,y          ; init RAM
                 dey
                 sta jt_jmps,y

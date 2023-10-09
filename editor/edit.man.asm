@@ -24,11 +24,11 @@ _fm1            lda curch
 
                 lda curch
                 ;!!ldy CH1
-                cpy #$c0                ; Ctrl-Shft
+                cpy #$C0                ; Ctrl-Shft
                 bcs _fmcs
 
                 ldy lastch
-                cpy #$1b                ; escape
+                cpy #$1B                ; escape
                 bne _fmch
 
                 cmp #eol

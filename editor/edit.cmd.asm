@@ -173,7 +173,7 @@ InsertToggle    .proc
                 inc insert
                 beq _it1
 
-                lda #$ff
+                lda #$FF
                 sta insert
                 lda #<_imsg
                 ldx #>_imsg
@@ -370,7 +370,7 @@ SetSpacing      .proc
 MoveDown        .proc
                 ldy #+0-40              ; rowSize
                 sty arg5
-                ldy #$ff
+                ldy #$FF
                 bne MoveContent
 
                 .endproc

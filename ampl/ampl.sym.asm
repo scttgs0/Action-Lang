@@ -61,7 +61,7 @@ stmres          jmp (jt_stmradr)
 iSTMres         .proc
                 ldy arg14
                 cpy #8
-_stmr0          lda #$ff                ; if name too long!
+_stmr0          lda #$FF                ; if name too long!
                 bcs _stmr3              ; not reserved name
 
                 iny

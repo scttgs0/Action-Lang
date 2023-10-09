@@ -13,7 +13,7 @@ Substitute      .proc
                 jsr SaveWindow
 
                 lda lastch
-                cmp #$7d
+                cmp #$7D
                 beq _s2
 
                 pha
@@ -31,10 +31,10 @@ Substitute      .proc
                 bne _s0
 
                 ldx subbuf+1
-                cpx #$1b
+                cpx #$1B
                 beq _s1
 
-_s0             cmp #$f8
+_s0             cmp #$F8
                 beq _s3                 ; string already found
 
                 lda #<formsg
@@ -47,7 +47,7 @@ _s1             rts
 _s2             jsr Find.find2
                 beq _s1
 
-_s3             lda #$7d
+_s3             lda #$7D
                 sta curch
                 sta isDirty             ; flag line as dirty
                 sec

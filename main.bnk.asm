@@ -221,7 +221,7 @@ splerr          .proc
 emloop          .proc
                 jsr EditBank
 
-                jmp Monitor._mloop
+                jmp Monitor._ENTRY2
 
                 .endproc
 

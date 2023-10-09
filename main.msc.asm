@@ -372,7 +372,7 @@ alpha           .proc
                 cpx #'a'
                 bmi _alpha1
 
-                cpx #$7b
+                cpx #$7B
                 bmi _alpha2
 
 _alpha1         ldx #0

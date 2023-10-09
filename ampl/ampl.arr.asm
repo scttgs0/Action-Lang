@@ -39,10 +39,12 @@ _arptr          ldy #0
 ;   page zero pointer
                 ldy #1
                 sta (stack),y
+
                 dey
                 lda (stack),y
-                ora #$b0                ; temp array mode
+                ora #$B0                ; temp array mode
                 sta (stack),y
+
                 rts
 
 _arpt1          jsr zerost
@@ -64,8 +66,10 @@ _arr0           jsr pushnext
 _ar0            ldy #7
                 lda (stack),y
 arra0           pha
+
                 lda #tokVAR_t+tokCARD_t
                 sta (stack),y
+
                 lda #tokPLUS
                 jsr genops
 
@@ -75,8 +79,9 @@ arra0           pha
 
                 and #7
                 tax
-                ora #$b0                ; temp array mode
+                ora #$B0                ; temp array mode
                 sta arg7
+
                 ldy arg1
                 cpy #tokCONST_t+tokSTR_t
                 ldy #1                  ; clear Z flag if we branch
@@ -98,13 +103,13 @@ _ar1            sta FR1
 
 _arint          jsr GetTemps
 
-                lda #$a1                ; LDA
+                lda #$A1                ; LDA
                 ldx FR1
                 beq _ari1
 
                 jsr Load2L
 
-                lda #$0a                ; ASL A
+                lda #$0A                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
                 jsr Push3
@@ -116,16 +121,17 @@ _arint          jsr GetTemps
                 nop
                 nop
         .endif
+
 _ari1           jsr LoadX.Op1L
                 jsr STempL
 
-                lda #$a1                ; LDA
+                lda #$A1                ; LDA
                 ldx FR1
                 beq _ari2
 
                 jsr Load2H
 
-                lda #$2a                ; ROL A
+                lda #$2A                ; ROL A
                 ldx #$28                ; PLP, restore carry
                 jsr Push2
 
@@ -140,6 +146,7 @@ _arbyte         jmp codegen.cg1
 
 _arsmall        ldy #7
                 sta (stack),y           ; restore correct type
+
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
@@ -148,11 +155,13 @@ _arsmall        ldy #7
 
                 ldy #10
                 sta (stack),y
+
                 ldy #2
                 jsr LoadI
 
                 ldy #11
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
+
                 jmp popst
 
                 .endproc

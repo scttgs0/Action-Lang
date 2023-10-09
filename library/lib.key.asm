@@ -11,13 +11,13 @@
 libKeyGetKey    .proc
 ;   get next key in buffer
 _waitForKey     ;!!lda CH_                 ; key down?
-                eor #$ff
+                eor #$FF
                 bne _gk0
 
                 bra _waitForKey
 
 _gk0            ;!!ldx SRTIMR              ; faster repeat
-                cpx #$0c
+                cpx #$0C
                 bcs _gk5
 
                 cpx #4
@@ -26,14 +26,14 @@ _gk0            ;!!ldx SRTIMR              ; faster repeat
                 ldx #3
 _gk1            ;!!stx SRTIMR
 _gk2            ;!!lda CH_
-                cmp #$c0
+                cmp #$C0
                 bcc _gk3                ; not Ctrl-Shft
 
 _cskey          jsr libKeyClick
                 bra _gk4
 
-_gk3            and #$3f
-                cmp #$3c                ; caps key
+_gk3            and #$3F
+                cmp #$3C                ; caps key
                 beq _caps
 
                 cmp #$27                ; Atari key
@@ -57,7 +57,7 @@ _gk5            ldx #20
                 bne _gk1
 
 _caps           ;!!lda CH_
-                and #$c0                ; isolate control (128) and uppercase (64)
+                and #$C0                ; isolate control (128) and uppercase (64)
                 ;!!sta SHFLOK
 _caps1          jsr libKeyClick
                 bmi libKeyGetKey
@@ -74,7 +74,7 @@ _atari          ;!!lda INVFLG
 ;   Click() click the keyboard
 ;======================================
 libKeyClick     .proc
-                ldx #$7f
+                ldx #$7F
 _click1         stx CONSOL
                 ;!!stx WSYNC
                 dex

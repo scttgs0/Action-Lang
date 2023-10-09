@@ -362,7 +362,7 @@ libIOPut        .proc
 libIOPutD       .proc
                 stx arg1
                 ldy arg1
-putd1           ldx #$0b
+putd1           ldx #$0B
                 jmp libIOGetD.ccio
 
                 .endproc

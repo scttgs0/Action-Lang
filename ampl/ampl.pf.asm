@@ -50,7 +50,7 @@ _c4             ldx numargs
                 lda argtypes-1,x
                 ldx argbytes
                 stx abt+3
-                cmp #$7f
+                cmp #$7F
                 bcs _c5                 ; one byte arg
 
                 sta temps-args+1,x

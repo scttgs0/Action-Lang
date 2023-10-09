@@ -6,7 +6,7 @@
 
 
 ;======================================
-; Monitor for ACTION!
+;   Monitor for ACTION!
 ;======================================
 Monitor         .proc
                 jsr SaveWorld
@@ -17,34 +17,40 @@ Monitor         .proc
 
                 lda top+1
                 sta top1
-_mon1           jsr scrinit
+
+_ENTRY1         jsr scrinit
 
                 ldx #1
                 stx ROWCRS
                 stx isMonitorLive
+
                 dex
                 stx cmdln
                 stx device
+
                 jsr SPLsetup
 
-_mloop          jsr InitKeys
+_ENTRY2
+_next1          jsr InitKeys
 
                 lda DINDEX              ; display mode
-                beq _mon2
+                beq _1
 
                 jsr scrinit             ; get Graphics(0)
-_mon2           jsr jt_alarm
+
+_1              jsr jt_alarm
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
                 jsr GetTemp
 
                 ldy tempbuf
-                beq _mloop
+                beq _next1
 
                 lda #0
                 sta top+1
                 sta Channel
+
                 lda #<tempbuf
                 ldx #>tempbuf
                 ldy sp
@@ -54,18 +60,28 @@ _mon2           jsr jt_alarm
 
                 lda tempbuf+1
                 ora #$20
-                ldx #<mcmd
-                ldy #>mcmd
+                ldx #<monitorCmd
+                ldy #>monitorCmd
                 jsr lookup
 
-                jmp _mloop
+                jmp _next1
 
-_mquit          ldy #0
+                .endproc
+
+
+;--------------------------------------
+;
+;--------------------------------------
+MonQuit         .proc
+                ldy #0
                 sty isMonitorLive
                 sty subbuf
                 sty findbuf
                 sty isDirty
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -74,16 +90,18 @@ _mquit          ldy #0
 RSTwnd          .proc
                 lda #23
                 sta cmdln
+
                 lda numwd
-                beq _rw1
+                beq _1
 
                 lda jt_wsize
                 sta cmdln
+
                 lda #w2-w1
                 jsr PaintW
 
                 lda #0
-_rw1            jsr PaintW
+_1              jsr PaintW
                 jsr EditorInit.fcmsg1
 
                 jmp floop
@@ -109,20 +127,21 @@ PaintW          .proc
 MDump           .proc
                 jsr MPrint
 
-_md1            inc arg11
-                bne _md2
+_next1          inc arg11
+                bne _1
 
                 inc arg12
-_md2            lda arg11
-                ldx arg12
-                jsr MPrint._mp1
-                jsr GotKey
-                beq _md1
 
-                ldx #$ff
+_1              lda arg11
+                ldx arg12
+                jsr MPrint._ENTRY1
+                jsr GotKey
+                beq _next1
+
+                ldx #$FF
                 ;!!stx CH_
-                cmp #$de
-                bne _md1
+                cmp #$DE
+                bne _next1
 
                 rts
                 .endproc
@@ -133,7 +152,8 @@ _md2            lda arg11
 ;======================================
 MPrint          .proc
                 jsr MpSave
-_mp1            jsr printc
+
+_ENTRY1         jsr printc
 
                 ldy #','
                 jsr putchar
@@ -174,8 +194,10 @@ MpLoad          .proc
                 ldy #1
                 lda (arg11),y
                 tax
+
                 dey
                 lda (arg11),y
+
                 rts
                 .endproc
 
@@ -188,6 +210,7 @@ MpSave          .proc
 
                 sta arg11
                 stx arg12
+
                 rts
                 .endproc
 
@@ -199,10 +222,11 @@ Boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr YesNo
-
-                bne MRun._mwrt1
+                bne MRun._XIT
 
                 jmp Start.cold
+
+;--------------------------------------
 
 _bmsg           .text 6,"Boot? "
                 .endproc
@@ -214,24 +238,26 @@ _bmsg           .text 6,"Boot? "
 MRun            .proc
                 lda nxttoken
                 cmp #tokEOF
-                beq _mr1
+                beq _1
 
                 cmp #tokQuote           ; compile and go?
-                bne _mr2                ; no
+                bne _2                  ;   no
 
                 jsr Comp
 
-_mr1            ;!!lda INITAD
+_1              ;!!lda INITAD
                 ;!!ldx INITAD+1
-                bne _mr3
+                bne _3
 
-_mwrt1          rts
+_XIT            rts
 
-_mr2            jsr mnum
-_mr3            jsr run
+_2              jsr mnum
+
+_3              jsr run
 
                 lda #0
                 sta device
+
                 rts
                 .endproc
 
@@ -242,26 +268,30 @@ _mr3            jsr run
 MWrite          .proc                   ; write object file
                 lda nxttoken
                 cmp #tokQuote
-                bne MRun._mwrt1         ; no output file!
+                bne MRun._XIT           ; no output file!
 
                 ;!!lda INITAD+1
-                beq MRun._mwrt1         ; no program!!
+                beq MRun._XIT           ; no program!!
 
                 lda #1
                 sta Channel
+
                 lda #8                  ; output
                 jsr openchan
 
 ;   write header
                 lda #6
                 sta arg9
-                lda #$ff
+
+                lda #$FF
                 sta arg10               ; $FF
                 sta arg11               ; $FF
+
                 clc
                 lda codebase            ; starting address
                 adc codeoff
                 sta arg12
+
                 lda codebase+1
                 adc codeoff+1
                 sta arg13
@@ -271,18 +301,20 @@ MWrite          .proc                   ; write object file
                 lda arg12
                 adc codesize
                 sta arg14
-                bne _mw2
+                bne _1
 
                 dex
-_mw2            dec arg14
+
+_1              dec arg14
                 txa
                 adc codesize+1
                 sta arg15
+
                 jsr MWOut
 
 ;   write the qcode
                 ldx #$10
-                lda #$0b                ; output command
+                lda #$0B                ; output command
                 ;!!sta IOCB0+ICCOM,x
 
                 lda codebase
@@ -300,15 +332,17 @@ _mw2            dec arg14
 
 ;   save start address
                 ldx #4
-_mw3            lda _mwinit,x
+_next1          lda _mwinit,x
                 sta arg9,x
+
                 dex
-                bpl _mw3
+                bpl _next1
 
                 ;!!lda INITAD
                 sta arg14
                 ;!!lda INITAD+1
                 sta arg15
+
                 jsr MWOut
 
 ;   close file
@@ -320,6 +354,7 @@ _mw3            lda _mwinit,x
 _mwinit         .byte 6
                 ;!!.addr INITAD
                 ;!!.addr INITAD+1
+
                 .endproc
 
 
@@ -336,25 +371,19 @@ MWOut           .proc
 
                 rts
 
-
-;======================================
-;
-;======================================
 _mxerr          ldy #endERR
+
 _mwerr          jmp splerr
 
-
-;======================================
-;
-;======================================
-_mx                                     ; execute command line
-                lda #0
+_ENTRY1         lda #0                  ; execute command line
                 sta codeoff
                 sta codeoff+1
+
                 lda qcode
                 pha
                 lda qcode+1
                 pha
+
                 jsr GetNext
                 jsr cstmtlst
 
@@ -364,9 +393,11 @@ _mx                                     ; execute command line
                 lda #$60                ; RTS
                 ldy #0
                 sta (qcode),y
+
                 pla
                 tax
                 pla
+
                 jmp run
 
                 .endproc
@@ -397,20 +428,22 @@ Comp            .proc
 ;======================================
 Proceed         .proc
                 ldx procsp
-                beq _p1
+                beq _XIT
 
-        ; lda #<_pmsg
-        ; ldx #>_pmsg
-        ; jsr YesNo
-        ; bne _p1
-        ; ldx procSP  ; break stack pointer
+; lda #<_pmsg
+; ldx #>_pmsg
+; jsr YesNo
+; bne _XIT
+; ldx procSP  ; break stack pointer
 
                 lda #0
                 sta procsp
+
                 txs
+
                 jmp lproceed
 
-_p1             rts
+_XIT            rts
                 .endproc
 
 ;:Pmsg DEFMSG "Proceed? "
@@ -422,50 +455,56 @@ _p1             rts
 PrintH          .proc
                 sta arg0
                 stx arg1
+
                 lda #4
                 sta arg2
+
                 ldy #'$'
                 jsr putchar
 
-_ph1            lda #0
+_next1          lda #0
                 ldx #4
-_ph2            asl arg0
+_next2          asl arg0
                 rol arg1
                 rol a
+
                 dex
-                bne _ph2
+                bne _next2
 
                 ; clc
                 adc #'0'
                 cmp #':'
-                bmi _ph3
+                bmi _1
 
                 adc #6
-_ph3            tay
+
+_1              tay
                 jsr putchar
 
                 dec arg2
-                bne _ph1
+                bne _next1
 
                 rts
                 .endproc
 
+
 ;--------------------------------------
 ;--------------------------------------
 
-mcmd            .addr jt_disptb+9       ; unknown cmd
+monitorCmd      .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
+
                 .addr Boot
                 .byte 'b'
                 .addr Comp
                 .byte 'c'
                 .addr dret
                 .byte 'd'
-                .addr Monitor._mquit
+                .addr MonQuit
                 .byte 'e'
 
-; .WORD Format
-; .BYTE 'f
+;               .addr Format
+;               .byte 'f'
 
                 .addr options
                 .byte 'o'
@@ -475,11 +514,11 @@ mcmd            .addr jt_disptb+9       ; unknown cmd
                 .byte 'r'
                 .addr MWrite
                 .byte 'w'
-                .addr MWOut._mx
+                .addr MWOut._ENTRY1
                 .byte 'x'
                 .addr MPrint
                 .byte '?'
                 .addr MDump
                 .byte '*'
 
-monitorPrompt   .byte 1,">"
+monitorPrompt   .byte 1,'>'

@@ -15,7 +15,7 @@ scrinit         .proc
                 ; lda #0
                 ; jsr close             ; close #0, sets X to 0
 
-                ; lda #$0c
+                ; lda #$0C
                 ; sta arg3
                 ; lda #0
                 ; ldx #<scred
@@ -59,7 +59,7 @@ putch1          ;!!stx DSPFLG
                 asl
                 asl
                 tax
-                lda #$0b                ; PUTCHR
+                lda #$0B                ; PUTCHR
 putch2          ;!!sta IOCB0+ICCOM,x
                 lda #0
                 ;!!sta IOCB0+ICBLL,x
@@ -74,7 +74,7 @@ putch2          ;!!sta IOCB0+ICCOM,x
 ;   ScrUp() - Move cursor up one
 ;======================================
 scrup           .proc
-                lda #$1c
+                lda #$1C
                 bne putch
 
                 .endproc
@@ -84,7 +84,7 @@ scrup           .proc
 ;   ScrDwn() - Move cursor down one
 ;======================================
 scrdwn          .proc
-                lda #$1d
+                lda #$1D
                 bne putch
 
                 .endproc
@@ -94,7 +94,7 @@ scrdwn          .proc
 ;   ScrBell() - Bell Char
 ;======================================
 scrbell         .proc
-                lda #$fd
+                lda #$FD
                 bne putch
 
                 .endproc
@@ -104,7 +104,7 @@ scrbell         .proc
 ;   ScrLft() - Move cursor left one
 ;======================================
 scrlft          .proc
-                lda #$1e
+                lda #$1E
                 bne putch
 
                 .endproc
@@ -114,7 +114,7 @@ scrlft          .proc
 ;   ScrRt() - Move cursor right one
 ;======================================
 scrrt           .proc
-                lda #$1f
+                lda #$1F
                 bne putch
 
                 .endproc
@@ -302,7 +302,7 @@ getnl0          cmp #tokEOF
                 beq getnloop
                 bpl getnr1
 
-                and #$7f
+                and #$7F
                 bra _getnr0
 
 _getnl1         jsr alpha
@@ -387,7 +387,7 @@ ldig3           sta nxtaddr
 ldig4           lda #tokCONST_t+tokREAL_t
                 sta nxttoken
                 ldy CIX
-                ldx #$ff                ; for SET cmd
+                ldx #$FF                ; for SET cmd
                 bne ldig2
 
                 .endproc

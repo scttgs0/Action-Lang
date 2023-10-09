@@ -146,7 +146,7 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
                 lda addr
                 ldx addr+1
                 ldy #2
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
                 ldy #0
                 jsr SaveCd
@@ -608,9 +608,9 @@ _par1           cmp #tokVAR_t+tokINT_t
                 bcc _par3               ; one byte arg
 
 ;   two-byte arg
-_par2           and #$1f
+_par2           and #$1F
                 inc argbytes
-_par3           and #$9f
+_par3           and #$9F
                 inc argbytes
                 sta (props),y
                 rts
@@ -746,7 +746,7 @@ ass1            eor #tokEQU
 
 ;   check for temps
                 iny
-                and #$f8
+                and #$F8
                 cmp #tokARRAY_t+8
                 bne _a1a
 
@@ -1085,10 +1085,10 @@ _fnostep        cmp #tokDO
                 iny
                 lda (frame),y
                 tax
-                lda #$a9
+                lda #$A9
                 jsr Push2               ; LDA #low
 
-                lda #$c1                ; CMP
+                lda #$C1                ; CMP
                 jsr Op2L
 
                 lda arg3
@@ -1097,17 +1097,17 @@ _fnostep        cmp #tokDO
                 ldy #18
                 lda (frame),y
                 tax
-_f2             lda #$a9
+_f2             lda #$A9
                 jsr Push2               ; LDA #high
 
                 jmp _f4
 
 _f3             ldy #17
                 sty arg0
-                lda #$ad                ; LDA addr16
+                lda #$AD                ; LDA addr16
                 jsr forexp.fexp2
 
-                lda #$c1                ; CMP
+                lda #$C1                ; CMP
                 jsr Op2L
 
                 lda arg3
@@ -1119,15 +1119,15 @@ _f3             ldy #17
                 cmp #tokVAR_t+tokINT_t
                 bcc _f2                 ; only byte var
 
-                lda #$ad                ; LDA addr16
+                lda #$AD                ; LDA addr16
                 jsr forexp.fexp2
 
-_f4             lda #$e1                ; SBC
+_f4             lda #$E1                ; SBC
                 jsr Op2H
 
 _fbody          lda arg3
                 ror a                   ; get type
-                lda #$b0                ; BCS, CARD
+                lda #$B0                ; BCS, CARD
                 bcc _f5
 
                 lda #$10                ; BPL, INT
@@ -1213,7 +1213,7 @@ _f7             pha
                 iny
                 lda (frame),y
                 sbc stkbase-8
-                cmp #$ff
+                cmp #$FF
                 bne _f8                 ; yes, branch to top
 
                 lda stkbase-9
@@ -1294,7 +1294,7 @@ _fevar          jsr Load2L
 
                 jsr Load2H
 
-fexp1           lda #$8d                ; STA data16
+fexp1           lda #$8D                ; STA data16
 fexp2           pha
                 ldy arg0
                 jsr frameadr.fadr1
@@ -1609,7 +1609,7 @@ _ln2            rts
 ;   PushJMP(, addr)
 ;======================================
 pushjmp         .proc
-                lda #$4c                ; JMP addr16
+                lda #$4C                ; JMP addr16
                 jmp Push3
 
                 .endproc
@@ -1900,7 +1900,7 @@ _expp1          jsr procref
                 bra _expvar
 
 _expstr
-                lda #$4c                ; JMP around string
+                lda #$4C                ; JMP around string
                 jsr Push1
                 jsr getcdoff
 
@@ -1955,7 +1955,7 @@ _ef1            dec arg0
                 sta (frame),y
                 beq _ef2
 
-                lda #$a5                ; LDA addr
+                lda #$A5                ; LDA addr
                 ldx arg1
                 ldy #$48                ; PHA
                 jsr Push3
@@ -2004,7 +2004,7 @@ _ef4            inc arg1
                 and #7
                 ora #tokTEMP_t
                 ldx #args
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
                 jmp eerr._exp7
 
@@ -2074,7 +2074,7 @@ pushst          .proc
                 iny
                 lda addr
                 ldx addr+1
-                jmp SaveCd.savstk
+                jmp SaveCd._saveStack
 
                 .endproc
 
@@ -2090,7 +2090,7 @@ etypep          .proc
                 ldy #0
                 sta (stack),y
                 tax
-                and #$f8
+                and #$F8
                 ldy #typERR
                 cmp #tokTYPE_t
                 bne eerr1
@@ -2159,7 +2159,7 @@ _e1             jsr etypep              ; set type
 
                 ldy #0
                 pla
-                ora #$b0                ; temp array
+                ora #$B0                ; temp array
                 sta (stack),y
                 rts
                 .endproc
@@ -2423,13 +2423,13 @@ cgplus          .proc
                 bne codegen.cg1         ; no
 
 ;   whew!, we can now increment it
-                lda #$e6                ; INC
+                lda #$E6                ; INC
                 jsr LoadX.Op1L
 
                 lda arg4
                 beq _cga2               ; byte var
 
-                lda #$d0                ; BNE
+                lda #$D0                ; BNE
                 jsr Push1
 
                 ldy #12
@@ -2438,7 +2438,7 @@ cgplus          .proc
                 lda #0
                 jsr Push1               ; offset
 
-                lda #$e6                ; INC
+                lda #$E6                ; INC
                 jsr Op1H
 
                 ldy #13
@@ -2569,8 +2569,8 @@ _cgat1          ldy #4
 
                 sty arg13
                 ldy #1
-                lda #$8d                ; STA addr16
-                jsr Insrt3.i30          ; insert STA data16
+                lda #$8D                ; STA addr16
+                jsr Insrt3._ENTRY1      ; insert STA data16
 
                 lda #1
 _cgat2          ldy #5
@@ -2635,8 +2635,8 @@ chasseq         .proc
 ;======================================
 chstkeq         ldx #2
                 lda stkbase-7
-                and #$f8
-                cmp #$b0                ; large array?
+                and #$F8
+                cmp #$B0                ; large array?
                 beq _cse2               ; yes, can't INC or shift
 
                 cmp #tokARRAY_t+8       ; small array?
@@ -2733,7 +2733,7 @@ cgadd5          ldy #7
                 sta (stack),y
                 iny
                 lda arg9
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
 cgadd6          jmp popst
 
@@ -2764,11 +2764,11 @@ cgshift         .proc
                 bra cgadd.cgadd5
 
 _s1             sta arg1
-                lda #$0a                ; ASL A
+                lda #$0A                ; ASL A
                 ldx arg8
                 beq _s2
 
-                lda #$4a                ; LSR A
+                lda #$4A                ; LSR A
 _s2             sta arg3
                 jsr GetTemps
                 jsr LoadX.Load1L
@@ -2818,14 +2818,14 @@ cgmd            jsr GetTemps
 
                 jsr Load1H
 
-                lda #$aa                ; TAX
+                lda #$AA                ; TAX
                 jsr Push1
 _md1            jsr LoadX.Load1L
 
                 lda arg4
                 bne _md2
 
-                lda #$a2                ; LDX #0
+                lda #$A2                ; LDX #0
                 ldx #0
                 jsr Push2
 
@@ -2837,7 +2837,7 @@ _md2            ldx arg8
                 lda arg5
                 beq _md3
 
-                lda #$8a                ; TXA
+                lda #$8A                ; TXA
                 jsr Push1
                 jsr STempH
 
@@ -2911,7 +2911,7 @@ _and1           jsr saven               ; patch addresses
                 ldy #8
                 jsr StkAddr
 
-                lda #$4c                ; JMP
+                lda #$4C                ; JMP
                 jsr Insrt3              ; patch in JMP false
 
                 lda qcode
@@ -2935,13 +2935,13 @@ _and1           jsr saven               ; patch addresses
 
                 inx
 _and2           ldy #10
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
 and3            ldy #2
                 jsr LoadI
 
                 ldy #8
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
                 ldy #12
                 jsr SaveCd
@@ -2993,7 +2993,7 @@ _cge0           lda arg5
                 php                     ; save status
                 beq _cge1
 
-                lda #$d0                ; BNE
+                lda #$D0                ; BNE
                 jsr PushTrue
 
 _cge1           lda #$01                ; ORA
@@ -3028,7 +3028,7 @@ cgls            .proc
 cgge            jsr RelOp
                 jsr LoadX.Load1L
 
-                lda #$c1                ; CMP
+                lda #$C1                ; CMP
                 jsr Op2L
 
                 lda arg5
@@ -3036,7 +3036,7 @@ cgge            jsr RelOp
 
                 jsr Load1H
 
-                lda #$e1                ; SBC
+                lda #$E1                ; SBC
                 jsr Op2H
                 bra cgeq.cge2           ; see CodeIncr
 
@@ -3050,7 +3050,7 @@ cggr            .proc
 cgle            jsr RelOp
                 jsr Load2L
 
-                lda #$c1                ; CMP
+                lda #$C1                ; CMP
                 jsr LoadX.Op1L
 
                 lda arg5
@@ -3058,7 +3058,7 @@ cgle            jsr RelOp
 
                 jsr Load2H
 
-                lda #$e1                ; SBC
+                lda #$E1                ; SBC
                 jsr Op1H
                 bra cgeq.cge2           ; see CodeIncr
 
@@ -3097,7 +3097,7 @@ _cgum1          jsr copyst
                 lda #0
                 tax
                 iny
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
                 lda #tokMINUS
                 jmp codegen
@@ -3120,14 +3120,14 @@ cgat            .proc
                 jsr StkP
 
                 iny
-                jsr SaveCd.savstk
+                jsr SaveCd._saveStack
 
 _cgat1          ldy #0
                 lda #tokCONST_t+tokCARD_t
                 sta (stack),y
                 rts
 
-_cgat2          and #$f8
+_cgat2          and #$F8
                 cmp #tokTYPE_t          ; check for record field
                 beq _cgat1
                                         ; constant or cond. exp. (error)

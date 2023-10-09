@@ -31,7 +31,7 @@ print           .proc
                 jsr xiostr
                 bne print1
 
-                lda #$0b
+                lda #$0B
                 ;!!sta IOCB0+ICCOM,x
                 lda #eol
                 ;!!jmp CIOV
@@ -54,7 +54,7 @@ close           .proc
                  nop
         .endif
 
-                ldy #$0c
+                ldy #$0C
                 bne input.input1
 
                 .endproc
@@ -266,7 +266,7 @@ ctostr          .proc
 rtostr          ;.proc
                 ;!!jsr FASC
 
-                ldy #$ff
+                ldy #$FF
                 ldx #0
 _rts1           iny
                 inx
@@ -550,7 +550,7 @@ _ps4            lda arg2
                 and #$60
                 tax
                 pla
-                and #$9f
+                and #$9F
                 ora chrConvert,x
                 sta (arg0),y
                 dey

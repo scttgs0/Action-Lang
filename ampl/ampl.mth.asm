@@ -10,21 +10,25 @@ _a             = aflast+1
 _b             = aflast
 _c             = afcur+1
 _d             = afcur
+
 _rl            = afsize
 _rh            = afsize+1
+
 _t1            = addr
 _t2            = addr+1
+
 _sign          = token
                 .endproc
 
 
 ;======================================
 ;   MultI(op1, op2)
-;======================================
-MultI           .proc
+;--------------------------------------
 ; op2 is in c & d
 ;  r = ab * cd
 ;  r = (a*d + c*b)*2^8 + b*d
+;======================================
+MultI           .proc
                 jsr SMOps
 
                 ldx math._b
@@ -37,7 +41,7 @@ MultI           .proc
                 dex
                 stx math._t2
                 ldx #8
-_mc3            asl                     ; b*d, 16 bit result
+_mc3            asl                     ; b*d, 16-bit result
                 rol math._rh
                 asl math._t1
                 bcc _mc4
@@ -51,11 +55,11 @@ _mc4            dex
 _mc5            sta math._rl
                 lda math._b
                 ldx math._c
-                jsr MulB                ; b*c, 8 bit result
+                jsr MulB                ; b*c, 8-bit result
 
                 lda math._a
                 ldx math._d
-                jsr MulB                ; a*d, 8 bit result
+                jsr MulB                ; a*d, 8-bit result
 
 
 _setsign        ldy math._sign

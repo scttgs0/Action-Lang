@@ -134,7 +134,7 @@ _func2          lda param
                 jsr storprops
 
 ;   get space for proc variable
-                lda #$4c                ; JMP
+                lda #$4C                ; JMP
                 jsr Push1
                 jsr getcdoff            ; fill in address
 
@@ -153,12 +153,12 @@ _fh3            lda argbytes
                 bcs _fh5
 
                 cmp #2
-                lda #$8d                ; STA addr16
+                lda #$8D                ; STA addr16
                 ldx arg0
                 ldy arg1
                 bcc _fh4
 
-                lda #$8e                ; STX addr16
+                lda #$8E                ; STX addr16
                 inx
                 bne _fh4
 
