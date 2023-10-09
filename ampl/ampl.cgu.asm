@@ -41,10 +41,10 @@ _ly1            jsr insrt1
 _ly2            cmp #0
                 bne _ly3
 
-                lda #$c8                ; INY
+                lda #$C8                ; INY
                 bne _ly1
 
-_ly3            lda #$a0
+_ly3            lda #$A0
                 ldx arg12
                 jsr insrt2              ; LDY #0 or #1
 
@@ -59,7 +59,7 @@ _lyret          rts
 ;   TrashY()
 ;======================================
 trashy          .proc
-                lda #$ff
+                lda #$FF
                 sta cury
                 rts
                 .endproc
@@ -84,13 +84,13 @@ loadx           .proc
 
                 beq _lxz
 
-                lda #$ae                ; LDX addr16
+                lda #$AE                ; LDX addr16
                 jmp push3
 
 _lxt            lda (stack),y
                 tax
                 dec temps-args,x
-_lxz            lda #$a6                ; LDX addr
+_lxz            lda #$A6                ; LDX addr
 _lx1            jmp push2
 
 _lxc            lda (stack),y
@@ -104,7 +104,7 @@ _lxc            lda (stack),y
                 pla
                 pla
                 tay
-                bne ophigh._opv         ; uncond.
+                bne ophigh._opv         ; [unc]
 
 _optype         and #$20
                 beq ophigh._operr       ; con. exp.
@@ -124,7 +124,7 @@ _optype         and #$20
 ;======================================
 ;   Load1L
 ;======================================
-load1l          lda #$a1                ; LDA op
+load1l          lda #$A1                ; LDA op
 
 
 ;======================================
@@ -161,7 +161,7 @@ _opv            jsr stkprop
 
     ; 16 bit address
 _opv1           pla
-                ora #$0c                ; addr16
+                ora #$0C                ; addr16
                 jmp push3
 
 _opp            inc arg12               ; skip JMP byte
@@ -194,7 +194,7 @@ _opa1           sta arg10
 
                 tax
                 dec temps-args,x        ; free temp
-                bcc _opc3               ; uncond.
+                bcc _opc3               ; [unc]
 
 _opa2           tya                     ; small array
                 pha
@@ -208,7 +208,7 @@ _opa2           tya                     ; small array
                 beq _opa2a              ; page zero
 
                 pla
-                ora #$1c                ; addr16,X
+                ora #$1C                ; addr16,X
                 jmp push3
 
 _opa2a          pla
@@ -228,7 +228,7 @@ _opc3           pla
                 jmp push2
 
 _opt            lda #$04                ; addr
-                bne _opa1               ; uncond.
+                bne _opa1               ; [unc]
 
 _opz            pla
                 ora #$04                ; addr
@@ -241,7 +241,7 @@ _opz            pla
 ;   Load2L()
 ;======================================
 load2l          .proc
-                lda #$a1                ; LDA op
+                lda #$A1                ; LDA op
                 .endproc
 
 
@@ -261,7 +261,7 @@ op2l            .proc
 ;   Load1H()
 ;======================================
 load1h          .proc
-                lda #$a1                ; LDA op
+                lda #$A1                ; LDA op
                 .endproc
 
 
@@ -285,7 +285,7 @@ op1h1           ldx #1
 ;   Load2H()
 ;======================================
 load2h          .proc
-                lda #$a1                ; LDA op
+                lda #$A1                ; LDA op
                 .endproc
 
 
@@ -586,7 +586,7 @@ i11             iny
 stemph          .proc
                 inc arg9
                 ldy #12
-                bne stempl.stemp        ; uncond.
+                bne stempl.stemp        ; [unc]
 
                 .endproc
 
@@ -600,7 +600,7 @@ stemp           jsr savecd
 
                 lda arg9
                 tax
-                and #$fe                ; set to low address
+                and #$FE                ; set to low address
                 sta arg9
                 lda #$85                ; STA addr
                 .endproc
@@ -623,7 +623,7 @@ push2           .proc
 ;======================================
 ;   Insrt2(op,data)
 ;======================================
-insrt2          .proc            
+insrt2          .proc
                 ldy #2
                 jsr addcdsp
 
@@ -638,7 +638,7 @@ i21             txa
 ;======================================
 ;   Push3(op,data16)
 ;======================================
-push3           .proc            
+push3           .proc
                 jsr push0
 
                 sta (arg14),y
@@ -650,7 +650,7 @@ push3           .proc
 ;======================================
 ;   Insrt3(op,data16)
 ;======================================
-insrt3          .proc            
+insrt3          .proc
                 sty arg13
                 ldy #3
 i30             jsr addcdsp

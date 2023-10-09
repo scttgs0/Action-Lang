@@ -30,10 +30,10 @@ getstr          .proc
 _gs1            jsr getkey
 
                 tax
-                cpx #$7e
+                cpx #$7E
                 beq _gs3                ; backspace
 
-                cpx #$7d
+                cpx #$7D
                 beq _gs3                ; clear
 
 _gs1a           ldy #0
@@ -41,7 +41,7 @@ _gs1a           ldy #0
                 lda (arg12),y
                 adc #1
 
-                cpx #$1b                ; ESC
+                cpx #$1B                ; ESC
                 beq _gs1b
 
                 cpx #eol
@@ -90,11 +90,11 @@ _gs4            ldy #0
                 jsr scrlft
 
                 ldx arg3
-                cpx #$7e
+                cpx #$7E
                 bne _gs4
                 beq _gs1
 
-_gs5            cpx #$7d
+_gs5            cpx #$7D
                 beq _gs1
                 bne _gs1a
                 .endproc
@@ -224,7 +224,7 @@ _fo1            lda inbuf,y
 
                 lda #':'
                 sta inbuf+2
-                bne _fo3                ; uncond.
+                bne _fo3                ; [unc]
 
 _fo2            lda inbuf+1
                 cmp #'?'                ; read directory?
@@ -287,6 +287,6 @@ keybd           .text 2,"K:"
 gotkey          .proc
     ; Test if key in buffer
                 lda CH_                 ; key down?
-                eor #$ff
+                eor #$FF
                 rts
                 .endproc

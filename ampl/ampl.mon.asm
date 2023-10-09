@@ -137,9 +137,9 @@ _md2            lda arg11
                 jsr gotkey
                 beq _md1
 
-                ldx #$ff
+                ldx #$FF
                 stx CH_
-                cmp #$de
+                cmp #$DE
                 bne _md1
 
                 rts
@@ -273,7 +273,7 @@ mwrite          .proc                   ; write object file
     ; write header
                 lda #6
                 sta arg9
-                lda #$ff
+                lda #$FF
                 sta arg10               ; $FF
                 sta arg11               ; $FF
                 clc
@@ -300,7 +300,7 @@ _mw2            dec arg14
 
     ; write the qcode
                 ldx #$10
-                lda #$0b                ; output command
+                lda #$0B                ; output command
                 sta IOCB0+ICCOM,x
 
                 lda codebase

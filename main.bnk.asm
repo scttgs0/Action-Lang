@@ -22,23 +22,23 @@
 ;
 
 
-en0             .text 5,"Error",$c0
+en0             .text 5,"Error",$C0
                 .word error
                 .byte 3,138,138,138
 
-en1             .text 3,"EOF",$9a
+en1             .text 3,"EOF",$9A
                 .word eof
 
-en2             .text 5,"color",$8a
+en2             .text 5,"color",$8A
                 .word FILDAT
 
-en3             .text 4,"LIST",$8a
+en3             .text 4,"LIST",$8A
                 .word list
 
-en4             .text 6,"device",$8a
+en4             .text 6,"device",$8A
                 .word device
 
-en5             .text 5,"TRACE",$8a
+en5             .text 5,"TRACE",$8A
                 .word trace
 
 

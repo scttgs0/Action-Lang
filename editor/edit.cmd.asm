@@ -190,7 +190,7 @@ insrtt          .proc            ; was InsertT
                 inc insert
                 beq _it1
 
-                lda #$ff
+                lda #$FF
                 sta insert
                 lda #<_imsg
                 ldx #>_imsg
@@ -387,7 +387,7 @@ setsp           .proc
 movedwn         .proc
                 ldy #+0-40
                 sty arg5
-                ldy #$ff
+                ldy #$FF
                 bne move
 
                 .endproc

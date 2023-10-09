@@ -53,7 +53,7 @@ _pbuf1          iny
 _pbret          ldy sp
                 lda curch
                 sta (buf),y
-                lda #$ff
+                lda #$FF
                 sta dirtyf
                 jsr dspbuf
 
@@ -195,7 +195,7 @@ delete          .proc
                 ldx delbuf+1
                 stx dirty
                 ldy lastch
-                cpy #$9c
+                cpy #$9C
                 beq _del1
 
                 jsr delfree
@@ -210,7 +210,7 @@ _del1           sta arg3
                 sta (buf),y
                 iny
                 sty dirtyf
-                bne return.ret3         ; uncond.
+                bne return.ret3         ; [unc]
 
 _del2           jsr delcur
                 beq _del3
@@ -255,7 +255,7 @@ delfree         .proc
                 beq delend.de1
 
                 jsr delln
-                bne delfree             ; uncond.
+                bne delfree             ; [unc]
                 .endproc
 
 

@@ -32,7 +32,7 @@ lgetkey         .proc
                 adc #14
                 tax
 _bc1            lda CH_                 ; key down?
-                eor #$ff
+                eor #$FF
                 bne _gk0
 
                 cpx rtclok+2
@@ -49,7 +49,7 @@ _gk0            ldy #0
                 eor #$80
                 sta (oldadr),y          ; restore cursor
                 ldx SRTIMR              ; faster repeat
-                cpx #$0c
+                cpx #$0C
                 bcs _gk5
 
                 cpx #4
@@ -58,14 +58,14 @@ _gk0            ldy #0
                 ldx #3
 _gk1            stx SRTIMR
 _gk2            lda CH_
-                cmp #$c0
+                cmp #$C0
                 bcc _gk3                ; not Ctrl-Shft
 
 _cskey          jsr click
-                bmi _gk4                ; uncond.
+                bmi _gk4                ; [unc]
 
-_gk3            and #$3f
-                cmp #$3c                ; caps key
+_gk3            and #$3F
+                cmp #$3C                ; caps key
                 beq _caps
 
                 cmp #$27                ; Atari key
@@ -89,7 +89,7 @@ _gk5            ldx #20
                 bne _gk1
 
 _caps           lda CH_
-                and #$c0
+                and #$C0
                 sta SHFLOC
 _caps1          jsr click
                 bmi lgetkey
@@ -106,7 +106,7 @@ _atari          lda INVFLG
 ;   Click() click the keyboard
 ;======================================
 click           .proc
-                ldx #$7f
+                ldx #$7F
 _click1         stx CONSOL
                 stx WSYNC
                 dex

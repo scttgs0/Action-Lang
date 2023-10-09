@@ -58,12 +58,12 @@ _arptr          ldy #0
                 sta (stack),y
                 dey
                 lda (stack),y
-                ora #$b0                ; temp array mode
+                ora #$B0                ; temp array mode
                 sta (stack),y
                 rts
 
 _arpt1          jsr zerost
-                bne _ar0                ; uncond.
+                bne _ar0                ; [unc]
 
 _arr0           jsr pushnext
 
@@ -92,7 +92,7 @@ arra0           pha
 
                 and #7
                 tax
-                ora #$b0                ; temp array mode
+                ora #$B0                ; temp array mode
                 sta arg7
                 ldy arg1
                 cpy #constt+strt
@@ -114,13 +114,13 @@ _ar1            sta fr1
 
 _arint          jsr gettemps
 
-                lda #$a1                ; LDA
+                lda #$A1                ; LDA
                 ldx fr1
                 beq _ari1
 
                 jsr load2l
 
-                lda #$0a                ; ASL A
+                lda #$0A                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
                 jsr push3
@@ -135,13 +135,13 @@ _arint          jsr gettemps
 _ari1           jsr loadx.op1l
                 jsr stempl
 
-                lda #$a1                ; LDA
+                lda #$A1                ; LDA
                 ldx fr1
                 beq _ari2
 
                 jsr load2h
 
-                lda #$2a                ; ROL A
+                lda #$2A                ; ROL A
                 ldx #$28                ; PLP, restore carry
                 jsr push2
 

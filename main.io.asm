@@ -48,7 +48,7 @@ print           .proc
                 jsr xiostr
                 bne print1
 
-                lda #$0b
+                lda #$0B
                 sta IOCB0+ICCOM,x
                 lda #eol
                 jmp CIOV
@@ -71,7 +71,7 @@ close           .proc
                  nop
         .endif
 
-                ldy #$0c
+                ldy #$0C
                 bne input.input1
 
                 .endproc
@@ -132,7 +132,7 @@ _xs1            tay
 ;======================================
 output          .proc
                 sty arg6
-                ldy #$0b
+                ldy #$0B
                 bne input.input1
 
                 .endproc
@@ -281,7 +281,7 @@ ctostr          .proc
 rtostr          ;.proc
                 jsr FASC
 
-                ldy #$ff
+                ldy #$FF
                 ldx #0
 _rts1           iny
                 inx
@@ -442,7 +442,7 @@ _htcok          sta arg5
                 sta fr0
                 stx fr0+1
                 inc cix
-                bne _htc1               ; uncond.
+                bne _htc1               ; [unc]
 
                 .endproc
 
@@ -565,7 +565,7 @@ _ps4            lda arg2
                 and #$60
                 tax
                 pla
-                and #$9f
+                and #$9F
                 ora chcvt,x
                 sta (arg0),y
                 dey
@@ -599,7 +599,7 @@ _ps10           lda arg3
                 bne _ps8
 
                 tay
-                beq _ps5                ; uncond.
+                beq _ps5                ; [unc]
 
                 .endproc
 

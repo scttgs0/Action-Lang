@@ -48,20 +48,20 @@ _do2            sta tvdisp
                 lda #$60                ; RTS
                 bne _a2
 
-_a1             lda #$4c                ; JMP
+_a1             lda #$4C                ; JMP
 _a2             sta alarm
 
     ; Case sensitive?
                 ldx #cmsg-optmsg
                 ldy stmask
-                cpy #$df
+                cpy #$DF
                 jsr _yn
                 beq _c1
 
-                lda #$df
+                lda #$DF
                 bne _c2
 
-_c1             lda #$ff
+_c1             lda #$FF
 _c2             sta stmask
 
     ; Trace On?
@@ -73,7 +73,7 @@ _c2             sta stmask
                 lda #0
                 beq _t2
 
-_t1             lda #$ff
+_t1             lda #$FF
 _t2             sta trace
 
     ; List On?
@@ -85,7 +85,7 @@ _t2             sta trace
                 lda #0
                 beq _lst2
 
-_lst1           lda #$ff
+_lst1           lda #$FF
 _lst2           sta list
 
     ; window size
@@ -144,7 +144,7 @@ _l1             lda linemax
                 and #3
                 tax
                 tya
-                and #$9f
+                and #$9F
                 ora stoa_,x
                 tay
                 ldx #emsg-optmsg
@@ -155,7 +155,7 @@ _l1             lda linemax
                 and #$60
                 tax
                 tya
-                and #$9f
+                and #$9F
                 ora chcvt,x
                 sta eolch
                 rts
@@ -174,7 +174,7 @@ _yn2            sty tempbuf+1
                 ldy tempbuf
                 bne _yn5
 
-                cmp #$1b
+                cmp #$1B
                 bne _yn4
 
 _yn3            pla
@@ -198,7 +198,7 @@ _getnum         ldy tempbuf
                 bne _gn0
 
                 lda tempbuf+1
-                cmp #$1b
+                cmp #$1B
                 beq _yn3
 
 _gn0            lda #<tempbuf

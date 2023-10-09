@@ -100,7 +100,7 @@ w2init          .proc                   ; W2Init()
                 lda #23
                 sbc wsize
                 sta nlines
-                bne einit.fcmsg         ; uncond.
+                bne einit.fcmsg         ; [unc]
 
                 .endproc
 

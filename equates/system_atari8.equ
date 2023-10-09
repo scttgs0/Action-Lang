@@ -1,3 +1,4 @@
+
 CH_             = $02FC                 ; character buffer
 DSPFLG          = $02FE                 ; display flag
 
@@ -43,6 +44,7 @@ PORTA           = $D300
 
 DMACTL          = $D400
 WSYNC           = $D40A
+
 
 ;    floating point routines
 ;    -----------------------

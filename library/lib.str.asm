@@ -61,7 +61,7 @@ _sc3            iny
 
                 rts
 
-_sc4            ldx #$ff
+_sc4            ldx #$FF
                 stx args
                 bcc _sc5
 

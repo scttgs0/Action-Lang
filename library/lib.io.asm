@@ -182,7 +182,7 @@ opn             .proc
                 tay
                 iny
                 lda #eol
-                bne _op2                ; uncond.
+                bne _op2                ; [unc]
 
 _op1            lda (arg1),y
 _op2            sta (buf),y
@@ -379,7 +379,7 @@ put             .proc
 putd            .proc
                 stx arg1
                 ldy arg1
-putd1           ldx #$0b
+putd1           ldx #$0B
                 jmp getd.ccio
 
                 .endproc
@@ -391,7 +391,7 @@ putd1           ldx #$0b
 ;======================================
 putde           .proc
                 ldy #eol
-                bne putd.putd1          ; uncond.
+                bne putd.putd1          ; [unc]
 
                 .endproc
 

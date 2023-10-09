@@ -1,0 +1,258 @@
+
+;======================================
+;   FILE: edit.def.asm
+;======================================
+
+; Action! Programming Language
+; Copyright 1983 by Clinton W Parker
+
+;
+; Action! is free software: you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 3 of the License, or
+; (at your option) any later version.
+;
+; Action! is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+
+ramzap          = 1                     ; to zap or not to zap, that is the question?
+
+; Page Zero defs
+;----------------
+; Alloc/Free defs, also used by compiler
+afbase          = $80
+aflast          = $82
+afcur           = $84
+afsize          = $86
+afbest          = $88
+props           = $88
+afbsze          = $8A
+op              = $8A
+lsttoken        = $8B                   ; prev. token value
+
+; current window data / comp. vars
+;----------------------------------
+sp              = $8C
+choff           = $8D
+lnum            = $8E
+curproc         = $8E                   ; 2 bytes
+dirty           = $8F
+top             = $90                   ; -> top line
+bot             = $92                   ; -> bottom line
+whaddr          = $92                   ; -> current DO frame
+cur             = $94                   ; -> current line
+x               = $96                   ; don't use in comp.
+y               = $97                   ; don't use in comp.
+nlines          = $98
+chan            = $98                   ; current input file
+ytop            = $99
+defflg          = $99
+indent          = $9A
+stackptr        = $9A                   ; op stack offset
+
+buf             = $9B                   ; -> edit buf
+insert          = $9D                   ; insert/replace flag
+delnxt          = $9E                   ; ->, USED BY LEX
+
+; arguments and temps
+;---------------------
+args            = $A0
+arg0            = $A0
+arg1            = $A1
+arg2            = $A2
+arg3            = $A3
+arg4            = $A4
+arg5            = $A5
+arg6            = $A6
+arg7            = $A7
+arg8            = $A8
+arg9            = $A9
+arg10           = $AA
+arg11           = $AB
+arg12           = $AC
+arg13           = $AD
+arg14           = $AE
+arg15           = $AF
+
+; compiler vars
+;---------------
+stbase          = $B0                   ; s.t. base (page)
+stglobal        = $B1                   ; qglobal hash table
+stlocal         = $B3                   ; local hash table
+codeoff         = $B5                   ; relocation offset
+device          = $B7                   ; default device
+qglobal         = $B8                   ; qglobal/local flag
+stack           = $B9                   ; value stack
+frame           = $BB                   ; -> current frame
+symtab          = $BD                   ; -> next s.t. entry
+stmax           = $BF                   ; s.t. top (page)
+addr            = $C0                   ; token address
+token           = $C2                   ; token value
+
+; following defs can be used during
+; program execution (user program)
+;-----------------------------------
+dirtyf          = $C3
+spln            = $C4                   ; error char
+curln           = $C5                   ; error line
+curnxt          = $C7                   ; next error line
+nxtaddr         = $C9                   ; next token address
+
+        ; note: $CA-$CD never referenced
+
+stg2            = $CE                   ; only used if big s.t.
+arrayptr        = $D0                   ; array mem. list
+spnxt           = $D2                   ; next error char
+nxttoken        = $D3                   ; next token value
+
+
+; ACTION! vars ($480 - $57D)
+;----------------------------
+w1              = $0480                 ; window 1 data
+top1            = $048F
+chcvt           = $0490                 ; char convert
+codebase        = $0491                 ; 2 bytes
+codesize        = $0493                 ; 2 bytes
+stsp            = $0495                 ; s.t. size (pages)
+mpc             = $0496                 ; edit/mon flag
+gbase           = $0497                 ; 2 bytes
+type            = $0499
+list            = $049A                 ; listing flag
+numargs         = $049B
+cmdln           = $049C                 ; command line offset
+param           = $049D
+opmode          = $049E
+curwdw          = $049F                 ; window memory offset
+cury            = $04A0                 ; current Y reg (0/1/unknown)
+lastch          = $04A1                 ; last char
+curch           = $04A2                 ; current char
+sparem          = $04A3                 ; -> spare mem
+numwd           = $04A5                 ; number of windows
+allocerr        = $04A6                 ; INC on Alloc error
+delbuf          = $04A7                 ; 6 bytes
+frstchar        = $04AD                 ; used for big s.t.
+taglist         = $04AE                 ; 2 bytes
+chcvt1          = $04B0
+w2              = $04B1                 ; window 2 data
+bckgrnd         = $04C0                 ; background color
+procsp          = $04C1                 ; Break stack pointer
+argbytes        = $04C2
+trace           = $04C3                 ; trace flag
+bigst           = $04C4                 ; big s.t. flag
+
+        ; note: $4C5 available
+
+jmps            = $04C6                 ; see EDIT.CAR
+
+; Jump table goes to $4FF
+;-------------------------
+segend          = $04C6
+curbank         = $04C9
+stmask          = $04CA
+error           = $04CB
+wsize           = $04CE
+linemax         = $04CF
+chcvt2          = $04D0
+expend          = $04D1
+dclend          = expend+3
+cgend           = dclend+3
+arend           = cgend+3
+splend          = arend+3
+alarm           = splend+3
+eolch           = alarm+3
+lsh             = eolch+1
+
+chcvt3          = $04F0
+tvdisp          = $04F1
+disptb          = $04F2
+smtend          = $04F8
+stmradr         = $04FE
+
+subbuf          = $0500                 ; 40 bytes
+findbuf         = $0528                 ; 40 bytes
+numbuf          = $0550                 ; 24 bytes
+stkbase         = $0577
+
+opstack         = $0580
+
+; $580 TO ? is used for output of
+; FASC routine.  Should not exceed
+; 16 bytes, $58F (worst case?).
+;---------------------------------
+tempbuf         = $0590                 ; 40 bytes
+argtypes        = $05B8                 ;  8 bytes
+eof             = $05C0                 ;  8 bytes
+inbuf           = $05C8                 ; 36 bytes
+abt             = $05EC                 ;  4 bytes
+temps           = $05F0                 ; 16 bytes
+
+
+; system vars
+;-------------
+warmst          = $08
+dosvec          = $0A
+dosini          = $0C
+qcode           = $0E                   ; ap. high mem.
+brkkey          = $11
+rtclok          = $12
+adress          = $64
+lmargin         = $52
+rmargin         = $53
+rowcrs          = $54
+colcrs          = $55
+dindex          = $57
+savmsc          = $58
+oldrow          = $5A
+oldcol          = $5B
+oldadr          = $5E
+oldchr          = $5D
+csrch           = $5D
+ramtop          = $6A
+fr0             = $D4
+fr1             = $E0
+cix             = $F2
+inbuff          = $F3
+flptr           = $FC
+
+lbuff           = $0580                 ; fp ASCII buf
+
+
+; window record offsets
+;-----------------------
+wsp             = 0
+wch             = 1
+wlnum           = 2
+wdirty          = 3
+wtop            = 4
+wbot            = 6
+wcur            = 8
+wx              = 10
+wy              = 11
+wnlns           = 12                    ; num lines
+wytop           = 13
+windent         = 14
+
+
+; system defs
+;-------------
+eol             = $9B
+esc             = $1B
+
+
+; bank switching defs
+;---------------------
+ml              = $B000
+el              = $A000
+ll              = $A000
+cl              = $A000
+bank            = $D500
+ebank           = 3
+lbank           = 0
+cbank           = 9

@@ -62,14 +62,14 @@ pf              lda #0                  ; load arg types flag
 
                 jsr getnext
 
-                bne _c7                 ; uncond.
+                bne _c7                 ; [unc]
 
 _c4             ldx numargs
                 ldy #tempt+bytet
                 lda argtypes-1,x
                 ldx argbytes
                 stx abt+3
-                cmp #$7f
+                cmp #$7F
                 bcs _c5                 ; one byte arg
 
                 sta temps-args+1,x

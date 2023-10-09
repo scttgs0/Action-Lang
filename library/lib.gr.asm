@@ -31,7 +31,7 @@ graphics        .proc                   ; Graphics(mode)
                 lda #0
                 jsr clos
 
-                lda #$0c
+                lda #$0C
                 sta arg3
                 lda #0
                 ldx #<_e
@@ -45,7 +45,7 @@ graphics        .proc                   ; Graphics(mode)
                 pla
                 sta arg4
                 and #$30
-                eor #$1c
+                eor #$1C
                 sta arg3
                 lda #6
                 ldx #<_devs
@@ -141,7 +141,7 @@ setcolor        .proc
 
                 sta arg0
                 tya
-                and #$0f
+                and #$0F
                 sta arg2
                 txa
                 asl a

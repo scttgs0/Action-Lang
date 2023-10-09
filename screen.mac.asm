@@ -29,7 +29,7 @@ scrinit         .proc
                 lda #0
                 jsr close               ; close #0, sets X to 0
 
-                lda #$0c
+                lda #$0C
                 sta arg3
                 lda #0
                 ldx #<scred
@@ -38,7 +38,7 @@ scrinit         .proc
 
 ;--------------------------------------
 
-scred           .text 2,"E:",$9b
+scred           .text 2,"E:",$9B
                 .endproc
 
 
@@ -73,7 +73,7 @@ putch1          stx DSPFLG
                 asl a
                 asl a
                 tax
-                lda #$0b                ; PUTCHR
+                lda #$0B                ; PUTCHR
 putch2          sta IOCB0+ICCOM,x
                 lda #0
                 sta IOCB0+ICBLL,x
@@ -88,7 +88,7 @@ putch2          sta IOCB0+ICCOM,x
 ;   ScrUp() - Move cursor up one
 ;======================================
 scrup           .proc
-                lda #$1c
+                lda #$1C
                 bne putch
 
                 .endproc
@@ -98,7 +98,7 @@ scrup           .proc
 ;   ScrDwn() - Move cursor down one
 ;======================================
 scrdwn          .proc
-                lda #$1d
+                lda #$1D
                 bne putch
 
                 .endproc
@@ -108,7 +108,7 @@ scrdwn          .proc
 ;   ScrBell() - Bell Char
 ;======================================
 scrbell         .proc
-                lda #$fd
+                lda #$FD
                 bne putch
 
                 .endproc
@@ -118,7 +118,7 @@ scrbell         .proc
 ;   ScrLft() - Move cursor left one
 ;======================================
 scrlft          .proc
-                lda #$1e
+                lda #$1E
                 bne putch
 
                 .endproc
@@ -128,7 +128,7 @@ scrlft          .proc
 ;   ScrRt() - Move cursor right one
 ;======================================
 scrrt           .proc
-                lda #$1f
+                lda #$1F
                 bne putch
 
                 .endproc
@@ -219,8 +219,8 @@ eofid           = 127
 constt          = $80
 vart            = $88
 arrayt          = $90
-tempt           = $a8
-funct           = $c0
+tempt           = $A8
+funct           = $C0
 condt           = $48
 
 ;    types
@@ -316,8 +316,8 @@ getnl0          cmp #eofid
                 beq getnloop
                 bpl getnr1
 
-                and #$7f
-                bne _getnr0              ; uncond.
+                and #$7F
+                bne _getnr0              ; [unc]
 
 _getnl1         jsr alpha
                 bne _getnid
@@ -330,7 +330,7 @@ _getnl1         jsr alpha
 
                 cmp #']'
                 beq getnr1
-                bne getnloop            ; uncond.
+                bne getnloop            ; [unc]
 
 _getnid         jsr getname
                 bmi getnr1
@@ -358,7 +358,7 @@ ismt            lda token
 ;======================================
 lexcom          .proc
                 jsr nextline
-                bne getnext.getnl0      ; uncond.
+                bne getnext.getnl0      ; [unc]
 
                 .endproc
 
@@ -401,7 +401,7 @@ ldig3           sta nxtaddr
 ldig4           lda #constt+realt
                 sta nxttoken
                 ldy cix
-                ldx #$ff                ; for SET cmd
+                ldx #$FF                ; for SET cmd
                 bne ldig2
 
                 .endproc
@@ -430,7 +430,7 @@ lexne           .proc
                 bne lexeq.leq1
 
                 lda #neid
-                bne getnext.getnr1      ; uncond.
+                bne getnext.getnr1      ; [unc]
 
                 .endproc
 
@@ -445,7 +445,7 @@ leq1            cmp #'='
                 bne putback
 
                 inc nxttoken
-                bne getnext.getnr2      ; uncond.
+                bne getnext.getnr2      ; [unc]
 
                 .endproc
 
@@ -459,7 +459,7 @@ lexhex          .proc
                 inc choff
                 jsr lexbuf
                 jsr htocar
-                bne lexdig.ldig2        ; uncond.
+                bne lexdig.ldig2        ; [unc]
 
                 .endproc
 
@@ -488,7 +488,7 @@ lexpf           .proc
                 sta symtab
                 lda gbase+1
                 sta symtab+1
-                bne putback.pback       ; uncond.
+                bne putback.pback       ; [unc]
 
                 .endproc
 
@@ -627,7 +627,7 @@ lexdef          .proc
                 lda defflg
                 sta choff
                 sty defflg
-                bcc nextchar.nxtch0     ; uncond.
+                bcc nextchar.nxtch0     ; [unc]
 
 ldef1           ldy choff
                 lda (delnxt),y

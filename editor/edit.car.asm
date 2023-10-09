@@ -100,7 +100,7 @@ _c0             sta $0480,y             ; zero RAM
                 dey
                 bne _c0
 
-                ldy #$3a
+                ldy #$3A
 _cold1          lda emjmps-1,y          ; init RAM
                 dey
                 sta jmps,y

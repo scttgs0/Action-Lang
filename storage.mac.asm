@@ -31,7 +31,7 @@ slop            = 7                     ; can't be less than 4
 allocate        .proc
                 sta afsize              ; save size
                 stx afsize+1
-                lda #$ff                ; set best size
+                lda #$FF                ; set best size
                 sta afbsze
                 sta afbsze+1
                 lda #<afbase            ; last = base
@@ -99,7 +99,7 @@ _afl5           lda afcur
     ; no entry found, use best guess
 
 _afl6           lda afbsze+1
-                cmp #$ff
+                cmp #$FF
                 beq _afl10              ; no free block
 
     ; see if we need to split block
@@ -218,7 +218,7 @@ _afl13          iny
                 tax
                 iny
                 lda (afbest),y
-                and #$7f                ; clear tag flag
+                and #$7F                ; clear tag flag
                 sta (afbest),y
                 adc afbest+1
                 cmp afcur+1
