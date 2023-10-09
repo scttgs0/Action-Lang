@@ -20,7 +20,7 @@
                 .include "macros/frs_jr_random.mac"
                 .include "macros/frs_jr_text.mac"
 
-                .include "editor/edit.def.asm"
+                .include "equates/editor.equ"
 
 
 ;--------------------------------------
