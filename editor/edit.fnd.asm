@@ -14,57 +14,60 @@ Find            .proc
 
                 lda lastch
                 cmp #$F8
-                beq find2
+                beq _ENTRY2
 
                 lda #<findmsg
                 ldx #>findmsg
-find1           ldy #>findbuf
+
+_ENTRY1         ldy #>findbuf
                 sty arg3
+
                 ldy #<findbuf
                 jsr CommandString
 
                 lda #$F8
                 sta curch
 
-find2           lda findbuf
-                beq _f7
+_ENTRY2         lda findbuf
+                beq _3
 
-_f2             ldy #0
+_next1          ldy #0
                 lda (buf),y
                 tay
                 iny
                 sty arg0
 
-_f3             ldy sp
+_next2          ldy sp
                 iny
                 cpy arg0
-                bcs _f5
+                bcs _1
 
                 sty sp
                 ldx #0
 
-_f4             lda (buf),y
+_next3          lda (buf),y
                 inx
                 cmp findbuf,x
-                bne _f3
+                bne _next2
 
                 iny
                 cpx findbuf
                 beq Found
 
                 cpy arg0
-                bcc _f4
+                bcc _next3
 
-_f5             jsr nextdwn
-                beq _f6
+_1              jsr nextdwn
+                beq _2
 
                 jsr ldbuf
 
                 lda #0
                 sta sp
-                beq _f2
+                beq _next1
 
-_f6             sta curch
+_2              sta curch
+
                 jsr rstcur
                 jsr ldbuf
 
@@ -73,7 +76,8 @@ _f6             sta curch
                 jsr CommandMsg
 
                 lda #0
-_f7             sta curch
+_3              sta curch
+
                 rts
                 .endproc
 
@@ -88,11 +92,13 @@ Found           .proc
                 ldy sp
                 dey
                 tya
-                jsr Back.back0
+                jsr Back._ENTRY1
 
                 lda #$FE
+
                 rts
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------

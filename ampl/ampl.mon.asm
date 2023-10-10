@@ -103,7 +103,7 @@ RSTwnd          .proc
 
                 lda #0
 _1              jsr PaintW
-                jsr EditorInit.fcmsg1
+                jsr EditorInit._ENTRY3
 
                 jmp floop
 

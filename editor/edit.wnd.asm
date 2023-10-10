@@ -10,11 +10,14 @@
 ;======================================
 Window1         .proc
                 lda currentWindow
-                beq SaveWorld.wdret
+                beq SaveWorld._XIT
 
                 lda #0
                 pha
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -34,15 +37,16 @@ SwapWindows     .proc
 ;======================================
 Window2         .proc
                 lda currentWindow
-                bne SaveWorld.wdret
+                bne SaveWorld._XIT
 
                 lda numwd
-                bne _w2
+                bne _1
 
                 jmp Window2Init
 
-_w2             lda #w2-w1
+_1              lda #w2-w1
                 pha
+
                 bra SwapWindows
 
                 .endproc
@@ -54,11 +58,12 @@ _w2             lda #w2-w1
 SaveWorld       .proc
                 jsr CleanLine
                 jsr savecol
+                jsr rstcsr
                 jsr SetSpacing
 
                 jmp SaveWindow
 
-wdret           rts
+_XIT            rts
                 .endproc
 
 
@@ -71,30 +76,33 @@ Clear_           .proc
                 lda #<DeleteWindow.clearmsg
                 ldx #>DeleteWindow.clearmsg
                 jsr YesNo
-                bne SaveWorld.wdret
+                bne SaveWorld._XIT
 
-clr0            jsr CleanLine
+_ENTRY1         jsr CleanLine
 
                 lda dirty
-                beq clr1
+                beq _1
 
 ;               jsr Alarm
+
                 lda #<DeleteWindow.dirtymsg
                 ldx #>DeleteWindow.dirtymsg
                 jsr YesNo
-                bne SaveWorld.wdret
+                bne SaveWorld._XIT
 
-clr1            jsr FreeTags            ; get rid of tags
+_1              jsr FreeTags            ; get rid of tags
 
                 lda bot
                 ldx bot+1
-_clr2           jsr DeleteLine
-                bne _clr2
+
+_next1          jsr DeleteLine
+                bne _next1
 
                 stx cur+1
                 stx dirty
                 stx isDirty
                 stx inbuf
+
                 jmp NewPage
 
                 .endproc
@@ -105,6 +113,7 @@ _clr2           jsr DeleteLine
 ;======================================
 RestoreWorld    .proc
                 sta currentWindow
+
                 jsr RestoreWindow
                 jsr ldbuf
 
@@ -118,36 +127,39 @@ RestoreWorld    .proc
 ;======================================
 DeleteWindow    .proc
                 lda numwd
-                beq SaveWorld.wdret
+                beq SaveWorld._XIT
 
                 jsr jt_alarm
 
                 lda #<delmsg
                 ldx #>delmsg
                 jsr YesNo
-                bne SaveWorld.wdret
+                bne SaveWorld._XIT
 
-_dw1            jsr Clear_.clr0
+                jsr Clear_._ENTRY1
 
                 lda dirty
-                bne SaveWorld.wdret
+                bne SaveWorld._XIT
 
                 ldy #0
                 sty numwd
+
                 cpy currentWindow
-                bne delwd2
+                bne _1
 
                 ldy #w2-w1
-delwd2          sty currentWindow
+_1              sty currentWindow
+
                 jsr RestoreWindow
 
-                jmp EditorInit.winit1
+                jmp EditorInit._ENTRY1
 
 ;--------------------------------------
 
 clearmsg        .text 7,"CLEAR? "
 delmsg          .text 15,"Delete window? "
 dirtymsg        .text 19,"Not saved, Delete? "
+
                 .endproc
 
 
@@ -156,11 +168,15 @@ dirtymsg        .text 19,"Not saved, Delete? "
 ;======================================
 GetTemp         .proc
                 ldy #0
-gett1           sty tempbuf
+_ENTRY1         sty tempbuf
+
                 ldy #>tempbuf
                 sty arg3
                 ldy #<tempbuf
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -169,13 +185,17 @@ gett1           sty tempbuf
 CommandString   .proc
                 sta arg0
                 sty arg2
+
                 jsr cmdcol
 
                 lda #$80
                 sta arg4
+
                 lda arg0
                 ldy arg2
+
                 jsr GetString
+                jsr rstcsr
 
                 jmp rstcol
 
@@ -189,13 +209,15 @@ YesNo           .proc
                 jsr GetTemp
 
                 ldy tempbuf
-                bne _yn1
+                bne _1
 
                 iny
+
                 rts
 
-_yn1            lda tempbuf+1
+_1              lda tempbuf+1
                 ora #$20
                 cmp #'y'
+
                 rts
                 .endproc

@@ -13,6 +13,7 @@ Front           .proc
                 lda #0
                 sbc indent
                 sta choff
+
                 jsr dspbuf
 
                 lda LMARGN
@@ -27,25 +28,31 @@ Front           .proc
 Back            .proc
                 ldy #0
                 lda (buf),y
-back0           pha
+_ENTRY1         pha
+
                 clc
                 adc LMARGN
+
                 sec
                 sbc RMARGN
-                bcs _back1
+                bcs _1
 
                 lda #1
-_back1          sbc indent
+_1              sbc indent
                 sta choff
+
                 jsr dspbuf
 
                 sec
                 pla
                 sbc indent
+
                 sec
                 sbc choff
+
                 clc
                 adc LMARGN
+
                 jmp rstcol+6
 
                 .endproc
@@ -58,8 +65,9 @@ PageUp          .proc
                 sec
                 lda lnum
                 sbc #2
+
                 ldy #1
-                bne PageContent
+                bra PageContent
 
                 .endproc
 
@@ -69,11 +77,14 @@ PageUp          .proc
 ;======================================
 PageDown        .proc
                 ldy #5
+
                 sec
                 lda #2
                 sbc lnum
+
                 .endproc
 
+                ;[fall-through]
 
 ;--------------------------------------
 ;
@@ -82,19 +93,20 @@ PageContent     .proc
                 clc
                 adc nlines
                 sta arg14
+
                 dec arg14
-                beq _page2
+                beq _XIT
 
                 sty arg13
                 jsr CleanLine
 
-_page1          ldy arg13
+_next1          ldy arg13
                 jsr next
 
                 dec arg14
-                bne _page1
+                bne _next1
 
-_page2          jmp CenterLine
+_XIT            jmp CenterLine
 
                 .endproc
 
@@ -107,32 +119,35 @@ Paste           .proc
                 beq _XIT
 
                 stx dirty
+
                 jsr CleanLine
                 jsr nextup
 
                 sta cur+1               ; tricky, fake out top
-                jsr SaveWindow.savwd1
+
+                jsr SaveWindow._ENTRY1
                 jsr DeleteTop
-_p1             jsr strptr
+
+_next1          jsr strptr
                 jsr ldbuf.ldbuf1
                 jsr InsertByte
 
                 lda allocerr
-                bne _p2                 ; check for out of memory
+                bne _1                  ; check for out of memory
 
                 jsr DeleteNext
-                bne _p1
+                bne _next1
 
-_p2             jsr rstcur
+_1              jsr rstcur
 
                 ldy currentWindow
                 lda w1+wcur+1,y
-                beq _p3
+                beq _2
 
                 jsr nextdwn
 
-_p3             lda #0
-                jmp NewPage.npage1
+_2              lda #0
+                jmp NewPage._ENTRY1
 
 _XIT            rts
                 .endproc
@@ -146,6 +161,7 @@ IndentLeft      .proc
                 beq ScrollInit._XIT
 
                 dec indent
+
                 jmp CenterLine
 
                 .endproc
@@ -159,6 +175,7 @@ IndentRight     .proc
                 bmi ScrollInit._XIT
 
                 inc indent
+
                 jmp CenterLine
 
                 .endproc
@@ -171,18 +188,21 @@ InsertToggle    .proc
                 lda #<_rmsg
                 ldx #>_rmsg
                 inc insert
-                beq _it1
+                beq _XIT
 
                 lda #$FF
                 sta insert
+
                 lda #<_imsg
                 ldx #>_imsg
-_it1            jmp CommandMsg
+
+_XIT            jmp CommandMsg
 
 ;--------------------------------------
 
 _imsg           .text 6,"INSERT"
 _rmsg           .text 7,"REPLACE"
+
                 .endproc
 
 
@@ -191,12 +211,13 @@ _rmsg           .text 7,"REPLACE"
 ;======================================
 ScrollInit      .proc
                 sty arg13
+
                 jsr CleanLine
-                beq _siret
+                beq _XIT
 
                 ldy arg13
                 jsr next
-                beq _siret              ; EOF
+                beq _1                ; EOF
 
                 lda COLCRS
                 sta x
@@ -206,12 +227,14 @@ ScrollInit      .proc
 
                 lda #0
                 sta choff
+
                 jsr dspbuf
 
-_si1            jmp ldbuf
+                jmp ldbuf
 
-_siret          pla
+_1              pla
                 pla
+
 _XIT            rts
                 .endproc
 
@@ -224,13 +247,15 @@ ScrollUp        .proc
                 jsr ScrollInit
 
                 dec lnum
-                bmi _su2
+                bmi _1
 
                 jmp scrup
 
-_su2            inc lnum
+_1              inc lnum
+
                 lda ytop
                 sta y
+
                 jsr BottomLine
 
                 lda nlines
@@ -252,14 +277,16 @@ ScrollDown      .proc
                 ldx lnum
                 inx
                 cpx nlines
-                beq _sd2
+                beq _1
 
                 stx lnum
+
                 jmp scrdwn
 
-_sd2            jsr BottomLine
+_1              jsr BottomLine
 
                 stx y
+
                 lda nlines
                 ldx ytop
                 jsr MoveUp
@@ -279,8 +306,10 @@ BottomLine      .proc
                 clc
                 lda ytop
                 adc nlines
+
                 tax
                 dex
+
 _XIT            rts
                 .endproc
 
@@ -312,7 +341,7 @@ ScrollLeft      .proc
 
                 lda LMARGN
                 cmp COLCRS
-                bcc _sl1
+                bcc _XIT
 
                 clc
                 lda choff
@@ -320,10 +349,11 @@ ScrollLeft      .proc
                 beq CheckColumn._XIT
 
                 dec choff
+
                 jsr dspbuf
                 jsr scrrt
 
-_sl1            jmp scrlft
+_XIT            jmp scrlft
 
                 .endproc
 
@@ -337,13 +367,14 @@ ScrollRight     .proc
 
                 lda COLCRS
                 cmp RMARGN
-                bcc _sr2
+                bcc _XIT
 
                 inc choff
+
                 jsr dspbuf
                 jsr scrlft
 
-_sr2            jmp scrrt
+_XIT            jmp scrrt
 
                 .endproc
 
@@ -355,11 +386,14 @@ SetSpacing      .proc
                 sec
                 lda indent
                 adc choff
+
                 clc
                 adc COLCRS
+
                 sec
                 sbc LMARGN
                 sta sp
+
                 rts
                 .endproc
 
@@ -370,8 +404,9 @@ SetSpacing      .proc
 MoveDown        .proc
                 ldy #+0-40              ; rowSize
                 sty arg5
+
                 ldy #$FF
-                bne MoveContent
+                bra MoveContent
 
                 .endproc
 
@@ -382,40 +417,50 @@ MoveDown        .proc
 MoveUp          .proc
                 ldy #40                 ; rowSize
                 sty arg5
+
                 ldy #0
+
                 .endproc
 
+                ;[fall-through]
 
-;--------------------------------------
+
+;======================================
 ;
-;--------------------------------------
+;======================================
 MoveContent     .proc
                 sty arg6                ; save registers
                 sta arg4
 
                 stx ROWCRS
+                jsr rstcsr
                 jsr DisplayLocation     ; get display address
 
                 ldx arg4
                 dex
-_mu1            lda arg0
+
+_next1          lda arg0
                 sta arg2
+
                 clc
                 adc arg5
                 sta arg0
+
                 lda arg1
                 sta arg3
+
                 adc arg6
                 sta arg1
 
                 ldy #39
-_mu2            lda (arg0),y
+_next2          lda (arg0),y
                 sta (arg2),y
+
                 dey
-                bpl _mu2
+                bpl _next2
 
                 dex
-                bne _mu1
+                bne _next1
 
                 rts
                 .endproc

@@ -45,11 +45,14 @@ ltab            .addr lsh1._lshift      ; LSH
                 .byte $22               ; tvDisp
 
                 jmp InsertChar          ; normal char
+
                 rts                     ; ctrl-shift char
+
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
 
                 jmp GetNext.ismt        ; STM catch all
+
                 rts                     ; illegal Monitor cmd
 
                 .byte $86
@@ -71,23 +74,24 @@ Start           .proc
                 bne cold
 
 _warm           lda isMonitorLive       ; see where we were
-                beq _w1
+                beq _1
 
                 jmp Monitor._ENTRY1
 
-_w1             jmp GeneralMemErr.Punt  ; editor
+_1              jmp GeneralMemErr.Punt  ; editor
 
 cold            lda #0
                 tay
-_nextZero       sta $0480,y             ; zero RAM
+_next1          sta $0480,y             ; zero RAM
+
                 dey
-                bne _nextZero
+                bne _next1
 
                 ldy #$3A
-_nextJmps       lda emjmps-1,y          ; init RAM
+_next2          lda emjmps-1,y          ; init RAM
                 dey
                 sta jt_jmps,y
-                bne _nextJmps
+                bne _next2
 
                 lda #<iSTMres
                 sta jt_stmradr
@@ -97,6 +101,7 @@ _nextJmps       lda emjmps-1,y          ; init RAM
                 sta jt_stmradr+2
 
                 ; sty chrConvert1       ; Y=0
+
                 jsr EditorInit          ; init editor
 
 ;SPLInit PROC ; init compiler RAM
@@ -114,23 +119,26 @@ _nextJmps       lda emjmps-1,y          ; init RAM
 
                 lda #0
                 ldx #4
-                ldy isBigSymTbl
-                beq _1                  ; no
+                ldy isBigSymTbl         ; big symbol table?
+                beq _2                  ;   no
 
                 ldx #6
-_1              jsr GetMemory           ; get hash table
+_2              jsr GetMemory           ; get hash table
 
                 sta symTblGlobal        ; qglobal hash table
                 stx symTblGlobal+1
-                ldy isBigSymTbl
-                beq _2                  ; no
+
+                ldy isBigSymTbl         ; big symbol table?
+                beq _3                  ;   no
 
                 inx
                 inx
                 sta bigSymTblGlobal     ; big symbol table hash table
                 stx bigSymTblGlobal+1
-_2              inx
+
+_3              inx
                 inx
                 sta symTblLocal         ; local hash table
                 stx symTblLocal+1
+
                 .endproc

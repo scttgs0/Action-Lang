@@ -11,52 +11,60 @@
 InsertChar      .proc
                 jsr SetSpacing
 
-_padbuf         ldy #0
+                ldy #0
                 lda (buf),y
                 cmp jt_linemax
-                bcc _pbuf0              ; test line too long
+                bcc _1                 ; test line too long
 
                 jsr scrbell
 
                 ldy #0
                 lda (buf),y
-_pbuf0          cmp sp
-                bcs _pbuf2
+_1              cmp sp
+                bcs _2
 
                 sta arg0
+
                 lda sp
                 sta (buf),y
+
                 ldy arg0
                 lda #$20                ; pad with spaces
-_pbuf1          iny
+_next1          iny
                 sta (buf),y
-                cpy sp
-                bcc _pbuf1
 
-_pbret          ldy sp
+                cpy sp
+                bcc _next1
+
+_next2          ldy sp
                 lda curch
                 sta (buf),y
+
                 lda #$FF
                 sta isDirty
+
                 jsr dspbuf
 
                 jmp ScrollRight
 
-_pbuf2          ldx insert
-                beq _pbret
+_2              ldx insert
+                beq _next2
 
-    ; move buf right one char
-_movert         adc #0                  ; really 1, carry set
+;   move buf right one char
+                adc #0                  ; really 1, carry set
                 sta (buf),y
+
                 tay
-_mrt1           dey
+_next3          dey
+
                 lda (buf),y
                 iny
                 sta (buf),y
+
                 dey
                 cpy sp
-                bne _mrt1
-                beq _pbret
+                bne _next3
+                bra _next2
 
                 .endproc
 
@@ -67,13 +75,16 @@ _mrt1           dey
 InsertSpace     .proc
                 lda insert
                 pha
+
                 lda #$20
                 sta insert
                 sta curch
+
                 jsr InsertChar
 
                 pla
                 sta insert
+
                 jmp scrlft
 
                 .endproc
@@ -87,63 +98,70 @@ Insert_         .proc
                 jsr nextup
 
                 sta cur+1               ; tricky
-                jsr insert2
+
+                jsr _ENTRY1
 
                 lda #0
-                jmp NewPage.npage1
+                jmp NewPage._ENTRY1
 
-insert2         lda #0
+_ENTRY1         lda #0
                 tay
-insert3         sta (buf),y
+_ENTRY2         sta (buf),y
+
                 iny
                 sty dirty
+
                 jmp InsertByte
 
                 .endproc
 
 
 ;======================================
-;
+; handle pad if any
 ;======================================
 csret           .proc
-    ; handle pad if any
                 jsr InsertSpace
                 jsr DeleteChar
 
                 ldy #0
                 lda (buf),y
                 pha
+
                 jsr SetSpacing
 
                 sta isDirty             ; always non-zero
+
                 sec
                 sbc #1
                 sta (buf),y
+
                 jsr CleanLine
 
                 pla
                 sta arg1
+
                 inc arg1
                 lda #0
                 sta arg0
-                beq _csr2
+                beq _1
 
-_csr1           lda (buf),y
+_next1          lda (buf),y
                 inc arg0
                 ldy arg0
                 sta (buf),y
+
                 inc sp
-_csr2           ldy sp
+_1              ldy sp
                 cpy arg1
-                bcc _csr1
+                bcc _next1
 
                 ldy #0
                 lda arg0
-                jsr Insert_.insert3
+                jsr Insert_._ENTRY2
                 jsr nextup
                 jsr Refresh
 
-                jmp Return_.ret2
+                jmp Return_._ENTRY1
 
                 .endproc
 
@@ -156,14 +174,15 @@ Return_         .proc
                 bne csret
 
                 jsr CheckDown
-                bne ret2
+                bne _ENTRY1
 
-_ret1           jsr Insert_.insert2
+                jsr Insert_._ENTRY1
                 jsr nextup
                 jsr ldbuf
-ret2            jsr ScrollDown
 
-ret3            jmp Front
+_ENTRY1         jsr ScrollDown
+
+_XIT            jmp Front
 
                 .endproc
 
@@ -177,33 +196,37 @@ Delete_         .proc
                 lda delbuf
                 ldx delbuf+1
                 stx dirty
+
                 ldy lastch
                 cpy #$9C
-                beq _del1
+                beq _1
 
                 jsr DeleteFree
 
-_del1           sta arg3
+_1              sta arg3
                 stx arg4
+
                 jsr InsertBuffer
                 jsr CheckDown           ; last line ?
-                bne _del2               ; no, delete it
+                bne _2                  ;   no, delete it
 
                 tay
                 sta (buf),y
+
                 iny
                 sty isDirty
-                bra Return_.ret3
+                bra Return_._XIT
 
-_del2           jsr DeleteCurrentLine
-                beq _del3
+_2              jsr DeleteCurrentLine
+                beq _3
 
                 jsr nextdwn
-_del3           jsr chkcur
+_3              jsr chkcur
 
                 lda #0
 
-                jmp NewPage.npage1
+                jmp NewPage._ENTRY1
+
                 .endproc
 
 
@@ -215,7 +238,10 @@ DeleteTop       .proc
                 ldx delbuf+5
                 sta delnxt
                 stx delnxt+1
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -226,6 +252,7 @@ DeleteEnd       .proc
                 bne _XIT
 
                 cpx #>delbuf
+
 _XIT            rts
                 .endproc
 
@@ -238,7 +265,8 @@ DeleteFree      .proc
                 beq DeleteEnd._XIT
 
                 jsr DeleteLine
-                bra DeleteFree
+                bne DeleteFree
+
                 .endproc
 
 
@@ -249,10 +277,12 @@ DeleteNext      .proc
                 ldy #5
                 lda (delnxt),y
                 tax
+
                 dey
                 lda (delnxt),y
                 sta delnxt
                 stx delnxt+1
+
                 jmp DeleteEnd
 
                 .endproc
@@ -279,17 +309,21 @@ DeleteChar      .proc
                 ldy #0
                 lda (buf),y
                 sta isDirty
+
                 sec
                 sbc #1
                 sta (buf),y
+
                 ldy sp
-_dch1           iny
+_next1          iny
                 lda (buf),y
+
                 dey
                 sta (buf),y
+
                 iny
                 cpy isDirty
-                bcc _dch1               ; really checking for =
+                bcc _next1              ; really checking for =
 
                 .endproc
 
@@ -314,6 +348,7 @@ CheckDown       .proc
 
                 ldy #5
                 lda (cur),y
+
 _XIT            rts
                 .endproc
 
@@ -327,13 +362,14 @@ BackSpc         .proc
                 cmp #2
                 bcc CheckDown._XIT
 
-bsp1            jsr ScrollLeft
+_ENTRY1         jsr ScrollLeft
                 jsr SetSpacing
 
                 tay
                 lda #$20
                 sta (buf),y
                 sta isDirty
+
                 lda insert
                 bne DeleteChar
 
@@ -349,7 +385,7 @@ csbs            .proc
                 jsr SetSpacing
 
                 cmp #2
-                bcs BackSpc.bsp1
+                bcs BackSpc._ENTRY1
 
                 jsr chkcur
                 beq CheckDown._XIT      ; no lines at all!
@@ -364,29 +400,35 @@ csbs            .proc
                 jsr nextdwn
 
                 sta isDirty
+
                 jsr curstr
 
                 clc
                 ldy #0
                 lda (buf),y
                 sta arg2
+
                 adc (arg0),y
                 sta (buf),y
+
                 lda (arg0),y
-                beq _cb2
+                beq _next2
 
                 sta arg3
-_cb1            iny
+
+_next1          iny
                 sty arg4
+
                 lda (arg0),y
                 inc arg2
                 ldy arg2
                 sta (buf),y
+
                 ldy arg4
                 cpy arg3
-                bne _cb1
+                bne _next1
 
-_cb2            jsr DeleteCurrentLine
+_next2          jsr DeleteCurrentLine
 
                 jmp Refresh
 

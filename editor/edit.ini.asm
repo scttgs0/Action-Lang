@@ -17,16 +17,20 @@ MemoryInit      .proc
                 lda #0
                 tay
                 sta (afbase),y
+
                 iny
                 sta (afbase),y
 
                 sec
                 ;!!lda MEMTOP
                 sbc afbase
+
                 iny
                 sta (afbase),y
+
                 ;!!lda MEMTOP+1
                 sbc afbase+1
+
                 iny
                 sta (afbase),y
 
@@ -49,14 +53,17 @@ MemoryInit      .proc
 ZeroWindow      .proc
                 lda #0
                 ldx #15
+
 _next1          dex                     ; zero page0 window table
                 sta sp,x
                 bne _next1
 
                 sta isDirty
                 sta inbuf
+
                 tay
                 sta (buf),y
+
                 rts
                 .endproc
 
@@ -70,21 +77,25 @@ Window2Init     .proc
                 lda jt_wsize
                 sta nlines
                 sta cmdln
+
                 jsr SaveWorld
 
                 lda #w2-w1
                 sta numwd
                 sta currentWindow
+
                 jsr ZeroWindow
 
                 ldy jt_wsize
                 iny
                 sty ytop
+
                 sec
                 lda #23
                 sbc jt_wsize
                 sta nlines
-                bra EditorInit.fcmsg
+
+                bra EditorInit._ENTRY2
 
                 .endproc
 
@@ -103,7 +114,7 @@ EditorInit      .proc
                 lda #>$0600
                 ;!!sta MEMLO+1
 
-                jsr MemoryInit          ; initialize editor memory
+                jsr MemoryInit
 
                 lda #0
                 ldx #1
@@ -127,7 +138,7 @@ EditorInit      .proc
 ;   initialize window
                 jsr ZeroWindow
 
-winit1          lda #23                 ; rowcount
+_ENTRY1         lda #23                 ; rowcount
                 sta nlines
                 sta cmdln
 
@@ -135,10 +146,11 @@ winit1          lda #23                 ; rowcount
                 sta currentWindow
                 sta ytop
 
-fcmsg           jsr CenterLine
+_ENTRY2         jsr CenterLine
 
-fcmsg1          lda #<editCmdMsg
+_ENTRY3         lda #<editCmdMsg
                 ldx #>editCmdMsg
+
                 jmp CommandMsg
 
 ;--------------------------------------

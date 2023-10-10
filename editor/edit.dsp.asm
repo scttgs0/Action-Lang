@@ -10,10 +10,12 @@
 ;======================================
 CommandMsg      .proc
                 sta arg0
+
                 jsr cmdcol
 
                 lda #0
                 sta arg3
+
                 lda arg0
                 ldy #$80
                 jsr putstr
@@ -30,16 +32,17 @@ CleanLine       .proc
                 jsr chkcur
 
                 lda isDirty
-                beq _cll1
+                beq _XIT
 
                 sta dirty
+
                 lda #0
                 sta isDirty
 
                 jsr DeleteCurrentLine
                 jsr InsertByte
 
-_cll1           jmp chkcur
+_XIT            jmp chkcur
 
                 .endproc
 
@@ -50,16 +53,18 @@ _cll1           jmp chkcur
 SaveWindow      .proc
                 jsr CleanLine
 
-savwd1          clc
+_ENTRY1         clc
                 lda #14
                 tax
                 adc currentWindow
+
                 tay
-_sw1            lda sp,x
+_next1          lda sp,x
                 sta w1,y
+
                 dey
                 dex
-                bpl _sw1
+                bpl _next1
 
                 rts
                 .endproc
@@ -73,12 +78,14 @@ RestoreWindow   .proc
                 lda #14
                 tax
                 adc currentWindow
+
                 tay
-_rw1            lda w1,y
+_next1          lda w1,y
                 sta sp,x
+
                 dey
                 dex
-                bpl _rw1
+                bpl _next1
 
 _XIT            rts
                 .endproc
@@ -106,26 +113,30 @@ EndLine         .proc
 CenterLine      .proc
                 lda #0
                 sta temps
+
                 jsr CleanLine
-                beq _cl0
+                beq _1
 
                 jsr nextup
-                beq _cl0
+                beq _1
 
                 inc temps
+
                 jsr nextup
-                beq _cl0
+                beq _1
 
                 inc temps
-_cl0            jsr NewPage
 
-_cl1            lda temps
+_1              jsr NewPage
+
+_next1          lda temps
                 beq RestoreWindow._XIT
 
                 jsr ScrollDown
 
                 dec temps
-                jmp _cl1
+
+                jmp _next1
 
                 .endproc
 
@@ -148,10 +159,14 @@ TopLine         .proc
 NewPage         .proc
                 lda #0
                 sta lnum
-npage1          sta choff
+
+_ENTRY1         sta choff
+
+                jsr rstcsr              ; for command line
 
                 lda LMARGN
                 sta COLCRS
+
                 .endproc
 
                 ;[fall-through]
@@ -165,48 +180,56 @@ Refresh         .proc
                 lda ytop
                 adc lnum
                 sta ROWCRS
+
                 jsr savecol
                 jsr SaveWindow
 
                 inc ROWCRS
+
                 jsr nextdwn
 
                 sta arg9
+
                 clc
                 lda nlines
                 sbc lnum
                 sta arg10
-                beq _cl4
+                beq _2
 
-_cl1            ldy #0
+_next1          ldy #0
                 lda indent
                 sta arg3
+
                 ldx arg9
-                beq _cl5
+                beq _3
 
                 jsr curstr
 
-_cl2            jsr putstr
+_next2          jsr putstr
 
                 lda arg9
-                bne _cl3
+                bne _1
 
                 tay
                 sta (arg0),y
-_cl3            inc ROWCRS
+
+_1              inc ROWCRS
+
                 jsr nextdwn
 
                 sta arg9
-                dec arg10
-                bne _cl1
 
-_cl4            jsr rstcur
+                dec arg10
+                bne _next1
+
+_2              jsr rstcur
                 jsr rstcol
 
                 jmp RefreshBuf
 
-_cl5            lda #<zero
+_3              lda #<zero
                 ldx #>zero
-                bra _cl2
+
+                bra _next2
 
                 .endproc

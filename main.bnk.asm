@@ -166,7 +166,7 @@ cstmtlst        .proc
 ;======================================
 mgett1          .proc
                 jsr EditBank
-                jsr GetTemp.gett1
+                jsr GetTemp._ENTRY1
 
                 .endproc
 

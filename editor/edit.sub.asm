@@ -14,102 +14,115 @@ Substitute      .proc
 
                 lda lastch
                 cmp #$7D
-                beq _s2
+                beq _2
 
                 pha
+
                 lda #<submsg
                 ldx #>submsg
+
                 ldy #>subbuf
                 sty arg3
                 ldy #<subbuf
+
                 jsr CommandString
 
                 pla
 
 ;   check for ESC key
                 ldx subbuf
-                bne _s0
+                bne _1
 
                 ldx subbuf+1
                 cpx #$1B
-                beq _s1
+                beq _XIT1
 
-_s0             cmp #$F8
-                beq _s3                 ; string already found
+_1              cmp #$F8
+                beq _3                  ; string already found
 
                 lda #<formsg
                 ldx #>formsg
-                jsr Find.find1
-                bne _s3
+                jsr Find._ENTRY1
+                bne _3
 
-_s1             rts
+_XIT1           rts
 
-_s2             jsr Find.find2
-                beq _s1
+_2              jsr Find._ENTRY2
+                beq _XIT1
 
-_s3             lda #$7D
+_3              lda #$7D
                 sta curch
                 sta isDirty             ; flag line as dirty
+
                 sec
                 lda subbuf
                 sbc findbuf             ; get delta size
                 sta arg3
+
                 php                     ; save status for test below
-                bcs _s4
+                bcs _4
 
                 lda #1
                 sbc arg3                ; negate delta size
-_s4             clc
+
+_4              clc
                 adc buf
                 sta arg0
+
                 lda #0
                 tay
                 adc buf+1
                 sta arg1
+
                 lda (buf),y
                 plp
-                bcc _s6                 ; need to remove space
-                beq _s8                 ; same size
+                bcc _5                  ; need to remove space
+                beq _6                  ; same size
 
 ;   need to add space
                 tay
-_s5             lda (buf),y
+_next1          lda (buf),y
                 sta (arg0),y
+
                 dey
                 cpy sp
-                bcs _s5
-                bcc _s8
+                bcs _next1
+                bra _6
 
-_s6             sta arg2
+_5              sta arg2
+
                 ldy sp
                 dey
-_s7             iny
+
+_next2          iny
                 lda (arg0),y
                 sta (buf),y
+
                 cpy arg2
-                bcc _s7
+                bcc _next2
 
-_s8             ldy sp
+_6              ldy sp
                 ldx #0
-                beq _s10
+                beq _7
 
-_s9             inx
+_next3          inx
                 lda subbuf,x
                 sta (buf),y
+
                 iny
-_s10            cpx subbuf
-                bne _s9
+_7              cpx subbuf
+                bne _next3
 
                 clc
                 ldy #0
                 lda (buf),y
                 adc arg3
                 sta (buf),y
+
                 jmp RefreshBuf
 
                 .endproc
 
-;--------------------------------------
 ;--------------------------------------
 
 submsg          .text 12,"Substitute? "
