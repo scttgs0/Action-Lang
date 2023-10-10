@@ -30,6 +30,7 @@ front           .proc
                 lda #0
                 sbc indent
                 sta choff
+
                 jsr dspbuf
 
                 lda lmargin
@@ -44,25 +45,31 @@ front           .proc
 back            .proc
                 ldy #0
                 lda (buf),y
-back0           pha
+_ENTRY1         pha
+
                 clc
                 adc lmargin
+
                 sec
                 sbc rmargin
-                bcs _back1
+                bcs _1
 
                 lda #1
-_back1          sbc indent
+_1              sbc indent
                 sta choff
+
                 jsr dspbuf
 
                 sec
                 pla
                 sbc indent
+
                 sec
                 sbc choff
+
                 clc
                 adc lmargin
+
                 jmp rstcol+6
 
                 .endproc
@@ -75,8 +82,9 @@ pgup            .proc
                 sec
                 lda lnum
                 sbc #2
+
                 ldy #1
-                bne page
+                bne page                ; [unc]
 
                 .endproc
 
@@ -86,10 +94,14 @@ pgup            .proc
 ;======================================
 pgdwn           .proc
                 ldy #5
+
                 sec
                 lda #2
                 sbc lnum
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -99,19 +111,20 @@ page            .proc
                 clc
                 adc nlines
                 sta arg14
+
                 dec arg14
-                beq _page2
+                beq _XIT
 
                 sty arg13
                 jsr clnln
 
-_page1          ldy arg13
+_next1          ldy arg13
                 jsr next
 
                 dec arg14
-                bne _page1
+                bne _next1
 
-_page2          jmp ctrln
+_XIT            jmp ctrln
 
                 .endproc
 
@@ -121,37 +134,40 @@ _page2          jmp ctrln
 ;======================================
 paste           .proc
                 jsr deltop
-                beq _pret
+                beq _XIT
 
                 stx dirty
+
                 jsr clnln
                 jsr nextup
 
                 sta cur+1               ; tricky, fake out top
-                jsr savewd.savwd1
+
+                jsr savewd._ENTRY1
                 jsr deltop
-_p1             jsr strptr
+
+_next1          jsr strptr
                 jsr ldbuf.ldbuf1
                 jsr instb
 
                 lda allocerr
-                bne _p2                 ; check for out of memory
+                bne _1                  ; check for out of memory
 
                 jsr delnext
-                bne _p1
+                bne _next1
 
-_p2             jsr rstcur
+_1              jsr rstcur
 
                 ldy curwdw
                 lda w1+wcur+1,y
-                beq _p3
+                beq _2
 
                 jsr nextdwn
 
-_p3             lda #0
-                jmp newpage.npage1
+_2              lda #0
+                jmp newpage._ENTRY1
 
-_pret           rts
+_XIT            rts
                 .endproc
 
 
@@ -160,9 +176,10 @@ _pret           rts
 ;======================================
 indntl          .proc
                 lda indent
-                beq scrlinit.putrtn
+                beq scrlinit._XIT
 
                 dec indent
+
                 jmp ctrln
 
                 .endproc
@@ -173,9 +190,10 @@ indntl          .proc
 ;======================================
 indntr          .proc
                 lda indent
-                bmi scrlinit.putrtn
+                bmi scrlinit._XIT
 
                 inc indent
+
                 jmp ctrln
 
                 .endproc
@@ -188,18 +206,21 @@ insrtt          .proc            ; was InsertT
                 lda #<_rmsg
                 ldx #>_rmsg
                 inc insert
-                beq _it1
+                beq _XIT
 
                 lda #$FF
                 sta insert
+
                 lda #<_imsg
                 ldx #>_imsg
-_it1            jmp cmdmsg
+
+_XIT            jmp cmdmsg
 
 ;--------------------------------------
 
 _imsg           .text 6,"INSERT"
 _rmsg           .text 7,"REPLACE"
+
                 .endproc
 
 
@@ -208,28 +229,31 @@ _rmsg           .text 7,"REPLACE"
 ;======================================
 scrlinit        .proc
                 sty arg13
+
                 jsr clnln
-                beq _siret
+                beq _1
 
                 ldy arg13
                 jsr next
-                beq _siret              ; EOF
+                beq _1                  ; EOF
 
                 lda colcrs
                 sta x
 
-    ; LDA choff
-    ; BEQ _SI1
+                ; lda choff
+                ; beq _SI1
 
                 lda #0
                 sta choff
+
                 jsr dspbuf
 
-_si1            jmp ldbuf
+                jmp ldbuf
 
-_siret          pla
+_1              pla
                 pla
-putrtn          rts
+
+_XIT            rts
                 .endproc
 
 
@@ -241,13 +265,15 @@ scrlup          .proc
                 jsr scrlinit
 
                 dec lnum
-                bmi _su2
+                bmi _1
 
                 jmp scrup
 
-_su2            inc lnum
+_1              inc lnum
+
                 lda ytop
                 sta y
+
                 jsr botln
 
                 lda nlines
@@ -269,14 +295,16 @@ scrldwn         .proc
                 ldx lnum
                 inx
                 cpx nlines
-                beq _sd2
+                beq _1
 
                 stx lnum
+
                 jmp scrdwn
 
-_sd2            jsr botln
+_1              jsr botln
 
                 stx y
+
                 lda nlines
                 ldx ytop
                 jsr moveup
@@ -296,9 +324,11 @@ botln           .proc
                 clc
                 lda ytop
                 adc nlines
+
                 tax
                 dex
-escape          rts
+
+_XIT            rts
                 .endproc
 
 
@@ -311,13 +341,13 @@ chkcol          .proc
                 ldy #0
                 lda (buf),y
                 cmp sp
-                bcs chkc1
+                bcs _XIT
 
                 jsr back
                 jsr setsp
 
                 clc
-chkc1           rts
+_XIT            rts
                 .endproc
 
 
@@ -329,18 +359,19 @@ scrllft         .proc
 
                 lda lmargin
                 cmp colcrs
-                bcc _sl1
+                bcc _XIT
 
                 clc
                 lda choff
                 adc indent
-                beq chkcol.chkc1
+                beq chkcol._XIT
 
                 dec choff
+
                 jsr dspbuf
                 jsr scrrt
 
-_sl1            jmp scrlft
+_XIT            jmp scrlft
 
                 .endproc
 
@@ -350,17 +381,18 @@ _sl1            jmp scrlft
 ;======================================
 scrlrt          .proc
                 jsr chkcol
-                bcc chkcol.chkc1
+                bcc chkcol._XIT
 
                 lda colcrs
                 cmp rmargin
-                bcc _sr2
+                bcc _XIT
 
                 inc choff
+
                 jsr dspbuf
                 jsr scrlft
 
-_sr2            jmp scrrt
+_XIT            jmp scrrt
 
                 .endproc
 
@@ -372,11 +404,14 @@ setsp           .proc
                 sec
                 lda indent
                 adc choff
+
                 clc
                 adc colcrs
+
                 sec
                 sbc lmargin
                 sta sp
+
                 rts
                 .endproc
 
@@ -385,10 +420,11 @@ setsp           .proc
 ;   MoveDwn(cnt, row)
 ;======================================
 movedwn         .proc
-                ldy #+0-40
+                ldy #+0-40              ; rowSize
                 sty arg5
+
                 ldy #$FF
-                bne move
+                bne move                ; [unc]
 
                 .endproc
 
@@ -397,42 +433,52 @@ movedwn         .proc
 ;   MoveUp(cnt, row)
 ;======================================
 moveup          .proc
-                ldy #40
+                ldy #40                 ; rowSize
                 sty arg5
+
                 ldy #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
 ;
 ;======================================
 move            .proc
-                sty arg6
+                sty arg6                ; save registers
                 sta arg4
+
                 stx rowcrs
                 jsr rstcsr
                 jsr dsploc              ; get display address
 
                 ldx arg4
                 dex
-_mu1            lda arg0
+
+_next1          lda arg0
                 sta arg2
+
                 clc
                 adc arg5
                 sta arg0
+
                 lda arg1
                 sta arg3
+
                 adc arg6
                 sta arg1
 
                 ldy #39
-_mu2            lda (arg0),y
+_next2          lda (arg0),y
                 sta (arg2),y
+
                 dey
-                bpl _mu2
+                bpl _next2
 
                 dex
-                bne _mu1
+                bne _next1
 
                 rts
                 .endproc

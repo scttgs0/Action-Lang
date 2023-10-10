@@ -120,7 +120,7 @@ rstwnd          .proc
 
                 lda #0
 _1              jsr paintw
-                jsr einit.fcmsg1
+                jsr einit._ENTRY3
 
                 jmp floop
 

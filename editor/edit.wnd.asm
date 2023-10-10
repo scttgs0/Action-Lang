@@ -27,11 +27,14 @@
 ;======================================
 wind1           .proc
                 lda curwdw
-                beq savworld.wdret
+                beq savworld._XIT
 
                 lda #0
                 pha
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -51,15 +54,16 @@ swapwd          .proc
 ;======================================
 wind2           .proc
                 lda curwdw
-                bne savworld.wdret
+                bne savworld._XIT
 
                 lda numwd
-                bne _w2
+                bne _1
 
                 jmp w2init
 
-_w2             lda #w2-w1
+_1              lda #w2-w1
                 pha
+
                 bne swapwd              ; [unc]
 
                 .endproc
@@ -76,7 +80,7 @@ savworld        .proc
 
                 jmp savewd
 
-wdret           rts
+_XIT            rts
                 .endproc
 
 
@@ -89,30 +93,33 @@ clear           .proc
                 lda #<delwd.clearmsg
                 ldx #>delwd.clearmsg
                 jsr yesno
-                bne savworld.wdret
+                bne savworld._XIT
 
-clr0            jsr clnln
+_ENTRY1         jsr clnln
 
                 lda dirty
-                beq clr1
+                beq _1
 
-    ; JSR Alarm
+;               jsr Alarm
+
                 lda #<delwd.dirtymsg
                 ldx #>delwd.dirtymsg
                 jsr yesno
-                bne savworld.wdret
+                bne savworld._XIT
 
-clr1            jsr freetags            ; get rid of tags
+_1              jsr freetags            ; get rid of tags
 
                 lda bot
                 ldx bot+1
-_clr2           jsr delln
-                bne _clr2
+
+_next1          jsr delln
+                bne _next1
 
                 stx cur+1
                 stx dirty
                 stx dirtyf
                 stx inbuf
+
                 jmp newpage
 
                 .endproc
@@ -123,6 +130,7 @@ _clr2           jsr delln
 ;======================================
 rstworld        .proc
                 sta curwdw
+
                 jsr rstwd
                 jsr ldbuf
 
@@ -136,36 +144,39 @@ rstworld        .proc
 ;======================================
 delwd           .proc
                 lda numwd
-                beq savworld.wdret
+                beq savworld._XIT
 
                 jsr alarm
 
                 lda #<delmsg
                 ldx #>delmsg
                 jsr yesno
-                bne savworld.wdret
+                bne savworld._XIT
 
-_dw1            jsr clear.clr0
+                jsr clear._ENTRY1
 
                 lda dirty
-                bne savworld.wdret
+                bne savworld._XIT
 
                 ldy #0
                 sty numwd
+
                 cpy curwdw
-                bne delwd2
+                bne _1
 
                 ldy #w2-w1
-delwd2          sty curwdw
+_1              sty curwdw
+
                 jsr rstwd
 
-                jmp einit.winit1
+                jmp einit._ENTRY1
 
 ;--------------------------------------
 
 clearmsg        .text 7,"CLEAR? "
 delmsg          .text 15,"Delete window? "
 dirtymsg        .text 19,"Not saved, Delete? "
+
                 .endproc
 
 
@@ -174,11 +185,15 @@ dirtymsg        .text 19,"Not saved, Delete? "
 ;======================================
 gettemp         .proc
                 ldy #0
-gett1           sty tempbuf
+_ENTRY1         sty tempbuf
+
                 ldy #>tempbuf
                 sty arg3
                 ldy #<tempbuf
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -187,12 +202,15 @@ gett1           sty tempbuf
 cmdstr          .proc
                 sta arg0
                 sty arg2
+
                 jsr cmdcol
 
                 lda #$80
                 sta arg4
+
                 lda arg0
                 ldy arg2
+
                 jsr getstr
                 jsr rstcsr
 
@@ -208,13 +226,15 @@ yesno           .proc
                 jsr gettemp
 
                 ldy tempbuf
-                bne _yn1
+                bne _1
 
                 iny
+
                 rts
 
-_yn1            lda tempbuf+1
+_1              lda tempbuf+1
                 ora #$20
                 cmp #'y'
+
                 rts
                 .endproc

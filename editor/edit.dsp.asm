@@ -27,10 +27,12 @@
 ;======================================
 cmdmsg          .proc
                 sta arg0
+
                 jsr cmdcol
 
                 lda #0
                 sta arg3
+
                 lda arg0
                 ldy #$80
                 jsr putstr
@@ -47,15 +49,17 @@ clnln           .proc
                 jsr chkcur
 
                 lda dirtyf
-                beq _cll1
+                beq _XIT
 
                 sta dirty
+
                 lda #0
                 sta dirtyf
+
                 jsr delcur
                 jsr instb
 
-_cll1           jmp chkcur
+_XIT            jmp chkcur
 
                 .endproc
 
@@ -66,16 +70,18 @@ _cll1           jmp chkcur
 savewd          .proc
                 jsr clnln
 
-savwd1          clc
+_ENTRY1         clc
                 lda #14
                 tax
                 adc curwdw
+
                 tay
-_sw1            lda sp,x
+_next1          lda sp,x
                 sta w1,y
+
                 dey
                 dex
-                bpl _sw1
+                bpl _next1
 
                 rts
                 .endproc
@@ -89,14 +95,16 @@ rstwd           .proc
                 lda #14
                 tax
                 adc curwdw
+
                 tay
-_rw1            lda w1,y
+_next1          lda w1,y
                 sta sp,x
+
                 dey
                 dex
-                bpl _rw1
+                bpl _next1
 
-rw2             rts
+_XIT             rts
                 .endproc
 
 
@@ -111,8 +119,9 @@ endln           .proc
                 lda bot+1
                 sta cur+1
 
-    ; falls into CtrLn
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -121,26 +130,30 @@ endln           .proc
 ctrln           .proc
                 lda #0
                 sta temps
+
                 jsr clnln
-                beq _cl0
+                beq _1
 
                 jsr nextup
-                beq _cl0
+                beq _1
 
                 inc temps
+
                 jsr nextup
-                beq _cl0
+                beq _1
 
                 inc temps
-_cl0            jsr newpage
 
-_cl1            lda temps
-                beq rstwd.rw2
+_1              jsr newpage
+
+_next1          lda temps
+                beq rstwd._XIT
 
                 jsr scrldwn
 
                 dec temps
-                jmp _cl1
+
+                jmp _next1
 
                 .endproc
 
@@ -152,8 +165,9 @@ topln           .proc
                 jsr clnln
                 jsr chkcur._ldtop
 
-    ; falls into NewPage
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -162,14 +176,19 @@ topln           .proc
 newpage         .proc
                 lda #0
                 sta lnum
-npage1          sta choff
+
+_ENTRY1         sta choff
+
                 jsr rstcsr              ; for command line
 
                 lda lmargin
                 sta colcrs
 
-    ; JMP Refresh ; do all the work
+;               jmp Refresh             ; do all the work
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -180,48 +199,56 @@ refresh         .proc
                 lda ytop
                 adc lnum
                 sta rowcrs
+
                 jsr savecol
                 jsr savewd
 
                 inc rowcrs
+
                 jsr nextdwn
 
                 sta arg9
+
                 clc
                 lda nlines
                 sbc lnum
                 sta arg10
-                beq _cl4
+                beq _2
 
-_cl1            ldy #0
+_next1          ldy #0
                 lda indent
                 sta arg3
+
                 ldx arg9
-                beq _cl5
+                beq _3
 
                 jsr curstr
 
-_cl2            jsr putstr
+_next2          jsr putstr
 
                 lda arg9
-                bne _cl3
+                bne _1
 
                 tay
                 sta (arg0),y
-_cl3            inc rowcrs
+
+_1              inc rowcrs
+
                 jsr nextdwn
 
                 sta arg9
-                dec arg10
-                bne _cl1
 
-_cl4            jsr rstcur
+                dec arg10
+                bne _next1
+
+_2              jsr rstcur
                 jsr rstcol
 
                 jmp rfrshbuf
 
-_cl5            lda #<zero
+_3              lda #<zero
                 ldx #>zero
-                bne _cl2                ; [unc]
+
+                bne _next2                ; [unc]
 
                 .endproc

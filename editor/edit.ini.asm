@@ -34,16 +34,20 @@ minit           .proc                   ; initialize memory
                 lda #0
                 tay
                 sta (afbase),y
+
                 iny
                 sta (afbase),y
 
                 sec
                 lda MEMTOP
                 sbc afbase
+
                 iny
                 sta (afbase),y
+
                 lda MEMTOP+1
                 sbc afbase+1
+
                 iny
                 sta (afbase),y
 
@@ -55,58 +59,66 @@ minit           .proc                   ; initialize memory
                 sta sparem
                 ldx afcur+1
                 stx sparem+1
-miret           rts
-                .endproc
 
-
-;======================================
-;
-;======================================
-zerow           .proc                   ; initialize window
-                lda #0
-                ldx #15
-_zw1            dex                     ; zero page0 window table
-                sta sp,x
-                bne _zw1
-
-                sta dirtyf
-                sta inbuf
-                tay
-                sta (buf),y
                 rts
                 .endproc
 
 
 ;======================================
-;
+; Initialize window
 ;======================================
-w2init          .proc                   ; W2Init()
+zerow           .proc
+                lda #0
+                ldx #15
+
+_next1          dex                     ; zero page0 window table
+                sta sp,x
+                bne _next1
+
+                sta dirtyf
+                sta inbuf
+
+                tay
+                sta (buf),y
+
+                rts
+                .endproc
+
+
+;======================================
+; Initialize secondary window
+;======================================
+w2init          .proc
                 jsr ctrln
 
                 lda wsize
                 sta nlines
                 sta cmdln
+
                 jsr savworld
 
                 lda #w2-w1
                 sta numwd
                 sta curwdw
+
                 jsr zerow
 
                 ldy wsize
                 iny
                 sty ytop
+
                 sec
                 lda #23
                 sbc wsize
                 sta nlines
-                bne einit.fcmsg         ; [unc]
+
+                bne einit._ENTRY2       ; [unc]
 
                 .endproc
 
 
 ;======================================
-;
+; Initialize the Editor
 ;======================================
 einit           .proc
                 jsr minit
@@ -130,19 +142,22 @@ einit           .proc
                 sta delbuf+1
                 sta delbuf+5
 
-winit           jsr zerow
+;   initialize window
+                jsr zerow
 
-winit1          lda #23
+_ENTRY1         lda #23                 ; rowcount
                 sta nlines
                 sta cmdln
+
                 lda #0
                 sta curwdw
                 sta ytop
 
-fcmsg           jsr ctrln
+_ENTRY2         jsr ctrln
 
-fcmsg1          lda #<editc
+_ENTRY3         lda #<editc
                 ldx #>editc
+
                 jmp cmdmsg
 
 ;--------------------------------------

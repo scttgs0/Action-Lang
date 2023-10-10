@@ -27,26 +27,26 @@
 ;======================================
 floop           .proc
                 lda allocerr
-                beq _fm1
+                beq _1
 
                 lda #<outmem
                 ldx #>outmem
                 jsr cmdmsg
 
-_fm1            lda curch
+_1              lda curch
                 sta lastch
-                jsr getkey
 
-                jsr einit.fcmsg1
+                jsr getkey
+                jsr einit._ENTRY3
 
                 lda curch
                 ldy CH1
                 cpy #$C0                ; Ctrl-Shft
-                bcs _fmcs
+                bcs _2
 
                 ldy lastch
                 cpy #$1B                ; escape
-                bne _fmch
+                bne _3
 
                 cmp #eol
                 beq floop
@@ -55,18 +55,19 @@ _fm1            lda curch
 
                 jmp floop
 
-_fmcs           ldx #<fmcscmd
+_2              ldx #<fmcscmd
                 ldy #>fmcscmd
-                bne _fmlu
+                bne _4
 
-_fmch           ldx #<fmcmd
+_3              ldx #<fmcmd
                 ldy #>fmcmd
 
-_fmlu           jsr lookup
+_4              jsr lookup
 
                 jmp floop
 
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -95,7 +96,7 @@ zap4            .byte $7e
                 .byte $7f
                 .word delete
                 .byte $9c
-                .word botln.escape
+                .word botln._XIT
                 .byte $1b
                 .word clear
                 .byte $7d

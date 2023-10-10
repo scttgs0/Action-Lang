@@ -29,11 +29,12 @@ getmem          .proc
                 clc
                 adc #4
                 sta afsize
-                bcc _gm0
+                bcc _1
 
                 inx
-_gm0            stx afsize+1
-_gm1            jsr allocate+4
+_1              stx afsize+1
+
+_ENTRY1         jsr allocate._ENTRY
 
                 ldx afcur+1
                 beq gmerr               ; no memory allocated !
@@ -41,15 +42,16 @@ _gm1            jsr allocate+4
                 clc
                 lda afcur
                 adc #4
-                bcc _gm2
+                bcc _XIT
 
                 inx
-_gm2            rts
+
+_XIT            rts
                 .endproc
 
 
 ;======================================
-;
+; General Memory Error
 ;======================================
 gmerr           .proc
                 ldy #0
@@ -61,10 +63,15 @@ gmerr           .proc
                 bne punt                ; really out of memory
 
                 inc allocerr
+
                 jsr free
 
-                jmp getmem._gm1         ; retry
+                jmp getmem._ENTRY1      ; retry
 
+
+;--------------------------------------
+;
+;--------------------------------------
 punt            jsr savewd              ; we're in big trouble
 
                 jmp rstwnd
@@ -78,9 +85,11 @@ punt            jsr savewd              ; we're in big trouble
 freemem         ;.proc
                 sec
                 sbc #4
-                bcs freem1
+                bcs _XIT
+
                 dex
-freem1          jmp free
+
+_XIT            jmp free
 
                 ;.endproc
 
@@ -93,10 +102,12 @@ instb           .proc
                 sta arg3
                 lda cur+1
                 sta arg4
+
                 jsr instbuf
 
                 sta cur
                 stx cur+1
+
                 rts
                 .endproc
 
@@ -109,7 +120,10 @@ instbuf         .proc
                 lda (buf),y
                 ldx buf
                 ldy buf+1
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -119,37 +133,45 @@ instln          ;.proc
                 sta arg0                ; save sze
                 stx arg1                ; save sloc
                 sty arg2
+
                 clc
                 adc #3
                 ldx #0
+
                 jsr getmem
 
                 clc
                 adc #2
                 sta arg5
+
                 txa
                 adc #0
                 sta arg6
+
                 ldy arg0
-                beq _il1a
+                beq _1
 
-_il1            lda (arg1),y
+_next1          lda (arg1),y
                 sta (arg5),y
-                dey
-                bne _il1
 
-_il1a           lda arg0
+                dey
+                bne _next1
+
+_1              lda arg0
                 sta (arg5),y
 
                 lda arg4
-                bne _il4                ; up # 0
+                bne _3                  ; up # 0
 
                 lda top                 ; down _= top
                 sta arg5
+
                 ldy #4                  ; AFcur(2) _= down
                 sta (afcur),y
+
                 lda top+1
                 sta arg6
+
                 iny
                 sta (afcur),y
 
@@ -161,48 +183,57 @@ _il1a           lda arg0
                 ldy #0                  ; AFcur(0) _= 0
                 tya
                 sta (afcur),y
+
                 iny
                 sta (afcur),y
 
-_il2            lda arg6
-                bne _il3                ; down # 0
+_next2          lda arg6
+                bne _2                  ; down # 0
 
                 lda afcur               ; bot _= AFcur
                 sta bot
                 ldx afcur+1
                 stx bot+1
+
                 rts
 
-_il3            ldy #1
+_2              ldy #1
                 lda afcur+1             ; @down _= AFcur
                 sta (arg5),y
+
                 dey
                 lda afcur
                 sta (arg5),y
+
                 ldx afcur+1
+
                 rts
 
-_il4            ldy #4
+_3              ldy #4
                 lda (arg3),y
                 sta arg5                ; down _= Next(up)
                 sta (afcur),y           ; AFcur(2) _= down
+
                 lda afcur
                 sta (arg3),y            ; up(2) _= AFcur
+
                 iny
                 lda (arg3),y
                 sta arg6
                 sta (afcur),y
+
                 lda afcur+1
                 sta (arg3),y
 
                 ldy #0
                 lda arg3
                 sta (afcur),y
+
                 iny
                 lda arg4
                 sta (afcur),y
 
-                jmp _il2
+                jmp _next2
 
                 ;.endproc
 
@@ -217,7 +248,8 @@ delcur          .proc
 
                 sta cur
                 stx cur+1
-dln1            rts
+
+_XIT            rts
                 .endproc
 
 
@@ -226,13 +258,15 @@ dln1            rts
 ;======================================
 delln           .proc
                 cpx #0
-                beq delcur.dln1
+                beq delcur._XIT
 
                 sta arg0
                 stx arg1
+
                 ldy #4
                 lda (arg0),y
                 sta arg4                ; down _= Next(ptr)
+
                 iny
                 lda (arg0),y
                 sta arg5
@@ -240,46 +274,51 @@ delln           .proc
                 ldy #0
                 lda (arg0),y
                 sta arg2                ; up _= Prev(ptr)
+
                 iny
                 lda (arg0),y
                 sta arg3
-
-                bne _dln2               ; up # 0
+                bne _1                  ; up # 0
 
                 lda arg4
                 sta top                 ; top _= down
                 lda arg5
                 sta top+1
-                jmp _dln3
 
-_dln2           ldy #4
+                jmp _2
+
+_1              ldy #4
                 lda arg4
                 sta (arg2),y            ; up(2) _= down
+
                 iny
                 lda arg5
                 sta (arg2),y
 
-_dln3           lda arg5
-                bne _dln4               ; down # 0
+_2              lda arg5
+                bne _3                  ; down # 0
 
                 lda arg2
                 sta bot                 ; bot _= up
                 lda arg3
                 sta bot+1
-                jmp _dln5
 
-_dln4           ldy #0
+                jmp _4
+
+_3              ldy #0
                 lda arg2
                 sta (arg4),y            ; down(0) _= up
+
                 iny
                 lda arg3
                 sta (arg4),y
 
-_dln5           lda arg0
+_4              lda arg0
                 ldx arg1
                 jsr free
 
                 lda arg2
                 ldx arg3
+
                 rts
                 .endproc

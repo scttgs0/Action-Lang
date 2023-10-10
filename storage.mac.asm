@@ -31,7 +31,8 @@ slop            = 7                     ; can't be less than 4
 allocate        .proc
                 sta afsize              ; save size
                 stx afsize+1
-                lda #$FF                ; set best size
+
+_ENTRY          lda #$FF                ; set best size
                 sta afbsze
                 sta afbsze+1
                 lda #<afbase            ; last = base

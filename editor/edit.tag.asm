@@ -35,42 +35,49 @@ settag          .proc
 
                 lda tempbuf+1
                 jsr gettag
-                bne _st1                ; tag already exists
+                bne _1                  ; tag already exists
 
-    ; get a new tag
+;   get a new tag
                 lda #8
                 jsr allocate
 
                 ldy #1
                 lda taglist+1
                 sta (afcur),y
+
                 dey
                 lda taglist
                 sta (afcur),y
+
                 lda afcur
                 sta taglist
+
                 ldx afcur+1
                 stx taglist+1
 
-_st1            ldy #4
+_1              ldy #4
                 lda tempbuf+1
                 sta (afcur),y
+
                 iny
                 lda cur
                 sta (afcur),y
+
                 iny
                 lda cur+1
                 sta (afcur),y
+
                 iny
                 jsr setsp
 
                 sta (afcur),y
 
-    ; flag line as taged
+;   flag line as tagged
                 ldy #3
                 lda (cur),y
                 ora #$80
                 sta (cur),y
+
                 rts
                 .endproc
 
@@ -81,11 +88,13 @@ _st1            ldy #4
 notag           .proc
                 lda #<_ntmsg
                 ldx #>_ntmsg
+
                 jmp cmdmsg
 
 ;--------------------------------------
 
 _ntmsg          .text 11,"tag not set"
+
                 .endproc
 
 
@@ -95,11 +104,13 @@ _ntmsg          .text 11,"tag not set"
 tagid           .proc
                 lda #<_stmsg
                 ldx #>_stmsg
+
                 jmp gettemp
 
 ;--------------------------------------
 
 _stmsg          .text 8,"tag id: "
+
                 .endproc
 
 
@@ -110,7 +121,7 @@ loctag          .proc
                 jsr tagid
 
                 lda tempbuf
-                beq gettag._ltret
+                beq gettag._XIT
 
                 jsr clnln
 
@@ -120,6 +131,7 @@ loctag          .proc
 
                 ldy #6
                 lda (afcur),y
+
                 tax
                 dey
                 lda (afcur),y
@@ -133,10 +145,12 @@ loctag          .proc
                 ldy #7
                 lda (afcur),y
                 sta sp
+
                 lda arg2
                 sta cur
                 ldx arg3
                 stx cur+1
+
                 jmp found
 
                 .endproc
@@ -147,28 +161,32 @@ loctag          .proc
 ;======================================
 gettag          .proc
                 sta arg0
+
                 lda taglist
                 ldx taglist+1
-                bne _gt2
+                bne _1
 
-_ltret          rts
+_XIT            rts
 
-_gt1            ldy #4
+_next1          ldy #4
                 lda (afcur),y
                 cmp arg0
-                beq _gt3
+                beq _2
 
                 ldy #1
                 lda (afcur),y
+
                 tax
                 dey
                 lda (afcur),y
-_gt2            sta afcur
+_1              sta afcur
                 stx afcur+1
-                txa
-                bne _gt1
 
-_gt3            ldx afcur+1
+                txa
+                bne _next1
+
+_2              ldx afcur+1
+
                 rts
                 .endproc
 
@@ -179,23 +197,28 @@ _gt3            ldx afcur+1
 freetags        .proc
                 lda taglist
                 ldx taglist+1
-                beq _ft2
+                beq _XIT
 
-_ft1            sta afbest
+_next1          sta afbest
                 stx afbest+1
+
                 ldy #0
                 lda (afbest),y
                 sta arg0
+
                 iny
                 lda (afbest),y
                 sta arg1
+
                 jsr free.free1
 
                 lda arg0
                 ldx arg1
-                bne _ft1
+                bne _next1
+
                 stx taglist+1
-_ft2            rts
+
+_XIT            rts
                 .endproc
 
 
@@ -205,28 +228,33 @@ _ft2            rts
 findln          .proc
                 sta arg0
                 stx arg1
+
                 lda top
                 ldx top+1
-                bne _fl2
+                bne _1
 
                 rts
 
-_fl1            ldy #5
+_next1          ldy #5
                 lda (arg2),y
+
                 tax
                 dey
                 lda (arg2),y
-_fl2            sta arg2
+
+_1              sta arg2
                 stx arg3
+
                 cmp arg0
-                bne _fl3
+                bne _2
 
                 cpx arg1
-                beq _fl4
+                beq _3
 
-_fl3            txa
-                bne _fl1
+_2              txa
+                bne _next1
 
-_fl4            ldx arg3
+_3              ldx arg3
+
                 rts
                 .endproc

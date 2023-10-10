@@ -62,11 +62,14 @@ ltab            .word lsh1._lshift      ; LSH
                 .byte $22               ; tvDisp
 
                 jmp insrtch             ; normal char
+
                 rts                     ; ctrl-shift char
+
 serial          .word $0A00             ; serial number of ROM
-                                        ; TODO: to be filled in before blowing ROM
+                                        ; TODO: to be filled in before burning ROM
 
                 jmp getnext.ismt        ; STM catch all
+
                 rts                     ; illegal monitor cmd
 
                 .byte $86
@@ -88,29 +91,30 @@ start           .proc
                 bne cold
 
 _warm           lda mpc                 ; see where we were
-                beq _w1
+                beq _1
 
-                jmp monitor._ENTRY1       ; monitor
+                jmp monitor._ENTRY1     ; monitor
 
-_w1             jmp gmerr.punt          ; editor
+_1              jmp gmerr.punt          ; editor
 
 cold            lda #0
                 tay
-_c0             sta $0480,y             ; zero RAM
+_next1          sta $0480,y             ; zero RAM
+
                 dey
-                bne _c0
+                bne _next1
 
                 ldy #$3A
-_cold1          lda emjmps-1,y          ; init RAM
+_next2          lda emjmps-1,y          ; init RAM
                 dey
                 sta jmps,y
-                bne _cold1
+                bne _next2
 
-    ; STY ChCvt1 ; Y=0
+;               sty ChCvt1              ; Y=0
 
                 jsr einit               ; init editor
 
-;SPLInit PROC ; init compiler RAM
+;SPLInit PROC                           ; init compiler RAM
 
         .if ramzap
                 jsr zap4
@@ -125,25 +129,28 @@ _cold1          lda emjmps-1,y          ; init RAM
 
                 lda #0
                 ldx #4
-                ldy bigst               ; big s.t. ?
-                beq _si1                ; no
+                ldy bigst               ; big symbol table?
+                beq _2                  ;   no
 
                 ldx #6
-_si1            jsr getmem              ; get hash table
+_2              jsr getmem              ; get hash table
 
                 sta stglobal            ; qglobal hash table
                 stx stglobal+1
-                ldy bigst               ; big s.t. ?
-                beq _si2                ; no
+
+                ldy bigst               ; big symbol table?
+                beq _3                  ;   no
 
                 inx
                 inx
-                sta stg2                ; big s.t. hash table
+                sta stg2                ; big symbol table hash table
                 stx stg2+1
-_si2            inx
+
+_3              inx
                 inx
                 sta stlocal             ; local hash table
                 stx stlocal+1
-                .endproc
 
-; RTS
+;               rts
+
+                .endproc

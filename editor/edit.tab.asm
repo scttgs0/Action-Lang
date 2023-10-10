@@ -27,38 +27,45 @@
 ;======================================
 tab             .proc
                 jsr setsp
-                jsr tabloc._tabpos
+                jsr tabloc._ENTRY1
 
-_t1             lda TABMAP,x
-                beq _t3
+_next1          lda TABMAP,x
+                beq _2
 
                 and _onbit,y
-                beq _t2
+                beq _1
 
-    ; found tab setting
+;   found tab setting
                 sty arg0
+
                 txa
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
                 ora arg0
-                jmp back.back0          ; do the tab
 
-_t2             iny
+                jmp back._ENTRY1          ; do the tab
+
+_1              iny
                 cpy #8
-                bmi _t1
+                bmi _next1
 
-_t3             ldy #0
+_2              ldy #0
                 inx
                 cpx #15
-                bmi _t1
+                bmi _next1
 
                 rts
 
 ;--------------------------------------
 
-_onbit          .byte $80,$40,$20,$10,8,4,2,1,0
-_offbit         .byte $7f,$bf,$df,$ef,$f7,$fb,$fd,$fe,$ff
+_onbit          .byte $80,$40,$20,$10
+                .byte $08,$04,$02,$01
+                .byte $00
+_offbit         .byte $7F,$BF,$DF,$EF
+                .byte $F7,$FB,$FD,$FE
+                .byte $FF
+
                 .endproc
 
 
@@ -71,6 +78,7 @@ settab          .proc
                 lda TABMAP,x
                 ora tab._onbit,y
                 sta TABMAP,x
+
                 rts
                 .endproc
 
@@ -84,6 +92,7 @@ clrtab          .proc
                 lda TABMAP,x
                 and tab._offbit,y
                 sta TABMAP,x
+
                 rts
                 .endproc
 
@@ -91,22 +100,26 @@ clrtab          .proc
 ;======================================
 ;
 ;======================================
-tabloc         .proc
+tabloc          .proc
                 jsr setsp
 
                 sec
                 sbc #1
-_tabpos         tay
-                lsr a
-                lsr a
-                lsr a
+
+_ENTRY1         tay
+                lsr
+                lsr
+                lsr
+
                 tax
                 tya
                 and #7
+
                 tay
                 cpx #15
-                bmi _tp1
+                bmi _XIT
 
                 ldy #8
-_tp1            rts
+
+_XIT            rts
                 .endproc
