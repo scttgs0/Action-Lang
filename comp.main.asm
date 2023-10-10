@@ -617,7 +617,7 @@ _p1             pla
                 cmp #typet+8
                 beq perr._par2
 
-perr            jmp segment.argerr
+perr            jmp segment._argerr
 
 ;:Par1 CMP #varT+realT
 ; BEQ PErr
@@ -2590,7 +2590,7 @@ _cgat1          ldy #4
                 sty arg13
                 ldy #1
                 lda #$8D                ; STA addr16
-                jsr insrt3.i30          ; insert STA data16
+                jsr insrt3._ENTRY1      ; insert STA data16
 
                 lda #1
 _cgat2          ldy #5

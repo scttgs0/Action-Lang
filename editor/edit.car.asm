@@ -90,7 +90,7 @@ start           .proc
 _warm           lda mpc                 ; see where we were
                 beq _w1
 
-                jmp monitor._mon1       ; monitor
+                jmp monitor._ENTRY1       ; monitor
 
 _w1             jmp gmerr.punt          ; editor
 

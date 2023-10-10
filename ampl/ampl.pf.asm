@@ -22,24 +22,26 @@
 ;
 
 
-
 ;======================================
-;   PF()
+;
 ;======================================
-ld1             ldy #0
+ld1             .proc
+                ldy #0
                 lda (stack),y
                 cmp #arrayt
-                bcs pf._c5a
+                bcs pf._ENTRY1
 
                 inc abt-args,x
+
                 ldy #7
                 lda (stack),y
                 cmp #tempt+bytet
-                beq pf._c5b
+                beq pf._ENTRY2
 
                 dec abt+1-args,x
+
                 cpx #args+2
-                bcc pf._c5b
+                bcc pf._ENTRY2
 
                 jsr genops.gops
                 jsr load2h
@@ -47,67 +49,79 @@ ld1             ldy #0
                 lda #$81                ; STA
                 jsr op1h
 
-                jmp pf._c5b
+                jmp pf._ENTRY2
 
-pf              lda #0                  ; load arg types flag
+                .endproc
+
+
+;======================================
+;   PF()
+;======================================
+pf              .proc
+                lda #0                  ; load arg types flag
                 jsr getargs
                 jsr pushst
                 jsr getnext
 
                 ldx #args
                 stx argbytes
+
                 ldx nxttoken
                 cpx #rparen
-                bne _c4
+                bne _next1
 
                 jsr getnext
 
-                bne _c7                 ; [unc]
+                bne _next2              ; [unc]
 
-_c4             ldx numargs
+_next1          ldx numargs
                 ldy #tempt+bytet
                 lda argtypes-1,x
+
                 ldx argbytes
                 stx abt+3
                 cmp #$7F
-                bcs _c5                 ; one byte arg
+                bcs _1                  ; one byte arg
 
                 sta temps-args+1,x
+
                 inc argbytes
                 iny
-_c5             sta temps-args,x
+_1              sta temps-args,x
+
                 inc argbytes
+
                 txa
                 jsr storst
                 jsr getexp
 
                 dec numargs
-                bmi callerr
+                bmi _err
 
                 ldx abt+3
                 cpx #args+3
                 bcc ld1
 
-_c5a            jsr cgassign
+_ENTRY1         jsr cgassign
 
-_c5b            lda token
+_ENTRY2         lda token
                 cmp #comma
-                beq _c4
+                beq _next1
 
                 cmp #rparen
-                bne callerr
+                bne _err
 
-_c6             lda argbytes
+                lda argbytes
                 cmp #args+3
-                bcs _c8
+                bcs _2
 
                 cmp #args+2
-                bcs _c9
+                bcs _3
 
                 cmp #args+1
-                bcs _c10
+                bcs _4
 
-_c7             jsr trashy
+_next2          jsr trashy
 
                 ldy #1
                 jsr stkaddr
@@ -115,52 +129,58 @@ _c7             jsr trashy
                 lda #$20                ; JSR
                 jmp push3
 
-_c8             ldx #args+2
-                jsr callerr._push
+_2              ldx #args+2
+                jsr _push
 
-_c9             ldx #args+1
-                jsr callerr._push
+_3              ldx #args+1
+                jsr _push
 
-_c10            ldx #args
-                jsr callerr._push
+_4              ldx #args
+                jsr _push
 
-                jmp _c7
+                jmp _next2
 
-callerr         jmp segment.argerr
+_err            jmp segment._argerr
 
+
+;======================================
+;
+;======================================
 _push           lda abt-args,x
-                bne _p1
+                bne _5
 
                 lda _ops-args,x
                 ora #$04
+
                 jmp push2
 
-_p1             stx arg0
+_5              stx arg0
                 jsr genops.gops
 
                 ldx arg0
                 lda _ops-args,x
 
-; all of this for LDX # and LDY #
-; can't use OpXX for these instr.
+;   all of this for LDX # and LDY #
+;   can't use OpXX for these instr.
 
                 cpx #args
-                beq _p4                 ; LDA instr.
+                beq _9                  ; LDA instr.
 
                 ldy arg1
-                bpl _p3a                ; record element
+                bpl _7                  ; record element
 
                 cpy #vart
                 ldy abt-args,x
-                bcs _p3                 ; not const.
+                bcs _8                  ; not const.
 
                 pha
                 sty arg0
+
                 ldy #2
                 jsr loadi
 
                 ldy arg0
-                bmi _p2
+                bmi _6
 
                 tax
                 pla
@@ -168,22 +188,23 @@ _p1             stx arg0
 
                 jmp cgassign.cga1
 
-_p2             pla
-_p2a            jmp push2               ; high byte
+_6              pla
+_XIT1           jmp push2               ; high byte
 
-_p3a            ldy abt-args,x
-_p3             bpl _p4
+_7              ldy abt-args,x
+_8              bpl _9
 
                 ldx arg3
-                beq _p2a
+                beq _XIT1
 
                 jmp op2h
 
-_p4             jsr op2l
+_9              jsr op2l
 
                 jmp cgassign.cga1
 
 ;--------------------------------------
-;--------------------------------------
 
 _ops            .byte $a1,$a2,$a0       ; LDA, LDX, LDY
+
+                .endproc

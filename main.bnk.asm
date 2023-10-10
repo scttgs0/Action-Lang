@@ -151,7 +151,7 @@ _gal1           jmp mnum._varerr
 ;======================================
 gnlocal         .proc
                 sta bank+lbank
-                jsr lgetname.lgnlocal
+                jsr lgetname._ENTRY1
 
                 jmp rstbank
 
@@ -232,7 +232,7 @@ splerr          .proc
 emloop          .proc
                 jsr editbank
 
-                jmp monitor._mloop
+                jmp monitor._ENTRY2
 
                 .endproc
 

@@ -28,47 +28,48 @@
 arrref          .proc
                 ldx nxttoken
                 cpx #lparen
-                beq arrconst._arr0
+                beq arrconst._2
 
                 cpx #uparrow
-                beq arrconst._arr0
+                beq arrconst._2
 
 arrvar          ldy #vart+cardt         ; no index!
                 sty token
                 cmp #arrayt+8
-                bcc arrconst._arr1
+                bcc arrconst._XIT1
 
 arrconst        jsr procref.stconst
 
-_arr1           jmp pushst
+_XIT1           jmp pushst
 
-_arptr          ldy #0
+_next1          ldy #0
                 lda (stack),y
                 cmp #arrayt+8
-                bcs _arpt1              ; small array
+                bcs _1                  ; small array
 
                 iny
                 jsr stkp
 
                 cpx #0
-                bne _arpt1
+                bne _1
 
-    ; page zero pointer
+;   page zero pointer
                 ldy #1
                 sta (stack),y
                 dey
                 lda (stack),y
                 ora #$B0                ; temp array mode
                 sta (stack),y
+
                 rts
 
-_arpt1          jsr zerost
-                bne _ar0                ; [unc]
+_1              jsr zerost
+                bne _3                  ; [unc]
 
-_arr0           jsr pushnext
+_2              jsr pushnext
 
                 cmp #uparrow
-                beq _arptr
+                beq _next1
 
                 jsr getexp
 
@@ -78,45 +79,49 @@ _arr0           jsr pushnext
                 ldx op
                 bne arrerr
 
-_ar0            ldy #7
+_3              ldy #7
                 lda (stack),y
 arra0           pha
+
                 lda #vart+cardt
                 sta (stack),y
+
                 lda #plusid
                 jsr genops
 
                 pla
                 cmp #arrayt+8
-                bcs arrerr._arsmall
+                bcs arrerr._small
 
                 and #7
                 tax
                 ora #$B0                ; temp array mode
                 sta arg7
+
                 ldy arg1
                 cpy #constt+strt
                 ldy #1                  ; clear Z flag if we branch
-                bcs _ar1
+                bcs _4
 
                 lda (stack),y
                 iny
                 ora (stack),y
-_ar1            sta fr1
-                beq _arint              ; pointer
+_4              sta fr1
+                beq _5                  ; pointer
 
                 ldy vartype-1,x
-                beq arrerr._arbyte
+                beq arrerr._XIT2
 
-; CPY #3
-; BEQ _ARReal
-; integer or cardinal
+;               cpy #3
+;               beq _ARReal
 
-_arint          jsr gettemps
+;   integer or cardinal
+
+_5              jsr gettemps
 
                 lda #$A1                ; LDA
                 ldx fr1
-                beq _ari1
+                beq _6
 
                 jsr load2l
 
@@ -132,12 +137,13 @@ _arint          jsr gettemps
                 nop
                 nop
         .endif
-_ari1           jsr loadx.op1l
+
+_6              jsr loadx.op1l
                 jsr stempl
 
                 lda #$A1                ; LDA
                 ldx fr1
-                beq _ari2
+                beq _7
 
                 jsr load2h
 
@@ -146,16 +152,19 @@ _ari1           jsr loadx.op1l
                 jsr push2
 
                 lda #$61                ; ADC
-_ari2           jsr op1h
+_7              jsr op1h
                 jmp cgadd.cgadd2
 
 arrerr          ldy #arrer              ; bad array ref
                 jmp splerr
 
-_arbyte         jmp codegen.cg1
+_XIT2           jmp codegen.cg1
 
-_arsmall        ldy #7
+;   small arrary
+
+_small          ldy #7
                 sta (stack),y           ; restore correct type
+
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
@@ -164,11 +173,13 @@ _arsmall        ldy #7
 
                 ldy #10
                 sta (stack),y
+
                 ldy #2
                 jsr loadi
 
                 ldy #11
                 jsr savecd.savstk
+
                 jmp popst
 
                 .endproc

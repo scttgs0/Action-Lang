@@ -42,20 +42,22 @@ segment         .proc
 
 _proc           lda #funct-vart+char-1
                 sta type
-                bne _func1              ; [unc]
+                bne _1                  ; [unc]
 
 _func           clc
                 adc #funct-vart
                 sta type
+
                 jsr getnext
 
-_func1          jsr makeentry
+_1              jsr makeentry
                 jsr segend
 
                 lda addr
                 sta curproc
                 lda addr+1
                 sta curproc+1
+
                 sta qglobal
 
                 lda #1
@@ -67,20 +69,21 @@ _func1          jsr makeentry
                 sta argbytes
 
                 tay
-_funcst         sta (stlocal),y
+_next1          sta (stlocal),y
+
                 iny                     ; zap local st
-                bne _funcst
+                bne _next1
 
                 lda symtab
                 sta gbase
                 lda symtab+1
                 sta gbase+1
 
-; space for arg list (8 bytes) and
-; room for name of next proc/func
-; up to 20 letters (24 bytes)
-; unused space will be reclaimed
-; see Params
+;   space for arg list (8 bytes) and
+;   room for name of next proc/func
+;   up to 20 letters (24 bytes)
+;   unused space will be reclaimed
+;   see Params
                 lda #32
                 jsr stincr              ; arg list space
                 jsr trashy
@@ -88,7 +91,8 @@ _funcst         sta (stlocal),y
                 lda nxttoken
                 eor #equalid
                 sta param               ; this is very tricky!!
-                bne _funchd
+                bne _2
+
                 jsr ideq                ; param must = 0 here
 
                 iny
@@ -99,121 +103,136 @@ _funcst         sta (stlocal),y
                 ora #8
                 sta (props),y           ; set Sys flag
                 sta param
+
                 jsr getnext
-_funchd         jsr getnext
+
+_2              jsr getnext
 
                 cmp #lparen
-                bne argerr
+                bne _argerr
 
 
-; low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
-; low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
-
+;   low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
+;   low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
 
                 jsr getnext
 
                 cmp #rparen
-                beq argerr._func2
+                beq _3
 
-_heading        jsr declare
+_next2          jsr declare
 
                 ldx lsttoken
                 inc lsttoken            ; in case 2 ,'s
                 cpx #comma
-                beq _heading
+                beq _next2
 
                 cmp #rparen
-                beq argerr._func2
+                beq _3
 
-argerr          ldy #arger
+_argerr         ldy #arger
+
                 jmp splerr
 
-_func2          lda param
+_3              lda param
                 pha
+
                 lda #0
                 sta param
 
                 jsr getnext
                 jsr declare             ; locals
 
-    ; handle procedure setup here
+;   handle procedure setup here
                 pla
-                bmi _f4                 ; system proc
+                bmi _6                  ; system proc
 
-    ; get beginning of arguments and
-    ; save actual procedure address
+;   get beginning of arguments and
+;   save actual procedure address
                 lda #1
                 jsr cprop
 
                 sta arg0
                 stx arg1
+
                 jsr getcdoff
                 jsr storprops
 
-    ; get space for proc variable
+;   get space for proc variable
                 lda #$4C                ; JMP
                 jsr push1
                 jsr getcdoff            ; fill in address
 
                 adc #2
-                bcc _fh2
+                bcc _4
 
                 inx
-_fh2            jsr push2
 
-    ; qcode to transfer arguments to
-    ; local frame
-_fh3            lda argbytes
-                beq _func3              ; no arguments
+_4              jsr push2
+
+;   qcode to transfer arguments to
+;   local frame
+_next3          lda argbytes
+                beq _8                  ; no arguments
 
                 cmp #3
-                bcs _fh5
+                bcs _7
 
                 cmp #2
                 lda #$8D                ; STA addr16
                 ldx arg0
                 ldy arg1
-                bcc _fh4
+                bcc _5
 
                 lda #$8E                ; STX addr16
+
                 inx
-                bne _fh4
+                bne _5
 
                 iny
-_fh4            jsr push3
+
+_5              jsr push3
+
                 dec argbytes
-                jmp _fh3
 
-_f4             jmp _func4
+                jmp _next3
 
-_fh5            ldx #10
+_6              jmp _9
+
+_7              ldx #10
                 jsr jsrtable
 
                 lda arg0
                 ldx arg1
+
                 ldy argbytes
                 dey
+
                 jsr push3
 
-_func3          lda trace               ; check for trace
-                beq _func4              ; no trace
+_8              lda trace               ; check for trace
+                beq _9                  ; no trace
 
                 lda #$20                ; JSR CTrace
                 ldx #<ctrace
                 ldy #>ctrace
+
                 jsr push3
 
                 ldy #0
                 lda (curproc),y
+
                 tay
                 tax
-_f3a            lda (curproc),y
+_next4          lda (curproc),y
                 sta (qcode),y
+
                 dey
-                bpl _f3a
+                bpl _next4
 
                 inx
                 txa
+
                 jsr codeincr
 
                 lda arg0
@@ -225,16 +244,19 @@ _f3a            lda (curproc),y
 
                 tay
                 tax
-_f3b            lda (props),y
+
+_next5          lda (props),y
                 sta (qcode),y
+
                 dey
-                bpl _f3b
+                bpl _next5
 
                 inx
                 txa
+
                 jsr codeincr
 
-_func4          jsr stmtlist
+_9              jsr stmtlist
 
                 jmp segment
 
