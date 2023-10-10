@@ -12,48 +12,55 @@ STM             .proc
                 sta arg2
                 stx arg3
                 sta arg4
+
                 inx
                 stx arg5
+
                 ldy arg15
                 sty arg13
-_stm1           lda (arg2),y
+
+_next1          lda (arg2),y
                 sta nxtaddr+1
-                beq _stm3
+                beq _XIT1
 
                 lda (arg4),y
                 sta nxtaddr
+
                 ldy #0
-_stm2           lda (nxtaddr),y
+_next2          lda (nxtaddr),y
                 eor (symtab),y
                 and jt_stmask
-                bne _stm4
+                bne _1
 
                 cpy arg14
                 iny
-                bcc _stm2
+                bcc _next2
 
                 lda (nxtaddr),y         ; matched
-_stm3           rts
 
-_stm4           inc arg13               ; try next entry
+_XIT1           rts
+
+_1              inc arg13               ; try next entry
                 ldy arg13
                 cpy arg15
-                bne _stm1
+                bne _next1
 
                 ldy #symtblERR
                 lda arg3
                 cmp symTblGlobal+1
-                beq _stm5
+                beq _XIT2
 
                 iny
-_stm5           jmp splerr
 
-stmres          jmp (jt_stmradr)
+_XIT2           jmp splerr
+
+_XIT            jmp (jt_stmradr)
 
                 .endproc
 
 
 ; this normially goes to ISTMres below
+
 
 ;======================================
 ;   STMres() lookup reserved names
@@ -61,35 +68,39 @@ stmres          jmp (jt_stmradr)
 iSTMres         .proc
                 ldy arg14
                 cpy #8
-_stmr0          lda #$FF                ; if name too long!
-                bcs _stmr3              ; not reserved name
+                lda #$FF                ; if name too long!
+                bcs _XIT1               ; not reserved name
 
                 iny
                 sty arg0
+
                 ldx tblReserveWords-2,y
-_stmr1          stx arg1
+_next1          stx arg1
+
                 ldy #1
-_stmr2          lda resw1,x
-                bmi _stmr3
+_next2          lda resw1,x
+                bmi _XIT1
 
                 eor (symtab),y
                 and jt_stmask
-                bne _stmr4
+                bne _1
 
                 inx
                 iny
                 cpy arg0
-                bcc _stmr2
+                bcc _next2
 
 ;   we have a match
                 lda resw1,x             ; get token value
-_stmr3          rts
 
-_stmr4          clc
+_XIT1           rts
+
+_1              clc
                 lda arg1
                 adc arg0
+
                 tax
-                bne _stmr1              ; try next entry
+                bne _next1              ; try next entry
 
                 .endproc
 
@@ -100,59 +111,66 @@ _stmr4          clc
 lGetName        .proc
                 ldy #0
                 sta FirstChar           ; indicates a big symbol table is not needed (yet)
+
                 tax                     ; preserve A
                 ora #$20
                 sta arg15               ; initial hash
+
                 txa                     ; restore A
-_gname1         iny
+_next1          iny
                 sty arg14
                 sta (symtab),y
+
                 ora #$20
                 asl arg15
                 adc arg15
                 sta arg15
+
                 jsr nextchar
 
                 ldy arg14
                 cmp #'_'
-                beq _gname1
-                jsr alphanum
+                beq _next1
 
-                bne _gname1
+                jsr alphanum
+                bne _next1
 
                 tya
                 ldy #0
                 sta (symtab),y
+
                 dec choff               ; put character back
-                jsr STM.stmres          ; check for res. name
-                bpl iSTMres._stmr3      ; return
+
+                jsr STM._XIT            ; check for res. name
+                bpl iSTMres._XIT1       ; return
 
                 lda qglobal
-                beq gnglobal
+                beq _1
 
                 lda symTblLocal
                 ldx symTblLocal+1
                 jsr STM
-                bne iSTMres._stmr3      ; return
+                bne iSTMres._XIT1       ; return
 
-gnglobal        lda symTblGlobal
+_1              lda symTblGlobal
                 ldx symTblGlobal+1
+
                 ldy FirstChar
                 cpy isBigSymTbl
-                bpl _gng1
+                bpl _2
 
                 lda bigSymTblGlobal
                 ldx bigSymTblGlobal+1
-_gng1           jsr STM
-                bne iSTMres._stmr3      ; return
+_2              jsr STM
+                bne iSTMres._XIT1       ; return
 
                 lda qglobal
                 beq NewEntry
 
-lgnlocal        lda symTblLocal
+_ENTRY1         lda symTblLocal
                 ldx symTblLocal+1
                 jsr STM
-                bne iSTMres._stmr3
+                bne iSTMres._XIT1
 
         .if ramzap
                 inc STM,x
@@ -165,14 +183,14 @@ lgnlocal        lda symTblLocal
 
 
 ;======================================
-;
+;   Make new entry in symbol table
 ;======================================
 NewEntry        .proc
-;   Make new entry in symbol table
                 lda symtab+1
                 sta (arg2),y
                 lda symtab
                 sta (arg4),y
+
                 lda #<libst
                 ldx #>libst
                 jsr STM                 ; lookup shadow name
@@ -181,23 +199,29 @@ NewEntry        .proc
                 ldy arg14
                 iny
                 sta (symtab),y
+
                 lda nxtaddr
                 iny
                 sta (symtab),y          ; save shadow entry
+
                 lda nxtaddr+1
                 iny
                 sta (symtab),y
+
                 lda symtab
                 sta nxtaddr
                 ldx symtab+1
                 stx nxtaddr+1
+
                 iny
                 tya
                 jsr stincr
 
                 lda #tokUNDEC
+
                 rts
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -214,21 +238,21 @@ resw1           .byte $ff
 
 resw2           .text "DO",tokDO
                 .text "FI",tokFI
-    ; .BYTE "FO",tokESAC
+    ; .byte "FO",tokESAC
                 .text "IF",tokIF
                 .text "OD",tokOD
-    ; .BYTE "OF",of
+    ; .byte "OF",of
                 .text "OR",tokOR
                 .text "TO",tokTO
                 .byte $ff
 
 resw3           .text "AND",tokAND
                 .text "FOR",tokFOR
-    ; .BYTE "GET",get
+    ; .byte "GET",get
                 .text "INT",tokINT
                 .text "LSH",tokLSH
                 .text "MOD",tokREM
-    ; .BYTE "NOT",notId
+    ; .byte "NOT",notId
                 .text "RSH",tokRSH
                 .text "SET",tokSET
                 .text "XOR",tokXOR
@@ -236,14 +260,14 @@ resw3           .text "AND",tokAND
 
 resw4           .text "BYTE",tokBYTE
                 .text "CARD",tokCARD
-    ; .BYTE "CASE",caseId
+    ; .byte "CASE",caseId
                 .text "CHAR",tokCHAR
                 .text "ELSE",tokELSE
-    ; .BYTE "ESAC",tokESAC
+    ; .byte "ESAC",tokESAC
                 .text "EXIT",tokEXIT
                 .text "FUNC",tokFUNC
                 .text "PROC",tokPROC
-    ; .BYTE "REAL",tokREAL
+    ; .byte "REAL",tokREAL
                 .text "STEP",tokSTEP
                 .text "THEN",tokTHEN
                 .text "TYPE",tokTYPE
@@ -255,7 +279,7 @@ resw5           .text "ARRAY",tokARRAY
                 .byte $ff
 
 resw6           .text "DEFINE",tokDEFINE
-    ; .BYTE "DOWNTO",tokDOWNTO
+    ; .byte "DOWNTO",tokDOWNTO
                 .text "ELSEIF",tokELSEIF
                 .text "MODULE",tokMOD
                 .text "RETURN",tokRET

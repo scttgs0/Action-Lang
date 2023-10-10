@@ -39,6 +39,7 @@ _next1          jsr InitKeys
                 jsr scrinit             ; get Graphics(0)
 
 _1              jsr jt_alarm
+                jsr rstcsr
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
@@ -114,6 +115,7 @@ _1              jsr PaintW
 ;======================================
 PaintW          .proc
                 sta currentWindow
+
                 jsr RestoreWindow
 
                 jmp Found
@@ -229,6 +231,7 @@ Boot            .proc
 ;--------------------------------------
 
 _bmsg           .text 6,"Boot? "
+
                 .endproc
 
 
@@ -252,7 +255,6 @@ _1              ;!!lda INITAD
 _XIT            rts
 
 _2              jsr mnum
-
 _3              jsr run
 
                 lda #0
@@ -306,6 +308,7 @@ MWrite          .proc                   ; write object file
                 dex
 
 _1              dec arg14
+
                 txa
                 adc codesize+1
                 sta arg15
@@ -371,6 +374,10 @@ MWOut           .proc
 
                 rts
 
+
+;======================================
+;
+;======================================
 _mxerr          ldy #endERR
 
 _mwerr          jmp splerr
@@ -418,9 +425,9 @@ Comp            .proc
 
 ; see MAIN.BNK now
 ;Dret PROC ; Dret() go to DOS
-;     lda DOSVEC
-;     ldx DOSVEC+1
-;     jmp JSRInd
+;               lda DOSVEC
+;               ldx DOSVEC+1
+;               jmp JSRInd
 
 
 ;======================================
@@ -430,11 +437,12 @@ Proceed         .proc
                 ldx procsp
                 beq _XIT
 
-; lda #<_pmsg
-; ldx #>_pmsg
-; jsr YesNo
-; bne _XIT
-; ldx procSP  ; break stack pointer
+;               lda #<_pmsg
+;               ldx #>_pmsg
+;               jsr YesNo
+;               bne _XIT
+
+;               ldx procSP              ; break stack pointer
 
                 lda #0
                 sta procsp

@@ -140,7 +140,7 @@ _gal1           jmp mnum._varerr
 ;======================================
 gnlocal         .proc
                 ;!!sta bank+lbank
-                jsr lGetName.lgnlocal
+                jsr lGetName._ENTRY1
 
                 jmp RestoreBank
 

@@ -11,30 +11,30 @@
 ArrRef          .proc
                 ldx nxttoken
                 cpx #tokLParen
-                beq arrconst._arr0
+                beq arrconst._2
 
                 cpx #tokUpArrow
-                beq arrconst._arr0
+                beq arrconst._2
 
 arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
                 sty token
                 cmp #tokARRAY_t+8
-                bcc arrconst._arr1
+                bcc arrconst._XIT1
 
 arrconst        jsr procref.stconst
 
-_arr1           jmp pushst
+_XIT1           jmp pushst
 
-_arptr          ldy #0
+_next1          ldy #0
                 lda (stack),y
                 cmp #tokARRAY_t+8
-                bcs _arpt1              ; small array
+                bcs _1                  ; small array
 
                 iny
                 jsr StkP
 
                 cpx #0
-                bne _arpt1
+                bne _1
 
 ;   page zero pointer
                 ldy #1
@@ -47,13 +47,13 @@ _arptr          ldy #0
 
                 rts
 
-_arpt1          jsr zerost
-                bra _ar0
+_1              jsr zerost
+                bra _3
 
-_arr0           jsr pushnext
+_2              jsr pushnext
 
                 cmp #tokUpArrow
-                beq _arptr
+                beq _next1
 
                 jsr getexp
 
@@ -63,7 +63,7 @@ _arr0           jsr pushnext
                 ldx op
                 bne arrerr
 
-_ar0            ldy #7
+_3              ldy #7
                 lda (stack),y
 arra0           pha
 
@@ -75,7 +75,7 @@ arra0           pha
 
                 pla
                 cmp #tokARRAY_t+8
-                bcs arrerr._arsmall
+                bcs arrerr._small
 
                 and #7
                 tax
@@ -85,27 +85,27 @@ arra0           pha
                 ldy arg1
                 cpy #tokCONST_t+tokSTR_t
                 ldy #1                  ; clear Z flag if we branch
-                bcs _ar1
+                bcs _4
 
                 lda (stack),y
                 iny
                 ora (stack),y
-_ar1            sta FR1
-                beq _arint              ; pointer
+_4              sta FR1
+                beq _5                  ; pointer
 
                 ldy vartype-1,x
-                beq arrerr._arbyte
+                beq arrerr._XIT2
 
                 ; cpy #3
                 ; beq _ARReal
 
 ;   integer or cardinal
 
-_arint          jsr GetTemps
+_5              jsr GetTemps
 
                 lda #$A1                ; LDA
                 ldx FR1
-                beq _ari1
+                beq _6
 
                 jsr Load2L
 
@@ -122,12 +122,12 @@ _arint          jsr GetTemps
                 nop
         .endif
 
-_ari1           jsr LoadX.Op1L
+_6              jsr LoadX.Op1L
                 jsr STempL
 
                 lda #$A1                ; LDA
                 ldx FR1
-                beq _ari2
+                beq _7
 
                 jsr Load2H
 
@@ -136,15 +136,17 @@ _ari1           jsr LoadX.Op1L
                 jsr Push2
 
                 lda #$61                ; ADC
-_ari2           jsr Op1H
+_7              jsr Op1H
                 jmp cgadd.cgadd2
 
 arrerr          ldy #arrayERR           ; bad array ref
                 jmp splerr
 
-_arbyte         jmp codegen.cg1
+_XIT2           jmp codegen.cg1
 
-_arsmall        ldy #7
+;   small arrary
+
+_small          ldy #7
                 sta (stack),y           ; restore correct type
 
                 lda arg1

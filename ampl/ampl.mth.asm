@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-math            .proc
+math            .block
 _a             = aflast+1
 _b             = aflast
 _c             = afcur+1
@@ -18,7 +18,7 @@ _t1            = addr
 _t2            = addr+1
 
 _sign          = token
-                .endproc
+                .endblock
 
 
 ;======================================
@@ -72,6 +72,7 @@ _setsign        ldy math._sign
                 nop
                 nop
         .endif
+
 _ss1            sta math._rl
                 stx math._rh
                 sec
@@ -82,6 +83,7 @@ _ss1            sta math._rl
                 sbc math._rh
                 tax
                 tya
+
 _ss2            rts
                 .endproc
 
@@ -113,6 +115,7 @@ _mb2            dex
                 sta math._rh
 _mb3            lda math._rl
                 ldx math._rh
+
                 rts
                 .endproc
 
@@ -142,6 +145,7 @@ _smo1           sta math._b
                 stx math._c
 _smo2           lda #0
                 sta math._rh
+
                 rts
                 .endproc
 
@@ -178,6 +182,7 @@ _dl2            dex
                 ldx #0
                 ldy math._a
                 sty math._rl            ; save low byte of REM
+
                 jmp MultI._setsign
 
 _dsmall         ldx #16
@@ -199,6 +204,7 @@ _ds2            dex
                 sta math._rl
                 lda math._b
                 ldx math._a
+
                 jmp MultI._setsign
 
                 .endproc
@@ -212,6 +218,7 @@ remi            .proc
 
                 lda math._rl
                 ldx math._rh
+
 _rem1           rts
                 .endproc
 
@@ -230,6 +237,7 @@ _rsh1           lsr math._c
                 bne _rsh1
 
                 ldx math._c
+
 _rshret         rts
                 .endproc
 
@@ -290,7 +298,8 @@ _sa2            rts
 ;        jsr FMOVE
 ;        jsr ZFR0
 ;        jmp FSUB
-;RToInt() real in FR0
+
+; RToInt() real in FR0
 ;RToInt lda FR0
 ;       sta _sign
 ;       jsr _FSign

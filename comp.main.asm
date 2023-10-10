@@ -599,7 +599,7 @@ _p1             pla
                 cmp #tokTYPE_t+8
                 beq perr._par2
 
-perr            jmp Segment.argerror
+perr            jmp Segment._argerr
 
 ;:Par1          cmp #varT+realT
 ;               beq PErr
