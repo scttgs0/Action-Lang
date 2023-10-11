@@ -49,6 +49,7 @@ cstart          .proc
                 ldy #ebank
                 sty curbank
                 sty bank+ebank
+
                 jmp start
 
                 .endproc
@@ -63,6 +64,8 @@ getname         .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   RstBank()
@@ -70,10 +73,12 @@ getname         .proc
 rstbank         .proc
                 php
                 pha
+
                 tya
                 ldy curbank
 rbank1          sta bank,y
                 tay
+
                 pla
                 plp
 init            rts
@@ -83,11 +88,13 @@ init            rts
 ;======================================
 ;   Run(address)
 ;======================================
-run             .proc                   ; reset Error routine
+run             .proc
+; reset Error routine
                 ldy #<splerr
                 sty error+1
                 ldy #>splerr
                 sty error+2
+
                 jsr lproceed
                 jsr jsrind
 
@@ -103,9 +110,12 @@ compile         .proc
                 ldy #cbank
                 sty curbank
                 sty bank+cbank
+
                 jsr ccompile
 
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -114,9 +124,11 @@ compile         .proc
 editbank        .proc
                 php
                 pha
+
                 tya
                 ldy #ebank
                 sty curbank
+
                 jmp rstbank.rbank1
 
                 .endproc
@@ -130,18 +142,20 @@ getalias        .proc
                 jsr getprop
 
                 cpx #0
-                beq _gal1
+                beq _XIT
 
                 sta addr
                 stx addr+1
                 sta bank+lbank
+
                 lda #0
                 jsr getprop
 
                 sta token
+
                 jmp rstbank
 
-_gal1           jmp mnum._varerr
+_XIT            jmp mnum._varerr
 
                 .endproc
 
@@ -151,6 +165,7 @@ _gal1           jmp mnum._varerr
 ;======================================
 gnlocal         .proc
                 sta bank+lbank
+
                 jsr lgetname._ENTRY1
 
                 jmp rstbank
@@ -165,6 +180,7 @@ cstmtlst        .proc
                 ldy #cbank
                 sty curbank
                 sta bank+cbank
+
                 jsr stmtlist
 
                 jmp editbank
@@ -181,6 +197,8 @@ mgett1          .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   LProceed()
@@ -189,6 +207,7 @@ lproceed        .proc
                 ldy #lbank
                 sty curbank
                 sty bank+lbank
+
                 rts
                 .endproc
 
@@ -201,6 +220,7 @@ options         .proc
                 jsr setopts
 
                 jmp editbank
+
                 .endproc
 
 
@@ -209,6 +229,7 @@ options         .proc
 ;======================================
 getkey          .proc
                 sta bank+lbank
+
                 jsr lgetkey
 
                 jmp rstbank
@@ -221,6 +242,7 @@ getkey          .proc
 ;======================================
 splerr          .proc
                 sta bank+lbank
+
                 jmp lsplerr
 
                 .endproc
@@ -242,7 +264,9 @@ emloop          .proc
 ;======================================
 getargs         .proc
                 pha                     ; save arg type load flag
+
                 sty bank+lbank
+
                 lda #1
                 jsr getprop
 
@@ -250,7 +274,7 @@ getargs         .proc
                 stx addr+1
 
                 pla
-                bne _ga2                ; don't load arg types
+                bne _XIT                ; don't load arg types
 
                 sta abt                 ; A=0
                 sta abt+1               ; flag as temp args
@@ -259,31 +283,33 @@ getargs         .proc
                 ldy #2
                 lda (props),y
                 sta numargs
-                beq _ga2
+                beq _XIT
 
                 tax
                 cpx #9
-                bcs _ga2
+                bcs _XIT
 
-_ga1            iny
+_next1          iny
                 lda (props),y
                 dex
                 sta argtypes,x          ; args inverted
-                bne _ga1
+                bne _next1
 
-_ga2            jmp rstbank
+_XIT            jmp rstbank
 
                 .endproc
 
 
 ;======================================
-;
+; call only from LBANK!
 ;======================================
-prth            .proc                   ; call only from LBANK!
+prth            .proc
                 sty bank+ebank
+
                 jsr printh
 
                 sty bank+lbank
+
                 jmp chkerr
 
                 .endproc

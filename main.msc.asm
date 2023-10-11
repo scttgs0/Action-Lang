@@ -41,7 +41,7 @@ _lshift         ldy _d
                 beq _lshret
 
                 stx _c
-_lsh1           asl a
+_lsh1           asl
                 rol _c
                 dey
                 bne _lsh1
@@ -66,7 +66,10 @@ nextup          .proc
 ;======================================
 nextdwn         .proc
                 ldy #5
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -74,10 +77,10 @@ nextdwn         .proc
 ;======================================
 next            .proc
                 jsr chkcur
-                beq next1
+                beq _XIT
 
                 lda (cur),y
-                beq next1
+                beq _XIT
 
                 tax
                 dey
@@ -85,7 +88,8 @@ next            .proc
                 sta cur
                 txa
                 sta cur+1
-next1           rts
+
+_XIT            rts
                 .endproc
 
 
@@ -95,7 +99,10 @@ next1           rts
 curstr          .proc
                 lda cur
                 ldx cur+1
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -105,10 +112,12 @@ strptr          .proc
                 clc
                 adc #6
                 sta arg0
-                bcc _sp1
+                bcc _1
 
                 inx
-_sp1            stx arg1
+
+_1              stx arg1
+
                 rts
                 .endproc
 
@@ -121,85 +130,88 @@ mnum            .proc
                 sta afsize
                 sta afsize+1
 
-_mn1            lda nxttoken
+_next1          lda nxttoken
                 cmp #timesid
-                beq _mn4                ; qcode reference
+                beq _4                  ; qcode reference
 
                 cmp #lbrack
-                beq _mn5
+                beq _5
 
                 cmp #record
-                beq _mnvar
+                beq _1
 
                 cmp #typet
-                beq _mnvar
+                beq _1
 
                 cmp #typet+8
-                beq _mnvar
+                beq _1
 
                 cmp #quote
-                beq _mnstr
+                beq _6
 
                 cmp #undec
-                beq _mnundec
-                bcs _mnvar
+                beq _9
+                bcs _1
 
                 jsr getconst
-                bcc _mn2
+                bcc _next3
 
-_mnvar          lda #1
+_1              lda #1
                 jsr nxtprop
-_mnv1           jsr rstp
+_next2          jsr rstp
 
-_mn2            clc
+_next3          clc
                 adc afsize
                 sta afsize
+
                 txa
                 adc afsize+1
-_mn2a           sta afsize+1
+_next4          sta afsize+1
+
                 jsr nextchar
 
                 cmp #'+'
-                bne _mn2b
+                bne _2
 
                 jsr getnext
-                bne _mn1                ; [unc]
+                bne _next1              ; [unc]
 
-_mn2b           ldy #0
+_2              ldy #0
                 cmp #'^'
-                bne _mn3
+                bne _3
 
                 lda (afsize),y
                 tax
                 iny
+
                 lda (afsize),y
                 stx afsize
-                jmp _mn2a
 
-_mn3            dec choff               ; put back character
+                jmp _next4
+
+_3              dec choff               ; put back character
                 lda afsize
                 ldx afsize+1
-;    LDY #0
+;               ldy #0
+
                 rts
 
-_mn4            jsr getcdoff            ; qcode reference
+_4              jsr getcdoff            ; qcode reference
+                jmp _next3
 
-                jmp _mn2
-
-_mn5            jsr getcdoff            ; table reference
+_5              jsr getcdoff            ; table reference
 
                 pha
                 txa
                 pha
-                bne _mn8                ; [unc]
+                bne _8                  ; [unc]
 
-_mnstr          jsr copystr             ; string ref
+_6              jsr copystr             ; string ref
+                jmp _next3
 
-                jmp _mn2
-
-_mn6            lda nxttoken            ; body of table
+_next5          lda nxttoken            ; body of table
                 cmp #rbrack
-                beq _mn9
+                beq _XIT
 
                 jsr getconst
 
@@ -207,15 +219,15 @@ _mn6            lda nxttoken            ; body of table
                 jsr storevar
 
                 lda op
-                beq _mn7                ; byte?
+                beq _7                  ; byte?
 
                 iny                     ; no, word
-_mn7            tya
+_7              tya
                 jsr codeincr
-_mn8            jsr getnext
-                bne _mn6                ; [unc]
+_8              jsr getnext
+                bne _next5              ; [unc]
 
-_mnundec        lda #1
+_9              lda #1
                 jsr nxtprop
 
                 tax
@@ -225,19 +237,20 @@ _mnundec        lda #1
 
                 tay
                 sta bank+lbank
+
                 lda #1
                 jsr gprop
                 jsr rstbank
 
-                jmp _mnv1
+                jmp _next2
 
 _varerr         ldy #varer
 _adrerr         jmp splerr
 
-_mn9            pla                     ; end of table
+_XIT            pla                     ; end of table
                 tax
                 pla
-                jmp _mn2
+                jmp _next3
 
                 .endproc
 
@@ -255,6 +268,7 @@ getconst        .proc
 
                 lda nxtaddr
                 ldx nxtaddr+1
+
                 rts
                 .endproc
 
@@ -272,24 +286,29 @@ copystr         .proc
                 ldy #0
                 lda (nxtaddr),y         ; size
                 sta (qcode),y
+
                 tax
                 tay
-_cs1            lda (nxtaddr),y
+_next1          lda (nxtaddr),y
                 sta (qcode),y
+
                 dey
-                bne _cs1
+                bne _next1
 
                 inx
                 txa
-                bne _cs2
+                bne _1
 
                 inc qcode+1
-_cs2            jsr codeincr
+
+_1              jsr codeincr
 
                 inc choff               ; get rid of end quote
+
                 pla
                 tax
                 pla
+
                 rts
                 .endproc
 
@@ -302,8 +321,10 @@ getcdoff        .proc
                 lda qcode
                 adc codeoff
                 pha
+
                 lda qcode+1
                 adc codeoff+1
+
                 tax
                 pla
                 rts
@@ -315,9 +336,11 @@ getcdoff        .proc
 ;======================================
 storevar        .proc
                 sta (qcode),y
+
                 iny
                 txa
                 sta (qcode),y
+
                 rts
                 .endproc
 
@@ -335,27 +358,32 @@ lookup          .proc
                 nop
         .endif
 
-lu1             stx arg1
+                stx arg1
+
                 tax
                 ldy #2
                 lda (arg1),y
+
                 tay
                 txa
-_fml1           cmp (arg1),y
-                beq _fmjmp
+_next1          cmp (arg1),y
+                beq _1
 
                 dey
                 dey
                 dey
                 cpy #2
-                bne _fml1
+                bne _next1
 
-_fmjmp          dey
+_1              dey
+
                 lda (arg1),y
                 sta arg4
+
                 dey
                 lda (arg1),y
                 sta arg3
+
                 jmp (arg3)
 
                 .endproc
@@ -366,15 +394,16 @@ _fmjmp          dey
 ;======================================
 alphanum        .proc
                 jsr alpha
-                bne _anum2
+                bne _XIT
 
 _num            cmp #'0'
-                bmi _anum1
+                bmi _1
 
                 cmp #':'
-                bmi _anum2
-_anum1          ldx #0
-_anum2          rts
+                bmi _XIT
+
+_1              ldx #0
+_XIT            rts
                 .endproc
 
 
@@ -383,17 +412,19 @@ _anum2          rts
 ;======================================
 alpha           .proc
                 pha
+
                 ora #$20
                 tax
+
                 pla
                 cpx #'a'
-                bmi _alpha1
+                bmi _1
 
                 cpx #$7B
-                bmi _alpha2
+                bmi _XIT
 
-_alpha1         ldx #0
-_alpha2         rts
+_1              ldx #0
+_XIT            rts
                 .endproc
 
 
@@ -404,14 +435,16 @@ stincr          .proc
                 clc
                 adc symtab
                 sta symtab
-                bcc _s1
+                bcc _1
 
                 inc symtab+1
-_s1             lda stmax
+
+_1              lda stmax
                 cmp symtab+1
-                bcs alpha._alpha2       ; return
+                bcs alpha._XIT          ; return
 
                 ldy #61                 ; out of symbol table space
+
                 jmp splerr
 
                 .endproc
@@ -424,14 +457,16 @@ codeincr        .proc
                 clc
                 adc qcode
                 sta qcode
-                bcc _c1
+                bcc _1
 
                 inc qcode+1
-_c1             lda stbase
+
+_1              lda stbase
                 cmp qcode+1
-                bcs alpha._alpha2       ; return
+                bcs alpha._XIT          ; return
 
 cderr           sta bank+ebank
+
                 jsr splsetup            ; reset compiler
 
                 ldy #cder               ; out of qcode space
@@ -448,11 +483,14 @@ nxtprop         .proc
                 stx aflast
                 ldx props+1
                 stx aflast+1
+
                 ldx nxtaddr
                 ldy nxtaddr+1
                 bne gprop
 
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -465,6 +503,8 @@ cprop           .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   GetProp(offset)
@@ -472,7 +512,10 @@ cprop           .proc
 getprop         .proc
                 ldx addr
                 ldy addr+1
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -481,25 +524,31 @@ getprop         .proc
 gprop           .proc
                 stx props
                 sty props+1
+
                 ldx props+1
                 clc
                 adc props
-                bcc _gp1
+                bcc _1
 
                 inx
-_gp1            sec
+
+_1              sec
                 ldy #0
                 adc (props),y
                 sta props
-                bcc _gp2
+                bcc _2
 
                 inx
-_gp2            stx props+1
+
+_2              stx props+1
+
                 iny
                 lda (props),y
+
                 tax
                 dey
                 lda (props),y
+
                 rts
                 .endproc
 
@@ -512,6 +561,7 @@ rstp            .proc
                 sty props
                 ldy aflast+1
                 sty props+1
+
                 rts
                 .endproc
 

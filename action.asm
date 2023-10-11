@@ -19,7 +19,7 @@
 
 
                 .enc "atari-screen-inverse"
-                .cdef " z", $A0
+                    .cdef " z",$A0
                 .enc "none"
 
 ;--------------------------------------
@@ -34,11 +34,13 @@
 ;--------------------------------------
 
 version         .byte $36
-date            .byte $1,$17,$84        ; assemble date of latest version!
+date            .byte $01,$17,$84       ; assemble date of latest version!
 
 
                 .include "main.io.asm"
-propid          ldx $a0
+
+propid          ldx $A0
+
                 .include "screen.mac.asm"
                 .include "main.msc.asm"
                 .include "main.bnk.asm"
@@ -47,7 +49,9 @@ amplfin
 ;    ACTION! 3.6 - Editor Routines
 ;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
+
                 .fill 4,$00
+
                 .include "editor/edit.fnd.asm"
                 .include "editor/edit.sub.asm"
                 .include "editor/edit.tab.asm"
@@ -56,13 +60,16 @@ amplfin
 ;    "ACTION! 3.6 - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
+
                 .fill 3,$00
+
                 .include "ampl/ampl.seg.asm"
                 .include "ampl/ampl.pf.asm"
                 .include "ampl/ampl.arr.asm"
                 .include "ampl/ampl.cgu.asm"
 
                 .fill 9,$00
+
                 .addr cstart
                 .byte $00,$05           ; boot disk and start cart.
                 .addr rstbank.init
@@ -91,7 +98,6 @@ amplfin
                 .include "library/lib.gr.asm"
                 .include "library/lib.msc.asm"
                 .include "library/lib.str.asm"
-
                 .include "library/lib.opt.asm"
 
 cpyright        .null "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  "
@@ -99,7 +105,7 @@ cpyright        .null "ACTION! (c)1983 Action Computer Services (ACS)  November 
 
 ;--------------------------------------
 ;--------------------------------------
-                * = ll+$0fff
+                * = ll+$0FFF
 ;--------------------------------------
 
                 .byte lbank
@@ -120,8 +126,7 @@ doc
                 .logical cl
 ;--------------------------------------
 
-main
-                .include "comp.main.asm"
+main            .include "comp.main.asm"
 
 cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 

@@ -158,7 +158,7 @@ fwrite          .proc
                 ldy #8
                 jsr fopen
 
-                jsr chkcur._ldtop
+                jsr chkcur._ENTRY1
                 beq _1
 
 _next1          jsr ldbuf

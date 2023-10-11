@@ -147,7 +147,7 @@ paste           .proc
                 jsr deltop
 
 _next1          jsr strptr
-                jsr ldbuf.ldbuf1
+                jsr ldbuf._ENTRY1
                 jsr instb
 
                 lda allocerr

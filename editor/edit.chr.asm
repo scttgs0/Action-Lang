@@ -351,7 +351,7 @@ _next1          iny
 rfrshbuf        .proc
                 jsr dspbuf
 
-                jmp rstcol.lftrt
+                jmp rstcol._ENTRY1
 
                 .endproc
 
