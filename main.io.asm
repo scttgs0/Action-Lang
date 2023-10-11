@@ -549,7 +549,7 @@ puteol          .proc
 ;======================================
 putchar         .proc
                 lda device
-                jmp scrch.scrchar
+                jmp scrch._ENTRY1
 
                 .endproc
 

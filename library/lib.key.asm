@@ -78,7 +78,7 @@ _3              and #$3F
                 lda #7                  ; GETCHR
                 sta brkkey              ; ignore BREAK key
 
-                jsr putch.putch2
+                jsr putch._ENTRY2
 
 _4              ldx SRTIMR
                 cpx #10

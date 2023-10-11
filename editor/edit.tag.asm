@@ -210,7 +210,7 @@ _next1          sta afbest
                 lda (afbest),y
                 sta arg1
 
-                jsr free.free1
+                jsr free._ENTRY1
 
                 lda arg0
                 ldx arg1

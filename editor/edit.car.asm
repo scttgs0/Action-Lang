@@ -68,7 +68,7 @@ ltab            .word lsh1._lshift      ; LSH
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
 
-                jmp getnext.ismt        ; STM catch all
+                jmp getnext._ENTRY5        ; STM catch all
 
                 rts                     ; illegal monitor cmd
 

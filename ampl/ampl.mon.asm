@@ -73,7 +73,7 @@ _1              jsr alarm
                 ldx #>tempbuf
                 ldy sp
                 iny                     ; make sure non-zero
-                jsr lexexpand.lexp1
+                jsr lexexpand._ENTRY1
                 jsr getnext
 
                 lda tempbuf+1
