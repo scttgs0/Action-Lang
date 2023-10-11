@@ -10,17 +10,19 @@
 ;======================================
 lsplerr         .proc
                 lda top+1
-                beq spler1
+                beq _1
 
 ;   set pointer to error
                 ldx currentWindow
                 lda spln
                 sta w1+wsp,x
+
                 lda curln
                 sta w1+wcur,x
                 lda curln+1
                 sta w1+wcur+1,x
-spler1          jsr syserr
+
+_1              jsr syserr
                 jsr puteol
                 jsr printbuf
 
@@ -31,6 +33,7 @@ spler1          jsr syserr
 
                 lda #0
                 ;!!sta INITAD+1
+
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr print

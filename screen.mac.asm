@@ -18,13 +18,13 @@ scrinit         .proc
                 ; lda #$0C
                 ; sta arg3
                 ; lda #0
-                ; ldx #<scred
-                ; ldy #>scred
+                ; ldx #<_data
+                ; ldy #>_data
                 ; jmp Open
 
 ;--------------------------------------
 
-; scred         .text 2,"E:",$9b
+; _data         .text 2,"E:",$9B
                 .endproc
 
 
@@ -37,8 +37,8 @@ scrinit         .proc
 scrch           .proc
                 tay
                 lda #0
-scrchar         ldx #1
-                bne putch.putch1
+_ENTRY1         ldx #1
+                bne putch._ENTRY1       ; [unc]
 
                 .endproc
 
@@ -53,17 +53,21 @@ putch           .proc
                 tay
                 lda #0
                 tax
-putch1          ;!!stx DSPFLG
+_ENTRY1         ;!!stx DSPFLG
+
                 asl
                 asl
                 asl
                 asl
+
                 tax
                 lda #$0B                ; PUTCHR
-putch2          ;!!sta IOCB0+ICCOM,x
+_ENTRY2         ;!!sta IOCB0+ICCOM,x
+
                 lda #0
                 ;!!sta IOCB0+ICBLL,x
                 ;!!sta IOCB0+ICBLH,x
+
                 tya
                 ;!!jmp CIOV
 
@@ -75,7 +79,7 @@ putch2          ;!!sta IOCB0+ICCOM,x
 ;======================================
 scrup           .proc
                 lda #$1C
-                bne putch
+                bra putch
 
                 .endproc
 
@@ -85,7 +89,7 @@ scrup           .proc
 ;======================================
 scrdwn          .proc
                 lda #$1D
-                bne putch
+                bra putch
 
                 .endproc
 
@@ -95,7 +99,7 @@ scrdwn          .proc
 ;======================================
 scrbell         .proc
                 lda #$FD
-                bne putch
+                bra putch
 
                 .endproc
 
@@ -105,7 +109,7 @@ scrbell         .proc
 ;======================================
 scrlft          .proc
                 lda #$1E
-                bne putch
+                bra putch
 
                 .endproc
 
@@ -115,7 +119,7 @@ scrlft          .proc
 ;======================================
 scrrt           .proc
                 lda #$1F
-                bne putch
+                bra putch
 
                 .endproc
 
@@ -275,66 +279,70 @@ GetNext         .proc
 
                 lda token
                 sta lsttoken
+
                 ldx nxtaddr
                 ldy nxtaddr+1
                 lda nxttoken
                 stx addr
                 sty addr+1
                 sta token
-getnloop
-                jsr nextchar
 
-getnl0          cmp #tokEOF
-                beq getnr1
+_ENTRY1         jsr nextchar
+
+_ENTRY2         cmp #tokEOF
+                beq _ENTRY3
 
                 cmp #'!'
-                bcc getnloop
+                bcc _ENTRY1
 
 ;   save line index for debugging
                 ldx choff
                 stx spnxt
 
                 cmp #'A'
-                bcs _getnl1
+                bcs _1
 
                 tay
                 lda lexchars-33,y
-                beq getnloop
-                bpl getnr1
+                beq _ENTRY1
+                bpl _ENTRY3
 
                 and #$7F
-                bra _getnr0
+                bra _3
 
-_getnl1         jsr alpha
-                bne _getnid
+_1              jsr alpha
+                bne _2
 
                 cmp #'['
-                beq getnr1
+                beq _ENTRY3
 
                 cmp #'^'
-                beq getnr1
+                beq _ENTRY3
 
                 cmp #']'
-                beq getnr1
-                bra getnloop
+                beq _ENTRY3
+                bra _ENTRY1
 
-_getnid         jsr GetName
-                bmi getnr1
+_2              jsr GetName
+                bmi _ENTRY3
 
-_getnr0         sta nxttoken
+_3              sta nxttoken
+
                 ldx #<lexcmd
                 ldy #>lexcmd
                 jmp lookup
 
-getnr1          sta nxttoken
+_ENTRY3         sta nxttoken
 
-;GetNr2 lda $D0
-;       beq GetNr3
-;       jsr PrintTok
+;GetNr2         lda $D0
+;               beq GetNr3
+;               jsr PrintTok
 
-getnr2          ldx addr
+_ENTRY4         ldx addr
                 ldy addr+1
-ismt            lda token
+
+_ENTRY5         lda token
+
                 rts
                 .endproc
 
@@ -344,7 +352,7 @@ ismt            lda token
 ;======================================
 LexCom          .proc
                 jsr NextLine
-                bra GetNext.getnl0
+                bra GetNext._ENTRY2
 
                 .endproc
 
@@ -355,40 +363,46 @@ LexCom          .proc
 LexDig          .proc
                 lda #tokCONST_t+tokINT_t
                 sta nxttoken
+
                 jsr lexbuf              ; get buf ptr
                 jsr storeal
-ldig1           jsr nextchar            ; cardinal?
+
+_next1          jsr nextchar            ; cardinal?
                 jsr alphanum._num
-                bne ldig1
+                bne _next1
 
                 cmp #'.'
-                beq ldig4
+                beq _2
 
                 cmp #'E'
-                beq ldig4
+                beq _2
 
                 dec choff
-                jsr rtocar
-                bcc ldig3
 
-cnsterr         ldy #constERR
+                jsr rtocar
+                bcc _1
+
+_err            ldy #constERR
                 jmp splerr
 
-ldig2           dey
+_ENTRY1         dey
                 sty choff
-ldig3           sta nxtaddr
+
+_1              sta nxtaddr
                 stx nxtaddr+1
+
                 cpx #0
-                bne GetNext.getnr2
+                bne GetNext._ENTRY4
 
                 lda #tokCONST_t+tokBYTE_t
-                bne GetNext.getnr1
+                bne GetNext._ENTRY3
 
-ldig4           lda #tokCONST_t+tokREAL_t
+_2              lda #tokCONST_t+tokREAL_t
                 sta nxttoken
+
                 ldy CIX
                 ldx #$FF                ; for SET cmd
-                bne ldig2
+                bra _ENTRY1
 
                 .endproc
 
@@ -400,8 +414,9 @@ LexChr          .proc
                 jsr nextchar
 
                 sta nxtaddr
+
                 lda #tokCONST_t+tokCHAR_t
-                bne GetNext.getnr1
+                bra GetNext._ENTRY3
 
                 .endproc
 
@@ -413,10 +428,10 @@ LexNE           .proc
                 jsr nextchar
 
                 cmp #'>'
-                bne LexEq.leq1
+                bne LexEq._ENTRY1
 
                 lda #tokNOTEQU
-                bra GetNext.getnr1
+                bra GetNext._ENTRY3
 
                 .endproc
 
@@ -427,11 +442,11 @@ LexNE           .proc
 LexEq           .proc
                 jsr nextchar
 
-leq1            cmp #'='
+_ENTRY1         cmp #'='
                 bne putback
 
                 inc nxttoken
-                bra GetNext.getnr2
+                bra GetNext._ENTRY4
 
                 .endproc
 
@@ -442,10 +457,12 @@ leq1            cmp #'='
 LexHex          .proc
                 lda #tokCONST_t+tokCARD_t
                 sta nxttoken
+
                 inc choff
+
                 jsr lexbuf
                 jsr htocar
-                bra LexDig.ldig2
+                bra LexDig._ENTRY1
 
                 .endproc
 
@@ -455,7 +472,8 @@ LexHex          .proc
 ;======================================
 putback         .proc
                 dec choff
-pback           jmp GetNext.getnr2
+
+_ENTRY1         jmp GetNext._ENTRY4
 
                 .endproc
 
@@ -465,7 +483,7 @@ pback           jmp GetNext.getnr2
 ;======================================
 lexpf           .proc
                 lda qglobal
-                beq putback.pback
+                beq putback._ENTRY1
 
                 lda #0
                 sta qglobal
@@ -474,7 +492,8 @@ lexpf           .proc
                 sta symtab
                 lda gbase+1
                 sta symtab+1
-                bra putback.pback
+
+                bra putback._ENTRY1
 
                 .endproc
 
@@ -485,44 +504,49 @@ lexpf           .proc
 lexstr          .proc
                 lda token
                 cmp #tokQuote
-                beq putback.pback       ; zap local st
+                beq putback._ENTRY1     ; zap local st
 
                 lda #0
                 sta arg9
-_lstr1          jsr nextchar
+
+_next1          jsr nextchar
 
                 inc arg9
-                beq _lstr3              ; string too long
+                beq _1                  ; string too long
 
                 cmp #'"'
-                beq _lstr4
+                beq _2
 
-_lstr2          ldy arg9
+_next2          ldy arg9
                 sta (symtab),y
-                lda Channel
-                bpl _lstr1              ; if not EOF
 
-_lstr3          ldy #strERR
+                lda Channel
+                bpl _next1              ; if not EOF
+
+_1              ldy #strERR
                 jmp splerr
 
-_lstr4          jsr nextchar
+_2              jsr nextchar
 
                 cmp #'"'
-                beq _lstr2              ; " in string
+                beq _next2              ; " in string
                                         ; end of string
 
                 ldy arg9
                 lda #eol
                 sta (symtab),y
+
                 dey
                 tya
                 ldy #0
                 sta (symtab),y          ; save size
+
                 lda symtab
                 ldx symtab+1
                 ldy choff
+
                 dey
-                jmp LexDig.ldig2
+                jmp LexDig._ENTRY1
 
                 .endproc
 
@@ -534,9 +558,9 @@ nextchar        .proc
                 ldy defflg
                 bne lexdef
 
-nxtch0          ldy choff
+_ENTRY1         ldy choff
                 cpy sp
-                bcc NextLine._nxtch1
+                bcc NextLine._ENTRY1
 
                 .endproc
 
@@ -556,6 +580,7 @@ NextLine        .proc
 
                 cpy #$88                ; EOF
                 beq _next1
+
                 jmp splerr
 
 _next1          dec Channel
@@ -570,6 +595,7 @@ _1              ldy top+1
                 sta curnxt
                 ldx cur+1
                 stx curnxt+1
+
                 jsr nextdwn
                 bne _2
 
@@ -585,19 +611,23 @@ _2              lda list
 _3              ldy #0
                 sty choff
                 lda (buf),y
+
                 tay
                 iny
                 sty sp
+
                 lda #eol
                 sta (buf),y
-                ldy #0
 
-_nxtch1         iny
+                ldy #0
+_ENTRY1         iny
                 lda (buf),y
                 sty choff
+
                 rts
 
 _4              lda #tokEOF
+
                 rts
                 .endproc
 
@@ -608,17 +638,19 @@ _4              lda #tokEOF
 lexdef          .proc
                 ldy #0
                 lda (delnxt),y
+
                 inc choff
                 cmp choff
-                bcs ldef1
+                bcs _1
 
                 lda defflg
                 sta choff
                 sty defflg
-                bra nextchar.nxtch0
+                bra nextchar._ENTRY1
 
-ldef1           ldy choff
+_1              ldy choff
                 lda (delnxt),y
+
                 rts
                 .endproc
 
@@ -627,16 +659,18 @@ ldef1           ldy choff
 ;   LexGet()
 ;======================================
 lexget          .proc
-                jsr GetNext.getnloop
+                jsr GetNext._ENTRY1
 
-lget            lda #0
+_ENTRY1         lda #0
                 sta defflg
+
                 inc Channel
+
                 lda #4
                 jsr openchan
                 jsr NextLine
 
-                jmp GetNext.getnl0
+                jmp GetNext._ENTRY2
 
                 .endproc
 
@@ -645,33 +679,34 @@ lget            lda #0
 ;   LexSet()
 ;======================================
 lexset          .proc
-                jsr getadr
+                jsr _1
 
                 sta arg11
                 stx arg12
 
-                jsr GetNext.getnloop
+                jsr GetNext._ENTRY1
 
                 lda nxttoken
                 cmp #tokEQU
-                bne lseterr
+                bne _err
 
-                jsr getadr
+                jsr _1
 
                 ldy #0
                 sta (arg11),y
+
                 txa
-                beq lset1
+                beq _XIT1
 
                 iny
                 sta (arg11),y
-lset1           jmp GetNext.getnloop
 
-lseterr         ldy #setERR
+_XIT1           jmp GetNext._ENTRY1
+
+_err            ldy #setERR
                 jmp splerr
 
-getadr          jsr GetNext.getnloop
-
+_1              jsr GetNext._ENTRY1
                 jmp mnum
 
                 .endproc
@@ -682,12 +717,12 @@ getadr          jsr GetNext.getnloop
 ;======================================
 lexexpand       .proc
                 lda defflg
-                beq lexp
+                beq _1
 
                 ldy #dfnERR
                 jmp splerr
 
-lexp            lda #3
+_1              lda #3
                 jsr nxtprop
 
                 lda props
@@ -695,12 +730,15 @@ lexp            lda #3
                 jsr rstp
 
                 ldy choff
-lexp1           sta delnxt
+_ENTRY1         sta delnxt
+
                 stx delnxt+1
                 sty defflg
+
                 lda #0
                 sta choff
-                jmp GetNext.getnloop
+
+                jmp GetNext._ENTRY1
 
                 .endproc
 
@@ -711,21 +749,23 @@ lexp1           sta delnxt
 lexbuf          .proc
                 ldy choff
                 lda defflg
-                beq _lbuf
+                beq _1
 
                 lda delnxt
                 ldx delnxt+1
+
                 rts
 
-_lbuf           lda buf
+_1              lda buf
                 ldx buf+1
+
                 rts
                 .endproc
 
 ;--------------------------------------
 ;--------------------------------------
 
-lexcmd          .addr GetNext.getnr2
+lexcmd          .addr GetNext._ENTRY4
                 .byte 41
                 .addr LexDig
                 .byte tokDigit-$80

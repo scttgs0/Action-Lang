@@ -20,7 +20,7 @@ spl             ;.proc
                 cmp #tokQuote
                 bne _spl1               ; no name
 
-                jsr lexget.lget
+                jsr lexget._ENTRY1
                 jmp _spl2
 
 _spl1           lda top1
