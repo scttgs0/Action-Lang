@@ -5,9 +5,6 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-;lstr            .proc
-
-
 ;======================================
 ;INT FUNC SCompare(STRING a,b)
 ; result returned is:
@@ -19,38 +16,42 @@ libStrSCompare  .proc
                 sta arg4
                 stx arg5
                 sty arg2
+
                 ldy #0
                 sty args
                 sty args+1
+
                 lda (arg4),y
                 cmp (arg2),y
-                beq _sc1
+                beq _1
 
-                jsr _sc4
+                jsr _3
 
-_sc1            cmp #0
-                bne _sc2
+_1              cmp #0
+                bne _2
 
                 rts
 
-_sc2            sta arg6
-_sc3            iny
+_2              sta arg6
+
+_next1          iny
                 lda (arg4),y
                 cmp (arg2),y
-                bne _sc4
+                bne _3
 
                 cpy arg6
-                bcc _sc3
+                bcc _next1
 
                 rts
 
-_sc4            ldx #$FF
+_3              ldx #$FF
                 stx args
-                bcc _sc5
+                bcc _4
 
                 lda (arg2),y
                 inx
-_sc5            stx args+1
+_4              stx args+1
+
                 rts
                 .endproc
 
@@ -63,18 +64,20 @@ libStrSCopy     .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda (arg2),y
-_scopy1         sta (arg0),y
-                beq _scp2
+_ENTRY1         sta (arg0),y
+                beq _XIT
 
-_scopy2         tay
-_scp1           lda (arg2),y
+_ENTRY2         tay
+_next1          lda (arg2),y
                 sta (arg0),y
-                dey
-                bne _scp1
 
-_scp2           rts
+                dey
+                bne _next1
+
+_XIT            rts
                 .endproc
 
 
@@ -87,27 +90,32 @@ libStrSCopyS    .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda (arg2),y
                 cmp arg5
-                bcs _scs1
+                bcs _1
 
                 sta arg5
-_scs1           dec arg4
+
+_1              dec arg4
+
                 clc
                 lda arg2
                 adc arg4
                 sta arg2
-                bcc _scs2
+                bcc _2
 
                 inc arg3
-_scs2           sec
+
+_2              sec
                 lda arg5
                 sbc arg4
-                bcs _scs3
+                bcs _XIT
 
                 lda #0
-_scs3           jmp libStrSCopy._scopy1
+
+_XIT            jmp libStrSCopy._ENTRY1
 
                 .endproc
 
@@ -124,47 +132,51 @@ libStrSAssign   .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda (arg2),y
-                beq _sa1
+                beq _XIT1
 
                 sta arg6
+
                 dec arg4
+
                 sec
                 lda arg5
                 sbc arg4
-                beq _sa1
-                bcs _sa2
+                beq _XIT1
+                bcs _1
 
-_sa1            rts
+_XIT1           rts
 
-_sa2            tax
+_1              tax
                 cmp  arg6
-                bcc  _sa3
+                bcc _2
 
                 clc
                 lda arg6
                 tax
                 adc arg4
                 sta arg5
-_sa3            lda arg5
+
+_2              lda arg5
                 cmp (arg0),y
-                bcc _sa4
+                bcc _3
 
                 sta (arg0),y
+
                 clc
-_sa4            lda arg0
+_3              lda arg0
                 adc arg4
                 sta arg0
-                bcc _sa5
+                bcc _4
 
                 inc arg1
-_sa5            txa
-                jmp libStrSCopy._scopy2
+
+_4              txa
+                jmp libStrSCopy._ENTRY2
 
                 .endproc
-
-                ;.endproc
 
 
 ;======================================
@@ -525,8 +537,13 @@ libStrSTrig     .proc
                 tax
                 ;!!lda TRIG0,x
                 sta args
+
                 rts
                 .endproc
+
+
+;--------------------------------------
+;--------------------------------------
 
                 .byte <_en73
 
@@ -540,6 +557,7 @@ libStrPaddle    .proc
                 tax
                 ;!!lda PADDL0,x
                 sta args
+
                 rts
                 .endproc
 

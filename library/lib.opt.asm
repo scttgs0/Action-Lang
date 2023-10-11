@@ -12,108 +12,111 @@ libOptSetOpts   .proc
 ;   Display On?
                 ldx #domsg-optmsg
                 ldy jt_tvdisp
-                jsr _yn
-                beq _do1
+                jsr _14
+                beq _1
 
                 lda #0
-                beq _do2
+                beq _2
 
-_do1            lda #$22
-_do2            sta jt_tvdisp
+_1              lda #$22
+_2              sta jt_tvdisp
 
 ;   Alarm?
                 ldx #amsg-optmsg
                 ldy jt_alarm
                 cpy #$60
-                jsr _yn
-                beq _a1
+                jsr _14
+                beq _3
 
                 lda #$60                ; RTS
-                bne _a2
+                bne _4
 
-_a1             lda #$4C                ; JMP
-_a2             sta jt_alarm
+_3              lda #$4C                ; JMP
+_4              sta jt_alarm
 
 ;   Case sensitive?
                 ldx #cmsg-optmsg
                 ldy jt_stmask
                 cpy #$DF
-                jsr _yn
-                beq _c1
+                jsr _14
+                beq _5
 
                 lda #$DF
-                bne _c2
+                bne _6
 
-_c1             lda #$FF
-_c2             sta jt_stmask
+_5              lda #$FF
+_6              sta jt_stmask
 
 ;   Trace On?
                 ldx #tmsg-optmsg
                 ldy trace
-                jsr _yn
-                beq _t1
+                jsr _14
+                beq _7
 
                 lda #0
-                beq _t2
+                beq _8
 
-_t1             lda #$FF
-_t2             sta trace
+_7              lda #$FF
+_8              sta trace
 
 ;   List On?
                 ldx #lstmsg-optmsg
                 ldy list
-                jsr _yn
-                beq _lst1
+                jsr _14
+                beq _9
 
                 lda #0
-                beq _lst2
+                beq _10
 
-_lst1           lda #$FF
-_lst2           sta list
+_9              lda #$FF
+_10             sta list
 
 ;   window size
                 lda jt_wsize
-                jsr _getstr
+                jsr _18
 
                 ldx #wmsg-optmsg
-                jsr _getnum
+                jsr _19
 
                 cmp #5
-                bcs _w0                 ; make sure at least 5
+                bcs _11                 ; make sure at least 5
 
                 lda #5
-_w0             cmp #19
-                bcc _w1                 ; make sure less than 19
+_11             cmp #19
+                bcc _12                 ; make sure less than 19
 
                 lda #18
-_w1             sta jt_wsize
+_12             sta jt_wsize
+
                 ldx numwd
-                beq _l1
+                beq _13
 
                 sta w1+wnlns
+
                 tay
                 iny
                 sty w2+wytop
+
                 sec
                 lda #23
                 sbc jt_wsize
                 sta w2+wnlns
 
 ;   line size
-_l1             lda jt_linemax
-                jsr _getstr
+_13             lda jt_linemax
+                jsr _18
 
                 ldx #lmsg-optmsg
-                jsr _getnum
+                jsr _19
 
                 sta jt_linemax
 
 ;   left margin
                 lda LMARGN
-                jsr _getstr
+                jsr _18
 
                 ldx #lmmsg-optmsg
-                jsr _getnum
+                jsr _19
 
                 sta LMARGN
 
@@ -125,72 +128,85 @@ _l1             lda jt_linemax
                 rol a
                 rol a
                 and #3
+
                 tax
                 tya
                 and #$9F
-                ora stoa_,x
+                ora stoa_,X
+
                 tay
                 ldx #emsg-optmsg
-                jsr _yn2
+                jsr _16
 
                 lda tempbuf+1
                 tay
                 and #$60
+
                 tax
                 tya
                 and #$9F
-                ora chrConvert,x
+                ora chrConvert,X
                 sta jt_eolch
+
                 rts
 
-_yn             beq _yn1
+_14             beq _15
 
                 ldy #'Y'
-                bne _yn2
+                bne _16
 
-_yn1            ldy #'N'
-_yn2            sty tempbuf+1
+_15             ldy #'N'
+_16             sty tempbuf+1
+
                 ldy #1
                 jsr libOptGetTmpBuf
 
                 lda tempbuf+1
                 ldy tempbuf
-                bne _yn5
+                bne _17
 
                 cmp #$1B
-                bne _yn4
+                bne _XIT1
 
-_yn3            pla
+_next1          pla
                 pla
-_yn4            rts
 
-_yn5            ora #$20
+_XIT1           rts
+
+_17             ora #$20
                 cmp #'y'
+
                 rts
 
-_getstr         ldx #0
+; get string
+_18             ldx #0
                 ldy #>tempbuf
                 sty arg3
+
                 ldy #<tempbuf
+
                 jmp libIOStrC
 
-_getnum         ldy tempbuf
+; get number
+_19             ldy tempbuf
                 jsr libOptGetTmpBuf
 
                 ldy tempbuf
-                bne _gn0
+                bne _20
 
                 lda tempbuf+1
                 cmp #$1B
-                beq _yn3
+                beq _next1
 
-_gn0            lda #<tempbuf
+_20             lda #<tempbuf
                 ldx #>tempbuf
                 jsr libIOValB
 
                 lda args
-_gn1            rts
+
+                rts
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -219,20 +235,22 @@ libOptGetTmpBuf .proc
 
 ;   copy string to tempBuf+10
                 ldy #20
-_gt1            lda optmsg+20,x
-                sta tempbuf+10,y
+_next1          lda optmsg+20,X
+                sta tempbuf+10,Y
+
                 dex
                 dey
-                bpl _gt1
+                bpl _next1
 
 ;   put space at end
                 tay
                 lda #' '
-                sta tempbuf+10,y
+                sta tempbuf+10,Y
 
                 lda #<(tempbuf+10)
                 ldx #>(tempbuf+10)
                 ldy arg2
+
                 jmp mgett1
 
                 .endproc
