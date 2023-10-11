@@ -334,7 +334,7 @@ _next1          iny
 RefreshBuf      .proc
                 jsr dspbuf
 
-                jmp rstcol.lftrt
+                jmp rstcol._ENTRY1
 
                 .endproc
 

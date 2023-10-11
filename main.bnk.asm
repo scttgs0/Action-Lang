@@ -32,9 +32,10 @@ cstart          .proc
                 ;!!ldy #ebank
                 sty jt_curbank
                 ;!!sty bank+ebank
-                .endproc
 
-                ;[fall-through]
+                jmp start
+
+                .endproc
 
 
 ;======================================
@@ -63,7 +64,7 @@ rbank1          ;!!sta bank,y
 
                 pla
                 plp
-                rts
+init            rts
                 .endproc
 
 
@@ -96,6 +97,8 @@ compile         .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   EditBank()
@@ -103,9 +106,11 @@ compile         .proc
 EditBank        .proc
                 php
                 pha
+
                 tya
                 ;!!ldy #ebank
                 sty jt_curbank
+
                 jmp RestoreBank.rbank1
 
                 .endproc
@@ -119,18 +124,20 @@ GetAlias        .proc
                 jsr getprop
 
                 cpx #0
-                beq _gal1
+                beq _XIT
 
                 sta addr
                 stx addr+1
                 ;!!sta bank+lbank
+
                 lda #0
                 jsr getprop
 
                 sta token
+
                 jmp RestoreBank
 
-_gal1           jmp mnum._varerr
+_XIT            jmp mnum._varerr
 
                 .endproc
 
@@ -140,6 +147,7 @@ _gal1           jmp mnum._varerr
 ;======================================
 gnlocal         .proc
                 ;!!sta bank+lbank
+
                 jsr lGetName._ENTRY1
 
                 jmp RestoreBank
@@ -154,6 +162,7 @@ cstmtlst        .proc
                 ;!!ldy #cbank
                 sty jt_curbank
                 ;!!sta bank+cbank
+
                 jsr stmtlist
 
                 jmp EditBank
@@ -170,6 +179,8 @@ mgett1          .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   LProceed()
@@ -178,6 +189,7 @@ lproceed        .proc
                 ;!!ldy #lbank
                 sty jt_curbank
                 ;!!sty bank+lbank
+
                 rts
                 .endproc
 
@@ -190,6 +202,7 @@ options         .proc
                 jsr libOptSetOpts
 
                 jmp EditBank
+
                 .endproc
 
 
@@ -198,6 +211,7 @@ options         .proc
 ;======================================
 GetKey          .proc
                 ;!!sta bank+lbank
+
                 jsr libKeyGetKey
 
                 jmp RestoreBank
@@ -210,6 +224,7 @@ GetKey          .proc
 ;======================================
 splerr          .proc
                 ;!!sta bank+lbank
+
                 jmp lsplerr
 
                 .endproc
@@ -231,7 +246,9 @@ emloop          .proc
 ;======================================
 GetArgs         .proc
                 pha                     ; save arg type load flag
+
                 ;!!sty bank+lbank
+
                 lda #1
                 jsr getprop
 
@@ -239,7 +256,7 @@ GetArgs         .proc
                 stx addr+1
 
                 pla
-                bne _ga2                ; don't load arg types
+                bne _XIT                ; don't load arg types
 
                 sta abt                 ; A=0
                 sta abt+1               ; flag as temp args
@@ -248,31 +265,33 @@ GetArgs         .proc
                 ldy #2
                 lda (props),y
                 sta numargs
-                beq _ga2
+                beq _XIT
 
                 tax
                 cpx #9
-                bcs _ga2
+                bcs _XIT
 
-_ga1            iny
+_next1          iny
                 lda (props),y
                 dex
                 sta argtypes,x          ; args inverted
-                bne _ga1
+                bne _next1
 
-_ga2            jmp RestoreBank
+_XIT            jmp RestoreBank
 
                 .endproc
 
 
 ;======================================
-;
+; call only from LBANK!
 ;======================================
-prth            .proc                   ; call only from LBANK!
+prth            .proc
                 ;!!sty bank+ebank
+
                 jsr PrintH
 
                 ;!!sty bank+lbank
+
                 jmp libIOChkErr
 
                 .endproc

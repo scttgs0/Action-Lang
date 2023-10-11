@@ -13,8 +13,9 @@
 Open            .proc
                 stx arg5
                 sty arg6
+
                 ldy #3
-                bne xiostr
+                bne xiostr              ; [unc]
 
                 .endproc
 
@@ -25,18 +26,21 @@ Open            .proc
 print           .proc
                 stx arg5
                 sty arg6
+
                 ldx #0
                 stx arg3
+
                 ldy #$09
                 jsr xiostr
-                bne print1
+                bne _XIT
 
                 lda #$0B
                 ;!!sta IOCB0+ICCOM,x
+
                 lda #eol
                 ;!!jmp CIOV
 
-print1          rts
+_XIT            rts
                 .endproc
 
 
@@ -44,7 +48,7 @@ print1          rts
 ;   Close(device)
 ;======================================
 close           .proc
-                ldx #>$B000             ; ml
+                ldx #>$B000      ;; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
@@ -55,7 +59,7 @@ close           .proc
         .endif
 
                 ldy #$0C
-                bne input.input1
+                bne input._ENTRY1       ; [unc]
 
                 .endproc
 
@@ -65,8 +69,10 @@ close           .proc
 ;======================================
 input           .proc
                 sty arg6
+
                 ldy #$05
-input1          stx arg5
+_ENTRY1         stx arg5
+
                 ldx #0
                 stx arg3
 
@@ -83,31 +89,36 @@ xiostr          .proc
                 asl
                 asl
                 asl
+
                 tax
                 tya
                 ;!!sta IOCB0+ICCOM,x       ; command
+
                 lda arg3
-                beq _xs1
+                beq _1
 
                 ;!!sta IOCB0+ICAX1,x
+
                 lda arg4
                 ;!!sta IOCB0+ICAX2,x
 
                 lda #0
-_xs1            tay
+_1              tay
                 ;!!sta IOCB0+ICBLH,x
                 lda (arg5),y
                 ;!!sta IOCB0+ICBLL,x       ; size
 
-                beq print.print1        ; return
+                beq print._XIT          ; return
 
                 clc
                 lda arg5
                 adc #1
                 ;!!sta IOCB0+ICBAL,x       ; buffer address
+
                 lda arg6
                 adc #0
                 ;!!sta IOCB0+ICBAH,x
+
                 ;!!jmp CIOV
 
                 .endproc
@@ -118,8 +129,9 @@ _xs1            tay
 ;======================================
 output          .proc
                 sty arg6
+
                 ldy #$0B
-                bne input.input1
+                bne input._ENTRY1       ; [unc]
 
                 .endproc
 
@@ -129,10 +141,13 @@ output          .proc
 ;======================================
 dspstr          .proc
                 sty arg12
+
                 ldy arg3
                 sty arg13
+
                 ldy #0
                 sty arg3
+
                 ldy arg4
                 jsr putstr
 
@@ -140,25 +155,26 @@ dspstr          .proc
                 clc
                 adc LMARGN
                 sta COLCRS
+
                 jsr scrrt
 
                 ldy #0
                 lda (arg12),y
-                beq _ds2
+                beq _XIT
 
                 sta arg3
                 sty arg4
 
-_ds1            inc arg4
+_next1          inc arg4
                 ldy arg4
                 lda (arg12),y
                 eor arg2
                 jsr scrch
 
                 dec arg3
-                bne _ds1
+                bne _next1
 
-_ds2            rts
+_XIT            rts
                 .endproc
 
 
@@ -166,6 +182,7 @@ _ds2            rts
 ;   ReadBuffer(device)
 ;======================================
 ReadBuffer      .proc
+;               inc COLOR4
                 nop
                 nop
                 nop
@@ -174,12 +191,14 @@ ReadBuffer      .proc
                 tax
                 lda #240
                 sta (buf),y
+
                 txa
                 ldx buf
                 ldy buf+1
 inputs          jsr input
 
                 sty arg0
+
                 ;!!lda IOCB0+ICBLL,x       ; size
                 beq _1
 
@@ -187,7 +206,9 @@ inputs          jsr input
                 sbc #1
 _1              ldy #0
                 sta (arg5),y
+
                 ldy arg0
+
                 rts
                 .endproc
 
@@ -212,6 +233,7 @@ rstcur          .proc
                 sta cur
                 lda w1+wcur+1,y
                 sta cur+1
+
                 jmp ldbuf
 
                 .endproc
@@ -233,6 +255,7 @@ syserr          .proc
                 lda #>numbuf
                 sta arg3
                 ldy #<numbuf
+
                 lda #<sermsg
                 ldx #>sermsg
                 jsr dspstr
@@ -242,6 +265,7 @@ syserr          .proc
                 jmp scrbell
 
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -255,9 +279,12 @@ sermsg          .text 7,"Error: "
 ctostr          .proc
                 sta FR0
                 stx FR0+1
+
                 ;!!jsr IFP                 ; Cardinal to real
 
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -268,17 +295,21 @@ rtostr          ;.proc
 
                 ldy #$FF
                 ldx #0
-_rts1           iny
+_next1          iny
                 inx
+
                 lda (INBUFF),y
                 sta numbuf,x
-                bpl _rts1
+                bpl _next1
 
                 eor #$80
                 sta numbuf,x
                 stx numbuf
+
                 rts
                 ;.endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -288,6 +319,7 @@ dspoff          .proc
                 lda jt_tvdisp
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
+
                 rts
                 .endproc
 
@@ -299,8 +331,10 @@ dspon           .proc
                 lda #$22
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
+
                 lda bckgrnd             ; background color
                 ;!!sta COLOR4              ; restore background
+
                 rts
                 .endproc
 
@@ -314,6 +348,7 @@ printc          .proc
 pnum            lda device
                 ldx #<numbuf
                 ldy #>numbuf
+
                 jmp output
 
                 .endproc
@@ -324,6 +359,7 @@ pnum            lda device
 ;======================================
 openchan        .proc
                 pha
+
                 lda Channel
                 jsr close
 
@@ -334,11 +370,11 @@ openchan        .proc
                 lda #':'
                 ldy #2
                 cmp (nxtaddr),y
-                beq _oc2
+                beq _1
 
                 iny
                 cmp (nxtaddr),y
-                beq _oc2
+                beq _1
 
 ;   stuff in D: for device
                 clc
@@ -353,20 +389,23 @@ openchan        .proc
                 lda (nxtaddr),y         ; add 2 to length of string
                 adc #2                  ;  so we can insert 'D:'
                 sta (nxtaddr),y
+
                 tay
-_oc1            lda (nxtaddr),y         ; move string up...
+_next1          lda (nxtaddr),y         ; move string up...
                 sta (FR0),y
+
                 dey
-                bne _oc1
+                bne _next1
 
                 iny
                 lda #'D'
                 sta (nxtaddr),y
+
                 iny
                 lda #':'
                 sta (nxtaddr),y
 
-_oc2            lda Channel
+_1              lda Channel
                 ldx nxtaddr
                 ldy nxtaddr+1
                 jsr Open
@@ -382,7 +421,7 @@ _oc2            lda Channel
 ;======================================
 printbuf        .proc
                 lda list
-                bne rtocar.htcr1        ; return
+                bne rtocar._XIT         ; return
 
                 jmp WriteBuffer
 
@@ -396,27 +435,29 @@ htocar          .proc
                 sty CIX
                 sta arg1
                 stx arg2
+
                 lda #0
                 sta FR0
                 sta FR0+1
 
-_htc1           ldy CIX
+_next1          ldy CIX
                 lda (arg1),y
                 sec
                 sbc #'0'
-                bmi rtocar.htcrtn
+                bmi rtocar._ENTRY1
 
                 cmp #10
-                bmi _htcok
+                bmi _1
 
                 cmp #17
-                bmi rtocar.htcrtn
+                bmi rtocar._ENTRY1
 
                 sbc #7
                 cmp #16
-                bpl rtocar.htcrtn
+                bpl rtocar._ENTRY1
 
-_htcok          sta arg5
+_1              sta arg5
+
                 lda FR0
                 ldx FR0+1
                 ldy #4
@@ -426,8 +467,9 @@ _htcok          sta arg5
                 adc arg5
                 sta FR0
                 stx FR0+1
+
                 inc CIX
-                bra _htc1
+                bne _next1
 
                 .endproc
 
@@ -437,14 +479,15 @@ _htcok          sta arg5
 ;======================================
 rtocar          .proc
                 ;!!jsr FPI
-                bcs rcerr
+                bcs _err
 
-htcrtn          lda FR0
+_ENTRY1         lda FR0
                 ldx FR0+1
                 ldy CIX
-htcr1           rts
 
-rcerr           ldy #constERR
+_XIT            rts
+
+_err            ldy #constERR
                 jmp splerr
 
                 .endproc
@@ -457,6 +500,7 @@ storeal         .proc
                 sty CIX
                 sta INBUFF
                 stx INBUFF+1
+
                 ;!!jmp AFP
 
                 .endproc
@@ -467,7 +511,7 @@ storeal         .proc
 ;======================================
 putsp           .proc
                 ldy #$20
-                bne putchar
+                bne putchar             ; [unc]
 
                 .endproc
 
@@ -477,7 +521,10 @@ putsp           .proc
 ;======================================
 puteol          .proc
                 ldy #eol
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -501,33 +548,39 @@ putstr          .proc
                 sec
                 adc arg3
                 sta arg4
-                bcc _ps1
+                bcc _1
 
                 inx
-_ps1            stx arg5
+
+_1              stx arg5
+
                 jsr DisplayLocation
                 jsr zapcsr
 
                 ldy #39
                 lda arg2
-_ps2            sta (arg0),y            ; clear line
+_next1          sta (arg0),y            ; clear line
+
                 dey
-                bpl _ps2
+                bpl _next1
 
                 clc                     ; handle left margin
                 lda arg0
                 adc LMARGN
                 sta arg0
-                bcc _ps3
+                bcc _2
 
                 inc arg1
-_ps3            iny                     ; sets Y to 0
+
+_2              iny                     ; sets Y to 0
+
                 clc
                 lda (arg6),y
                 sbc arg3
-                bcc _ps10               ; no chars
+                bcc _6                  ; no chars
 
                 sta arg6
+
                 tay
                 lda #0
                 sta arg7
@@ -536,55 +589,61 @@ _ps3            iny                     ; sets Y to 0
                 lda RMARGN
                 sbc LMARGN
                 cmp arg6
-                beq _ps3a               ; handle EOL char
-                bcs _ps4                ; length ok
+                beq _3                  ; handle EOL char
+                bcs _next2                ; length ok
 
                 sta arg6
+
                 ldy arg6                ; length too long
-_ps3a           lda #$80
+_3              lda #$80
                 sta arg7
 
-_ps4            lda arg2
+_next2          lda arg2
                 eor (arg4),y
                 pha
+
                 and #$60
                 tax
+
                 pla
                 and #$9F
                 ora chrConvert,x
                 sta (arg0),y
+
                 dey
-                bpl _ps4
+                bpl _next2
 
                 ldy arg6
                 lda arg7
-                bne _ps6
+                bne _4
 
                 lda arg2
-                bne _ps7                ; no EOL char if inverted
+                bne _5                  ; no EOL char if inverted
 
                 iny
-_ps5            lda eol
-                sta (arg0),y
-                jmp _ps7
-
-_ps6            eor (arg0),y
+_next3          lda eol
                 sta (arg0),y
 
-_ps7            lda arg3
-                beq _ps9
+                jmp _5
 
-_ps8            ldy #0
+_4              eor (arg0),y
+                sta (arg0),y
+
+_5              lda arg3
+                beq _XIT1
+
+_next4          ldy #0
                 lda (arg0),y
                 eor #$80
                 sta (arg0),y
-_ps9            rts
 
-_ps10           lda arg3
-                bne _ps8
+_XIT1           rts
+
+_6              lda arg3
+                bne _next4
 
                 tay
-                bra _ps5
+                beq _next3              ; [unc]
 
                 .endproc
 
@@ -598,6 +657,7 @@ cmdcol          .proc
 
                 ldy cmdln
                 sty ROWCRS
+
                 rts
                 .endproc
 
@@ -608,8 +668,10 @@ cmdcol          .proc
 savecol         .proc
                 lda ROWCRS
                 sta y
+
                 lda COLCRS
                 sta x
+
                 rts
                 .endproc
 
@@ -620,10 +682,12 @@ savecol         .proc
 rstcol          .proc
                 lda y
                 sta ROWCRS
+
                 lda x
                 sta COLCRS
+
                 jsr zapcsr
-lftrt           jsr scrlft
+_ENTRY1         jsr scrlft
 
                 jmp scrrt
 
@@ -635,13 +699,14 @@ lftrt           jsr scrlft
 ;======================================
 chkcur          .proc
                 lda cur+1
-                bne _ccret
+                bne _XIT
 
-_ldtop          lda top
+_ENTRY1         lda top
                 sta cur
                 lda top+1
                 sta cur+1
-_ccret          rts
+
+_XIT            rts
                 .endproc
 
 
@@ -650,23 +715,25 @@ _ccret          rts
 ;======================================
 ldbuf           .proc
                 jsr chkcur
-                bne _ldb0
+                bne _1
 
                 tay
                 sta (buf),y
+
                 rts
 
-_ldb0           jsr curstr
+_1              jsr curstr
 
-ldbuf1          ldy #0
+_ENTRY1         ldy #0
                 lda (arg0),y
                 sta (buf),y
-                tay
 
-_ldb1           lda (arg0),y
+                tay
+_next1          lda (arg0),y
                 sta (buf),y
+
                 dey
-                bne _ldb1
+                bne _next1
 
                 rts
                 .endproc
@@ -680,9 +747,11 @@ dspbuf          .proc
                 lda indent
                 adc choff
                 sta arg3
+
                 ldy #0
                 lda buf
                 ldx buf+1
+
                 jmp putstr
 
                 .endproc
@@ -695,18 +764,20 @@ DisplayLocation .proc
                 lda #<CS_TEXT_MEM_PTR
                 ldx #>CS_TEXT_MEM_PTR
                 ldy ROWCRS
-                beq _dlocrt
+                beq _2
 
-_dloc1          clc
+_next1          clc
                 adc #CharResX           ; TODO: fragile
-                bcc _dloc2
+                bcc _1
 
                 inx
-_dloc2          dey
-                bne _dloc1
 
-_dlocrt         sta arg0
+_1              dey
+                bne _next1
+
+_2              sta arg0
                 stx arg1
+
                 rts
                 .endproc
 
@@ -719,6 +790,7 @@ zapcsr          .proc
                 ;sta OLDADR      ; TODO:
                 lda #>csrch
                 ;sta OLDADR+1
+
                 rts
                 .endproc
 
@@ -730,5 +802,6 @@ rstcsr          .proc
                 ldy #0
                 lda OLDCHR
                 ;sta (OLDADR),y
+
                 rts
                 .endproc

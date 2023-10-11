@@ -146,7 +146,7 @@ _next1          lda temps
 ;======================================
 TopLine         .proc
                 jsr CleanLine
-                jsr chkcur._ldtop
+                jsr chkcur._ENTRY1
 
                 .endproc
 

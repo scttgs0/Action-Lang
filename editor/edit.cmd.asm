@@ -129,7 +129,7 @@ Paste           .proc
                 jsr DeleteTop
 
 _next1          jsr strptr
-                jsr ldbuf.ldbuf1
+                jsr ldbuf._ENTRY1
                 jsr InsertByte
 
                 lda allocerr

@@ -25,7 +25,7 @@ spl             ;.proc
 
 _spl1           lda top1
                 sta top+1
-                jsr chkcur._ldtop
+                jsr chkcur._ENTRY1
                 beq _splrtn             ; no program !
 
                 jsr GetNext
