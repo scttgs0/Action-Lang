@@ -22,9 +22,6 @@
 ;
 
 
-;misc            .proc
-
-
 ;======================================
 ;BYTE FUNC Rand(BYTE range)
 ; returns random number between 0 and
@@ -34,14 +31,17 @@
 rand            .proc
                 ldx RANDOM
                 cmp #0
-                beq _rand1
+                beq _1
 
                 stx afcur
+
                 ldx #0
                 stx afcur+1
+
                 jsr multi
 
-_rand1          stx args
+_1              stx args
+
                 rts
                 .endproc
 
@@ -52,24 +52,27 @@ _rand1          stx args
 ; and volume.  Assumes volume low  16.
 ;======================================
 sound           .proc
-                asl a
+                asl
                 sty arg2
+
                 tay
                 cmp #7
-                bmi _snd1
+                bmi _1
 
                 ldy #100
                 jsr error
 
-_snd1           txa
+_1              txa
                 sta AUDF1,y
+
                 lda arg2
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 ora arg3
                 sta AUDC1,y
+
                 rts
                 .endproc
 
@@ -83,11 +86,13 @@ sndrst          .proc
                 and #$EF                ; turn off two tone bit
                 sta SSKCTL
                 sta SKCTL
+
                 lda #0
                 ldx #8
-_sr1            sta AUDF1,x             ; zero sound regs
+_next1          sta AUDF1,X             ; zero sound regs
+
                 dex
-                bpl _sr1
+                bpl _next1
 
                 rts
                 .endproc
@@ -98,11 +103,12 @@ _sr1            sta AUDF1,x             ; zero sound regs
 ; returns paddle value of port
 ; Assumes port low  8.
 ; see LIB.ST
-;Paddle TAX
-; LDA POT0,X
-; STA args
-; RTS
-;
+;Paddle          tax
+;                lda POT0,x
+;                sta args
+;                rts
+
+
 ;BYTE FUNC PTrig(BYTE port)
 ; returns zero if trigger of paddle
 ; port is depressed.  Assumes port<8
@@ -110,19 +116,22 @@ _sr1            sta AUDF1,x             ; zero sound regs
 ptrig           .proc
                 ldx #0
                 cmp #4
-                bmi _pt1
+                bmi _1
 
                 inx
                 and #3
-_pt1            tay
+
+_1              tay
                 lda PORTA,x
-                and _pt2,y
+                and _data1,y
                 sta args
+
                 rts
 
 ;--------------------------------------
 
-_pt2            .byte $04,$08,$40,$80
+_data1          .byte $04,$08,$40,$80
+
                 .endproc
 
 
@@ -134,21 +143,25 @@ _pt2            .byte $04,$08,$40,$80
 stick           .proc
                 ldx #0
                 cmp #2
-                bmi _stk1
+                bmi _1
 
                 inx
                 and #1
-_stk1           tay
-                lda PORTA,x
-                dey
-                bne _stk2
 
-                lsr a
-                lsr a
-                lsr a
-                lsr a
-_stk2           and #$0F
+_1              tay
+                lda PORTA,x
+
+                dey
+                bne _2
+
+                lsr
+                lsr
+                lsr
+                lsr
+
+_2              and #$0F
                 sta args
+
                 rts
                 .endproc
 
@@ -159,20 +172,19 @@ _stk2           and #$0F
 ; port is depressed.  Assumes port<4
 ;
 ; see LIB.ST
-;STrig TAX
-; LDA TRIG0,X
-; STA args
-; RTS
 ;======================================
+;STrig           tax
+;                ;!!lda TRIG0,x
+;                sta args
+;                rts
+
 
 
 ;======================================
 ;BYTE FUNC Peek(CARD address)
 ; returns value stored at address
 ;======================================
-peek            .proc
-                .endproc
-
+peek
                 ;[fall-through]
 
 
@@ -183,12 +195,15 @@ peek            .proc
 peekc           .proc
                 sta arg2
                 stx arg3
+
                 ldy #0
                 lda (arg2),y
                 sta args
+
                 iny
                 lda (arg2),y
                 sta args+1
+
                 rts
                 .endproc
 
@@ -201,9 +216,11 @@ peekc           .proc
 poke            .proc
                 sta arg0
                 stx arg1
+
                 tya
                 ldy #0
                 sta (arg0),y
+
                 rts
                 .endproc
 
@@ -219,6 +236,7 @@ pokec           .proc
                 iny
                 lda arg3
                 sta (arg0),y
+
                 rts
                 .endproc
 
@@ -232,8 +250,10 @@ pokec           .proc
 ;======================================
 mzero           .proc
                 pha
+
                 lda #0
                 sta arg4
+
                 pla
                 .endproc
 
@@ -251,24 +271,27 @@ setblock        .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda arg4
                 ldx arg3
-                beq _sb3
+                beq _1
 
-_sb1            sta (arg0),y
+_next1          sta (arg0),Y
+
                 iny
-                bne _sb1
+                bne _next1
 
                 inc arg1
                 dec arg3
-                bne _sb1
-                beq _sb3
+                bne _next1
+                beq _1                  ; [unc]
 
-_sb2            sta (arg0),y
+_next2          sta (arg0),Y
+
                 iny
-_sb3            cpy arg2
-                bne _sb2
+_1              cpy arg2
+                bne _next2
 
                 rts
                 .endproc
@@ -285,26 +308,29 @@ moveblock       .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda arg5
-                beq _mb4
+                beq _1
 
-_mb2            lda (arg2),y
+_next1          lda (arg2),y
                 sta (arg0),y
+
                 iny
-                bne _mb2
+                bne _next1
 
                 inc arg1
                 inc arg3
                 dec arg5
-                bne _mb2
-                beq _mb4
+                bne _next1
+                beq _1                  ; [unc]
 
-_mb3            lda (arg2),y
+_next2          lda (arg2),y
                 sta (arg0),y
+
                 iny
-_mb4            cpy arg4
-                bne _mb3
+_1              cpy arg4
+                bne _next2
 
                 rts
                 .endproc
@@ -312,34 +338,37 @@ _mb4            cpy arg4
 
 ;======================================
 ;PROC Break()
-; returns to monitor after saving
+; returns to Monitor after saving
 ; stack pointer in procSP
 ;======================================
 break           .proc
                 tsx
                 stx procsp
+
                 ldy #brker
                 tya
+
                 jmp error
 
                 .endproc
 
 
 ;======================================
-;
+;   Call Trace handler
 ;======================================
-ctrace          .proc                   ; Call Trace handler
-    ; name passed following JSR
+ctrace          .proc
+;   name passed following JSR
                 clc
                 pla
                 adc #1
                 sta arg10
+
                 pla
                 adc #0
                 sta arg11
 
-    ; address of name now in arg10-11
-    ; ok, let's print the name
+;   address of name now in arg10-11
+;   ok, let's print the name
                 lda arg10
                 ldx arg11
                 jsr prt
@@ -347,76 +376,82 @@ ctrace          .proc                   ; Call Trace handler
                 lda #'('
                 jsr put
 
-    ; now get addr of args
+;   now get addr of args
                 sec
                 lda arg10
+
                 ldy #0
                 sty arg15
+
                 adc (arg10),y
                 sta arg10
-                bcc _ct1
+                bcc _1
 
                 inc arg11
-_ct1            lda (arg10),y
+
+_1              lda (arg10),y
                 sta arg12
+
                 iny
                 lda (arg10),y
                 sta arg13
-    ; get number of args
+
+;   get number of args
                 iny
                 lda (arg10),y
                 sta arg9
-                sty arg14
-                beq _ct7                ; no args
 
-_ct2            inc arg14
+                sty arg14
+                beq _5                  ; no args
+
+_next1          inc arg14
                 ldy arg14
                 lda (arg10),y
-                bmi _ct4                ; byte
+                bmi _2                  ; byte
 
                 cmp #cardt
+
                 inc arg15
                 ldy arg15
                 lda (arg12),y
+
                 tax
                 dey
-                bcs _ct5                ; cardinal
+                bcs _3                  ; cardinal
 
-    ; integer
+;   integer
                 lda (arg12),y
                 jsr prti
+                jmp _4
 
-                jmp _ct6
-
-_ct4            ldx #0
+_2              ldx #0
                 ldy arg15
-_ct5            lda (arg12),y
+_3              lda (arg12),y
                 jsr prtc
 
-_ct6            inc arg15
+_4              inc arg15
                 dec arg9
-                beq _ct7                ; all done
+                beq _5                  ; all done
 
                 lda #','
                 jsr put
+                jmp _next1
 
-                jmp _ct2
-
-    ; setup return
-_ct7            clc
+;   setup return
+_5              clc
                 lda arg10
                 adc arg14
                 tax
+
                 lda arg11
                 adc #0
                 pha
+
                 txa
                 pha
+
                 lda #')'
                 jsr put
-
                 jmp pute
 
                 .endproc
-
-                ;.endproc

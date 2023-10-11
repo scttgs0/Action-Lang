@@ -30,10 +30,10 @@
 ; see Hardware manual for CIO details
 ;======================================
 chkerr          .proc
-                bpl _ce2
+                bpl _2
 
                 cpy #$88                ; EOF
-                beq _ce1
+                beq _1
 
                 tya
                 cpy #$80                ; break key
@@ -41,15 +41,16 @@ chkerr          .proc
 
                 jmp error
 
-_ce1            txa
-                lsr a
-                lsr a
-                lsr a
-                lsr a
+_1              txa
+                lsr
+                lsr
+                lsr
+                lsr
+
                 tax
                 tya
                 sta eof,x
-_ce2
+_2
         .if ramzap
                 dec chkerr-$10,x
         .else
@@ -57,6 +58,7 @@ _ce2
                 nop
                 nop
         .endif
+
                 rts
                 .endproc
 
@@ -67,13 +69,23 @@ _ce2
 break1          .proc
                 ldx #1
                 stx brkkey
+
                 pha
+
                 jsr break
 
                 pla
                 tay
-pfe             rts
+
                 .endproc
+
+                ;[fall-through]
+
+
+;--------------------------------------
+;
+;--------------------------------------
+pfe             rts
 
 
 ;======================================
@@ -97,71 +109,81 @@ prtf            .proc
                 sta addr
                 stx addr+1
                 sty temps
+
                 ldy #0
                 lda (addr),y
                 sta token
+
                 inc token
+
                 ldx #13
-_pf1            lda args+2,x
+_next1          lda args+2,x
                 sta temps,x
+
                 dex
-                bne _pf1
+                bne _next1
 
                 stx lsttoken
                 stx op
-_pf2            inc op
+
+_next2          inc op
                 ldy op
                 cpy token
-                bcs break1.pfe
+                bcs pfe
 
                 lda (addr),y
                 cmp #'%'
-                bne _pf3
+                bne _next3
 
                 inc op
+
                 iny
                 lda (addr),y
                 cmp #'%'
-                beq _pf3
+                beq _next3
 
                 cmp #'E'
-                bne _pf4
+                bne _1
 
                 lda #eol
-_pf3            jsr put
+_next3          jsr put
 
-                jmp _pf2
-;
-_pf4            ldy lsttoken
+                jmp _next2
+
+_1              ldy lsttoken
                 inc lsttoken
                 inc lsttoken
                 sta args
+
                 lda temps,y
                 ldx temps+1,y
                 ldy args
                 cpy #'C'
-                beq _pf3
+                beq _next3
 
                 cpy #'S'
-                bne _pf5
+                bne _2
 
                 jsr prt
-                jmp _pf2
+                jmp _next2
 
-_pf5            cpy #'I'
-                bne _pf6
+_2              cpy #'I'
+                bne _3
 
                 jsr prti
-                jmp _pf2
+                jmp _next2
 
-_pf6            cpy #'H'
-                bne _pf7
+_3              cpy #'H'
+                bne _4
 
                 jsr prth
-                jmp _pf2
 
-_pf7            jsr prtc
-                jmp _pf2
+                jmp _next2
+
+_4              jsr prtc
+
+                jmp _next2
+
                 .endproc
 
 
@@ -171,29 +193,35 @@ _pf7            jsr prtc
 ;======================================
 opn             .proc
                 pha
+
                 stx arg1
                 sty arg2
+
                 tay
                 lda #0
                 sta eof,y
+
                 tay
                 lda (arg1),y
                 sta (buf),y
+
                 tay
                 iny
-                lda #eol
-                bne _op2                ; [unc]
 
-_op1            lda (arg1),y
-_op2            sta (buf),y
+                lda #eol
+                bne _1                ; [unc]
+
+_next1          lda (arg1),y
+_1              sta (buf),y
+
                 dey
-                bne _op1
+                bne _next1
 
                 pla
                 ldx buf
                 ldy buf+1
-                jsr open
 
+                jsr open
                 jmp chkerr
 
                 .endproc
@@ -205,12 +233,14 @@ _op2            sta (buf),y
 ;======================================
 prte            .proc
                 stx arg1
+
                 tax
                 ldy arg1
                 lda device
 
-    ; falls into PrintDE
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -219,7 +249,6 @@ prte            .proc
 ;======================================
 prtde           .proc
                 jsr print
-
                 jmp chkerr
 
                 .endproc
@@ -231,7 +260,6 @@ prtde           .proc
 ;======================================
 clos            .proc
                 jsr close
-
                 jmp chkerr
 
                 .endproc
@@ -243,9 +271,11 @@ clos            .proc
 ;======================================
 prt             .proc
                 stx arg1
+
                 tax
                 ldy arg1
                 lda device
+
                 .endproc
 
                 ;[fall-through]
@@ -257,7 +287,6 @@ prt             .proc
 ;======================================
 prtd            .proc
                 jsr output
-
                 jmp chkerr
 
                 .endproc
@@ -269,9 +298,11 @@ prtd            .proc
 ;======================================
 ins             .proc
                 stx arg2
+
                 tax
                 ldy arg2
                 lda device
+
                 .endproc
 
                 ;[fall-through]
@@ -283,9 +314,12 @@ ins             .proc
 ;======================================
 insd            .proc
                 pha
+
                 lda #255
                 sta arg3
+
                 pla
+
                 .endproc
 
                 ;[fall-through]
@@ -297,13 +331,17 @@ insd            .proc
 ;======================================
 inmd            .proc
                 pha
+
                 stx arg1
                 sty arg2
+
                 ldy #0
                 lda arg3
                 sta (arg1),y
+
                 pla
                 ldy arg2
+
                 .endproc
 
                 ;[fall-through]
@@ -317,7 +355,6 @@ inmd            .proc
 ;======================================
 ind             .proc
                 jsr rdbuf.inputs
-
                 jmp chkerr
 
                 .endproc
@@ -327,23 +364,35 @@ ind             .proc
 ;BYTE FUNC GetD(BYTE dev)
 ; inputs character from IOCB dev
 ;======================================
-getd            .proc
-                ldx #$07
-ccio            stx arg4
-                asl a
-                asl a
-                asl a
-                asl a
+getd            ldx #$07
+
+                ;[fall-through]
+
+
+;--------------------------------------
+;
+;--------------------------------------
+ccio            .proc
+                stx arg4
+
+                asl
+                asl
+                asl
+                asl
+
                 tax
                 lda arg4
                 sta IOCB0+ICCOM,x
+
                 lda #0
                 sta IOCB0+ICBLL,x
                 sta IOCB0+ICBLH,x
+
                 tya
                 jsr CIOV
 
                 sta args
+
                 jmp chkerr
 
                 .endproc
@@ -355,6 +404,7 @@ ccio            stx arg4
 ;======================================
 pute            .proc
                 lda #eol
+
                 .endproc
 
                 ;[fall-through]
@@ -367,6 +417,7 @@ pute            .proc
 put             .proc
                 tax
                 lda device
+
                 .endproc
 
                 ;[fall-through]
@@ -378,9 +429,11 @@ put             .proc
 ;======================================
 putd            .proc
                 stx arg1
+
                 ldy arg1
-putd1           ldx #$0B
-                jmp getd.ccio
+_ENTRY1         ldx #$0B
+
+                jmp ccio
 
                 .endproc
 
@@ -391,7 +444,7 @@ putd1           ldx #$0B
 ;======================================
 putde           .proc
                 ldy #eol
-                bne putd.putd1          ; [unc]
+                bne putd._ENTRY1        ; [unc]
 
                 .endproc
 
@@ -411,7 +464,6 @@ putde           .proc
 ;======================================
 xio             .proc
                 jsr xiostr
-
                 jmp chkerr
 
                 .endproc
@@ -423,7 +475,10 @@ xio             .proc
 ;======================================
 prtb            .proc
                 ldx #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -432,7 +487,6 @@ prtb            .proc
 ;======================================
 prtc            .proc
                 jsr printc
-
                 jmp chkerr
 
                 .endproc
@@ -444,7 +498,10 @@ prtc            .proc
 ;======================================
 prtbe           .proc
                 ldx #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -453,7 +510,6 @@ prtbe           .proc
 ;======================================
 prtce           .proc
                 jsr prtc
-
                 jmp pute
 
                 .endproc
@@ -465,7 +521,10 @@ prtce           .proc
 ;======================================
 prtbd           .proc
                 ldy #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -474,14 +533,15 @@ prtbd           .proc
 ;======================================
 prtcd           .proc
                 sta arg0
+
                 txa
                 sty arg2
                 ldx arg2
+
                 jsr ctostr
 
                 lda arg0
                 jsr printc.pnum+2
-
                 jmp chkerr
 
                 .endproc
@@ -493,7 +553,10 @@ prtcd           .proc
 ;======================================
 prtbde          .proc
                 ldy #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -515,9 +578,11 @@ prtcde          .proc
 ;======================================
 prti            .proc
                 stx arg2
+
                 tax
                 ldy arg2
                 lda device
+
                 .endproc
 
                 ;[fall-through]
@@ -532,19 +597,24 @@ prtid           .proc
                 bpl prtcd
 
                 pha
+
                 stx arg1
                 sty arg2
+
                 ldy #'-'
-                jsr putd.putd1
+                jsr putd._ENTRY1
 
                 sec
                 lda #0
                 sbc arg1
+
                 tax
                 lda #0
                 sbc arg2
+
                 tay
                 pla
+
                 jmp prtcd
 
                 .endproc
@@ -556,7 +626,6 @@ prtid           .proc
 ;======================================
 prtie           .proc
                 jsr prti
-
                 jmp pute
 
                 .endproc
@@ -582,8 +651,10 @@ prtide          .proc
 strb            .proc
                 stx arg2
                 sty arg3
+
                 ldx #0
                 ldy arg2
+
                 .endproc
 
                 ;[fall-through]
@@ -595,13 +666,15 @@ strb            .proc
 ;======================================
 strc            .proc
                 sty arg2
+
                 jsr ctostr
 
                 iny
-_strc1          lda numbuf,y
+_next1          lda numbuf,y
                 sta (arg2),y
+
                 dey
-                bpl _strc1
+                bpl _next1
 
                 rts
                 .endproc
@@ -618,29 +691,37 @@ stri            .proc
                 sta arg0
                 stx arg1
                 sty arg2
+
                 sec
                 lda #0
                 sbc arg0
+
                 tay
                 lda #0
                 sbc arg1
+
                 tax
                 tya
+
                 jsr ctostr
 
                 inx
                 txa
                 tay
-_s1             lda numbuf-1,y
+
+_next1          lda numbuf-1,y
                 sta (arg2),y
+
                 dey
-                bne _s1
+                bne _next1
 
                 txa
                 sta (arg2),y
+
                 iny
                 lda #'-'
                 sta (arg2),y
+
                 rts
                 .endproc
 
@@ -654,8 +735,7 @@ _s1             lda numbuf-1,y
 ;======================================
 input_b
 input_c
-input_i
-                lda    device
+input_i         lda device
 
                 ;[fall-through]
 
@@ -668,9 +748,9 @@ input_i
 ;======================================
 inbd
 incd
-inid
-                ldx #19
+inid            ldx #19
                 stx numbuf
+
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr ind
@@ -689,82 +769,95 @@ inid
 ;======================================
 valb
 vali
-valc
-                sta arg4
+valc            sta arg4
                 stx arg5
+
                 ldy #0
                 sty arg0
                 sty arg1
                 sty arg2
+
                 lda (arg4),y
                 sta arg3
+
                 inc arg3
+
                 lda #32
                 iny
-_i1             cmp (arg4),y
-                bne _i2
+_next1          cmp (arg4),y
+                bne _1
 
                 iny
                 cpy arg3
-                bmi _i1
+                bmi _next1
 
-_i2             lda (arg4),y
+_1              lda (arg4),y
                 cmp #'-'
-                bne _i3
+                bne _2
 
                 sta arg2
                 iny
-_i3             cpy arg3
-                bpl _i6
 
-_i4             lda (arg4),y
+_2              cpy arg3
+                bpl _4
+
+_next2          lda (arg4),y
                 cmp #'0'
-                bmi _i6
+                bmi _4
 
                 cmp #':'                ; '9'+1
-                bpl _i6
+                bpl _4
 
                 sec
                 sbc #'0'
+
+;   arg01*10
                 tax
-    ; arg01*10
                 lda arg1
                 pha
+
                 lda arg0
-                asl a
+                asl
                 rol arg1
-                asl a
+                asl
                 rol arg1
+
                 clc
                 adc arg0
                 sta arg0
+
                 pla
                 adc arg1
                 sta arg1
+
                 asl arg0
                 rol arg1
+
                 clc
                 txa
                 adc arg0                ; add in digit
                 sta arg0
-                bcc _i5
+                bcc _3
 
                 inc arg1
-_i5             iny
-                cpy arg3
-                bmi _i4
 
-_i6             lda arg2
-                beq _i7
+_3              iny
+                cpy arg3
+                bmi _next2
+
+_4              lda arg2
+                beq _XIT
 
                 sec
                 lda #0
                 sbc arg0
                 sta arg0
+
                 lda #0
                 sbc arg1
                 sta arg1
-_i7             rts
+
+_XIT            rts
 
 
 ;======================================
@@ -778,24 +871,29 @@ _i7             rts
 note            .proc
                 stx arg1
                 sty arg2
-                asl a
-                asl a
-                asl a
-                asl a
+
+                asl
+                asl
+                asl
+                asl
+
                 tax
                 lda #$26                ; NOTE
                 sta IOCB0+ICCOM,x
+
                 jsr CIOV
                 jsr chkerr
 
                 ldy #0
                 lda IOCB0+ICAX5,x       ; offset
                 sta (arg3),y
+
                 lda IOCB0+ICAX3,x       ; low byte of sector
                 sta (arg1),y
                 lda IOCB0+ICAX4,x       ; high byte of sector
                 iny
                 sta (arg1),y
+
                 rts
                 .endproc
 
@@ -809,21 +907,25 @@ note            .proc
 ;======================================
 point           .proc
                 stx arg1
-                asl a
-                asl a
-                asl a
-                asl a
+
+                asl
+                asl
+                asl
+                asl
+
                 tax
                 tya                     ; sector+1
                 sta IOCB0+ICAX4,x
                 lda arg1                ; sector
                 sta IOCB0+ICAX3,x
+
                 lda arg3                ; offset
                 sta IOCB0+ICAX5,x
+
                 lda #$25                ; POINT
                 sta IOCB0+ICCOM,x
-                jsr CIOV
 
+                jsr CIOV
                 jmp chkerr
 
                 .endproc

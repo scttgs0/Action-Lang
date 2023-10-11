@@ -23,81 +23,89 @@
 
 
 ;======================================
-;
+;   Get next key in buffer
 ;======================================
 lgetkey         .proc
-    ; Get next key in buffer
                 clc                     ; blink cursor
                 lda rtclok+2
                 adc #14
+
                 tax
-_bc1            lda CH_                 ; key down?
+_next1          lda CH_                 ; key down?
                 eor #$FF
-                bne _gk0
+                bne _1
 
                 cpx rtclok+2
-                bpl _bc1
+                bpl _next1
 
                 ldy #0
                 lda (oldadr),y
                 eor #$80
                 sta (oldadr),y
+
                 jmp lgetkey
 
-_gk0            ldy #0
+_1              ldy #0
                 lda oldchr
                 eor #$80
                 sta (oldadr),y          ; restore cursor
+
                 ldx SRTIMR              ; faster repeat
                 cpx #$0C
-                bcs _gk5
+                bcs _6
 
                 cpx #4
-                bcc _gk2
+                bcc _2
 
                 ldx #3
-_gk1            stx SRTIMR
-_gk2            lda CH_
+_next2          stx SRTIMR
+
+_2              lda CH_
                 cmp #$C0
-                bcc _gk3                ; not Ctrl-Shft
+                bcc _3                  ; not Ctrl-Shft
 
-_cskey          jsr click
-                bmi _gk4                ; [unc]
+                jsr click
+                bmi _4                  ; [unc]
 
-_gk3            and #$3F
+_3              and #$3F
                 cmp #$3C                ; caps key
-                beq _caps
+                beq _7
 
                 cmp #$27                ; Atari key
-                beq _atari
+                beq _8
 
-_gkey           ldx #$70
+                ldx #$70
                 lda #7                  ; GETCHR
                 sta brkkey              ; ignore BREAK key
+
                 jsr putch.putch2
 
-_gk4            ldx SRTIMR
+_4              ldx SRTIMR
                 cpx #10
-                bcs _gkret
+                bcs _5
 
                 ldx #3
                 stx SRTIMR
-_gkret          sta curch
+
+_5              sta curch
+
                 rts
 
-_gk5            ldx #20
-                bne _gk1
+_6              ldx #20
+                bne _next2
 
-_caps           lda CH_
-                and #$C0
+_7              lda CH_
+                and #$C0                ; isolate control (128) and uppercase (64)
                 sta SHFLOC
-_caps1          jsr click
+
+_next3          jsr click
                 bmi lgetkey
 
-_atari          lda INVFLG
+_8              lda INVFLG
                 eor #$80
                 sta INVFLG
-                jmp _caps1
+
+                jmp _next3
 
                 .endproc
 
@@ -107,11 +115,13 @@ _atari          lda INVFLG
 ;======================================
 click           .proc
                 ldx #$7F
-_click1         stx CONSOL
+_next1          stx CONSOL
                 stx WSYNC
+
                 dex
-                bpl _click1
+                bpl _next1
 
                 stx CH_
+
                 rts
                 .endproc
