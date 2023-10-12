@@ -21,7 +21,7 @@ arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
                 cmp #tokARRAY_t+8
                 bcc arrconst._XIT1
 
-arrconst        jsr procref.stconst
+arrconst        jsr procref._ENTRY1
 
 _XIT1           jmp pushst
 
@@ -137,12 +137,12 @@ _6              jsr LoadX.Op1L
 
                 lda #$61                ; ADC
 _7              jsr Op1H
-                jmp cgadd.cgadd2
+                jmp cgadd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
                 jmp splerr
 
-_XIT2           jmp codegen.cg1
+_XIT2           jmp codegen._ENTRY1
 
 ;   small arrary
 

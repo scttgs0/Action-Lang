@@ -164,7 +164,7 @@ _5              inc arg12               ; skip JMP byte
                 and #8
                 beq _opv
 
-_operr          jmp chkcond.conderr     ; cond. exp.
+_operr          jmp conderr             ; cond. exp.
 
 ;   array
 _6              bit cnstmode
