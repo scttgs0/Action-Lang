@@ -38,7 +38,7 @@ arrvar          ldy #vart+cardt         ; no index!
                 cmp #arrayt+8
                 bcc arrconst._XIT1
 
-arrconst        jsr procref.stconst
+arrconst        jsr procref._ENTRY1
 
 _XIT1           jmp pushst
 
@@ -153,12 +153,12 @@ _6              jsr loadx.op1l
 
                 lda #$61                ; ADC
 _7              jsr op1h
-                jmp cgadd.cgadd2
+                jmp cgadd._ENTRY2
 
 arrerr          ldy #arrer              ; bad array ref
                 jmp splerr
 
-_XIT2           jmp codegen.cg1
+_XIT2           jmp codegen._ENTRY1
 
 ;   small arrary
 

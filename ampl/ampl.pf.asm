@@ -43,7 +43,7 @@ ld1             .proc
                 cpx #args+2
                 bcc pf._ENTRY2
 
-                jsr genops.gops
+                jsr genops._ENTRY1
                 jsr load2h
 
                 lda #$81                ; STA
@@ -155,7 +155,7 @@ _push           lda abt-args,x
                 jmp push2
 
 _5              stx arg0
-                jsr genops.gops
+                jsr genops._ENTRY1
 
                 ldx arg0
                 lda _ops-args,x
@@ -186,7 +186,7 @@ _5              stx arg0
                 pla
                 jsr push2               ; low byte of const
 
-                jmp cgassign.cga1
+                jmp cgassign._ENTRY5
 
 _6              pla
 _XIT1           jmp push2               ; high byte
@@ -201,7 +201,7 @@ _8              bpl _9
 
 _9              jsr op2l
 
-                jmp cgassign.cga1
+                jmp cgassign._ENTRY5
 
 ;--------------------------------------
 
