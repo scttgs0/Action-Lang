@@ -12,7 +12,7 @@
 
 ;--------------------------------------
 
-                .include "equates/system_f256jr.equ"
+                .include "equates/system_f256.equ"
                 .include "equates/zeropage.equ"
                 .include "equates/action.equ"
 
@@ -138,7 +138,7 @@ cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
                 .include "ampl/ampl.mon.asm"
                 .include "ampl/ampl.ini.asm"
 
-                .include "platform_f256jr.asm"
+                .include "platform_f256.asm"
 
                 .text "ces",$00,$00
 
