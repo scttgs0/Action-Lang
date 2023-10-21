@@ -72,7 +72,7 @@ date            .byte $07,$05,$23        ; TODO: assemble date of latest version
 propid          ldx arg0
                 .include "screen.mac.asm"
                 .include "main.msc.asm"
-                .include "main.bnk.asm"
+                .include "main.bank.asm"
 
 amplfin
 
