@@ -48,7 +48,7 @@ afbsze          = ZPBASE+$8A
 op              = ZPBASE+$8A
 lsttoken        = ZPBASE+$8B            ; prev. token value
 
-; current window data / comp. vars
+; current window data / compiler vars
 ;----------------------------------
 sp              = ZPBASE+$8C
 choff           = ZPBASE+$8D
@@ -59,8 +59,8 @@ top             = ZPBASE+$90            ; -> top line
 bot             = ZPBASE+$92            ; -> bottom line
 whaddr          = ZPBASE+$92            ; -> current DO frame
 cur             = ZPBASE+$94            ; -> current line
-x__             = ZPBASE+$96            ; don't use in comp.
-y__             = ZPBASE+$97            ; don't use in comp.
+x__             = ZPBASE+$96            ; don't use in compiler
+y__             = ZPBASE+$97            ; don't use in compiler
 nlines          = ZPBASE+$98
 Channel         = ZPBASE+$98            ; current input file
 ytop            = ZPBASE+$99

@@ -1,5 +1,5 @@
 
-; SPDX-FileName: comp.main.asm
+; SPDX-FileName: compiler.main.asm
 ; SPDX-FileComment: Action! Programming Language
 ; SPDX-FileCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
@@ -32,10 +32,12 @@ _1              lda top1
                 jsr GetNext
 _next1          jsr GetNext
 
+
+;--------------------------------------
 ; <program> _:= <module list> MODULE <module>
 ;                 | (MODULE) <module>
 ; <module> _:= (<dcl list>) (<segment list>)
-
+;--------------------------------------
                 jsr declare
                 jsr Segment
 
@@ -134,12 +136,12 @@ _err2           jmp codeincr.cderr      ; out of qcode space
                 ;.endproc
 
 
-;=====================================
+;======================================
 ;    Declaration processing
-;=====================================
+;--------------------------------------
 ; <dcl list> _:= <dcl list> <dcl> | <dcl>
 ; <dcl> _:= <simple dcl> | <array dcl> | <def dcl>
-
+;======================================
 cderr           lda #0                  ; reset qcode before err
                 tay
                 jsr LoadCd
@@ -271,10 +273,12 @@ _3              cpx #tokPOINTER
                 sty afcur
                 bra arrDeclaration
 
+
+;--------------------------------------
 ; <simple dcl> _:= <type> <id eq list>
 ; <id eq list> _:= <id eq list> , <id eq> | <id eq>
 ; <id eq> _:= <id> (= <constant>)
-
+;--------------------------------------
 _next1          jsr makeentry
 
                 ldx param
@@ -309,10 +313,11 @@ _next2          beq _next1
                 jmp declare
 
 
+;--------------------------------------
 ; <def dcl> _:= DEFINE <def list>
 ; <def list> _:= <def list> , <def> | <def>
 ; <def> _:= <id> = <str const>
-
+;--------------------------------------
 _define         jsr makeentry
 
                 ldy #0

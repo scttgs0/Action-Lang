@@ -115,7 +115,7 @@ cpyright        .null " ACTION! (c) 2023 GPL3           Foenix Adaptation       
 ;    -----------------------
 
 main
-                .include "comp.main.asm"
+                .include "compiler.main.asm"
 
 cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
 
