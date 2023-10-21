@@ -14,7 +14,7 @@ SPLsetup        .proc
                 sta sp
                 sta Channel
                 sta symtab
-                ;!!sta INITAD+1
+                sta INITAD+1
                 sta (buf),Y
                 sta param
                 sta qglobal

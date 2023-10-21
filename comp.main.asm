@@ -48,8 +48,8 @@ _next1          jsr GetNext
                 lda #1                  ; save run address
                 jsr cprop
 
-                ;!!sta INITAD
-                ;!!stx INITAD+1
+                sta INITAD
+                stx INITAD+1
 
 ;   insert return, just in case
 _next2          lda #$60                ; RTS
@@ -116,8 +116,8 @@ _XIT1           rts
 
 _2              jsr getcdoff            ; no main PROC
 
-                ;!!sta INITAD
-                ;!!stx INITAD+1
+                sta INITAD
+                stx INITAD+1
                 jsr stmtlist
 
                 cmp #tokEOF

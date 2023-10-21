@@ -248,8 +248,8 @@ MRun            .proc
 
                 jsr Comp
 
-_1              ;!!lda INITAD
-                ;!!ldx INITAD+1
+_1              lda INITAD
+                ldx INITAD+1
                 bne _3
 
 _XIT            rts
@@ -272,7 +272,7 @@ MWrite          .proc                   ; write object file
                 cmp #tokQuote
                 bne MRun._XIT           ; no output file!
 
-                ;!!lda INITAD+1
+                lda INITAD+1
                 beq MRun._XIT           ; no program!!
 
                 lda #1
@@ -341,9 +341,9 @@ _next1          lda _mwinit,X
                 dex
                 bpl _next1
 
-                ;!!lda INITAD
+                lda INITAD
                 sta arg14
-                ;!!lda INITAD+1
+                lda INITAD+1
                 sta arg15
 
                 jsr MWOut
@@ -355,8 +355,8 @@ _next1          lda _mwinit,X
 ;--------------------------------------
 
 _mwinit         .byte 6
-                ;!!.addr INITAD
-                ;!!.addr INITAD+1
+                .addr INITAD
+                .addr INITAD+1
 
                 .endproc
 
