@@ -141,7 +141,8 @@ _1              lda arg11
                 beq _next1
 
                 ldx #$FF
-                ;!!stx CH_
+                stx KEYCHAR             ; reset last keypress
+
                 cmp #$DE
                 bne _next1
 

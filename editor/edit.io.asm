@@ -292,8 +292,8 @@ keybd           .text 2,"K:"
 ; Test if key in buffer
 ;======================================
 GotKey          .proc
-                ;!!lda CH_              ; key down?
-                eor #$FF
+                lda KEYCHAR             ; key down?
+                eor #$FF                ; flip the bits
 
                 rts
                 .endproc

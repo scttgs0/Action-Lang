@@ -139,12 +139,13 @@ InputType           .byte ?             ; Joystick/Keyboard for Player 1
 itJoystick      = 0
 itKeyboard      = 1
 KEYCHAR             .byte ?             ; last key pressed
+KEYCHARm1           .byte ?
 CONSOL              .byte ?             ; state of OPTION,SELECT,START
 
-zpSource            .long ?             ; Starting address for the source data
-zpDest              .long ?             ; Starting address for the destination block
-zpDest2             .long ?             ; Starting address for the destination block
-zpSize              .long ?             ; Number of bytes to copy
+zpSource            .word ?             ; Starting address for the source data
+zpDest              .word ?             ; Starting address for the destination block
+zpDest2             .word ?             ; Starting address for the destination block
+zpSize              .word ?             ; Number of bytes to copy
 
 zpTemp1             .byte ?
 zpTemp2             .byte ?
@@ -159,4 +160,5 @@ RND_MIN             .byte ?
 RND_SEC             .byte ?
 RND_RESULT          .word ?
 
-;; $52 available
+;; $4f-$59 available
+;; $60-$7f available

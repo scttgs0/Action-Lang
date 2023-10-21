@@ -444,7 +444,7 @@ v_TextColor     .var $40
                 sta zpDest
                 lda #>CS_COLOR_MEM_PTR
                 sta zpDest+1
-                stz zpDest+2
+                ;;stz zpDest+2
 
                 ldx #v_QtyPages
                 lda #v_TextColor
@@ -828,13 +828,13 @@ FONT0           lda #<GameFont
                 sta zpSource
                 lda #>GameFont
                 sta zpSource+1
-                stz zpSource+2
+                ;;stz zpSource+2
 
                 lda #<FONT_MEMORY_BANK0
                 sta zpDest
                 lda #>FONT_MEMORY_BANK0
                 sta zpDest+1
-                stz zpDest+2
+                ;;stz zpDest+2
 
                 ldx #$07                ; 7 pages
 _nextPage       ldy #$00

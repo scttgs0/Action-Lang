@@ -14,8 +14,8 @@ libKeyGetKey    .proc
                 adc #14
 
                 tax
-_waitForKey     ;!!lda CH_              ; key down?
-                eor #$FF
+_waitForKey     lda KEYCHAR             ; key down?
+                eor #$FF                ; flip the bits
                 bne _faster
 
                 ;!!cpx RTCLOK+2
@@ -43,9 +43,9 @@ _faster         ;!!ldx SRTIMR           ; faster repeat
                 ldx #3
 _next2          ;!!stx SRTIMR
 
-_2              ;!!lda CH_
-                cmp #$C0
-                bcc _3                  ; not Ctrl-Shft
+_2              lda KEYCHAR             ; last key pressed
+                cmp #$C0                ; Ctrl-Shft?
+                bcc _3                  ;   no
 
                 jsr libKeyClick
                 bra _4
@@ -77,7 +77,7 @@ _5              sta curch
 _6              ldx #20
                 bne _next2
 
-_7              ;!!lda CH_
+_7              lda KEYCHAR             ; last key pressed
                 and #$C0                ; isolate control (128) and uppercase (64)
                 ;!!sta SHFLOK
 
@@ -98,13 +98,13 @@ _8              ;!!lda INVFLG
 ;======================================
 libKeyClick     .proc
                 ldx #$7F
-_next1         stx CONSOL
+_next1          stx CONSOL
                 ;!!stx WSYNC
 
                 dex
                 bpl _next1
 
-                ;!!stx CH_
+                stx KEYCHAR             ; reset ($FF)
 
                 rts
                 .endproc

@@ -23,9 +23,9 @@ _1              lda curch
                 jsr EditorInit._ENTRY3
 
                 lda curch
-                ;!!ldy CH1
-                cpy #$C0                ; Ctrl-Shft
-                bcs _2
+                ldy KEYCHARm1           ; prior key pressed
+                cpy #$C0                ; Ctrl-Shft?
+                bcs _2                  ;   yes
 
                 ldy lastch
                 cpy #$1B                ; escape
