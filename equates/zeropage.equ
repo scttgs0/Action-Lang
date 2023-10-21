@@ -11,32 +11,29 @@
 
 ZPBASE          = $00
 WARMST          = ZPBASE+$00            ; 0=cold powerup; 255=warm RESET
-DOSVEC          = ZPBASE+$01            ; [3-byte] jump to DOS
-                ; ZPBASE+$03
-RMARGN          = ZPBASE+$04            ; [2-bytes]
-                ; ZPBASE+$05
+DOSVEC          = ZPBASE+$01            ; [long] jump to DOS
+RMARGN          = ZPBASE+$04            ; [word]
 LMARGN          = ZPBASE+$06
 OLDCHR          = ZPBASE+$07            ; character under the cursor
                                         ; used to restore that character when the cursor moves
-COLCRS          = ZPBASE+$08            ; [2-byte] Column of cursor
-                ; ZPBASE+$09
-ROWCRS          = ZPBASE+$0A            ; [2-byte] Row of cursor
-                ; ZPBASE+$0B
+COLCRS          = ZPBASE+$08            ; [word] Column of cursor
+ROWCRS          = ZPBASE+$0A            ; [word] Row of cursor
 DINDEX          = ZPBASE+$0C            ; display mode/current screen mode
 ADRESS          = ZPBASE+$0D            ; [3-byte] temporary storage / line buffer
-                ; ZPBASE+$0F
 BRKKEY          = ZPBASE+$10            ; 0=the BREAK key is pressed; 1=not pressed
 
 
 ; Floating-Point ======================
 FR0             = ZPBASE+$20            ; [6-byte]
-                ; ZPBASE+$25
 FR1             = ZPBASE+$26            ; [6-byte]
-                ; ZPBASE+$2B
 CIX             = ZPBASE+$2C
 INBUFF          = ZPBASE+$2D            ; [3-byte]
-                ; ZPBASE+$2F
 
+; Editor equates
+
+OLDROW          = $5A
+OLDCOL          = $5B                   ; [word]
+OLDADR          = $5E                   ; [word]
 
 ; Page Zero defs
 ;----------------
@@ -56,14 +53,14 @@ lsttoken        = ZPBASE+$8B            ; prev. token value
 sp              = ZPBASE+$8C
 choff           = ZPBASE+$8D
 lnum            = ZPBASE+$8E
-curproc         = ZPBASE+$8E            ; 2 bytes
+curproc         = ZPBASE+$8E            ; [word]
 dirty           = ZPBASE+$8F
 top             = ZPBASE+$90            ; -> top line
 bot             = ZPBASE+$92            ; -> bottom line
 whaddr          = ZPBASE+$92            ; -> current DO frame
 cur             = ZPBASE+$94            ; -> current line
-x               = ZPBASE+$96            ; don't use in comp.
-y               = ZPBASE+$97            ; don't use in comp.
+x__             = ZPBASE+$96            ; don't use in comp.
+y__             = ZPBASE+$97            ; don't use in comp.
 nlines          = ZPBASE+$98
 Channel         = ZPBASE+$98            ; current input file
 ytop            = ZPBASE+$99
@@ -161,3 +158,5 @@ BlitLines           .byte ?
 RND_MIN             .byte ?
 RND_SEC             .byte ?
 RND_RESULT          .word ?
+
+;; $52 available

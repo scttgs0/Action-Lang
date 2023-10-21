@@ -59,7 +59,7 @@ RestoreBank     .proc
 
                 tya
                 ldy jt_curbank
-rbank1          ;!!sta bank,y
+rbank1          ;!!sta bank,Y
                 tay
 
                 pla
@@ -263,7 +263,7 @@ GetArgs         .proc
                 sta abt+2               ; (default)
 
                 ldy #2
-                lda (props),y
+                lda (props),Y
                 sta numargs
                 beq _XIT
 
@@ -272,9 +272,9 @@ GetArgs         .proc
                 bcs _XIT
 
 _next1          iny
-                lda (props),y
+                lda (props),Y
                 dex
-                sta argtypes,x          ; args inverted
+                sta argtypes,X          ; args inverted
                 bne _next1
 
 _XIT            jmp RestoreBank

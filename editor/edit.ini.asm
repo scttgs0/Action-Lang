@@ -9,30 +9,30 @@
 ; Initialize memory
 ;======================================
 MemoryInit      .proc
-                ;!!lda MEMLO
+                lda MEMLO
                 sta afbase
-                ;!!lda MEMLO+1
+                lda MEMLO+1
                 sta afbase+1
 
                 lda #0
                 tay
-                sta (afbase),y
+                sta (afbase),Y
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 sec
-                ;!!lda MEMTOP
+                lda MEMTOP
                 sbc afbase
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
-                ;!!lda MEMTOP+1
+                lda MEMTOP+1
                 sbc afbase+1
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 lda #0                  ; allocate 2 pages of spare memory
                 ldx #2
@@ -55,14 +55,14 @@ ZeroWindow      .proc
                 ldx #15
 
 _next1          dex                     ; zero page0 window table
-                sta sp,x
+                sta sp,X
                 bne _next1
 
                 sta isDirty
                 sta inbuf
 
                 tay
-                sta (buf),y
+                sta (buf),Y
 
                 rts
                 .endproc
@@ -105,14 +105,14 @@ Window2Init     .proc
 ;======================================
 EditorInit      .proc
                 lda #<$7FFF
-                ;!!sta MEMTOP
+                sta MEMTOP
                 lda #>$7FFF
-                ;!!sta MEMTOP+1
+                sta MEMTOP+1
 
                 lda #<$0600
-                ;!!sta MEMLO
+                sta MEMLO
                 lda #>$0600
-                ;!!sta MEMLO+1
+                sta MEMLO+1
 
                 jsr MemoryInit
 

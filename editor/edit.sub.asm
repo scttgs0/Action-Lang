@@ -74,15 +74,15 @@ _4              clc
                 adc buf+1
                 sta arg1
 
-                lda (buf),y
+                lda (buf),Y
                 plp
                 bcc _5                  ; need to remove space
                 beq _6                  ; same size
 
 ;   need to add space
                 tay
-_next1          lda (buf),y
-                sta (arg0),y
+_next1          lda (buf),Y
+                sta (arg0),Y
 
                 dey
                 cpy sp
@@ -95,8 +95,8 @@ _5              sta arg2
                 dey
 
 _next2          iny
-                lda (arg0),y
-                sta (buf),y
+                lda (arg0),Y
+                sta (buf),Y
 
                 cpy arg2
                 bcc _next2
@@ -106,8 +106,8 @@ _6              ldy sp
                 beq _7
 
 _next3          inx
-                lda subbuf,x
-                sta (buf),y
+                lda subbuf,X
+                sta (buf),Y
 
                 iny
 _7              cpx subbuf
@@ -115,9 +115,9 @@ _7              cpx subbuf
 
                 clc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 adc arg3
-                sta (buf),y
+                sta (buf),Y
 
                 jmp RefreshBuf
 

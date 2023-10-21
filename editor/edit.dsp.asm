@@ -59,8 +59,8 @@ _ENTRY1         clc
                 adc currentWindow
 
                 tay
-_next1          lda sp,x
-                sta w1,y
+_next1          lda sp,X
+                sta w1,Y
 
                 dey
                 dex
@@ -80,8 +80,8 @@ RestoreWindow   .proc
                 adc currentWindow
 
                 tay
-_next1          lda w1,y
-                sta sp,x
+_next1          lda w1,Y
+                sta sp,X
 
                 dey
                 dex
@@ -211,7 +211,7 @@ _next2          jsr putstr
                 bne _1
 
                 tay
-                sta (arg0),y
+                sta (arg0),Y
 
 _1              inc ROWCRS
 

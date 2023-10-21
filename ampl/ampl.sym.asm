@@ -19,16 +19,16 @@ STM             .proc
                 ldy arg15
                 sty arg13
 
-_next1          lda (arg2),y
+_next1          lda (arg2),Y
                 sta nxtaddr+1
                 beq _XIT1
 
-                lda (arg4),y
+                lda (arg4),Y
                 sta nxtaddr
 
                 ldy #0
-_next2          lda (nxtaddr),y
-                eor (symtab),y
+_next2          lda (nxtaddr),Y
+                eor (symtab),Y
                 and jt_stmask
                 bne _1
 
@@ -36,7 +36,7 @@ _next2          lda (nxtaddr),y
                 iny
                 bcc _next2
 
-                lda (nxtaddr),y         ; matched
+                lda (nxtaddr),Y         ; matched
 
 _XIT1           rts
 
@@ -74,14 +74,14 @@ iSTMres         .proc
                 iny
                 sty arg0
 
-                ldx tblReserveWords-2,y
+                ldx tblReserveWords-2,Y
 _next1          stx arg1
 
                 ldy #1
-_next2          lda resw1,x
+_next2          lda resw1,X
                 bmi _XIT1
 
-                eor (symtab),y
+                eor (symtab),Y
                 and jt_stmask
                 bne _1
 
@@ -91,7 +91,7 @@ _next2          lda resw1,x
                 bcc _next2
 
 ;   we have a match
-                lda resw1,x             ; get token value
+                lda resw1,X             ; get token value
 
 _XIT1           rts
 
@@ -119,7 +119,7 @@ lGetName        .proc
                 txa                     ; restore A
 _next1          iny
                 sty arg14
-                sta (symtab),y
+                sta (symtab),Y
 
                 ora #$20
                 asl arg15
@@ -137,7 +137,7 @@ _next1          iny
 
                 tya
                 ldy #0
-                sta (symtab),y
+                sta (symtab),Y
 
                 dec choff               ; put character back
 
@@ -173,7 +173,7 @@ _ENTRY1         lda symTblLocal
                 bne iSTMres._XIT1
 
         .if ramzap
-                inc STM,x
+                inc STM,X
         .else
                 nop
                 nop
@@ -187,9 +187,9 @@ _ENTRY1         lda symTblLocal
 ;======================================
 NewEntry        .proc
                 lda symtab+1
-                sta (arg2),y
+                sta (arg2),Y
                 lda symtab
-                sta (arg4),y
+                sta (arg4),Y
 
                 lda #<libst
                 ldx #>libst
@@ -198,15 +198,15 @@ NewEntry        .proc
                 lda #tokUNDEC
                 ldy arg14
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda nxtaddr
                 iny
-                sta (symtab),y          ; save shadow entry
+                sta (symtab),Y          ; save shadow entry
 
                 lda nxtaddr+1
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda symtab
                 sta nxtaddr

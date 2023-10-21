@@ -60,7 +60,7 @@ TrashY          .proc
 ;======================================
 LoadX           .proc
 
-                lda (stack),y
+                lda (stack),Y
                 iny
                 bit tempmode
                 bne _1
@@ -76,14 +76,14 @@ LoadX           .proc
                 lda #$AE                ; LDX addr16
                 jmp Push3
 
-_1              lda (stack),y
+_1              lda (stack),Y
                 tax
-                dec temps-args,x
+                dec temps-args,X
 
 _2              lda #$A6                ; LDX addr
 _XIT1           jmp Push2
 
-_3              lda (stack),y
+_3              lda (stack),Y
 
 ;               tax
 ;               lda #$A2                ; LDX data
@@ -182,7 +182,7 @@ _6              bit cnstmode
                 lda #$10                ; (addr),Y
 _next1          sta arg10
 
-                lda (stack),y
+                lda (stack),Y
                 clc
                 adc arg12
                 cmp #args
@@ -192,7 +192,7 @@ _next1          sta arg10
                 bcs _11
 
                 tax
-                dec temps-args,x        ; free temp
+                dec temps-args,X        ; free temp
                 bra _12
 
 _7              tya                     ; small array
@@ -227,7 +227,7 @@ _9              lda #$08                ; data
 
                 iny
 
-_10             lda (stack),y
+_10             lda (stack),Y
 _11             tax
 _12             pla
                 ora arg10               ; op mode
@@ -351,18 +351,18 @@ _next1          dex
                 dey
                 bmi _err                ; exp. too complex
 
-                lda temps-args,x
+                lda temps-args,X
                 bne _next1
 
-                inc temps-args,x
+                inc temps-args,X
 
                 lda arg5                ; see if byte temp
                 beq _1                  ;   yes
 
-                inc temps-args+1,x
+                inc temps-args+1,X
 
         .if ramzap
-                inc SArgs,x
+                inc SArgs,X
         .else
                 nop
                 nop
@@ -382,13 +382,13 @@ _err            jmp experr
 ;   LoadI(,,offset)
 ;======================================
 LoadI           .proc
-                lda (stack),y
+                lda (stack),Y
                 sta arg15
 
                 tax
                 dey
 
-                lda (stack),y
+                lda (stack),Y
                 sta arg14
 
                 rts
@@ -411,12 +411,12 @@ LdCdZ           .proc
 ;======================================
 LoadCd          .proc
                 clc
-                adc (stack),y
+                adc (stack),Y
                 sta qcode
 
                 iny
                 lda #0
-                adc (stack),y
+                adc (stack),Y
                 sta qcode+1
 
                 rts
@@ -429,11 +429,11 @@ LoadCd          .proc
 SaveCd          .proc
                 lda qcode
                 ldx qcode+1
-_saveStack      sta (stack),y
+_saveStack      sta (stack),Y
 
                 txa
                 iny
-                sta (stack),y
+                sta (stack),Y
 
                 rts
                 .endproc
@@ -466,7 +466,7 @@ ChkZero         .proc
                 bcs _XIT
 
                 ldy #1
-                lda (stack),y
+                lda (stack),Y
 
 _XIT            rts
                 .endproc
@@ -477,7 +477,7 @@ _XIT            rts
 ;======================================
 OpCd1           .proc
                 ldx arg8
-                lda cgopscd+1,x
+                lda cgopscd+1,X
 
                 rts
                 .endproc
@@ -487,11 +487,11 @@ OpCd1           .proc
 ;   StkAddr(,,offset)
 ;======================================
 StkAddr         .proc
-                lda (stack),y
+                lda (stack),Y
                 tax
 
                 iny
-                lda (stack),y
+                lda (stack),Y
                 tay
 
                 rts
@@ -544,7 +544,7 @@ StkProp         .proc
                 tax
                 iny
 
-                lda (props),y
+                lda (props),Y
                 adc #0
                 tay
 
@@ -560,8 +560,8 @@ JSRTable        .proc
 ;               ldy LTab+1,X
 ;               lda LTab,X
 ;           .else
-                ldy jt_lsh+1,x
-                lda jt_lsh,x
+                ldy jt_lsh+1,X
+                lda jt_lsh,X
 ;           .endif
 
                 tax
@@ -612,7 +612,7 @@ PushTrue        .proc
 Push1           .proc
                 jsr Push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq Insrt1._ENTRY1
 
                 .endproc
@@ -673,7 +673,7 @@ _ENTRY1         jsr savecd
 Push2           .proc
                 jsr Push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq Insrt2._ENTRY1
 
                 .endproc
@@ -690,7 +690,7 @@ Insrt2          .proc
 
 _ENTRY1         txa
                 iny
-                sta (arg14),y
+                sta (arg14),Y
                 bne Insrt1._ENTRY1
 
                 .endproc
@@ -704,7 +704,7 @@ _ENTRY1         txa
 Push3           .proc
                 jsr Push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq Insrt3._ENTRY2
 
                 .endproc
@@ -724,7 +724,7 @@ _ENTRY1         jsr AddCdSp
 _ENTRY2         txa
                 ldx arg13
                 iny
-                sta (arg14),y
+                sta (arg14),Y
                 bne Insrt2._ENTRY1
 
                 .endproc
@@ -757,17 +757,17 @@ AddCdSp         .proc
                 tay
                 beq _1
 
-_next1          lda (arg14),y
-                sta (arg10),y
+_next1          lda (arg14),Y
+                sta (arg10),Y
 
                 dey
                 bne _next1
 
-                lda (arg14),y
-                sta (arg10),y
+                lda (arg14),Y
+                sta (arg10),Y
 
 _1              pla
-                sta (arg14),y
+                sta (arg14),Y
 
                 rts
                 .endproc

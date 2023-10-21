@@ -32,10 +32,10 @@ _1              txa
 
                 tax
                 tya
-                sta eof,x
+                sta eof,X
 _2
         .if ramzap
-                dec libIOChkErr-$10,x
+                dec libIOChkErr-$10,X
         .else
                 nop
                 nop
@@ -94,14 +94,14 @@ libIOPrintF     .proc
                 sty temps
 
                 ldy #0
-                lda (addr),y
+                lda (addr),Y
                 sta token
 
                 inc token
 
                 ldx #13
-_next1          lda args+2,x
-                sta temps,x
+_next1          lda args+2,X
+                sta temps,X
 
                 dex
                 bne _next1
@@ -114,14 +114,14 @@ _next2          inc op
                 cpy token
                 bcs pfe
 
-                lda (addr),y
+                lda (addr),Y
                 cmp #'%'
                 bne _next3
 
                 inc op
 
                 iny
-                lda (addr),y
+                lda (addr),Y
                 cmp #'%'
                 beq _next3
 
@@ -138,8 +138,8 @@ _1              ldy lsttoken
                 inc lsttoken
                 sta args
 
-                lda temps,y
-                ldx temps+1,y
+                lda temps,Y
+                ldx temps+1,Y
                 ldy args
                 cpy #'C'
                 beq _next3
@@ -182,11 +182,11 @@ libIOOpen       .proc
 
                 tay
                 lda #0
-                sta eof,y
+                sta eof,Y
 
                 tay
-                lda (arg1),y
-                sta (buf),y
+                lda (arg1),Y
+                sta (buf),Y
 
                 tay
                 iny
@@ -194,8 +194,8 @@ libIOOpen       .proc
                 lda #eol
                 bra _1
 
-_next1          lda (arg1),y
-_1              sta (buf),y
+_next1          lda (arg1),Y
+_1              sta (buf),Y
 
                 dey
                 bne _next1
@@ -320,7 +320,7 @@ libIOInputMD    .proc
 
                 ldy #0
                 lda arg3
-                sta (arg1),y
+                sta (arg1),Y
 
                 pla
                 ldy arg2
@@ -365,11 +365,11 @@ ccio            .proc
 
                 tax
                 lda arg4
-                ;!!sta IOCB0+ICCOM,x
+                ;!!sta IOCB0+ICCOM,X
 
                 lda #0
-                ;!!sta IOCB0+ICBLL,x
-                ;!!sta IOCB0+ICBLH,x
+                ;!!sta IOCB0+ICBLL,X
+                ;!!sta IOCB0+ICBLH,X
 
                 tya
                 ;!!jsr CIOV
@@ -653,8 +653,8 @@ libIOStrC       .proc
                 jsr ctostr
 
                 iny
-_next1          lda numbuf,y
-                sta (arg2),y
+_next1          lda numbuf,Y
+                sta (arg2),Y
 
                 dey
                 bpl _next1
@@ -692,18 +692,18 @@ libIOStrI       .proc
                 txa
                 tay
 
-_next1          lda numbuf-1,y
-                sta (arg2),y
+_next1          lda numbuf-1,Y
+                sta (arg2),Y
 
                 dey
                 bne _next1
 
                 txa
-                sta (arg2),y
+                sta (arg2),Y
 
                 iny
                 lda #'-'
-                sta (arg2),y
+                sta (arg2),Y
 
                 rts
                 .endproc
@@ -760,21 +760,21 @@ libIOValC       sta arg4
                 sty arg1
                 sty arg2
 
-                lda (arg4),y
+                lda (arg4),Y
                 sta arg3
 
                 inc arg3
 
                 lda #32
                 iny
-_next1          cmp (arg4),y
+_next1          cmp (arg4),Y
                 bne _1
 
                 iny
                 cpy arg3
                 bmi _next1
 
-_1              lda (arg4),y
+_1              lda (arg4),Y
                 cmp #'-'
                 bne _2
 
@@ -784,7 +784,7 @@ _1              lda (arg4),y
 _2              cpy arg3
                 bpl _4
 
-_next2          lda (arg4),y
+_next2          lda (arg4),Y
                 cmp #'0'
                 bmi _4
 
@@ -862,20 +862,20 @@ libIONote       .proc
 
                 tax
                 lda #$26                ; NOTE
-                ;!!sta IOCB0+ICCOM,x
+                ;!!sta IOCB0+ICCOM,X
 
                 ;!!jsr CIOV
                 jsr libIOChkErr
 
                 ldy #0
-                ;!!lda IOCB0+ICAX5,x       ; offset
-                sta (arg3),y
+                ;!!lda IOCB0+ICAX5,X       ; offset
+                sta (arg3),Y
 
-                ;!!lda IOCB0+ICAX3,x       ; low byte of sector
-                sta (arg1),y
-                ;!!lda IOCB0+ICAX4,x       ; high byte of sector
+                ;!!lda IOCB0+ICAX3,X       ; low byte of sector
+                sta (arg1),Y
+                ;!!lda IOCB0+ICAX4,X       ; high byte of sector
                 iny
-                sta (arg1),y
+                sta (arg1),Y
 
                 rts
                 .endproc
@@ -898,15 +898,15 @@ libIOPoint      .proc
 
                 tax
                 tya                     ; sector+1
-                ;!!sta IOCB0+ICAX4,x
+                ;!!sta IOCB0+ICAX4,X
                 lda arg1                ; sector
-                ;!!sta IOCB0+ICAX3,x
+                ;!!sta IOCB0+ICAX3,X
 
                 lda arg3                ; offset
-                ;!!sta IOCB0+ICAX5,x
+                ;!!sta IOCB0+ICAX5,X
 
                 lda #$25                ; POINT
-                ;!!sta IOCB0+ICCOM,x
+                ;!!sta IOCB0+ICCOM,X
 
                 ;!!jsr CIOV
                 jmp libIOChkErr

@@ -100,7 +100,7 @@ InsertByte      .proc
 ;======================================
 InsertBuffer    .proc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 ldx buf
                 ldy buf+1
 
@@ -134,14 +134,14 @@ InsertLine      ;.proc
                 ldy arg0
                 beq _1
 
-_next1          lda (arg1),y
-                sta (arg5),y
+_next1          lda (arg1),Y
+                sta (arg5),Y
 
                 dey
                 bne _next1
 
 _1              lda arg0
-                sta (arg5),y
+                sta (arg5),Y
 
                 lda arg4
                 bne _3                  ; up # 0
@@ -150,13 +150,13 @@ _1              lda arg0
                 sta arg5
 
                 ldy #4                  ; AFcur(2) _= down
-                sta (afcur),y
+                sta (afcur),Y
 
                 lda top+1
                 sta arg6
 
                 iny
-                sta (afcur),y
+                sta (afcur),Y
 
                 lda afcur               ; top _= AFcur
                 sta top
@@ -165,10 +165,10 @@ _1              lda arg0
 
                 ldy #0                  ; AFcur(0) _= 0
                 tya
-                sta (afcur),y
+                sta (afcur),Y
 
                 iny
-                sta (afcur),y
+                sta (afcur),Y
 
 _next2          lda arg6
                 bne _2                  ; down # 0
@@ -182,39 +182,39 @@ _next2          lda arg6
 
 _2              ldy #1
                 lda afcur+1             ; @down _= AFcur
-                sta (arg5),y
+                sta (arg5),Y
 
                 dey
                 lda afcur
-                sta (arg5),y
+                sta (arg5),Y
 
                 ldx afcur+1
 
                 rts
 
 _3              ldy #4
-                lda (arg3),y
+                lda (arg3),Y
                 sta arg5                ; down _= Next(up)
-                sta (afcur),y           ; AFcur(2) _= down
+                sta (afcur),Y           ; AFcur(2) _= down
 
                 lda afcur
-                sta (arg3),y            ; up(2) _= AFcur
+                sta (arg3),Y            ; up(2) _= AFcur
 
                 iny
-                lda (arg3),y
+                lda (arg3),Y
                 sta arg6
-                sta (afcur),y
+                sta (afcur),Y
 
                 lda afcur+1
-                sta (arg3),y
+                sta (arg3),Y
 
                 ldy #0
                 lda arg3
-                sta (afcur),y
+                sta (afcur),Y
 
                 iny
                 lda arg4
-                sta (afcur),y
+                sta (afcur),Y
 
                 jmp _next2
 
@@ -247,19 +247,19 @@ DeleteLine      .proc
                 stx arg1
 
                 ldy #4
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg4                ; down _= Next(ptr)
 
                 iny
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg5
 
                 ldy #0
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg2                ; up _= Prev(ptr)
 
                 iny
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg3
                 bne _1                  ; up # 0
 
@@ -272,11 +272,11 @@ DeleteLine      .proc
 
 _1              ldy #4
                 lda arg4
-                sta (arg2),y            ; up(2) _= down
+                sta (arg2),Y            ; up(2) _= down
 
                 iny
                 lda arg5
-                sta (arg2),y
+                sta (arg2),Y
 
 _2              lda arg5
                 bne _3                  ; down # 0
@@ -290,11 +290,11 @@ _2              lda arg5
 
 _3              ldy #0
                 lda arg2
-                sta (arg4),y            ; down(0) _= up
+                sta (arg4),Y            ; down(0) _= up
 
                 iny
                 lda arg3
-                sta (arg4),y
+                sta (arg4),Y
 
 _4              lda arg0
                 ldx arg1

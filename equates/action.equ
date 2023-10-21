@@ -22,8 +22,10 @@
 ;!!COLOR0          = $02C4
 ;!!COLOR4          = $02C8                 ; background color
 ;!!INITAD          = $02E2                 ; 2-byte
-;!!MEMTOP          = $02E5
-;!!MEMLO           = $02E7
+MEMTOP          = $02E5                 ; pointer to the top of free memory
+MEMLO           = $02E7                 ; pointer to the bottom of free memory
+EXTMEMTOP       = $02E9                 ; pointer to the top of free extended memory
+EXTMEMLO        = $02EB                 ; pointer to the bottom of free extended memory
 
 ;!!CH1             = $02F2                 ; Prior keyboard qcode
 ;!!CH_             = $02FC                 ; character buffer

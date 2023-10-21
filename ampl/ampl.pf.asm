@@ -10,18 +10,18 @@
 ;======================================
 ld1             .proc
                 ldy #0
-                lda (stack),y
+                lda (stack),Y
                 cmp #tokARRAY_t
                 bcs pf._ENTRY1
 
-                inc abt-args,x
+                inc abt-args,X
 
                 ldy #7
-                lda (stack),y
+                lda (stack),Y
                 cmp #tokTEMP_t+tokBYTE_t
                 beq pf._ENTRY2
 
-                dec abt+1-args,x
+                dec abt+1-args,X
 
                 cpx #args+2
                 bcc pf._ENTRY2
@@ -59,18 +59,18 @@ pf              .proc
 
 _next1          ldx numargs
                 ldy #tokTEMP_t+tokBYTE_t
-                lda argtypes-1,x
+                lda argtypes-1,X
 
                 ldx argbytes
                 stx abt+3
                 cmp #$7F
                 bcs _1                 ; one byte arg
 
-                sta temps-args+1,x
+                sta temps-args+1,X
 
                 inc argbytes
                 iny
-_1              sta temps-args,x
+_1              sta temps-args,X
 
                 inc argbytes
 
@@ -129,10 +129,10 @@ _err            jmp Segment._argerr
 ;======================================
 ;
 ;======================================
-_push           lda abt-args,x
+_push           lda abt-args,X
                 bne _5
 
-                lda _ops-args,x
+                lda _ops-args,X
                 ora #$04
 
                 jmp Push2
@@ -141,7 +141,7 @@ _5              stx arg0
                 jsr genops._ENTRY1
 
                 ldx arg0
-                lda _ops-args,x
+                lda _ops-args,X
 
 ; all of this for LDX # and LDY #
 ; can't use OpXX for these instr.
@@ -153,7 +153,7 @@ _5              stx arg0
                 bpl _7                  ; record element
 
                 cpy #tokVAR_t
-                ldy abt-args,x
+                ldy abt-args,X
                 bcs _8                  ; not const.
 
                 pha
@@ -174,7 +174,7 @@ _5              stx arg0
 _6              pla
 _XIT1           jmp Push2               ; high byte
 
-_7              ldy abt-args,x
+_7              ldy abt-args,X
 _8              bpl _9
 
                 ldx arg3

@@ -21,8 +21,8 @@ libStrSCompare  .proc
                 sty args
                 sty args+1
 
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 beq _1
 
                 jsr _3
@@ -35,8 +35,8 @@ _1              cmp #0
 _2              sta arg6
 
 _next1          iny
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 bne _3
 
                 cpy arg6
@@ -48,7 +48,7 @@ _3              ldx #$FF
                 stx args
                 bcc _4
 
-                lda (arg2),y
+                lda (arg2),Y
                 inx
 _4              stx args+1
 
@@ -66,13 +66,13 @@ libStrSCopy     .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
-_ENTRY1         sta (arg0),y
+                lda (arg2),Y
+_ENTRY1         sta (arg0),Y
                 beq _XIT
 
 _ENTRY2         tay
-_next1          lda (arg2),y
-                sta (arg0),y
+_next1          lda (arg2),Y
+                sta (arg0),Y
 
                 dey
                 bne _next1
@@ -92,7 +92,7 @@ libStrSCopyS    .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 cmp arg5
                 bcs _1
 
@@ -134,7 +134,7 @@ libStrSAssign   .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 beq _XIT1
 
                 sta arg6
@@ -160,10 +160,10 @@ _1              tax
                 sta arg5
 
 _2              lda arg5
-                cmp (arg0),y
+                cmp (arg0),Y
                 bcc _3
 
-                sta (arg0),y
+                sta (arg0),Y
 
                 clc
 _3              lda arg0
@@ -535,7 +535,7 @@ libst           .byte 0                 ; 1
 ;======================================
 libStrSTrig     .proc
                 tax
-                ;!!lda TRIG0,x
+                ;!!lda TRIG0,X
                 sta args
 
                 rts
@@ -555,7 +555,7 @@ libStrSTrig     .proc
 ;======================================
 libStrPaddle    .proc
                 tax
-                ;!!lda PADDL0,x
+                ;!!lda PADDL0,X
                 sta args
 
                 rts

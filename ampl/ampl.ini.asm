@@ -15,7 +15,7 @@ SPLsetup        .proc
                 sta Channel
                 sta symtab
                 ;!!sta INITAD+1
-                sta (buf),y
+                sta (buf),Y
                 sta param
                 sta qglobal
                 sta stackptr
@@ -28,12 +28,12 @@ SPLsetup        .proc
                 ldx isBigSymTbl
                 beq _next2              ;   no
 
-_next1          sta (bigSymTblGlobal),y
+_next1          sta (bigSymTblGlobal),Y
 
                 iny
                 bne _next1
 
-_next2          sta (symTblGlobal),y
+_next2          sta (symTblGlobal),Y
 
                 iny
                 bne _next2
@@ -45,12 +45,12 @@ _next2          sta (symTblGlobal),y
                 stx arg1
 
 _next3          ldy #1
-                lda (arg0),y
+                lda (arg0),Y
                 beq _1
 
                 tax
                 dey
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg0
                 stx arg1
 
@@ -70,7 +70,7 @@ _2              sta codebase
                 sta codebase+1
                 sta qcode+1
 
-                ;!!lda MEMTOP+1
+                lda MEMTOP+1
                 sta stmax
 
                 dec stmax

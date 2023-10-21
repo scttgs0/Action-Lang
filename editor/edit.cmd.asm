@@ -27,7 +27,7 @@ Front           .proc
 ;======================================
 Back            .proc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
 _ENTRY1         pha
 
                 clc
@@ -141,7 +141,7 @@ _next1          jsr strptr
 _1              jsr rstcur
 
                 ldy currentWindow
-                lda w1+wcur+1,y
+                lda w1+wcur+1,Y
                 beq _2
 
                 jsr nextdwn
@@ -220,7 +220,7 @@ ScrollInit      .proc
                 beq _1                ; EOF
 
                 lda COLCRS
-                sta x
+                sta x__
 
                 ; lda choff
                 ; beq _SI1
@@ -254,7 +254,7 @@ ScrollUp        .proc
 _1              inc lnum
 
                 lda ytop
-                sta y
+                sta y__
 
                 jsr BottomLine
 
@@ -285,7 +285,7 @@ ScrollDown      .proc
 
 _1              jsr BottomLine
 
-                stx y
+                stx y__
 
                 lda nlines
                 ldx ytop
@@ -321,7 +321,7 @@ CheckColumn     .proc
                 jsr SetSpacing
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 cmp sp
                 bcs _XIT
 
@@ -453,8 +453,8 @@ _next1          lda arg0
                 sta arg1
 
                 ldy #39
-_next2          lda (arg0),y
-                sta (arg2),y
+_next2          lda (arg0),Y
+                sta (arg2),Y
 
                 dey
                 bpl _next2

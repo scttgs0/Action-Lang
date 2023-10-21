@@ -32,7 +32,7 @@ _ENTRY2         lda findbuf
                 beq _3
 
 _next1          ldy #0
-                lda (buf),y
+                lda (buf),Y
                 tay
                 iny
                 sty arg0
@@ -45,9 +45,9 @@ _next2          ldy sp
                 sty sp
                 ldx #0
 
-_next3          lda (buf),y
+_next3          lda (buf),Y
                 inx
-                cmp findbuf,x
+                cmp findbuf,X
                 bne _next2
 
                 iny

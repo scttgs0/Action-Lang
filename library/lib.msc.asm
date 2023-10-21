@@ -46,7 +46,7 @@ libMscSound     .proc
                 jsr jt_error
 
 _1              txa
-                ;!!sta AUDF1,y
+                ;!!sta AUDF1,Y
 
                 lda arg2
                 asl
@@ -54,7 +54,7 @@ _1              txa
                 asl
                 asl
                 ora arg3
-                ;!!sta AUDC1,y
+                ;!!sta AUDC1,Y
 
                 rts
                 .endproc
@@ -87,7 +87,7 @@ _next1          ;!!sta AUDF1,X          ; zero sound regs
 ; Assumes port low  8.
 ; see LIB.ST
 ;Paddle          tax
-;                lda POT0,x
+;                lda POT0,X
 ;                sta args
 ;                rts
 
@@ -105,8 +105,8 @@ libMscPTrig     .proc
                 and #3
 
 _1              tay
-                ;!!lda PORTA,x
-                and _data1,y
+                ;!!lda PORTA,X
+                and _data1,Y
                 sta args
 
                 rts
@@ -132,7 +132,7 @@ libMscStick     .proc
                 and #1
 
 _1              tay
-                ;!!lda PORTA,x
+                ;!!lda PORTA,X
 
                 dey
                 bne _2
@@ -157,7 +157,7 @@ _2              and #$0F
 ; see LIB.ST
 ;======================================
 ;STrig           tax
-;                ;!!lda TRIG0,x
+;                ;!!lda TRIG0,X
 ;                sta args
 ;                rts
 
@@ -180,11 +180,11 @@ libMscPeekC     .proc
                 stx arg3
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 sta args
 
                 iny
-                lda (arg2),y
+                lda (arg2),Y
                 sta args+1
 
                 rts
@@ -202,7 +202,7 @@ libMscPoke      .proc
 
                 tya
                 ldy #0
-                sta (arg0),y
+                sta (arg0),Y
 
                 rts
                 .endproc
@@ -218,7 +218,7 @@ libMscPokeC     .proc
 
                 iny
                 lda arg3
-                sta (arg0),y
+                sta (arg0),Y
 
                 rts
                 .endproc
@@ -296,8 +296,8 @@ libMscMoveBlock .proc
                 lda arg5
                 beq _1
 
-_next1          lda (arg2),y
-                sta (arg0),y
+_next1          lda (arg2),Y
+                sta (arg0),Y
 
                 iny
                 bne _next1
@@ -308,8 +308,8 @@ _next1          lda (arg2),y
                 bne _next1
                 bra _1
 
-_next2          lda (arg2),y
-                sta (arg0),y
+_next2          lda (arg2),Y
+                sta (arg0),Y
 
                 iny
 _1              cpy arg4
@@ -366,22 +366,22 @@ libMscCTrace    .proc
                 ldy #0
                 sty arg15
 
-                adc (arg10),y
+                adc (arg10),Y
                 sta arg10
                 bcc _1
 
                 inc arg11
 
-_1              lda (arg10),y
+_1              lda (arg10),Y
                 sta arg12
 
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg13
 
 ;   get number of args
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg9
 
                 sty arg14
@@ -389,27 +389,27 @@ _1              lda (arg10),y
 
 _next1          inc arg14
                 ldy arg14
-                lda (arg10),y
+                lda (arg10),Y
                 bmi _2                  ; byte
 
                 cmp #tokCARD_t
 
                 inc arg15
                 ldy arg15
-                lda (arg12),y
+                lda (arg12),Y
 
                 tax
                 dey
                 bcs _3                  ; cardinal
 
 ;   integer
-                lda (arg12),y
+                lda (arg12),Y
                 jsr libIOPrintI
                 jmp _4
 
 _2              ldx #0
                 ldy arg15
-_3              lda (arg12),y
+_3              lda (arg12),Y
                 jsr libIOPrintC
 
 _4              inc arg15

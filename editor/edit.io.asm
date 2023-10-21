@@ -21,7 +21,7 @@ _next1          jsr GetKey
 
 _next2          ldy #0
                 clc
-                lda (arg12),y
+                lda (arg12),Y
                 adc #1
 
                 cpx #$1B                ; ESC
@@ -39,11 +39,11 @@ _next2          ldy #0
                 cpx RMARGN
                 bcs _next1              ; don't go off screen
 
-                sta (arg12),y
+                sta (arg12),Y
 
                 tay
                 lda arg3
-                sta (arg12),y
+                sta (arg12),Y
 
                 eor arg2
                 jsr scrch
@@ -52,26 +52,26 @@ _next2          ldy #0
 
 _1              lda #0
                 sta curch
-                sta (arg12),y
+                sta (arg12),Y
 
                 iny
                 tya
 
 _2              tay
                 txa                     ; EOL
-                sta (arg12),y
+                sta (arg12),Y
 
                 rts
 
 _3              stx arg3
 
 _next3          ldy #0
-                lda (arg12),y
+                lda (arg12),Y
                 beq _4
 
                 sec
                 sbc #1
-                sta (arg12),y
+                sta (arg12),Y
 
                 jsr scrlft
 
@@ -217,8 +217,8 @@ FOpen           .proc
                 iny
                 sty inbuf
 
-_next1          lda inbuf,y
-                sta inbuf+2,y
+_next1          lda inbuf,Y
+                sta inbuf+2,Y
 
                 dey
                 bne _next1

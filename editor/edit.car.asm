@@ -82,15 +82,15 @@ _1              jmp GeneralMemErr.Punt  ; editor
 
 cold            lda #0
                 tay
-_next1          sta $0480,y             ; zero RAM
+_next1          sta $0480,Y             ; zero RAM
 
                 dey
                 bne _next1
 
                 ldy #$3A
-_next2          lda emjmps-1,y          ; init RAM
+_next2          lda emjmps-1,Y          ; init RAM
                 dey
-                sta jt_jmps,y
+                sta jt_jmps,Y
                 bne _next2
 
                 lda #<iSTMres

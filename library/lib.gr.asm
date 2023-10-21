@@ -98,9 +98,9 @@ graphicIO       .proc
 ; same as BASIC
 ;======================================
 libGrPosition   .proc
-                ;!!sta oldcol              ; Position(col, row)
-                ;!!stx oldcol+1
-                ;!!sty oldrow
+                sta OLDCOL              ; Position(col, row)
+                stx OLDCOL+1
+                sty OLDROW
 
 pos1            sta COLCRS
                 stx COLCRS+1
@@ -164,8 +164,8 @@ libGrSetColor   .proc
                 ora arg2
 
                 ldx arg0
-                ;!!sta COLOR0,x
-                ;!!sta COLPF0,x
+                ;!!sta COLOR0,X
+                ;!!sta COLPF0,X
 
 _XIT            rts
                 .endproc

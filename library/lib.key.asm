@@ -14,7 +14,7 @@ libKeyGetKey    .proc
                 adc #14
 
                 tax
-_waitForKey     ;!!lda CH_                 ; key down?
+_waitForKey     ;!!lda CH_              ; key down?
                 eor #$FF
                 bne _faster
 
@@ -22,18 +22,18 @@ _waitForKey     ;!!lda CH_                 ; key down?
                 bpl _waitForKey
 
                 ldy #0
-                ;!!lda (oldadr),y
-                ;!!eor #$80
-                ;!!sta (oldadr),y
+                lda (OLDADR),Y
+                eor #$80
+                sta (OLDADR),Y
 
                 jmp libKeyGetKey
 
 _1              ldy #0
-                lda oldchr
+                lda OLDCHR
                 eor #$80
-                ;!!sta (oldadr),y          ; restore cursor
+                sta (OLDADR),Y          ; restore cursor
 
-_faster         ;!!ldx SRTIMR              ; faster repeat
+_faster         ;!!ldx SRTIMR           ; faster repeat
                 cpx #$0C
                 bcs _6
 

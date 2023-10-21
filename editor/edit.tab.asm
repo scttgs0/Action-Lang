@@ -12,10 +12,10 @@ Tab_             .proc
                 jsr SetSpacing
                 jsr TabLocation._ENTRY1
 
-_next1          ;!!lda TABMAP,x
+_next1          ;!!lda TABMAP,X
                 beq _2
 
-                and _onbit,y
+                and _onbit,Y
                 beq _1
 
 ;   found tab setting
@@ -58,9 +58,9 @@ _offbit         .byte $7F,$BF,$DF,$EF
 SetTab          .proc
                 jsr TabLocation
 
-                ;!!lda TABMAP,x
-                ora Tab_._onbit,y
-                ;!!sta TABMAP,x
+                ;!!lda TABMAP,X
+                ora Tab_._onbit,Y
+                ;!!sta TABMAP,X
 
                 rts
                 .endproc
@@ -72,9 +72,9 @@ SetTab          .proc
 ClearTab        .proc
                 jsr TabLocation
 
-                ;!!lda TABMAP,x
-                and Tab_._offbit,y
-                ;!!sta TABMAP,x
+                ;!!lda TABMAP,X
+                and Tab_._offbit,Y
+                ;!!sta TABMAP,X
 
                 rts
                 .endproc

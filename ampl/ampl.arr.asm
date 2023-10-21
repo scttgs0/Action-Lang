@@ -26,7 +26,7 @@ arrconst        jsr procref._ENTRY1
 _XIT1           jmp pushst
 
 _next1          ldy #0
-                lda (stack),y
+                lda (stack),Y
                 cmp #tokARRAY_t+8
                 bcs _1                  ; small array
 
@@ -38,12 +38,12 @@ _next1          ldy #0
 
 ;   page zero pointer
                 ldy #1
-                sta (stack),y
+                sta (stack),Y
 
                 dey
-                lda (stack),y
+                lda (stack),Y
                 ora #$B0                ; temp array mode
-                sta (stack),y
+                sta (stack),Y
 
                 rts
 
@@ -64,11 +64,11 @@ _2              jsr pushnext
                 bne arrerr
 
 _3              ldy #7
-                lda (stack),y
+                lda (stack),Y
 arra0           pha
 
                 lda #tokVAR_t+tokCARD_t
-                sta (stack),y
+                sta (stack),Y
 
                 lda #tokPLUS
                 jsr genops
@@ -87,13 +87,13 @@ arra0           pha
                 ldy #1                  ; clear Z flag if we branch
                 bcs _4
 
-                lda (stack),y
+                lda (stack),Y
                 iny
-                ora (stack),y
+                ora (stack),Y
 _4              sta FR1
                 beq _5                  ; pointer
 
-                ldy vartype-1,x
+                ldy vartype-1,X
                 beq arrerr._XIT2
 
                 ; cpy #3
@@ -116,7 +116,7 @@ _5              jsr GetTemps
 
                 lda #$61                ; ADC
         .if ramzap
-                sta (arg8),y
+                sta (arg8),Y
         .else
                 nop
                 nop
@@ -147,7 +147,7 @@ _XIT2           jmp codegen._ENTRY1
 ;   small arrary
 
 _small          ldy #7
-                sta (stack),y           ; restore correct type
+                sta (stack),Y           ; restore correct type
 
                 lda arg1
                 bpl arrerr              ; can't index with bool.
@@ -156,7 +156,7 @@ _small          ldy #7
                 bne arrerr              ; can't index with array
 
                 ldy #10
-                sta (stack),y
+                sta (stack),Y
 
                 ldy #2
                 jsr LoadI

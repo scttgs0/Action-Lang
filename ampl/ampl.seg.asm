@@ -48,11 +48,11 @@ _1              jsr makeentry
 
                 ldy #3
                 lda #0                  ; no args yet
-                sta (props),y
+                sta (props),Y
                 sta argbytes
 
                 tay
-_next1          sta (symTblLocal),y
+_next1          sta (symTblLocal),Y
 
                 iny                     ; zap local st
                 bne _next1
@@ -82,9 +82,9 @@ _next1          sta (symTblLocal),y
                 jsr storprops
 
                 ldy #0
-                lda (props),y
+                lda (props),Y
                 ora #8
-                sta (props),y           ; set Sys flag
+                sta (props),Y           ; set Sys flag
                 sta param
 
                 jsr GetNext
@@ -203,12 +203,12 @@ _8              lda trace               ; check for trace
                 jsr Push3
 
                 ldy #0
-                lda (curproc),y
+                lda (curproc),Y
 
                 tay
                 tax
-_next4          lda (curproc),y
-                sta (qcode),y
+_next4          lda (curproc),Y
+                sta (qcode),Y
 
                 dey
                 bpl _next4
@@ -228,8 +228,8 @@ _next4          lda (curproc),y
                 tay
                 tax
 
-_next5          lda (props),y
-                sta (qcode),y
+_next5          lda (props),Y
+                sta (qcode),Y
 
                 dey
                 bpl _next5
