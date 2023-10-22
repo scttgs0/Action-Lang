@@ -89,17 +89,17 @@ amplfin
 ;    ----------------------------------
 
                 .fill 3,$00
-                .include "ampl/ampl.seg.asm"
+                .include "ampl/ampl.segment.asm"
                 .include "ampl/ampl.pf.asm"
-                .include "ampl/ampl.arr.asm"
+                .include "ampl/ampl.array.asm"
                 .include "ampl/ampl.cgu.asm"
 
 
 ;    ACTION! - Symbol Table
 ;    ----------------------------------
 
-                .include "ampl/ampl.mth.asm"
-                .include "ampl/ampl.sym.asm"
+                .include "ampl/ampl.math.asm"
+                .include "ampl/ampl.symbol.asm"
                 .include "library/lib.key.asm"
                 .include "spl.err.asm"
                 .include "library/lib.io.asm"
@@ -135,8 +135,8 @@ cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
                 .include "editor/edit.command.asm"
                 .include "editor/edit.tag.asm"
 
-                .include "ampl/ampl.mon.asm"
-                .include "ampl/ampl.ini.asm"
+                .include "ampl/ampl.monitor.asm"
+                .include "ampl/ampl.init.asm"
 
                 .include "platform_f256.asm"
 
