@@ -15,12 +15,14 @@
                                         ;     4-6 =     Serial port mode control
                                         ;       7 =     Force break; serial output to zero
 ;!!PADDL0          = $0270
-;!!TABMAP          = $02A3                 ; 15-byte TODO:
-                ; $02B1
+
+TABMAP          = $02A3                 ; 15-byte (120 char positions); each bit represents a potential tabstop location
+
 ;!!INVFLG          = $02B6                 ; Inverse character flag; 0=normal; 128=inverse
 ;!!SHFLOK          = $02BE                 ; Flag for the shift and control keys; 0=lowercase; 64=uppercase; 128=control
 ;!!COLOR0          = $02C4
 ;!!COLOR4          = $02C8                 ; background color
+
 INITAD          = $02E2                 ; [word]
 MEMTOP          = $02E5                 ; pointer to the top of free memory
 MEMLO           = $02E7                 ; pointer to the bottom of free memory
