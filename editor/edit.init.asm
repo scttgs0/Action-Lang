@@ -1,5 +1,5 @@
 
-; SPDX-FileName: edit.ini.asm
+; SPDX-FileName: edit.init.asm
 ; SPDX-FileComment: Action! Programming Language
 ; SPDX-FileCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later

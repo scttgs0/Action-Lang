@@ -80,8 +80,8 @@ amplfin
 ;    ----------------------------------
 
                 .fill 4,$00
-                .include "editor/edit.fnd.asm"
-                .include "editor/edit.sub.asm"
+                .include "editor/edit.find.asm"
+                .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"
 
 
@@ -124,15 +124,15 @@ cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
 ;    --------------------
 
                 .include "storage.mac.asm"
-                .include "editor/edit.mem.asm"
-                .include "editor/edit.car.asm"
-                .include "editor/edit.man.asm"
+                .include "editor/edit.memory.asm"
+                .include "editor/edit.cartridge.asm"
+                .include "editor/edit.main.asm"
                 .include "editor/edit.chr.asm"
-                .include "editor/edit.ini.asm"
+                .include "editor/edit.init.asm"
                 .include "editor/edit.io.asm"
-                .include "editor/edit.wnd.asm"
-                .include "editor/edit.dsp.asm"
-                .include "editor/edit.cmd.asm"
+                .include "editor/edit.window.asm"
+                .include "editor/edit.display.asm"
+                .include "editor/edit.command.asm"
                 .include "editor/edit.tag.asm"
 
                 .include "ampl/ampl.mon.asm"
