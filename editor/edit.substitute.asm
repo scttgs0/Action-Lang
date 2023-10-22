@@ -125,6 +125,5 @@ _7              cpx subbuf
 
 ;--------------------------------------
 
-submsg          .text 12,"Substitute? "
-
-formsg          .text 5,"for? "
+submsg          .ptext "Substitute? "
+formsg          .ptext "for? "

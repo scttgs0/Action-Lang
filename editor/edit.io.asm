@@ -127,7 +127,7 @@ _3              jsr FWrite._ENTRY1
 
 ;--------------------------------------
 
-rdmsg           .text 6,"Read? "
+rdmsg           .ptext "Read? "
 
                 .endproc
 
@@ -174,7 +174,7 @@ _1              jsr syserr
 
 ;--------------------------------------
 
-wrtmsg          .text 7,"Write? "
+wrtmsg          .ptext "Write? "
 
                 .endproc
 
@@ -284,7 +284,8 @@ InitKeys        .proc
 
 ;--------------------------------------
 
-keybd           .text 2,"K:"
+keybd           .ptext "K:"
+
                 .endproc
 
 

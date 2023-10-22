@@ -156,9 +156,9 @@ _1              sty currentWindow
 
 ;--------------------------------------
 
-clearmsg        .text 7,"CLEAR? "
-delmsg          .text 15,"Delete window? "
-dirtymsg        .text 19,"Not saved, Delete? "
+clearmsg        .ptext "CLEAR? "
+delmsg          .ptext "Delete window? "
+dirtymsg        .ptext "Not saved, Delete? "
 
                 .endproc
 

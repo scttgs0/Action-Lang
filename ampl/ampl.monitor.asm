@@ -231,7 +231,7 @@ Boot            .proc
 
 ;--------------------------------------
 
-_bmsg           .text 6,"Boot? "
+_bmsg           .ptext "Boot? "
 
                 .endproc
 

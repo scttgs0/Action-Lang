@@ -187,55 +187,72 @@ _4              txa
 ; .addr PrtF ; #117
 ; .BYTE 6,17,12,12,12,12,12
 
-_en7            .text 4,"Open",200
+_en7            .ptext "Open"
+                .byte 200
                 .addr libIOOpen         ; #96
                 .byte 4,138,17,138,138
-_en8            .text 6,"PrintE",200
+_en8            .ptext "PrintE"
+                .byte 200
                 .addr libIOPrintE       ; #116
                 .byte 1,17
-_en9            .text 7,"PrintDE",200
+_en9            .ptext "PrintDE"
+                .byte 200
                 .addr libIOPrintDE      ; #75
                 .byte 2,138,17
-_en10           .text 5,"Close",200
+_en10           .ptext "Close"
+                .byte 200
                 .addr libIOClose        ; #253
                 .byte 1,138
-_en11           .text 5,"Print",200
+_en11           .ptext "Print"
+                .byte 200
                 .addr libIOPrint        ; #135
                 .byte 1,17
-_en12           .text 6,"PrintD",200
+_en12           .ptext "PrintD"
+                .byte 200
                 .addr libIOPrintD       ; #115
                 .byte 2,138,17
-_en13           .text 6,"InputS",200
+_en13           .ptext "InputS"
+                .byte 200
                 .addr libIOInputS       ; #249
                 .byte 1,17
-_en14           .text 7,"InputSD",200
+_en14           .ptext "InputSD"
+                .byte 200
                 .addr libIOInputSD      ; #87
                 .byte 2,138,17
-_en15           .text 7,"InputMD",200
+_en15           .ptext "InputMD"
+                .byte 200
                 .addr libIOInputMD      ; #75
                 .byte 3,138,17,138
-_en16           .text 4,"GetD",202
+_en16           .ptext "GetD"
+                .byte 202
                 .addr libIOGetD         ; #138
                 .byte 1,138
-_en17           .text 4,"PutE",200
+_en17           .ptext "PutE"
+                .byte 200
                 .addr libIOPutE         ; #162
                 .byte 0
-_en18           .text 3,"Put",200
+_en18           .ptext "Put"
+                .byte 200
                 .addr libIOPut          ; #158
                 .byte 1,137
-_en19           .text 4,"PutD",200
+_en19           .ptext "PutD"
+                .byte 200
                 .addr libIOPutD         ; #161
                 .byte 2,138,137
-_en20           .text 5,"PutDE",200
+_en20           .ptext "PutDE"
+                .byte 200
                 .addr libIOPutDE        ; #168
                 .byte 1,138
-_en21           .text 3,"XIO",200
+_en21           .ptext "XIO"
+                .byte 200
                 .addr libIOXIO          ; #225
                 .byte 6,138,138,138,138,138,17
-_en22           .text 6,"PrintB",200
+_en22           .ptext "PrintB"
+                .byte 200
                 .addr libIOPrintB       ; #113
                 .byte 1,138
-_en23           .text 7,"PrintBE",200
+_en23           .ptext "PrintBE"
+                .byte 200
                 .addr libIOPrintBE      ; #71
                 .byte 1,138
 
@@ -243,115 +260,152 @@ _en23           .text 7,"PrintBE",200
 ; .addr PrtBD ; #70
 ; .BYTE 2,138,138
 
-_en25           .text 8,"PrintBDE",200
+_en25           .ptext "PrintBDE"
+                .byte 200
                 .addr libIOPrintBDE     ; #241
                 .byte 2,138,138
-_en26           .text 6,"PrintC",200
+_en26           .ptext "PrintC"
+                .byte 200
                 .addr libIOPrintC       ; #114
                 .byte 1,12
-_en27           .text 7,"PrintCE",200
+_en27           .ptext "PrintCE"
+                .byte 200
                 .addr libIOPrintCE      ; #73
                 .byte 1,12
-_en28           .text 7,"PrintCD",200
+_en28           .ptext "PrintCD"
+                .byte 200
                 .addr libIOPrintCD      ; #72
                 .byte 2,138,12
-_en29           .text 8,"PrintCDE",200
+_en29           .ptext "PrintCDE"
+                .byte 200
                 .addr libIOPrintCDE     ; #245
                 .byte 2,138,12
-_en30           .text 6,"PrintI",200
+_en30           .ptext "PrintI"
+                .byte 200
                 .addr libIOPrintI       ; #120
                 .byte 1,11
-_en31           .text 7,"PrintID",200
+_en31           .ptext "PrintID"
+                .byte 200
                 .addr libIOPrintID      ; #84
                 .byte 2,138,11
-_en32           .text 7,"PrintIE",200
+_en32           .ptext "PrintIE"
+                .byte 200
                 .addr libIOPrintIE      ; #85
                 .byte 1,11
-_en33           .text 8,"PrintIDE",200
+_en33           .ptext "PrintIDE"
+                .byte 200
                 .addr libIOPrintIDE     ; #13
                 .byte 2,138,11
-_en34           .text 6,"InputB",202
+_en34           .ptext "InputB"
+                .byte 202
                 .addr libIOInputB       ; #232
                 .byte 0
-_en35           .text 7,"InputBD",202
+_en35           .ptext "InputBD"
+                .byte 202
                 .addr libIOInputBD      ; #53
                 .byte 1,138
-_en36           .text 6,"InputI",203
+_en36           .ptext "InputI"
+                .byte 203
                 .addr libIOInputI       ; #239
                 .byte 0
-_en37           .text 7,"InputID",203
+_en37           .ptext "InputID"
+                .byte 203
                 .addr libIOInputID      ; #67
                 .byte 1,138
-_en38           .text 6,"InputC",204
+_en38           .ptext "InputC"
+                .byte 204
                 .addr libIOInputC       ; #233
                 .byte 0
-_en39           .text 7,"InputCD",204
+_en39           .ptext "InputCD"
+                .byte 204
                 .addr libIOInputCD      ; #55
                 .byte 1,138
-_en40           .text 4,"ValB",202
+_en40           .ptext "ValB"
+                .byte 202
                 .addr libIOValB         ; #207
                 .byte 1,17
-_en41           .text 4,"ValI",203
+_en41           .ptext "ValI"
+                .byte 203
                 .addr libIOValI         ; #214
                 .byte 1,17
-_en42           .text 4,"ValC",204
+_en42           .ptext "ValC"
+                .byte 204
                 .addr libIOValC         ; #208
                 .byte 1,17
-_en43           .text 4,"StrB",200
+_en43           .ptext "StrB"
+                .byte 200
                 .addr libIOStrB         ; #223
                 .byte 2,138,17
-_en44           .text 4,"StrI",200
+_en44           .ptext "StrI"
+                .byte 200
                 .addr libIOStrI         ; #230
                 .byte 2,11,17
-_en45           .text 4,"StrC",200
+_en45           .ptext "StrC"
+                .byte 200
                 .addr libIOStrC         ; #224
                 .byte 2,12,17
-_en46           .text 4,"Note",200
+_en46           .ptext "Note"
+                .byte 200
                 .addr libIONote         ; #89
                 .byte 3,138,20,18
-_en47           .text 5,"Point",200
+_en47           .ptext "Point"
+                .byte 200
                 .addr libIOPoint        ; #110
                 .byte 3,138,12,138
-_en48           .text 8,"Graphics",200
+_en48           .ptext "Graphics"
+                .byte 200
                 .addr libGrGraphics     ; #108
                 .byte 1,138
-_en49           .text 6,"DrawTo",200
+_en49           .ptext "DrawTo"
+                .byte 200
                 .addr libGrDrawTo       ; #231
                 .byte 2,12,138
-_en50           .text 8,"Position",200
+_en50           .ptext "Position"
+                .byte 200
                 .addr libGrPosition     ; #94
                 .byte 2,12,138
-_en51           .text 6,"Locate",202
+_en51           .ptext "Locate"
+                .byte 202
                 .addr libGrLocate       ; #97
                 .byte 2,12,138
-_en52           .text 4,"Plot",200
+_en52           .ptext "Plot"
+                .byte 200
                 .addr libGrPlot         ; #131
                 .byte 2,12,138
-_en53           .text 8,"SetColor",200
+_en53           .ptext "SetColor"
+                .byte 200
                 .addr libGrSetColor     ; #6
                 .byte 3,138,138,138
-_en54           .text 4,"Fill",200
+_en54           .ptext "Fill"
+                .byte 200
                 .addr libGrFill         ; #122
                 .byte 2,12,138
-_en55           .text 4,"Rand",202
+_en55           .ptext "Rand"
+                .byte 202
                 .addr libMscRand        ; #117
                 .byte 1,138
-_en56           .text 5,"Sound",200
+_en56           .ptext "Sound"
+                .byte 200
                 .addr libMscSound       ; #31
                 .byte 4,138,138,138,138
-_en57           .text 6,"SndRst",200
+_en57           .ptext "SndRst"
+                .byte 200
                 .addr libMscSndRst      ; #73
                 .byte 0
-_en58           .text 6,"Paddle",202
+_en58           .ptext "Paddle"
+                .byte 202
                 .addr libStrPaddle      ; #254
                 .byte 1,138
-_en59           .text 5,"PTrig",202
+_en59           .ptext "PTrig"
+                .byte 202
                 .addr libMscPTrig       ; #164
                 .byte 1,138
-_en60           .text 5,"Stick",202
+_en60           .ptext "Stick"
+                .byte 202
                 .addr libMscStick       ; #8
                 .byte 1,138
-_en61           .text 5,"STrig",202
+_en61           .ptext "STrig"
+                .byte 202
                 .addr libStrSTrig       ; #52
                 .byte 1,138
 
@@ -362,16 +416,20 @@ _en61           .text 5,"STrig",202
 ; .addr PeekC ; #245
 ; .BYTE 1,12
 
-_en64           .text 4,"Poke",200
+_en64           .ptext "Poke"
+                .byte 200
                 .addr libMscPoke        ; #120
                 .byte 2,12,138
-_en65           .text 5,"PokeC",200
+_en65           .ptext "PokeC"
+                .byte 200
                 .addr libMscPokeC       ; #83
                 .byte 2,12,12
-_en66           .text 4,"Zero",200
+_en66           .ptext "Zero"
+                .byte 200
                 .addr libMscZero        ; #88
                 .byte 2,18,12
-_en67           .text 8,"SetBlock",200
+_en67           .ptext "SetBlock"
+                .byte 200
                 .addr libMscSetBlock    ; #203
                 .byte 3,18,12,138
 
@@ -379,18 +437,23 @@ _en67           .text 8,"SetBlock",200
 ; .WORD MoveBlock ; #85
 ; .BYTE 3,18,18,12
 
-_en69           .text 5,"Break",200
+_en69           .ptext "Break"
+                .byte 200
                 .addr libMscBreak       ; #183
-_en70           .text 8,"SCompare",203
+_en70           .ptext "SCompare"
+                .byte 203
                 .addr libStrSCompare    ; #92
                 .byte 2,17,17
-_en71           .text 5,"SCopy",200
+_en71           .ptext "SCopy"
+                .byte 200
                 .addr libStrSCopy       ; #192
                 .byte 2,17,17
-_en72           .text 6,"SCopyS",200
+_en72           .ptext "SCopyS"
+                .byte 200
                 .addr libStrSCopyS      ; #244
                 .byte 4,17,17,138,138
-_en73           .text 7,"SAssign",200
+_en73           .ptext "SAssign"
+                .byte 200
                 .addr libStrSAssign     ; #23
                 .byte 4,17,17,138,138
 
@@ -571,7 +634,8 @@ libStrPaddle    .proc
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0,0,0,0,0,0               ; 17
 
-_en6            .text 6,"PrintF",200
+_en6            .ptext "PrintF"
+                .byte 200
                 .addr libIOPrintF       ; #117
                 .byte 6,17,12,12,12,12,12
 ;
@@ -583,7 +647,8 @@ _en6            .text 6,"PrintF",200
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0                               ; 11
 
-_en63           .text 5,"PeekC",204
+_en63           .ptext "PeekC"
+                .byte 204
                 .addr libMscPeekC       ; #245
                 .byte 1,12
 
@@ -646,7 +711,8 @@ copyright       .byte 8,99,9,17,25,24,19,33,35,51
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0,0,0,0,0 ; 17
 
-_en68           .text 9,"MoveBlock",200
+_en68           .ptext "MoveBlock"
+                .byte 200
                 .addr libMscMoveBlock   ; #85
                 .byte 3,18,18,12
 
@@ -664,7 +730,8 @@ _en68           .text 9,"MoveBlock",200
 ; .BYTE 0,0,0,0,0,0,0,0,0,0
 ; .BYTE 0,0,0,0 ; 14
 
-_en24           .text 7,"PrintBD",200
+_en24           .ptext "PrintBD"
+                .byte 200
                 .addr libIOPrintBD      ; #70
                 .byte 2,138,138
 
@@ -675,7 +742,8 @@ _en24           .text 7,"PrintBD",200
 
 ; .BYTE 0,0,0,0,0,0,0,0,0,0 ; 10
 
-_en62           .text 4,"Peek",202
+_en62           .ptext "Peek"
+                .byte 202
                 .addr libMscPeek        ; #73
                 .byte 1,12
 

@@ -24,7 +24,8 @@ scrinit         .proc
 
 ;--------------------------------------
 
-; _data         .text 2,"E:",$9B
+; _data         .ptext "E:"
+;               .byte $9B
                 .endproc
 
 

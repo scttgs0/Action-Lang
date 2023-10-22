@@ -46,8 +46,11 @@ libGrGraphics   .proc
 
 ;--------------------------------------
 
-_e              .text 2,"E:",eol
-_devs           .text 2,"S:",eol
+_e              .ptext "E:"
+                .byte eol
+_devs           .ptext "S:"
+                .byte eol
+
 _color          = $02FD
 _atachr         = $02FB
 

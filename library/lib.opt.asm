@@ -211,18 +211,18 @@ _20             lda #<tempbuf
 ;--------------------------------------
 ;--------------------------------------
 
-domsg           .text 9,"Display?"
+domsg           .ptext "Display? "
 
 optmsg          = domsg-20              ; see GetTemp
 
-amsg            .text 6,"Bell?"
-cmsg            .text 16,"Case sensitive?"
-tmsg            .text 7,"Trace?"
-lstmsg          .text 6,"List?"
-wmsg            .text 15,"Window 1 size:"
-lmsg            .text 11,"Line size:"
-lmmsg           .text 13,"Left margin:"
-emsg            .text 10,"EOL char:"
+amsg            .ptext "Bell? "
+cmsg            .ptext "Case sensitive? "
+tmsg            .ptext "Trace? "
+lstmsg          .ptext "List? "
+wmsg            .ptext "Window 1 size: "
+lmsg            .ptext "Line size: "
+lmmsg           .ptext "Left margin: "
+emsg            .ptext "EOL char: "
 
 stoa_           .byte $20,$40,$00,$60
 

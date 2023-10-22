@@ -103,6 +103,6 @@ Found           .proc
 ;--------------------------------------
 ;--------------------------------------
 
-notfnd          .text 9,"not found"
+notfnd          .ptext "not found"
 
-findmsg         .text 6,"Find? "
+findmsg         .ptext "Find? "

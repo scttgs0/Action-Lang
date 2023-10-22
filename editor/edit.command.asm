@@ -200,8 +200,8 @@ _XIT            jmp CommandMsg
 
 ;--------------------------------------
 
-_imsg           .text 6,"INSERT"
-_rmsg           .text 7,"REPLACE"
+_imsg           .ptext "INSERT"
+_rmsg           .ptext "REPLACE"
 
                 .endproc
 

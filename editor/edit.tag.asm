@@ -76,7 +76,7 @@ notag           .proc
 
 ;--------------------------------------
 
-_ntmsg          .text 11,"tag not set"
+_ntmsg          .ptext "tag not set"
 
                 .endproc
 
@@ -92,7 +92,7 @@ tagid           .proc
 
 ;--------------------------------------
 
-_stmsg          .text 8,"tag id: "
+_stmsg          .ptext "tag id: "
 
                 .endproc
 

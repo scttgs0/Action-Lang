@@ -5,23 +5,29 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
-en0             .text 5,"Error",$c0
+en0             .ptext "Error"
+                .byte $C0
                 .addr jt_error
                 .byte 3,138,138,138
 
-en1             .text 3,"EOF",$9a
+en1             .ptext "EOF"
+                .byte $9A
                 .addr eof
 
-en2             .text 5,"color",$8a
+en2             .ptext "color"
+                .byte $8A
                 ;!!.addr FILDAT
 
-en3             .text 4,"LIST",$8a
+en3             .ptext "LIST"
+                .byte $8A
                 .addr list
 
-en4             .text 6,"device",$8a
+en4             .ptext "device"
+                .byte $8A
                 .word device
 
-en5             .text 5,"TRACE",$8a
+en5             .ptext "TRACE"
+                .byte $8A
                 .addr trace
 
 
