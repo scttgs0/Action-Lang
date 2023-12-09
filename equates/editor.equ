@@ -8,11 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
-ramzap          = 0                     ; to zap or not to zap, that is the question?
+ZAPRAM          = 0                     ; to zap or not to zap, that is the question?
 
 
 ; ACTION! vars ($480 - $57D)
-;----------------------------
+;--------------------------------------
+
 w1              = $0480                 ; window 1 data
 top1            = $048F
 chrConvert      = $0490                 ; char convert
@@ -50,7 +51,8 @@ isBigSymTbl     = $04C4                 ; big symbol table flag
 jt_jmps         = $04C6                 ; see EDIT.CAR
 
 ; Jump table goes to $4FF
-;-------------------------
+;--------------------------------------
+
 jt_segend       = $04C6
 jt_curbank      = $04C9
 jt_stmask       = $04CA
@@ -83,7 +85,8 @@ opstack         = $0580
 ; $580 TO ? is used for output of
 ; FASC routine.  Should not exceed
 ; 16 bytes, $58F (worst case?).
-;---------------------------------
+;--------------------------------------
+
 tempbuf         = $0590                 ; 40 bytes     ; rowSize
 argtypes        = $05B8                 ;  8 bytes
 eof             = $05C0                 ;  8 bytes
@@ -93,30 +96,33 @@ temps           = $05F0                 ; 16 bytes
 
 
 ; system vars
-;-------------
-qcode           = $0E                   ; ap. high mem.
-csrch           = $5D
+;--------------------------------------
 
-lbuff           = $0580                 ; fp ASCII buf
+QCODE           = $0E                   ; ap. high mem.
+CSRCH           = $5D
+
+LBUFF           = $0580                 ; FP ASCII buf
 
 
 ; window record offsets
-;-----------------------
-wsp             = 0
-wch             = 1
-wlnum           = 2
-wdirty          = 3
-wtop            = 4
-wbot            = 6
-wcur            = 8
-wx              = 10
-wy              = 11
-wnlns           = 12                    ; num lines
-wytop           = 13
-windent         = 14
+;--------------------------------------
+
+WSP             = 0
+WCH             = 1
+WLNUM           = 2
+WDIRTY          = 3
+WTOP            = 4
+WBOT            = 6
+WCUR            = 8
+WX              = 10
+WY              = 11
+WNLINES         = 12                    ; num lines
+WYTOP           = 13
+WINDENT         = 14
 
 
 ; system defs
-;-------------
-eol             = $9B
-esc             = $1B
+;--------------------------------------
+
+EOL             = $9B
+ESC             = $1B

@@ -109,13 +109,13 @@ _next2          lda emjmps-1,Y          ; init RAM
 
 ;SPLInit PROC ; init compiler RAM
 
-        .if ramzap
+            .if ZAPRAM
                 jsr zap4
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
                 ldx #8                  ; 2K id space
                 stx SymTblSizePages

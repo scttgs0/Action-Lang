@@ -30,7 +30,7 @@ _next2          ldy #0
                 cpx #$1B                ; ESC
                 beq _1
 
-                cpx #eol
+                cpx #EOL
                 beq _2
 
                 cpy arg3                ; first char?

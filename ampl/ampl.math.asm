@@ -68,13 +68,13 @@ _mc5            sta math._rl
 _setsign        ldy math._sign
                 bpl _ss2
 
-        .if ramzap
+            .if ZAPRAM
                 sta MulB,X
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
 _ss1            sta math._rl
                 stx math._rh

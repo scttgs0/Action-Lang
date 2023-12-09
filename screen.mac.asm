@@ -247,7 +247,7 @@ assgnERR        = 10                    ; bad assignment
 endERR          = 11                    ; unknown error
 thenERR         = 12                    ; missing THEN
 fiERR           = 13                    ; missing FI
-qcodeERR        = 14                    ; out of qcode space
+qcodeERR        = 14                    ; out of QCODE space
 doERR           = 15                    ; missing DO
 toERR           = 16                    ; missing TO
 exprERR         = 17                    ; bad expression
@@ -537,7 +537,7 @@ _2              jsr nextchar
                                         ; end of string
 
                 ldy arg9
-                lda #eol
+                lda #EOL
                 sta (symtab),Y
 
                 dey
@@ -591,7 +591,7 @@ _next1          dec Channel
                 bne NextLine
 
 _1              ldy top+1
-                beq _next1              ; set eof, tricky qcode
+                beq _next1              ; set eof, tricky QCODE
 
                 jsr ldbuf
 
@@ -620,7 +620,7 @@ _3              ldy #0
                 iny
                 sty sp
 
-                lda #eol
+                lda #EOL
                 sta (buf),Y
 
                 ldy #0

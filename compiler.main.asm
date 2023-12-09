@@ -61,12 +61,12 @@ _next1          jsr GetNext
 _next2          lda #$60                ; RTS
                 jsr Push1
 
-;   get qcode size
+;   get QCODE size
                 sec
-                lda qcode
+                lda QCODE
                 sbc codebase
                 sta codesize
-                lda qcode+1
+                lda QCODE+1
                 sbc codebase+1
                 sta codesize+1
 
@@ -94,14 +94,14 @@ _next3          ldy #1
 
                 clc
                 iny
-                lda qcode
+                lda QCODE
                 adc (arrayptr),Y
-                sta qcode
+                sta QCODE
 
                 iny
-                lda qcode+1
+                lda QCODE+1
                 adc (arrayptr),Y
-                sta qcode+1
+                sta QCODE+1
 
                 lda arg0
                 sta arrayptr
@@ -112,9 +112,9 @@ _next3          ldy #1
                 ; lda arrayPtr
                 ; bne _SPL3
 
-                lda qcode
+                lda QCODE
                 cmp MEMTOP
-                lda qcode+1
+                lda QCODE+1
                 sbc MEMTOP+1
                 bcs _err2
 
@@ -135,7 +135,7 @@ _2              jsr getcdoff            ; no main PROC
 _err            ldy #endERR
                 jmp errFI
 
-_err2           jmp codeincr.cderr      ; out of qcode space
+_err2           jmp codeincr.cderr      ; out of QCODE space
 
                 ;.endproc
 
@@ -146,7 +146,7 @@ _err2           jmp codeincr.cderr      ; out of qcode space
 ; <dcl list> _:= <dcl list> <dcl> | <dcl>
 ; <dcl> _:= <simple dcl> | <array dcl> | <def dcl>
 ;======================================
-cderr           lda #0                  ; reset qcode before err
+cderr           lda #0                  ; reset QCODE before err
                 tay
                 jsr LoadCd
 
@@ -177,10 +177,10 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
                 sec
                 lda #0
                 sbc codeoff
-                sta qcode
+                sta QCODE
                 lda #0
                 sbc codeoff+1
-                sta qcode+1
+                sta QCODE+1
 
                 jsr GetNext
 
@@ -213,10 +213,10 @@ _next2          jsr makeentry
                 ldy #2
                 jsr StkP
 
-                ldx qcode+1
+                ldx QCODE+1
                 bne cderr
 
-                lda qcode
+                lda QCODE
                 ldy #0
                 jsr storprops
 
@@ -399,11 +399,11 @@ _next1          jsr makeentry
 
                 ldy #2
                 lda #0
-                cmp (qcode),Y
+                cmp (QCODE),Y
 
                 iny
                 lda #1
-                sbc (qcode),Y
+                sbc (QCODE),Y
                 bcs _6                  ; size <= 256
 
 _next2          jsr GetNext
@@ -420,10 +420,10 @@ _next3          lda numargs
 
 ;   small array
                 ldy #2
-                lda (qcode),Y
+                lda (QCODE),Y
                 bne _next4
 
-                inc qcode+1
+                inc QCODE+1
                 bra _next5
 
 ;   array var
@@ -432,9 +432,9 @@ _1              cmp #4
                 bmi _next4
 
 ;   large array with memory
-                ldx qcode
+                ldx QCODE
                 stx arrayptr
-                ldx qcode+1
+                ldx QCODE+1
                 stx arrayptr+1
 
 _next4          jsr codeincr
@@ -711,7 +711,7 @@ stmtlist        .proc
                 cmp #tokLBracket
                 bne _next2
 
-;   machine qcode block
+;   machine QCODE block
                 jsr TrashY
 
 _next1          ldx nxttoken
@@ -1075,10 +1075,10 @@ exitstmt        .proc
                 lda (whaddr),Y
                 pha
 
-                lda qcode+1             ; link in JMP for EXIT
+                lda QCODE+1             ; link in JMP for EXIT
                 sta (whaddr),Y
 
-                lda qcode
+                lda QCODE
                 dey
                 sta (whaddr),Y
 
@@ -1692,8 +1692,8 @@ _ENTRY2         stx arg4
 framecd         .proc
                 ldy #2
 
-_ENTRY1         lda qcode
-                ldx qcode+1
+_ENTRY1         lda QCODE
+                ldx QCODE+1
 
 _ENTRY2         sta (frame),Y
 
@@ -1850,7 +1850,7 @@ _2              sta arg1
 ;
 ;======================================
 comprel         .proc
-                lda qcode
+                lda QCODE
                 clc                     ; extra -1 for offset byte
 _ENTRY1         sbc arg4
 
@@ -1916,13 +1916,13 @@ stmtlst         .addr jt_smtend         ; not found
 ;   GetExp()
 ;======================================
 getexp          .proc
-        .if ramzap
+            .if ZAPRAM
                 inc cgopscd
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
                 jsr GetNext
 
@@ -2104,7 +2104,7 @@ _errParen       ldy #parenthERR
                 jmp splerr
 
 
-;   qcode to handle function ref
+;   QCODE to handle function ref
 _16             cmp #tokFUNC_t+8
                 beq _next5
 
@@ -2631,7 +2631,7 @@ _ENTRY1         jsr jt_cgend
                 lda cgops-2,Y
                 ldx cgops-1,Y
 
-                jmp jsrind              ; jmp to qcode for op
+                jmp jsrind              ; jmp to QCODE for op
 
                 .endproc
 
@@ -2813,7 +2813,7 @@ _next1          ldy #5
                 jmp _ENTRY5
 
 _7              and #$40                ; proc?
-                bne cgassign._ENTRY2    ;   yes, punt(not the best qcode)
+                bne cgassign._ENTRY2    ;   yes, punt(not the best QCODE)
 
                 jsr StkAddr             ; temp (proc argument)
 
@@ -2840,7 +2840,7 @@ _10             ldy #3
 
                 jsr TrashY              ; in case INT ARRAY in rhs
 
-;   oh if I only had more qcode space!
+;   oh if I only had more QCODE space!
 ;   could handle Y, see _OpA in CGU
                 bra cgassign._ENTRY4
 
@@ -3040,12 +3040,12 @@ cgmul           .proc
                 sta arg5
                 sta arg7
 
-        .if ramzap
+            .if ZAPRAM
                 sta (ADRESS),Y
-        .else
+            .else
                 nop
                 nop
-        .endif
+            .endif
 
                 .endproc
 
@@ -3188,19 +3188,19 @@ _next1          jsr saven               ; patch addresses
                 lda #$4C                ; JMP
                 jsr Insrt3              ; patch in JMP false
 
-                lda qcode
+                lda QCODE
                 pha
 
                 clc
                 lda arg14
                 adc #3
-                sta qcode
+                sta QCODE
 
                 ldy #11
                 jsr fillbr              ; make T1 -> Cond2
 
                 pla
-                sta qcode
+                sta QCODE
 
                 ldy #4
                 jsr LoadI

@@ -118,12 +118,12 @@ _5              jsr GetTemps
                 jsr Push3
 
                 lda #$61                ; ADC
-        .if ramzap
+            .if ZAPRAM
                 sta (arg8),Y
-        .else
+            .else
                 nop
                 nop
-        .endif
+            .endif
 
 _6              jsr LoadX.Op1L
                 jsr STempL

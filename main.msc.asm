@@ -118,7 +118,7 @@ mnum            .proc
 
 _next1          lda nxttoken
                 cmp #tokMULT
-                beq _4                  ; qcode reference
+                beq _4                  ; QCODE reference
 
                 cmp #tokLBracket
                 beq _5
@@ -182,7 +182,7 @@ _3              dec choff               ; put back character
 
                 rts
 
-_4              jsr getcdoff            ; qcode reference
+_4              jsr getcdoff            ; QCODE reference
                 jmp _next3
 
 _5              jsr getcdoff            ; table reference
@@ -271,12 +271,12 @@ copystr         .proc
 
                 ldy #0
                 lda (nxtaddr),Y         ; size
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 tax
                 tay
 _next1          lda (nxtaddr),Y
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 dey
                 bne _next1
@@ -285,7 +285,7 @@ _next1          lda (nxtaddr),Y
                 txa
                 bne _1
 
-                inc qcode+1
+                inc QCODE+1
 
 _1              jsr codeincr
 
@@ -304,11 +304,11 @@ _1              jsr codeincr
 ;======================================
 getcdoff        .proc
                 clc
-                lda qcode
+                lda QCODE
                 adc codeoff
                 pha
 
-                lda qcode+1
+                lda QCODE+1
                 adc codeoff+1
 
                 tax
@@ -321,11 +321,11 @@ getcdoff        .proc
 ;   StoreVar(low, high, index)
 ;======================================
 storevar        .proc
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 iny
                 txa
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 rts
                 .endproc
@@ -337,12 +337,12 @@ storevar        .proc
 lookup          .proc
                 sty arg2
 
-        .if ramzap
+            .if ZAPRAM
                 sta (arg1),Y            ; zap RAM if any
-        .else
+            .else
                 nop
                 nop
-        .endif
+            .endif
 
                 stx arg1
 
@@ -441,21 +441,21 @@ _1              lda stmax
 ;======================================
 codeincr        .proc
                 clc
-                adc qcode
-                sta qcode
+                adc QCODE
+                sta QCODE
                 bcc _1
 
-                inc qcode+1
+                inc QCODE+1
 
 _1              lda stbase
-                cmp qcode+1
+                cmp QCODE+1
                 bcs alpha._XIT          ; return
 
 cderr           ;!!sta bank+ebank
 
                 jsr SPLsetup            ; reset compiler
 
-                ldy #qcodeERR           ; out of qcode space
+                ldy #qcodeERR           ; out of QCODE space
                 jmp splerr
 
                 .endproc

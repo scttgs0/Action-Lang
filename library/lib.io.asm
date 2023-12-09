@@ -37,13 +37,13 @@ _1              txa
                 tya
                 sta eof,X
 _2
-        .if ramzap
+            .if ZAPRAM
                 dec libIOChkErr-$10,X
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
                 rts
                 .endproc
@@ -131,7 +131,7 @@ _next2          inc op
                 cmp #'E'
                 bne _1
 
-                lda #eol
+                lda #EOL
 _next3          jsr libIOPut
 
                 jmp _next2
@@ -194,7 +194,7 @@ libIOOpen       .proc
                 tay
                 iny
 
-                lda #eol
+                lda #EOL
                 bra _1
 
 _next1          lda (arg1),Y
@@ -389,7 +389,7 @@ ccio            .proc
 ; output EOL do default IOCB
 ;======================================
 libIOPutE       .proc
-                lda #eol
+                lda #EOL
 
                 .endproc
 
@@ -429,7 +429,7 @@ _ENTRY1         ldx #$0B
 ; outputs EOL to IOCD dev
 ;======================================
 libIOPutDE      .proc
-                ldy #eol
+                ldy #EOL
                 bra libIOPutD._ENTRY1
 
                 .endproc

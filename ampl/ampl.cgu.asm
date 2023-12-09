@@ -364,13 +364,13 @@ _next1          dex
 
                 inc temps-args+1,X
 
-        .if ramzap
+            .if ZAPRAM
                 inc SArgs,X
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
 _1              stx arg9
 
@@ -415,12 +415,12 @@ LdCdZ           .proc
 LoadCd          .proc
                 clc
                 adc (stack),Y
-                sta qcode
+                sta QCODE
 
                 iny
                 lda #0
                 adc (stack),Y
-                sta qcode+1
+                sta QCODE+1
 
                 rts
                 .endproc
@@ -430,8 +430,8 @@ LoadCd          .proc
 ;   SaveCd(,,offset)
 ;======================================
 SaveCd          .proc
-                lda qcode
-                ldx qcode+1
+                lda QCODE
+                ldx QCODE+1
 _saveStack      sta (stack),Y
 
                 txa
@@ -581,9 +581,9 @@ JSRTable        .proc
 Push0           .proc
                 sty arg13
 
-                ldy qcode
+                ldy QCODE
                 sty arg14
-                ldy qcode+1
+                ldy QCODE+1
                 sty arg15
 
                 ldy #0
@@ -738,8 +738,8 @@ _ENTRY2         txa
 ;======================================
 ;   AddCdSp()
 ;--------------------------------------
-; AddCdSp(,,size) add qcode space
-; does NOT change qcode or codeOff
+; AddCdSp(,,size) add QCODE space
+; does NOT change QCODE or codeOff
 ;======================================
 AddCdSp         .proc
                 pha
@@ -754,7 +754,7 @@ AddCdSp         .proc
                 sta arg11
 
                 sec
-                lda qcode
+                lda QCODE
                 sbc arg14
 
                 tay

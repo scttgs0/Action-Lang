@@ -65,11 +65,10 @@ _next1          sta (symTblLocal),Y
                 lda symtab+1
                 sta gbase+1
 
-; space for arg list (8 bytes) and
-; room for name of next proc/func
-; up to 20 letters (24 bytes)
-; unused space will be reclaimed
-; see Params
+;   space for arg list (8 bytes) and room for name of next proc/func
+;   up to 20 letters (24 bytes)
+;   unused space will be reclaimed
+;   see Params
                 lda #32
                 jsr stincr              ; arg list space
                 jsr TrashY
@@ -156,7 +155,7 @@ _3          lda param
 
 _4              jsr Push2
 
-;   qcode to transfer arguments to
+;   QCODE to transfer arguments to
 ;   local frame
 _next3          lda argbytes
                 beq _8                  ; no arguments
@@ -211,7 +210,7 @@ _8              lda trace               ; check for trace
                 tay
                 tax
 _next4          lda (curproc),Y
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 dey
                 bpl _next4
@@ -232,7 +231,7 @@ _next4          lda (curproc),Y
                 tax
 
 _next5          lda (props),Y
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 dey
                 bpl _next5

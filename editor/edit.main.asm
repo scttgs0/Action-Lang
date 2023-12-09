@@ -34,7 +34,7 @@ _1              lda curch
                 cpy #$1B                ; escape
                 bne _3
 
-                cmp #eol
+                cmp #EOL
                 beq floop
 
                 jsr InsertChar
@@ -77,7 +77,7 @@ zap4            .byte $7e
                 .addr InsertSpace
                 .byte $ff
                 .addr Return_
-                .byte eol
+                .byte EOL
                 .addr Tab_
                 .byte $7f
                 .addr Delete_
@@ -143,16 +143,16 @@ fmcscmd         .addr jt_disptb+3       ; default
                 .byte $fd
 
 outmem          .text 14," "
-        .enc "atari-screen-inverse"
+            .enc "atari-screen-inverse"
                 .text "Out"
-        .enc "none"
+            .enc "none"
 
                 .text " "
-        .enc "atari-screen-inverse"
+            .enc "atari-screen-inverse"
                 .text "of"
-        .enc "none"
+            .enc "none"
 
                 .text " "
-        .enc "atari-screen-inverse"
+            .enc "atari-screen-inverse"
                 .text "Memory"
-        .enc "none"
+            .enc "none"

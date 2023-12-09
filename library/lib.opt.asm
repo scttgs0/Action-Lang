@@ -94,16 +94,16 @@ _12             sta jt_wsize
                 ldx numwd
                 beq _13
 
-                sta w1+wnlns
+                sta w1+WNLINES
 
                 tay
                 iny
-                sty w2+wytop
+                sty w2+WYTOP
 
                 sec
                 lda #23
                 sbc jt_wsize
-                sta w2+wnlns
+                sta w2+WNLINES
 
 ;   line size
 _13             lda jt_linemax

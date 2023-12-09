@@ -683,7 +683,7 @@ _en63           .ptext "PeekC"
 
 
 ; .BYTE 0,0,0,0,0,0,0,0,0,0             ; 10
-; (c)1983ACS in internal char. qcode
+; (c)1983ACS in internal char. QCODE
 
 copyright       .byte 8,99,9,17,25,24,19,33,35,51
 

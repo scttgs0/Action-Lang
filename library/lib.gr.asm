@@ -50,9 +50,9 @@ libGrGraphics   .proc
 ;--------------------------------------
 
 _e              .ptext "E:"
-                .byte eol
+                .byte EOL
 _devs           .ptext "S:"
-                .byte eol
+                .byte EOL
 
 _color          = $02FD
 _atachr         = $02FB

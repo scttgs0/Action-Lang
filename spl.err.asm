@@ -18,12 +18,12 @@ lsplerr         .proc
 ;   set pointer to error
                 ldx currentWindow
                 lda spln
-                sta w1+wsp,X
+                sta w1+WSP,X
 
                 lda curln
-                sta w1+wcur,X
+                sta w1+WCUR,X
                 lda curln+1
-                sta w1+wcur+1,X
+                sta w1+WCUR+1,X
 
 _1              jsr syserr
                 jsr puteol

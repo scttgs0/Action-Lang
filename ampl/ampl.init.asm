@@ -67,11 +67,11 @@ _1              clc
                 inc arg1
 
 _2              sta codebase
-                sta qcode
+                sta QCODE
 
                 lda arg1
                 sta codebase+1
-                sta qcode+1
+                sta QCODE+1
 
                 lda MEMTOP+1
                 sta stmax
@@ -83,7 +83,7 @@ _2              sta codebase
                 sta symtab+1
 
                 inc symtab+1
-                cmp qcode+1
+                cmp QCODE+1
                 bcs _3
 
 ;   can't allocate memory

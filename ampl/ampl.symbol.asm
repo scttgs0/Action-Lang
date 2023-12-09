@@ -62,7 +62,7 @@ _XIT            jmp (jt_stmradr)
                 .endproc
 
 
-; this normially goes to ISTMres below
+;   this normially goes to ISTMres below
 
 
 ;======================================
@@ -175,13 +175,13 @@ _ENTRY1         lda symTblLocal
                 jsr STM
                 bne iSTMres._XIT1
 
-        .if ramzap
+            .if ZAPRAM
                 inc STM,X
-        .else
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
                 .endproc
 
 
@@ -236,8 +236,8 @@ tblReserveWords .byte 0
                 .byte resw5-resw1
                 .byte resw6-resw1
                 .byte resw7-resw1
-;
-resw1           .byte $ff
+
+resw1           .byte $FF
 
 resw2           .text "DO",tokDO
                 .text "FI",tokFI
@@ -247,7 +247,7 @@ resw2           .text "DO",tokDO
     ; .byte "OF",of
                 .text "OR",tokOR
                 .text "TO",tokTO
-                .byte $ff
+                .byte $FF
 
 resw3           .text "AND",tokAND
                 .text "FOR",tokFOR
@@ -259,7 +259,7 @@ resw3           .text "AND",tokAND
                 .text "RSH",tokRSH
                 .text "SET",tokSET
                 .text "XOR",tokXOR
-                .byte $ff
+                .byte $FF
 
 resw4           .text "BYTE",tokBYTE
                 .text "CARD",tokCARD
@@ -274,20 +274,20 @@ resw4           .text "BYTE",tokBYTE
                 .text "STEP",tokSTEP
                 .text "THEN",tokTHEN
                 .text "TYPE",tokTYPE
-                .byte $ff
+                .byte $FF
 
 resw5           .text "ARRAY",tokARRAY
                 .text "UNTIL",tokUNTIL
                 .text "WHILE",tokWHILE
-                .byte $ff
+                .byte $FF
 
 resw6           .text "DEFINE",tokDEFINE
     ; .byte "DOWNTO",tokDOWNTO
                 .text "ELSEIF",tokELSEIF
                 .text "MODULE",tokMOD
                 .text "RETURN",tokRET
-                .byte $ff
+                .byte $FF
 
 resw7           .text "INCLUDE",tokGET
                 .text "POINTER",tokPOINTER
-                .byte $ff
+                .byte $FF

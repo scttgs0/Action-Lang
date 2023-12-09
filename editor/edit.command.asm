@@ -144,7 +144,7 @@ _next1          jsr strptr
 _1              jsr rstcur
 
                 ldy currentWindow
-                lda w1+wcur+1,Y
+                lda w1+WCUR+1,Y
                 beq _2
 
                 jsr nextdwn

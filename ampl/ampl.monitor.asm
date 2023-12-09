@@ -319,7 +319,7 @@ _1              dec arg14
 
                 jsr MWOut
 
-;   write the qcode
+;   write the QCODE
                 ldx #$10
                 lda #$0B                ; output command
                 ;!!sta IOCB0+ICCOM,X
@@ -390,9 +390,9 @@ _ENTRY1         lda #0                  ; execute command line
                 sta codeoff
                 sta codeoff+1
 
-                lda qcode
+                lda QCODE
                 pha
-                lda qcode+1
+                lda QCODE+1
                 pha
 
                 jsr GetNext
@@ -403,7 +403,7 @@ _ENTRY1         lda #0                  ; execute command line
 
                 lda #$60                ; RTS
                 ldy #0
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 pla
                 tax

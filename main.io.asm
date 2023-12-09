@@ -40,7 +40,7 @@ print           .proc
                 lda #$0B
                 ;!!sta IOCB0+ICCOM,X
 
-                lda #eol
+                lda #EOL
                 ;!!jmp CIOV
 
 _XIT            rts
@@ -54,12 +54,12 @@ close           .proc
                 ldx #>$B000      ;; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
-        .if ramzap
+            .if ZAPRAM
                  sta (arg5),Y
-        .else
+            .else
                  nop
                  nop
-        .endif
+            .endif
 
                 ldy #$0C
                 bne input._ENTRY1       ; [unc]
@@ -232,9 +232,9 @@ WriteBuffer     .proc
 ;======================================
 rstcur          .proc
                 ldy currentWindow
-                lda w1+wcur,Y
+                lda w1+WCUR,Y
                 sta cur
-                lda w1+wcur+1,Y
+                lda w1+WCUR+1,Y
                 sta cur+1
 
                 jmp ldbuf
@@ -523,7 +523,7 @@ putsp           .proc
 ;   PutEOL()
 ;======================================
 puteol          .proc
-                ldy #eol
+                ldy #EOL
 
                 .endproc
 
@@ -624,7 +624,7 @@ _next2          lda arg2
                 bne _5                  ; no EOL char if inverted
 
                 iny
-_next3          lda eol
+_next3          lda EOL
                 sta (arg0),Y
 
                 jmp _5
@@ -789,9 +789,9 @@ _2              sta arg0
 ;   ZapCsr() get rid of old cursor
 ;======================================
 zapcsr          .proc
-                lda #<csrch
+                lda #<CSRCH
                 sta OLDADR
-                lda #>csrch
+                lda #>CSRCH
                 sta OLDADR+1
 
                 rts
