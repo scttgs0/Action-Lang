@@ -18,9 +18,9 @@
                 .include "equates/zeropage.equ"
                 .include "equates/action.equ"
 
-                .include "macros/frs_jr_graphic.mac"
-                .include "macros/frs_jr_random.mac"
-                .include "macros/frs_jr_text.mac"
+                .include "macros/f256_graphic.mac"
+                .include "macros/f256_random.mac"
+                .include "macros/f256_text.mac"
 
                 .include "equates/editor.equ"
 
