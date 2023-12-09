@@ -1,3 +1,4 @@
+
 ; Action! Programming Language
 ; Copyright 1983 by Clinton W Parker
 
@@ -17,13 +18,13 @@
 ;
 
 
-                .enc "atari-screen-inverse"
+            .enc "atari-screen-inverse"
                 .cdef " z", $A0
-                .enc "none"
+            .enc "none"
 
 ;--------------------------------------
 
-                .include "equates_system_atari8.asm"
+                .include "equates/system_atari8.equ"
                 .include "editor/edit.def.asm"
 
                 * = $8000

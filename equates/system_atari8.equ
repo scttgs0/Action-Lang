@@ -1,3 +1,8 @@
+
+;--------------------------------------
+; System equates
+;--------------------------------------
+
 CH_             = $02FC                 ; character buffer
 DSPFLG          = $02FE                 ; display flag
 
