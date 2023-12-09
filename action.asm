@@ -1,10 +1,12 @@
 
-; SPDX-FileName: action.asm
-; SPDX-FileComment: Action! Programming Language
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-                .cpu "65c02"
+; SPDX-FileName: action.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+
 
                 .enc "atari-screen-inverse"
                     .cdef " z", $A0

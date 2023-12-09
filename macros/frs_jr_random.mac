@@ -1,7 +1,8 @@
 
-; SPDX-FileName: frs_jr_random.mac
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
+
+; SPDX-FileName: frs_jr_random.mac
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 frsRandomREG    = RNG_DAT

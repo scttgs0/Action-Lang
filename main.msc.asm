@@ -1,8 +1,11 @@
 
-; SPDX-FileName: main.msc.asm
-; SPDX-FileComment: Action! Programming Language
-; SPDX-FileCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
+
+; SPDX-FileName: main.msc.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================

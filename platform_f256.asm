@@ -1,7 +1,8 @@
 
-; SPDX-FileName: platform_f256.asm
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
+
+; SPDX-FileName: platform_f256.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
