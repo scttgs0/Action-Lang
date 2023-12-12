@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: lib.key.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: lib.key.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -39,16 +25,16 @@ _next1          lda CH_                 ; key down?
                 bpl _next1
 
                 ldy #0
-                lda (oldadr),y
+                lda (oldadr),Y
                 eor #$80
-                sta (oldadr),y
+                sta (oldadr),Y
 
                 jmp lgetkey
 
 _1              ldy #0
                 lda oldchr
                 eor #$80
-                sta (oldadr),y          ; restore cursor
+                sta (oldadr),Y          ; restore cursor
 
                 ldx SRTIMR              ; faster repeat
                 cpx #$0C

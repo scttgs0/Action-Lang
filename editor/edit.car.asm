@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.car.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.car.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -99,15 +85,15 @@ _1              jmp gmerr.punt          ; editor
 
 cold            lda #0
                 tay
-_next1          sta $0480,y             ; zero RAM
+_next1          sta $0480,Y             ; zero RAM
 
                 dey
                 bne _next1
 
                 ldy #$3A
-_next2          lda emjmps-1,y          ; init RAM
+_next2          lda emjmps-1,Y          ; init RAM
                 dey
-                sta jmps,y
+                sta jmps,Y
                 bne _next2
 
 ;               sty ChCvt1              ; Y=0

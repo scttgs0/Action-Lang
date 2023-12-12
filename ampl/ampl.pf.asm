@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.pf.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.pf.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -27,18 +13,18 @@
 ;======================================
 ld1             .proc
                 ldy #0
-                lda (stack),y
+                lda (stack),Y
                 cmp #arrayt
                 bcs pf._ENTRY1
 
-                inc abt-args,x
+                inc abt-args,X
 
                 ldy #7
-                lda (stack),y
+                lda (stack),Y
                 cmp #tempt+bytet
                 beq pf._ENTRY2
 
-                dec abt+1-args,x
+                dec abt+1-args,X
 
                 cpx #args+2
                 bcc pf._ENTRY2
@@ -76,18 +62,18 @@ pf              .proc
 
 _next1          ldx numargs
                 ldy #tempt+bytet
-                lda argtypes-1,x
+                lda argtypes-1,X
 
                 ldx argbytes
                 stx abt+3
                 cmp #$7F
                 bcs _1                  ; one byte arg
 
-                sta temps-args+1,x
+                sta temps-args+1,X
 
                 inc argbytes
                 iny
-_1              sta temps-args,x
+_1              sta temps-args,X
 
                 inc argbytes
 
@@ -146,10 +132,10 @@ _err            jmp segment._argerr
 ;======================================
 ;
 ;======================================
-_push           lda abt-args,x
+_push           lda abt-args,X
                 bne _5
 
-                lda _ops-args,x
+                lda _ops-args,X
                 ora #$04
 
                 jmp push2
@@ -158,7 +144,7 @@ _5              stx arg0
                 jsr genops._ENTRY1
 
                 ldx arg0
-                lda _ops-args,x
+                lda _ops-args,X
 
 ;   all of this for LDX # and LDY #
 ;   can't use OpXX for these instr.
@@ -170,7 +156,7 @@ _5              stx arg0
                 bpl _7                  ; record element
 
                 cpy #vart
-                ldy abt-args,x
+                ldy abt-args,X
                 bcs _8                  ; not const.
 
                 pha
@@ -191,7 +177,7 @@ _5              stx arg0
 _6              pla
 _XIT1           jmp push2               ; high byte
 
-_7              ldy abt-args,x
+_7              ldy abt-args,X
 _8              bpl _9
 
                 ldx arg3
@@ -203,6 +189,7 @@ _9              jsr op2l
 
                 jmp cgassign._ENTRY5
 
+;--------------------------------------
 ;--------------------------------------
 
 _ops            .byte $a1,$a2,$a0       ; LDA, LDX, LDY

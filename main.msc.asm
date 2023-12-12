@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: main.msc.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: main.msc.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -79,12 +65,12 @@ next            .proc
                 jsr chkcur
                 beq _XIT
 
-                lda (cur),y
+                lda (cur),Y
                 beq _XIT
 
                 tax
                 dey
-                lda (cur),y
+                lda (cur),Y
                 sta cur
                 txa
                 sta cur+1
@@ -180,11 +166,11 @@ _2              ldy #0
                 cmp #'^'
                 bne _3
 
-                lda (afsize),y
+                lda (afsize),Y
                 tax
                 iny
 
-                lda (afsize),y
+                lda (afsize),Y
                 stx afsize
 
                 jmp _next4
@@ -232,7 +218,7 @@ _9              lda #1
 
                 tax
                 iny
-                lda (props),y
+                lda (props),Y
                 beq _varerr
 
                 tay
@@ -284,13 +270,13 @@ copystr         .proc
                 pha
 
                 ldy #0
-                lda (nxtaddr),y         ; size
-                sta (qcode),y
+                lda (nxtaddr),Y         ; size
+                sta (qcode),Y
 
                 tax
                 tay
-_next1          lda (nxtaddr),y
-                sta (qcode),y
+_next1          lda (nxtaddr),Y
+                sta (qcode),Y
 
                 dey
                 bne _next1
@@ -335,11 +321,11 @@ getcdoff        .proc
 ;   StoreVar(low, high, index)
 ;======================================
 storevar        .proc
-                sta (qcode),y
+                sta (qcode),Y
 
                 iny
                 txa
-                sta (qcode),y
+                sta (qcode),Y
 
                 rts
                 .endproc
@@ -352,7 +338,7 @@ lookup          .proc
                 sty arg2
 
         .if ramzap
-                sta (arg1),y            ; zap RAM if any
+                sta (arg1),Y            ; zap RAM if any
         .else
                 nop
                 nop
@@ -362,11 +348,11 @@ lookup          .proc
 
                 tax
                 ldy #2
-                lda (arg1),y
+                lda (arg1),Y
 
                 tay
                 txa
-_next1          cmp (arg1),y
+_next1          cmp (arg1),Y
                 beq _1
 
                 dey
@@ -377,11 +363,11 @@ _next1          cmp (arg1),y
 
 _1              dey
 
-                lda (arg1),y
+                lda (arg1),Y
                 sta arg4
 
                 dey
-                lda (arg1),y
+                lda (arg1),Y
                 sta arg3
 
                 jmp (arg3)
@@ -534,7 +520,7 @@ gprop           .proc
 
 _1              sec
                 ldy #0
-                adc (props),y
+                adc (props),Y
                 sta props
                 bcc _2
 
@@ -543,11 +529,11 @@ _1              sec
 _2              stx props+1
 
                 iny
-                lda (props),y
+                lda (props),Y
 
                 tax
                 dey
-                lda (props),y
+                lda (props),Y
 
                 rts
                 .endproc

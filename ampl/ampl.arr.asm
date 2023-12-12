@@ -1,25 +1,11 @@
 
-;======================================
-;       FILE: ampl.arr.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.arr.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -43,7 +29,7 @@ arrconst        jsr procref._ENTRY1
 _XIT1           jmp pushst
 
 _next1          ldy #0
-                lda (stack),y
+                lda (stack),Y
                 cmp #arrayt+8
                 bcs _1                  ; small array
 
@@ -55,11 +41,11 @@ _next1          ldy #0
 
 ;   page zero pointer
                 ldy #1
-                sta (stack),y
+                sta (stack),Y
                 dey
-                lda (stack),y
+                lda (stack),Y
                 ora #$B0                ; temp array mode
-                sta (stack),y
+                sta (stack),Y
 
                 rts
 
@@ -80,11 +66,11 @@ _2              jsr pushnext
                 bne arrerr
 
 _3              ldy #7
-                lda (stack),y
+                lda (stack),Y
 arra0           pha
 
                 lda #vart+cardt
-                sta (stack),y
+                sta (stack),Y
 
                 lda #plusid
                 jsr genops
@@ -103,13 +89,13 @@ arra0           pha
                 ldy #1                  ; clear Z flag if we branch
                 bcs _4
 
-                lda (stack),y
+                lda (stack),Y
                 iny
-                ora (stack),y
+                ora (stack),Y
 _4              sta fr1
                 beq _5                  ; pointer
 
-                ldy vartype-1,x
+                ldy vartype-1,X
                 beq arrerr._XIT2
 
 ;               cpy #3
@@ -132,7 +118,7 @@ _5              jsr gettemps
 
                 lda #$61                ; ADC
         .if ramzap
-                sta (arg8),y
+                sta (arg8),Y
         .else
                 nop
                 nop
@@ -163,7 +149,7 @@ _XIT2           jmp codegen._ENTRY1
 ;   small arrary
 
 _small          ldy #7
-                sta (stack),y           ; restore correct type
+                sta (stack),Y           ; restore correct type
 
                 lda arg1
                 bpl arrerr              ; can't index with bool.
@@ -172,7 +158,7 @@ _small          ldy #7
                 bne arrerr              ; can't index with array
 
                 ldy #10
-                sta (stack),y
+                sta (stack),Y
 
                 ldy #2
                 jsr loadi

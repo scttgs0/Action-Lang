@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.ini.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.ini.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -33,7 +19,7 @@ splsetup        .proc
                 sta chan
                 sta symtab
                 sta INITAD+1
-                sta (buf),y
+                sta (buf),Y
                 sta param
                 sta qglobal
                 sta stackptr
@@ -46,12 +32,12 @@ splsetup        .proc
                 ldx bigst               ; big symbol table?
                 beq _next2              ;   no
 
-_next1          sta (stg2),y
+_next1          sta (stg2),Y
 
                 iny
                 bne _next1
 
-_next2          sta (stglobal),y
+_next2          sta (stglobal),Y
 
                 iny
                 bne _next2
@@ -63,12 +49,12 @@ _next2          sta (stglobal),y
                 stx arg1
 
 _next3          ldy #1
-                lda (arg0),y
+                lda (arg0),Y
                 beq _1
 
                 tax
                 dey
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg0
                 stx arg1
 
@@ -99,6 +85,7 @@ _2              sta codebase
                 sta symtab+1
 
                 inc symtab+1
+
                 cmp qcode+1
                 bcs _3
 
@@ -109,7 +96,6 @@ _2              sta codebase
                 sta symtab+1
 
 _err            ldy #alcer
-
                 jmp splerr
 
 _3              lda sparem

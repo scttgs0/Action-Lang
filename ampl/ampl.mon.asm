@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.mon.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.mon.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -211,11 +197,11 @@ _ENTRY1         jsr printc
 ;======================================
 mpload          .proc
                 ldy #1
-                lda (arg11),y
+                lda (arg11),Y
                 tax
 
                 dey
-                lda (arg11),y
+                lda (arg11),Y
 
                 rts
                 .endproc
@@ -335,25 +321,25 @@ _1              dec arg14
 ;   write the qcode
                 ldx #$10
                 lda #$0B                ; output command
-                sta IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,X
 
                 lda codebase
-                sta IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,X       ; buffer address
                 lda codebase+1
-                sta IOCB0+ICBAH,x
+                sta IOCB0+ICBAH,X
 
                 lda codesize
-                sta IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLL,X       ; size
                 lda codesize+1
-                sta IOCB0+ICBLH,x
+                sta IOCB0+ICBLH,X
 
                 jsr CIOV
                 bmi mwout._mwerr
 
 ;   save start address
                 ldx #4
-_next1          lda _mwinit,x
-                sta arg9,x
+_next1          lda _mwinit,X
+                sta arg9,X
 
                 dex
                 bpl _next1
@@ -416,7 +402,7 @@ _ENTRY1         lda #0                  ; execute command line
 
                 lda #$60                ; RTS
                 ldy #0
-                sta (qcode),y
+                sta (qcode),Y
 
                 pla
                 tax

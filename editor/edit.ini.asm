@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.ini.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.ini.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -33,23 +19,23 @@ minit           .proc                   ; initialize memory
 
                 lda #0
                 tay
-                sta (afbase),y
+                sta (afbase),Y
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 sec
                 lda MEMTOP
                 sbc afbase
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 lda MEMTOP+1
                 sbc afbase+1
 
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 lda #0                  ; allocate 2 pages of
                 ldx #2                  ; spare memory
@@ -72,14 +58,14 @@ zerow           .proc
                 ldx #15
 
 _next1          dex                     ; zero page0 window table
-                sta sp,x
+                sta sp,X
                 bne _next1
 
                 sta dirtyf
                 sta inbuf
 
                 tay
-                sta (buf),y
+                sta (buf),Y
 
                 rts
                 .endproc

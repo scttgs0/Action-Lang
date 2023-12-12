@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: main.io.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: main.io.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -52,7 +38,7 @@ print           .proc
                 bne _XIT
 
                 lda #$0B
-                sta IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,X
 
                 lda #eol
                 jmp CIOV
@@ -69,7 +55,7 @@ close           .proc
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
-                 sta (arg5),y
+                 sta (arg5),Y
         .else
                  nop
                  nop
@@ -109,32 +95,32 @@ xiostr          .proc
 
                 tax
                 tya
-                sta IOCB0+ICCOM,x       ; command
+                sta IOCB0+ICCOM,X       ; command
 
                 lda arg3
                 beq _1
 
-                sta IOCB0+ICAX1,x
+                sta IOCB0+ICAX1,X
 
                 lda arg4
-                sta IOCB0+ICAX2,x
+                sta IOCB0+ICAX2,X
 
                 lda #0
 _1              tay
-                sta IOCB0+ICBLH,x
-                lda (arg5),y
-                sta IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLH,X
+                lda (arg5),Y
+                sta IOCB0+ICBLL,X       ; size
 
                 beq print._XIT          ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,X       ; buffer address
 
                 lda arg6
                 adc #0
-                sta IOCB0+ICBAH,x
+                sta IOCB0+ICBAH,X
 
                 jmp CIOV
 
@@ -176,7 +162,7 @@ dspstr          .proc
                 jsr scrrt
 
                 ldy #0
-                lda (arg12),y
+                lda (arg12),Y
                 beq _XIT
 
                 sta arg3
@@ -184,7 +170,7 @@ dspstr          .proc
 
 _next1          inc arg4
                 ldy arg4
-                lda (arg12),y
+                lda (arg12),Y
                 eor arg2
                 jsr scrch
 
@@ -207,7 +193,7 @@ rdbuf           .proc
                 ldy #0
                 tax
                 lda #240
-                sta (buf),y
+                sta (buf),Y
 
                 txa
                 ldx buf
@@ -216,13 +202,13 @@ inputs          jsr input
 
                 sty arg0
 
-                lda IOCB0+ICBLL,x       ; size
+                lda IOCB0+ICBLL,X       ; size
                 beq _1
 
                 sec
                 sbc #1
 _1              ldy #0
-                sta (arg5),y
+                sta (arg5),Y
 
                 ldy arg0
 
@@ -246,9 +232,9 @@ wrtbuf          .proc
 ;======================================
 rstcur          .proc
                 ldy curwdw
-                lda w1+wcur,y
+                lda w1+wcur,Y
                 sta cur
-                lda w1+wcur+1,y
+                lda w1+wcur+1,Y
                 sta cur+1
 
                 jmp ldbuf
@@ -315,12 +301,12 @@ rtostr          ;.proc
 _next1          iny
                 inx
 
-                lda (inbuff),y
-                sta numbuf,x
+                lda (inbuff),Y
+                sta numbuf,X
                 bpl _next1
 
                 eor #$80
-                sta numbuf,x
+                sta numbuf,X
                 stx numbuf
 
                 rts
@@ -386,11 +372,11 @@ openchan        .proc
 ;   check for default device
                 lda #':'
                 ldy #2
-                cmp (nxtaddr),y
+                cmp (nxtaddr),Y
                 beq _1
 
                 iny
-                cmp (nxtaddr),y
+                cmp (nxtaddr),Y
                 beq _1
 
 ;   stuff in D: for device
@@ -403,24 +389,24 @@ openchan        .proc
                 sta fr0+1
 
                 ldy #0
-                lda (nxtaddr),y         ; add 2 to length of string
+                lda (nxtaddr),Y         ; add 2 to length of string
                 adc #2                  ;  so we can insert 'D:'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
 
                 tay
-_next1          lda (nxtaddr),y         ; move string up...
-                sta (fr0),y
+_next1          lda (nxtaddr),Y         ; move string up...
+                sta (fr0),Y
 
                 dey
                 bne _next1
 
                 iny
                 lda #'D'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
 
                 iny
                 lda #':'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
 
 _1              lda chan
                 ldx nxtaddr
@@ -458,7 +444,7 @@ htocar          .proc
                 sta fr0+1
 
 _next1          ldy cix
-                lda (arg1),y
+                lda (arg1),Y
                 sec
                 sbc #'0'
                 bmi rtocar._ENTRY1
@@ -576,7 +562,7 @@ _1              stx arg5
 
                 ldy #39
                 lda arg2
-_next1          sta (arg0),y            ; clear line
+_next1          sta (arg0),Y            ; clear line
 
                 dey
                 bpl _next1
@@ -592,7 +578,7 @@ _next1          sta (arg0),y            ; clear line
 _2              iny                     ; sets Y to 0
 
                 clc
-                lda (arg6),y
+                lda (arg6),Y
                 sbc arg3
                 bcc _6                  ; no chars
 
@@ -616,7 +602,7 @@ _3              lda #$80
                 sta arg7
 
 _next2          lda arg2
-                eor (arg4),y
+                eor (arg4),Y
                 pha
 
                 and #$60
@@ -624,8 +610,8 @@ _next2          lda arg2
 
                 pla
                 and #$9F
-                ora chcvt,x
-                sta (arg0),y
+                ora chcvt,X
+                sta (arg0),Y
 
                 dey
                 bpl _next2
@@ -639,20 +625,20 @@ _next2          lda arg2
 
                 iny
 _next3          lda eolch
-                sta (arg0),y
+                sta (arg0),Y
 
                 jmp _5
 
-_4              eor (arg0),y
-                sta (arg0),y
+_4              eor (arg0),Y
+                sta (arg0),Y
 
 _5              lda arg3
                 beq _XIT1
 
 _next4          ldy #0
-                lda (arg0),y
+                lda (arg0),Y
                 eor #$80
-                sta (arg0),y
+                sta (arg0),Y
 
 _XIT1           rts
 
@@ -735,19 +721,19 @@ ldbuf           .proc
                 bne _1
 
                 tay
-                sta (buf),y
+                sta (buf),Y
 
                 rts
 
 _1              jsr curstr
 
 _ENTRY1         ldy #0
-                lda (arg0),y
-                sta (buf),y
+                lda (arg0),Y
+                sta (buf),Y
 
                 tay
-_next1          lda (arg0),y
-                sta (buf),y
+_next1          lda (arg0),Y
+                sta (buf),Y
 
                 dey
                 bne _next1
@@ -818,7 +804,7 @@ zapcsr          .proc
 rstcsr          .proc
                 ldy #0
                 lda oldchr
-                sta (oldadr),y
+                sta (oldadr),Y
 
                 rts
                 .endproc

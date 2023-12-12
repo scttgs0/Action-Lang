@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: lib.str.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: lib.str.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -38,8 +24,8 @@ scompare        .proc
                 sty args
                 sty args+1
 
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 beq _1
 
                 jsr _3
@@ -52,8 +38,8 @@ _1              cmp #0
 _2              sta arg6
 
 _next1          iny
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 bne _3
 
                 cpy arg6
@@ -65,7 +51,7 @@ _3              ldx #$FF
                 stx args
                 bcc _4
 
-                lda (arg2),y
+                lda (arg2),Y
                 inx
 _4              stx args+1
 
@@ -83,13 +69,13 @@ scopy           .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
-_ENTRY1         sta (arg0),y
+                lda (arg2),Y
+_ENTRY1         sta (arg0),Y
                 beq _XIT
 
 _ENTRY2         tay
-_next1          lda (arg2),y
-                sta (arg0),y
+_next1          lda (arg2),Y
+                sta (arg0),Y
 
                 dey
                 bne _next1
@@ -109,7 +95,7 @@ scopys          .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 cmp arg5
                 bcs _1
 
@@ -151,7 +137,7 @@ sassign         .proc
                 sty arg2
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 beq _XIT1
 
                 sta arg6
@@ -177,10 +163,10 @@ _1              tax
                 sta arg5
 
 _2              lda arg5
-                cmp (arg0),y
+                cmp (arg0),Y
                 bcc _3
 
-                sta (arg0),y
+                sta (arg0),Y
 
                 clc
 _3              lda arg0
@@ -553,7 +539,7 @@ libst           .byte 0                 ; 1
 strig           .proc
                 tax
 
-                lda TRIG0,x
+                lda TRIG0,X
                 sta args
 
                 rts
@@ -574,7 +560,7 @@ strig           .proc
 paddle          .proc
                 tax
 
-                lda PADDL0,x
+                lda PADDL0,X
                 sta args
 
                 rts

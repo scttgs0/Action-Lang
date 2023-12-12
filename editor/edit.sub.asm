@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.sub.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.sub.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -91,15 +77,15 @@ _4              clc
                 adc buf+1
                 sta arg1
 
-                lda (buf),y
+                lda (buf),Y
                 plp
                 bcc _5                  ; need to remove space
                 beq _6                  ; same size
 
 ;   need to add space
                 tay
-_next1          lda (buf),y
-                sta (arg0),y
+_next1          lda (buf),Y
+                sta (arg0),Y
 
                 dey
                 cpy sp
@@ -112,8 +98,8 @@ _5              sta arg2
                 dey
 
 _next2          iny
-                lda (arg0),y
-                sta (buf),y
+                lda (arg0),Y
+                sta (buf),Y
 
                 cpy arg2
                 bcc _next2
@@ -123,8 +109,8 @@ _6              ldy sp
                 beq _7
 
 _next3          inx
-                lda subbuf,x
-                sta (buf),y
+                lda subbuf,X
+                sta (buf),Y
 
                 iny
 _7              cpx subbuf
@@ -132,9 +118,9 @@ _7              cpx subbuf
 
                 clc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 adc arg3
-                sta (buf),y
+                sta (buf),Y
 
                 jmp rfrshbuf
 

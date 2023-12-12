@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: screen.mac.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: screen.mac.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -79,11 +65,11 @@ _ENTRY1         stx DSPFLG
 
                 tax
                 lda #$0B                ; PUTCHR
-_ENTRY2         sta IOCB0+ICCOM,x
+_ENTRY2         sta IOCB0+ICCOM,X
 
                 lda #0
-                sta IOCB0+ICBLL,x
-                sta IOCB0+ICBLH,x
+                sta IOCB0+ICBLL,X
+                sta IOCB0+ICBLH,X
 
                 tya
                 jmp CIOV
@@ -320,7 +306,7 @@ _ENTRY2         cmp #eofid
                 bcs _1
 
                 tay
-                lda lexchars-33,y
+                lda lexchars-33,Y
                 beq _ENTRY1
                 bpl _ENTRY3
 
@@ -535,7 +521,7 @@ _next1          jsr nextchar
                 beq _2
 
 _next2          ldy arg9
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda chan
                 bpl _next1              ; if not EOF
@@ -551,12 +537,12 @@ _2              jsr nextchar
 
                 ldy arg9
                 lda #eol
-                sta (symtab),y
+                sta (symtab),Y
 
                 dey
                 tya
                 ldy #0
-                sta (symtab),y          ; save size
+                sta (symtab),Y          ; save size
 
                 lda symtab
                 ldx symtab+1
@@ -627,18 +613,18 @@ _2              lda list
 
 _3              ldy #0
                 sty choff
-                lda (buf),y
+                lda (buf),Y
 
                 tay
                 iny
                 sty sp
 
                 lda #eol
-                sta (buf),y
+                sta (buf),Y
 
                 ldy #0
 _ENTRY1         iny
-                lda (buf),y
+                lda (buf),Y
                 sty choff
 
                 rts
@@ -654,7 +640,7 @@ _4              lda #eofid
 ;======================================
 lexdef          .proc
                 ldy #0
-                lda (delnxt),y
+                lda (delnxt),Y
 
                 inc choff
                 cmp choff
@@ -666,7 +652,7 @@ lexdef          .proc
                 bcc nextchar._ENTRY1    ; [unc]
 
 _1              ldy choff
-                lda (delnxt),y
+                lda (delnxt),Y
 
                 rts
                 .endproc
@@ -710,13 +696,13 @@ lexset          .proc
                 jsr _1
 
                 ldy #0
-                sta (arg11),y
+                sta (arg11),Y
 
                 txa
                 beq _XIT1
 
                 iny
-                sta (arg11),y
+                sta (arg11),Y
 
 _XIT1           jmp getnext._ENTRY1
 

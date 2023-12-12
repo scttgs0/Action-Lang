@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.sym.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.sym.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -36,16 +22,16 @@ stm             .proc
                 ldy arg15
                 sty arg13
 
-_next1          lda (arg2),y
+_next1          lda (arg2),Y
                 sta nxtaddr+1
                 beq _XIT1
 
-                lda (arg4),y
+                lda (arg4),Y
                 sta nxtaddr
 
                 ldy #0
-_next2          lda (nxtaddr),y
-                eor (symtab),y
+_next2          lda (nxtaddr),Y
+                eor (symtab),Y
                 and stmask
                 bne _1
 
@@ -53,7 +39,7 @@ _next2          lda (nxtaddr),y
                 iny
                 bcc _next2
 
-                lda (nxtaddr),y         ; matched
+                lda (nxtaddr),Y         ; matched
 
 _XIT1           rts
 
@@ -91,14 +77,14 @@ istmres         .proc
                 iny
                 sty arg0
 
-                ldx rwstrt-2,y
+                ldx rwstrt-2,Y
 _next1          stx arg1
 
                 ldy #1
-_next2          lda resw1,x
+_next2          lda resw1,X
                 bmi _XIT1
 
-                eor (symtab),y
+                eor (symtab),Y
                 and stmask
                 bne _1
 
@@ -108,7 +94,7 @@ _next2          lda resw1,x
                 bcc _next2
 
 ;   we have a match
-                lda resw1,x             ; get token value
+                lda resw1,X             ; get token value
 
 _XIT1           rts
 
@@ -136,7 +122,7 @@ lgetname        .proc
                 txa                     ; restore A
 _next1          iny
                 sty arg14
-                sta (symtab),y
+                sta (symtab),Y
 
                 ora #$20
                 asl arg15
@@ -154,7 +140,7 @@ _next1          iny
 
                 tya
                 ldy #0
-                sta (symtab),y
+                sta (symtab),Y
 
                 dec choff               ; put character back
 
@@ -190,7 +176,7 @@ _ENTRY1         lda stlocal
                 bne istmres._XIT1
 
         .if ramzap
-                inc stm,x
+                inc stm,X
         .else
                 nop
                 nop
@@ -204,9 +190,9 @@ _ENTRY1         lda stlocal
 ;======================================
 newentry        .proc
                 lda symtab+1
-                sta (arg2),y
+                sta (arg2),Y
                 lda symtab
-                sta (arg4),y
+                sta (arg4),Y
 
                 lda #<libst
                 ldx #>libst
@@ -215,15 +201,15 @@ newentry        .proc
                 lda #undec
                 ldy arg14
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda nxtaddr
                 iny
-                sta (symtab),y          ; save shadow entry
+                sta (symtab),Y          ; save shadow entry
 
                 lda nxtaddr+1
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda symtab
                 sta nxtaddr

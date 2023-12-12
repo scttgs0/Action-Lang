@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: main.bnk.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: main.bnk.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 en0             .text 5,"Error",$C0
@@ -76,7 +62,7 @@ rstbank         .proc
 
                 tya
                 ldy curbank
-rbank1          sta bank,y
+rbank1          sta bank,Y
                 tay
 
                 pla
@@ -281,7 +267,7 @@ getargs         .proc
                 sta abt+2               ; (default)
 
                 ldy #2
-                lda (props),y
+                lda (props),Y
                 sta numargs
                 beq _XIT
 
@@ -290,9 +276,9 @@ getargs         .proc
                 bcs _XIT
 
 _next1          iny
-                lda (props),y
+                lda (props),Y
                 dex
-                sta argtypes,x          ; args inverted
+                sta argtypes,X          ; args inverted
                 bne _next1
 
 _XIT            jmp rstbank

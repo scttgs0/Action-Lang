@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: lib.msc.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: lib.msc.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -63,7 +49,7 @@ sound           .proc
                 jsr error
 
 _1              txa
-                sta AUDF1,y
+                sta AUDF1,Y
 
                 lda arg2
                 asl
@@ -71,7 +57,7 @@ _1              txa
                 asl
                 asl
                 ora arg3
-                sta AUDC1,y
+                sta AUDC1,Y
 
                 rts
                 .endproc
@@ -104,7 +90,7 @@ _next1          sta AUDF1,X             ; zero sound regs
 ; Assumes port low  8.
 ; see LIB.ST
 ;Paddle          tax
-;                lda POT0,x
+;                lda POT0,X
 ;                sta args
 ;                rts
 
@@ -122,8 +108,8 @@ ptrig           .proc
                 and #3
 
 _1              tay
-                lda PORTA,x
-                and _data1,y
+                lda PORTA,X
+                and _data1,Y
                 sta args
 
                 rts
@@ -149,7 +135,7 @@ stick           .proc
                 and #1
 
 _1              tay
-                lda PORTA,x
+                lda PORTA,X
 
                 dey
                 bne _2
@@ -174,7 +160,7 @@ _2              and #$0F
 ; see LIB.ST
 ;======================================
 ;STrig           tax
-;                ;!!lda TRIG0,x
+;                ;!!lda TRIG0,X
 ;                sta args
 ;                rts
 
@@ -197,11 +183,11 @@ peekc           .proc
                 stx arg3
 
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 sta args
 
                 iny
-                lda (arg2),y
+                lda (arg2),Y
                 sta args+1
 
                 rts
@@ -219,7 +205,7 @@ poke            .proc
 
                 tya
                 ldy #0
-                sta (arg0),y
+                sta (arg0),Y
 
                 rts
                 .endproc
@@ -235,7 +221,7 @@ pokec           .proc
 
                 iny
                 lda arg3
-                sta (arg0),y
+                sta (arg0),Y
 
                 rts
                 .endproc
@@ -313,8 +299,8 @@ moveblock       .proc
                 lda arg5
                 beq _1
 
-_next1          lda (arg2),y
-                sta (arg0),y
+_next1          lda (arg2),Y
+                sta (arg0),Y
 
                 iny
                 bne _next1
@@ -325,8 +311,8 @@ _next1          lda (arg2),y
                 bne _next1
                 beq _1                  ; [unc]
 
-_next2          lda (arg2),y
-                sta (arg0),y
+_next2          lda (arg2),Y
+                sta (arg0),Y
 
                 iny
 _1              cpy arg4
@@ -383,22 +369,22 @@ ctrace          .proc
                 ldy #0
                 sty arg15
 
-                adc (arg10),y
+                adc (arg10),Y
                 sta arg10
                 bcc _1
 
                 inc arg11
 
-_1              lda (arg10),y
+_1              lda (arg10),Y
                 sta arg12
 
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg13
 
 ;   get number of args
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg9
 
                 sty arg14
@@ -406,27 +392,27 @@ _1              lda (arg10),y
 
 _next1          inc arg14
                 ldy arg14
-                lda (arg10),y
+                lda (arg10),Y
                 bmi _2                  ; byte
 
                 cmp #cardt
 
                 inc arg15
                 ldy arg15
-                lda (arg12),y
+                lda (arg12),Y
 
                 tax
                 dey
                 bcs _3                  ; cardinal
 
 ;   integer
-                lda (arg12),y
+                lda (arg12),Y
                 jsr prti
                 jmp _4
 
 _2              ldx #0
                 ldy arg15
-_3              lda (arg12),y
+_3              lda (arg12),Y
                 jsr prtc
 
 _4              inc arg15

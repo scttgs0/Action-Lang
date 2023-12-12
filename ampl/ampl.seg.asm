@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.seg.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.seg.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ; low segment list> _:= low segment list> low segment> | low segment>
@@ -65,11 +51,11 @@ _1              jsr makeentry
 
                 ldy #3
                 lda #0                  ; no args yet
-                sta (props),y
+                sta (props),Y
                 sta argbytes
 
                 tay
-_next1          sta (stlocal),y
+_next1          sta (stlocal),Y
 
                 iny                     ; zap local st
                 bne _next1
@@ -99,9 +85,9 @@ _next1          sta (stlocal),y
                 jsr storprops
 
                 ldy #0
-                lda (props),y
+                lda (props),Y
                 ora #8
-                sta (props),y           ; set Sys flag
+                sta (props),Y           ; set Sys flag
                 sta param
 
                 jsr getnext
@@ -220,12 +206,12 @@ _8              lda trace               ; check for trace
                 jsr push3
 
                 ldy #0
-                lda (curproc),y
+                lda (curproc),Y
 
                 tay
                 tax
-_next4          lda (curproc),y
-                sta (qcode),y
+_next4          lda (curproc),Y
+                sta (qcode),Y
 
                 dey
                 bpl _next4
@@ -245,8 +231,8 @@ _next4          lda (curproc),y
                 tay
                 tax
 
-_next5          lda (props),y
-                sta (qcode),y
+_next5          lda (props),Y
+                sta (qcode),Y
 
                 dey
                 bpl _next5

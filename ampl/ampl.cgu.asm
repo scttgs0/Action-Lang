@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: ampl.cgu.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: ampl.cgu.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -76,7 +62,7 @@ trashy          .proc
 ;   from Op below, see _LXC
 ;======================================
 loadx           .proc
-                lda (stack),y
+                lda (stack),Y
                 iny
                 bit tempmode
                 bne _1
@@ -92,14 +78,14 @@ loadx           .proc
                 lda #$AE                ; LDX addr16
                 jmp push3
 
-_1              lda (stack),y
+_1              lda (stack),Y
                 tax
-                dec temps-args,x
+                dec temps-args,X
 
 _2              lda #$A6                ; LDX addr
 _XIT1           jmp push2
 
-_3              lda (stack),y
+_3              lda (stack),Y
 
 ;               tax
 ;               lda #$A2                ; LDX data
@@ -198,7 +184,7 @@ _6              bit cnstmode
                 lda #$10                ; (addr),Y
 _next1          sta arg10
 
-                lda (stack),y
+                lda (stack),Y
                 clc
                 adc arg12
                 cmp #args
@@ -208,7 +194,7 @@ _next1          sta arg10
                 bcs _11
 
                 tax
-                dec temps-args,x        ; free temp
+                dec temps-args,X        ; free temp
                 bcc _12                 ; [unc]
 
 _7              tya                     ; small array
@@ -243,7 +229,7 @@ _9              lda #$08                ; data
 
                 iny
 
-_10             lda (stack),y
+_10             lda (stack),Y
 _11             tax
 _12             pla
                 ora arg10               ; op mode
@@ -367,18 +353,18 @@ _next1          dex
                 dey
                 bmi _err                ; exp. too complex
 
-                lda temps-args,x
+                lda temps-args,X
                 bne _next1
 
-                inc temps-args,x
+                inc temps-args,X
 
                 lda arg5                ; see if byte temp
                 beq _1                  ;   yes
 
-                inc temps-args+1,x
+                inc temps-args+1,X
 
         .if ramzap
-                inc sargs,x
+                inc sargs,X
         .else
                 nop
                 nop
@@ -398,13 +384,13 @@ _err            jmp experr
 ;   LoadI(,,offset)
 ;======================================
 loadi           .proc
-                lda (stack),y
+                lda (stack),Y
                 sta arg15
 
                 tax
                 dey
 
-                lda (stack),y
+                lda (stack),Y
                 sta arg14
 
                 rts
@@ -427,12 +413,12 @@ ldcdz           .proc
 ;======================================
 loadcd          .proc
                 clc
-                adc (stack),y
+                adc (stack),Y
                 sta qcode
 
                 iny
                 lda #0
-                adc (stack),y
+                adc (stack),Y
                 sta qcode+1
 
                 rts
@@ -445,11 +431,11 @@ loadcd          .proc
 savecd          .proc
                 lda qcode
                 ldx qcode+1
-savstk          sta (stack),y
+savstk          sta (stack),Y
 
                 txa
                 iny
-                sta (stack),y
+                sta (stack),Y
 
                 rts
                 .endproc
@@ -482,7 +468,7 @@ chkzero         .proc
                 bcs _XIT
 
                 ldy #1
-                lda (stack),y
+                lda (stack),Y
 
 _XIT            rts
                 .endproc
@@ -493,7 +479,7 @@ _XIT            rts
 ;======================================
 opcd1           .proc
                 ldx arg8
-                lda cgopscd+1,x
+                lda cgopscd+1,X
 
                 rts
                 .endproc
@@ -503,11 +489,11 @@ opcd1           .proc
 ;   StkAddr(,,offset)
 ;======================================
 stkaddr         .proc
-                lda (stack),y
+                lda (stack),Y
                 tax
 
                 iny
-                lda (stack),y
+                lda (stack),Y
                 tay
 
                 rts
@@ -560,7 +546,7 @@ stkprop         .proc
                 tax
                 iny
 
-                lda (props),y
+                lda (props),Y
                 adc #0
                 tay
 
@@ -576,8 +562,8 @@ jsrtable        .proc
 ;               ldy LTab+1,X
 ;               lda LTab,X
 ;           .else
-                ldy lsh+1,x
-                lda lsh,x
+                ldy lsh+1,X
+                lda lsh,X
 ;           .endif
 
                 tax
@@ -628,7 +614,7 @@ pushtrue        .proc
 push1           .proc
                 jsr push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq insrt1._ENTRY1
 
                 .endproc
@@ -689,7 +675,7 @@ _ENTRY1         jsr savecd
 push2           .proc
                 jsr push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq insrt2._ENTRY1
 
                 .endproc
@@ -706,7 +692,7 @@ insrt2          .proc
 
 _ENTRY1         txa
                 iny
-                sta (arg14),y
+                sta (arg14),Y
                 bne insrt1._ENTRY1
 
                 .endproc
@@ -720,7 +706,7 @@ _ENTRY1         txa
 push3           .proc
                 jsr push0
 
-                sta (arg14),y
+                sta (arg14),Y
                 beq insrt3._ENTRY2
 
                 .endproc
@@ -741,7 +727,7 @@ _ENTRY1         jsr addcdsp
 _ENTRY2         txa
                 ldx arg13
                 iny
-                sta (arg14),y
+                sta (arg14),Y
                 bne insrt2._ENTRY1
 
                 .endproc
@@ -774,17 +760,17 @@ addcdsp         .proc
                 tay
                 beq _1
 
-_next1          lda (arg14),y
-                sta (arg10),y
+_next1          lda (arg14),Y
+                sta (arg10),Y
 
                 dey
                 bne _next1
 
-                lda (arg14),y
-                sta (arg10),y
+                lda (arg14),Y
+                sta (arg10),Y
 
 _1              pla
-                sta (arg14),y
+                sta (arg14),Y
 
                 rts
                 .endproc

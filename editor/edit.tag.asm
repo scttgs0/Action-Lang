@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.tag.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.tag.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -43,11 +29,11 @@ settag          .proc
 
                 ldy #1
                 lda taglist+1
-                sta (afcur),y
+                sta (afcur),Y
 
                 dey
                 lda taglist
-                sta (afcur),y
+                sta (afcur),Y
 
                 lda afcur
                 sta taglist
@@ -57,26 +43,26 @@ settag          .proc
 
 _1              ldy #4
                 lda tempbuf+1
-                sta (afcur),y
+                sta (afcur),Y
 
                 iny
                 lda cur
-                sta (afcur),y
+                sta (afcur),Y
 
                 iny
                 lda cur+1
-                sta (afcur),y
+                sta (afcur),Y
 
                 iny
                 jsr setsp
 
-                sta (afcur),y
+                sta (afcur),Y
 
 ;   flag line as tagged
                 ldy #3
-                lda (cur),y
+                lda (cur),Y
                 ora #$80
-                sta (cur),y
+                sta (cur),Y
 
                 rts
                 .endproc
@@ -130,20 +116,20 @@ loctag          .proc
                 beq notag
 
                 ldy #6
-                lda (afcur),y
+                lda (afcur),Y
 
                 tax
                 dey
-                lda (afcur),y
+                lda (afcur),Y
                 jsr findln
                 beq notag
 
                 ldy #3
-                lda (arg2),y
+                lda (arg2),Y
                 bpl notag
 
                 ldy #7
-                lda (afcur),y
+                lda (afcur),Y
                 sta sp
 
                 lda arg2
@@ -169,16 +155,16 @@ gettag          .proc
 _XIT            rts
 
 _next1          ldy #4
-                lda (afcur),y
+                lda (afcur),Y
                 cmp arg0
                 beq _2
 
                 ldy #1
-                lda (afcur),y
+                lda (afcur),Y
 
                 tax
                 dey
-                lda (afcur),y
+                lda (afcur),Y
 _1              sta afcur
                 stx afcur+1
 
@@ -203,11 +189,11 @@ _next1          sta afbest
                 stx afbest+1
 
                 ldy #0
-                lda (afbest),y
+                lda (afbest),Y
                 sta arg0
 
                 iny
-                lda (afbest),y
+                lda (afbest),Y
                 sta arg1
 
                 jsr free._ENTRY1
@@ -236,11 +222,11 @@ findln          .proc
                 rts
 
 _next1          ldy #5
-                lda (arg2),y
+                lda (arg2),Y
 
                 tax
                 dey
-                lda (arg2),y
+                lda (arg2),Y
 
 _1              sta arg2
                 stx arg3

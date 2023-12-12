@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.io.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.io.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -38,7 +24,7 @@ _next1          jsr getkey
 
 _next2          ldy #0
                 clc
-                lda (arg12),y
+                lda (arg12),Y
                 adc #1
 
                 cpx #$1B                ; ESC
@@ -56,11 +42,11 @@ _next2          ldy #0
                 cpx rmargin
                 bcs _next1              ; don't go off screen
 
-                sta (arg12),y
+                sta (arg12),Y
 
                 tay
                 lda arg3
-                sta (arg12),y
+                sta (arg12),Y
 
                 eor arg2
                 jsr scrch
@@ -69,26 +55,26 @@ _next2          ldy #0
 
 _1              lda #0
                 sta curch
-                sta (arg12),y
+                sta (arg12),Y
 
                 iny
                 tya
 
 _2              tay
                 txa                     ; EOL
-                sta (arg12),y
+                sta (arg12),Y
 
                 rts
 
 _3              stx arg3
 
 _next3          ldy #0
-                lda (arg12),y
+                lda (arg12),Y
                 beq _4
 
                 sec
                 sbc #1
-                sta (arg12),y
+                sta (arg12),Y
 
                 jsr scrlft
 
@@ -234,8 +220,8 @@ fopen           .proc
                 iny
                 sty inbuf
 
-_next1          lda inbuf,y
-                sta inbuf+2,y
+_next1          lda inbuf,Y
+                sta inbuf+2,Y
 
                 dey
                 bne _next1

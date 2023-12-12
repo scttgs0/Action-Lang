@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.cmd.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.cmd.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -44,7 +30,7 @@ front           .proc
 ;======================================
 back            .proc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
 _ENTRY1         pha
 
                 clc
@@ -159,7 +145,7 @@ _next1          jsr strptr
 _1              jsr rstcur
 
                 ldy curwdw
-                lda w1+wcur+1,y
+                lda w1+wcur+1,Y
                 beq _2
 
                 jsr nextdwn
@@ -339,7 +325,7 @@ chkcol          .proc
                 jsr setsp
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 cmp sp
                 bcs _XIT
 
@@ -471,8 +457,8 @@ _next1          lda arg0
                 sta arg1
 
                 ldy #39
-_next2          lda (arg0),y
-                sta (arg2),y
+_next2          lda (arg0),Y
+                sta (arg2),Y
 
                 dey
                 bpl _next2

@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.chr.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.chr.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -29,33 +15,33 @@ insrtch         .proc
                 jsr setsp
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 cmp linemax
                 bcc _1                  ; test line too long
 
                 jsr scrbell
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
 _1              cmp sp
                 bcs _2
 
                 sta arg0
 
                 lda sp
-                sta (buf),y
+                sta (buf),Y
 
                 ldy arg0
                 lda #$20                ; pad with spaces
 _next1          iny
-                sta (buf),y
+                sta (buf),Y
 
                 cpy sp
                 bcc _next1
 
 _next2          ldy sp
                 lda curch
-                sta (buf),y
+                sta (buf),Y
 
                 lda #$FF
                 sta dirtyf
@@ -69,14 +55,14 @@ _2              ldx insert
 
 ;   move buf right one char
                 adc #0                  ; really 1, carry set
-                sta (buf),y
+                sta (buf),Y
 
                 tay
 _next3          dey
 
-                lda (buf),y
+                lda (buf),Y
                 iny
-                sta (buf),y
+                sta (buf),Y
 
                 dey
                 cpy sp
@@ -123,7 +109,7 @@ insrt           .proc
 
 _ENTRY1         lda #0
                 tay
-_ENTRY2         sta (buf),y
+_ENTRY2         sta (buf),Y
 
                 iny
                 sty dirty
@@ -141,7 +127,7 @@ csret           .proc
                 jsr delch
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 pha
 
                 jsr setsp
@@ -150,7 +136,7 @@ csret           .proc
 
                 sec
                 sbc #1
-                sta (buf),y
+                sta (buf),Y
 
                 jsr clnln
 
@@ -162,10 +148,10 @@ csret           .proc
                 sta arg0
                 beq _1
 
-_next1          lda (buf),y
+_next1          lda (buf),Y
                 inc arg0
                 ldy arg0
-                sta (buf),y
+                sta (buf),Y
 
                 inc sp
 _1              ldy sp
@@ -228,7 +214,7 @@ _1              sta arg3
                 bne _2                  ;   no, delete it
 
                 tay
-                sta (buf),y
+                sta (buf),Y
 
                 iny
                 sty dirtyf
@@ -292,11 +278,11 @@ delfree         .proc
 ;======================================
 delnext         .proc
                 ldy #5
-                lda (delnxt),y
+                lda (delnxt),Y
                 tax
 
                 dey
-                lda (delnxt),y
+                lda (delnxt),Y
                 sta delnxt
                 stx delnxt+1
 
@@ -324,19 +310,19 @@ delch           .proc
                 bcc chkdwn._XIT
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 sta dirtyf
 
                 sec
                 sbc #1
-                sta (buf),y
+                sta (buf),Y
 
                 ldy sp
 _next1          iny
-                lda (buf),y
+                lda (buf),Y
 
                 dey
-                sta (buf),y
+                sta (buf),Y
 
                 iny
                 cpy dirtyf
@@ -364,7 +350,7 @@ chkdwn          .proc
                 beq _XIT
 
                 ldy #5
-                lda (cur),y
+                lda (cur),Y
 
 _XIT            rts
                 .endproc
@@ -384,7 +370,7 @@ _ENTRY1         jsr scrllft
 
                 tay
                 lda #$20
-                sta (buf),y
+                sta (buf),Y
                 sta dirtyf
 
                 lda insert
@@ -408,7 +394,7 @@ csbs            .proc
                 beq chkdwn._XIT        ; no lines at all!
 
                 ldy #1
-                lda (cur),y
+                lda (cur),Y
                 beq chkdwn._XIT        ; no line to merge with
 
 ;   merge
@@ -422,13 +408,13 @@ csbs            .proc
 
                 clc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 sta arg2
 
-                adc (arg0),y
-                sta (buf),y
+                adc (arg0),Y
+                sta (buf),Y
 
-                lda (arg0),y
+                lda (arg0),Y
                 beq _next2
 
                 sta arg3
@@ -436,10 +422,10 @@ csbs            .proc
 _next1          iny
                 sty arg4
 
-                lda (arg0),y
+                lda (arg0),Y
                 inc arg2
                 ldy arg2
-                sta (buf),y
+                sta (buf),Y
 
                 ldy arg4
                 cpy arg3

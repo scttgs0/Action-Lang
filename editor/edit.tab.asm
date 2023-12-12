@@ -1,25 +1,11 @@
 
-;======================================
-;   FILE: edit.tab.asm
-;======================================
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-; Action! Programming Language
-; Copyright 1983 by Clinton W Parker
-
-;
-; Action! is free software: you can redistribute it and/or modify
-; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation, either version 3 of the License, or
-; (at your option) any later version.
-;
-; Action! is distributed in the hope that it will be useful,
-; but WITHOUT ANY WARRANTY; without even the implied warranty of
-; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-; GNU General Public License for more details.
-;
-; You should have received a copy of the GNU General Public License
-; along with Action!.  If not, see <http://www.gnu.org/licenses/>.
-;
+; SPDX-FileName: edit.tab.asm
+; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
 ;======================================
@@ -29,10 +15,10 @@ tab             .proc
                 jsr setsp
                 jsr tabloc._ENTRY1
 
-_next1          lda TABMAP,x
+_next1          lda TABMAP,X
                 beq _2
 
-                and _onbit,y
+                and _onbit,Y
                 beq _1
 
 ;   found tab setting
@@ -75,9 +61,9 @@ _offbit         .byte $7F,$BF,$DF,$EF
 settab          .proc
                 jsr tabloc
 
-                lda TABMAP,x
-                ora tab._onbit,y
-                sta TABMAP,x
+                lda TABMAP,X
+                ora tab._onbit,Y
+                sta TABMAP,X
 
                 rts
                 .endproc
@@ -89,9 +75,9 @@ settab          .proc
 clrtab          .proc
                 jsr tabloc
 
-                lda TABMAP,x
-                and tab._offbit,y
-                sta TABMAP,x
+                lda TABMAP,X
+                and tab._offbit,Y
+                sta TABMAP,X
 
                 rts
                 .endproc
