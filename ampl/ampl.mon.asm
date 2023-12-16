@@ -512,7 +512,7 @@ mcmd            .word disptb+9          ; unknown cmd
                 .byte 'c'
                 .word dret
                 .byte 'd'
-                .word monitor._mquit
+                .word mquit
                 .byte 'e'
 
 ; .WORD Format

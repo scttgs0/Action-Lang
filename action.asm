@@ -45,7 +45,7 @@ amplfin
                 .fill 3,$00
                 .include "ampl/ampl.seg.asm"
                 .include "ampl/ampl.pf.asm"
-                .include "ampl/ampl.arr.asm"
+                .include "ampl/ampl.array.asm"
                 .include "ampl/ampl.cgu.asm"
 
                 .fill 9,$00

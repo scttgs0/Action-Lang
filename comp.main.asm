@@ -2176,9 +2176,9 @@ _e1             jsr etypep              ; set type
 procref         .proc
                 ldy #funct+cardt        ; make sure CARD
                 cmp #funct+8
-                bcc stconst._pr1
+                bcc _pr1
 
-stconst         jsr getargs             ; A#0, no arg types
+_ENTRY1         jsr getargs             ; A#0, no arg types
 
                 ldy #constt+cardt       ; sys proc
 _pr1            sty token
@@ -2356,13 +2356,13 @@ gops            ldy #0
 ;======================================
 cgsh            .proc
                 jsr chasseq
-                beq codegen.cg1
+                beq codegen._ENTRY1
 
 _cgs1           lda stkbase-20
                 beq _cgs5               ; no shift!
 
                 cmp #5
-                bcs codegen.cg1         ; too large a shift
+                bcs codegen._ENTRY1     ; too large a shift
 
     ; whew!, we can now shift it
                 ldy arg0
@@ -2402,7 +2402,7 @@ _cgs5           jmp popst
 ;======================================
 codegen         .proc
                 jsr genops
-cg1             jsr cgend
+_ENTRY1         jsr cgend
 
                 lda arg0
                 asl
@@ -2423,11 +2423,11 @@ cg1             jsr cgend
 ;======================================
 cgplus          .proc
                 jsr chasseq
-                beq codegen.cg1
+                beq codegen._ENTRY1
 
                 lda stkbase-20
                 cmp #1                  ; see if const = 1
-                bne codegen.cg1         ; no
+                bne codegen._ENTRY1     ; no
 
     ; whew!, we can now increament it
                 lda #$e6                ; INC
@@ -2718,7 +2718,7 @@ _a3             ldx arg8
                 lda cgopscd,x
                 jsr push1
 
-cgadd1          jsr gettemps
+_ENTRY1         jsr gettemps
                 jsr loadx.load1l
                 jsr opcd1
                 jsr op2l
@@ -2731,7 +2731,7 @@ cgadd1          jsr gettemps
                 jsr opcd1
                 jsr op2h
 
-cgadd2          jsr stemph
+_ENTRY2         jsr stemph
 
 cgadd3          ldx #0
 cgadd4          lda arg7
@@ -2972,7 +2972,7 @@ chkcond         .proc
 
 _cc1            pla
                 pla
-                jmp cgadd.cgadd1
+                jmp cgadd._ENTRY1
 
 conderr         ldy #cnder
                 jmp splerr
@@ -3187,7 +3187,7 @@ cgops           .byte 0
                 .byte 8
                 .word cgmul.cgdiv       ; remainder
                 .byte 3
-                .word cgadd.cgadd1      ; XOR
+                .word cgadd._ENTRY1     ; XOR
                 .byte 0
                 .word cgshift           ; LSH
                 .byte 2
