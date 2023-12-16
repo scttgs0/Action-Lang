@@ -74,9 +74,9 @@ libGrDrawTo     .proc
                 .endproc
 
 
-;======================================
+;==================
 ;
-;======================================
+;==================
 graphicIO       .proc
                 jsr libGrPosition.pos1
 
@@ -125,7 +125,6 @@ libGrLocate     .proc
                 jsr libGrPosition       ; Locate(col, row)
 
                 lda #6
-
                 jmp libIOGetD
 
                 .endproc

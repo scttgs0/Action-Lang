@@ -9,7 +9,8 @@
 
 
 ;======================================
-;PROC ChkErr=*(BYTE result, block, errCode)
+; PROC ChkErr=*(BYTE result, block, errCode)
+;--------------------------------------
 ; checks for error return from CIO
 ; Sets EOF(block) to true on error
 ; does not call Error if EOF error ($88)
@@ -50,7 +51,7 @@ _2
 
 
 ;======================================
-;   Break1(error)
+; Break1(error)
 ;======================================
 libIOBreak1     .proc
                 ldx #1
@@ -63,19 +64,12 @@ libIOBreak1     .proc
                 pla
                 tay
 
+_XIT            rts
                 .endproc
-
-                ;[fall-through]
-
-
-;--------------------------------------
-;
-;--------------------------------------
-pfe             rts
 
 
 ;======================================
-;PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
+; PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
 ;--------------------------------------
 ; outputs a1-a5 to default device
 ; using format f.  Any non '%' char
@@ -115,7 +109,7 @@ _next1          lda args+2,X
 _next2          inc op
                 ldy op
                 cpy token
-                bcs pfe
+                bcs libIOBreak1._XIT
 
                 lda (addr),Y
                 cmp #'%'
@@ -175,6 +169,7 @@ _4              jsr libIOPrintC
 
 ;======================================
 ;PROC Open(BYTE dev, STRING fileSpec, BYTE mode, aux2)
+;--------------------------------------
 ; opens fileSpec and assigns it to IOCB dev
 ;======================================
 libIOOpen       .proc
@@ -214,7 +209,8 @@ _1              sta (buf),Y
 
 
 ;======================================
-;PROC PrintE(STRING str)
+; PROC PrintE(STRING str)
+;--------------------------------------
 ; outputs str to default IOCB with EOL
 ;======================================
 libIOPrintE     .proc
@@ -230,7 +226,8 @@ libIOPrintE     .proc
 
 
 ;======================================
-;PROC PrintDE(BYTE dev, STRING str)
+; PROC PrintDE(BYTE dev, STRING str)
+;--------------------------------------
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
 libIOPrintDE    .proc
@@ -241,7 +238,8 @@ libIOPrintDE    .proc
 
 
 ;======================================
-;PROC Close(BYTE dev)
+; PROC Close(BYTE dev)
+;--------------------------------------
 ; closes IOCB dev
 ;======================================
 libIOClose      .proc
@@ -252,7 +250,8 @@ libIOClose      .proc
 
 
 ;======================================
-;PROC Print(STRING str)
+; PROC Print(STRING str)
+;--------------------------------------
 ; outputs str to default IOCB
 ;======================================
 libIOPrint      .proc
@@ -268,7 +267,8 @@ libIOPrint      .proc
 
 
 ;======================================
-;PROC PrintD(BYTE dev, STRING str)
+; PROC PrintD(BYTE dev, STRING str)
+;--------------------------------------
 ; outputs str to IOCB dev
 ;======================================
 libIOPrintD     .proc
@@ -279,7 +279,8 @@ libIOPrintD     .proc
 
 
 ;======================================
-;PROC InputS(STRING str)
+; PROC InputS(STRING str)
+;--------------------------------------
 ; same as InputSD, but uses default IOCB
 ;======================================
 libIOInputS     .proc
@@ -295,7 +296,8 @@ libIOInputS     .proc
 
 
 ;======================================
-;PROC InputSD(BYTE dev, STRING str)
+; PROC InputSD(BYTE dev, STRING str)
+;--------------------------------------
 ; see Input, size set to 255
 ;======================================
 libIOInputSD    .proc
@@ -312,7 +314,8 @@ libIOInputSD    .proc
 
 
 ;======================================
-;PROC InputMD(BYTE dev, STRING str, BYTE max)
+; PROC InputMD(BYTE dev, STRING str, BYTE max)
+;--------------------------------------
 ; see Input, size set to max
 ;======================================
 libIOInputMD    .proc
@@ -334,10 +337,12 @@ libIOInputMD    .proc
 
 
 ;======================================
-;PROC InputD(BYTE dev, STRING str)
+; PROC InputD(BYTE dev, STRING str)
+;--------------------------------------
 ; inputs str from IOCB dev
 ; first byte must be set to maximum size
-; on return, first byte set to size of string input
+; on return, first byte set to size of
+; string input
 ;======================================
 libIOInputD     .proc
                 jsr ReadBuffer.inputs
@@ -347,19 +352,14 @@ libIOInputD     .proc
 
 
 ;======================================
-;BYTE FUNC GetD(BYTE dev)
+; BYTE FUNC GetD(BYTE dev)
+;--------------------------------------
 ; inputs character from IOCB dev
 ;======================================
-libIOGetD       ldx #$07
+libIOGetD       .proc
+                ldx #$07
 
-                ;[fall-through]
-
-
-;--------------------------------------
-;
-;--------------------------------------
-ccio            .proc
-                stx arg4
+_ENTRY1         stx arg4
 
                 asl
                 asl
@@ -376,7 +376,6 @@ ccio            .proc
 
                 tya
                 ;!!jsr CIOV
-
                 sta args
 
                 jmp libIOChkErr
@@ -397,7 +396,8 @@ libIOPutE       .proc
 
 
 ;======================================
-;PROC Put(CHAR ch)
+; PROC Put(CHAR ch)
+;--------------------------------------
 ; outputs ch to default IOCB
 ;======================================
 libIOPut        .proc
@@ -410,7 +410,8 @@ libIOPut        .proc
 
 
 ;======================================
-;PROC PutD(BYTE dev, CHAR ch)
+; PROC PutD(BYTE dev, CHAR ch)
+;--------------------------------------
 ; outputs ch to IOCB dev
 ;======================================
 libIOPutD       .proc
@@ -419,13 +420,14 @@ libIOPutD       .proc
                 ldy arg1
 _ENTRY1         ldx #$0B
 
-                jmp ccio
+                jmp libIOGetD._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;PROC PutDE(BYTE dev)
+; PROC PutDE(BYTE dev)
+;--------------------------------------
 ; outputs EOL to IOCD dev
 ;======================================
 libIOPutDE      .proc
@@ -456,7 +458,8 @@ libIOXIO        .proc
 
 
 ;======================================
-;PROC PrintB(BYTE num)
+; PROC PrintB(BYTE num)
+;--------------------------------------
 ; outputs byte num to default IOCB
 ;======================================
 libIOPrintB     .proc
@@ -468,7 +471,8 @@ libIOPrintB     .proc
 
 
 ;======================================
-;PROC PrintC(CARD num)
+; PROC PrintC(CARD num)
+;--------------------------------------
 ; outputs cardinal num to default IOCB
 ;======================================
 libIOPrintC     .proc
