@@ -2576,7 +2576,7 @@ _cgat1          ldy #4
                 sty arg13
                 ldy #1
                 lda #$8d                ; STA addr16
-                jsr insrt3.i30          ; insert STA data16
+                jsr insrt3._ENTRY1      ; insert STA data16
 
                 lda #1
 _cgat2          ldy #5
