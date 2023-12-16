@@ -14,6 +14,7 @@
 splsetup        .proc
                 lda #0
                 tay
+
                 sta sp
                 sta chan
                 sta symtab
@@ -27,11 +28,12 @@ splsetup        .proc
                 sta curnxt+1
                 sta procsp
 
-    ; clear qglobal s.t.
-                ldx bigst               ; big s.t. ?
-                beq _spls0              ; no
+;   clear qglobal symbol table
+                ldx bigst               ; big symbol table?
+                beq _spls0              ;   no
 
 _s0             sta (stg2),y
+
                 iny
                 bne _s0
 
@@ -44,6 +46,7 @@ _spls0          sta (stglobal),y
                 ldx afbase+1
                 sta arg0
                 stx arg1
+
 _spls1          ldy #1
                 lda (arg0),y
                 beq _spls2
@@ -53,6 +56,7 @@ _spls1          ldy #1
                 lda (arg0),y
                 sta arg0
                 stx arg1
+
                 jmp _spls1
 
 _spls2          clc
@@ -61,6 +65,7 @@ _spls2          clc
                 bcc _spls3
 
                 inc arg1
+
 _spls3          sta codebase
                 sta qcode
 
@@ -70,11 +75,14 @@ _spls3          sta codebase
 
                 lda MEMTOP+1
                 sta stmax
+
                 dec stmax
+
                 clc
                 sbc stsp
                 sta stbase
                 sta symtab+1
+
                 inc symtab+1
 
                 cmp qcode+1
@@ -85,11 +93,13 @@ _spls3          sta codebase
                 sta symtab
                 lda sparem+1
                 sta symtab+1
+
 _alcerr         ldy #alcer
                 jmp splerr
 
 _spls4          lda sparem
                 sta frame
+
                 ldx sparem+1
                 inx
                 inx
@@ -99,6 +109,7 @@ _spls4          lda sparem
                 sta stack
                 lda #>stkbase
                 sta stack+1
+
                 sta cury                ; unknown initial Y value
 
                 rts

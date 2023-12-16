@@ -34,7 +34,7 @@ _fm1            lda curch
                 cpy #$1b                ; escape
                 bne _fmch
 
-                cmp #eol
+                cmp #EOL
                 beq floop
 
                 jsr insrtch
@@ -76,7 +76,7 @@ zap4            .byte $7e
                 .word insrtsp
                 .byte $ff
                 .word return
-                .byte eol
+                .byte EOL
                 .word tab
                 .byte $7f
                 .word delete

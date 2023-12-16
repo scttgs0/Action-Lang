@@ -46,7 +46,7 @@ wind2           .proc
 
 _w2             lda #w2-w1
                 pha
-                bne swapwd              ; uncond.
+                bne swapwd              ; [unc]
 
                 .endproc
 

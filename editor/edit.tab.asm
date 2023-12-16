@@ -24,9 +24,9 @@ _t1             lda TABMAP,x
     ; found tab setting
                 sty arg0
                 txa
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
                 ora arg0
                 jmp back.back0          ; do the tab
 
@@ -83,9 +83,9 @@ tabloc         .proc
                 sec
                 sbc #1
 _tabpos         tay
-                lsr a
-                lsr a
-                lsr a
+                lsr
+                lsr
+                lsr
                 tax
                 tya
                 and #7

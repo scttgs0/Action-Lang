@@ -30,7 +30,7 @@ _gs1a           ldy #0
                 cpx #$1b                ; ESC
                 beq _gs1b
 
-                cpx #eol
+                cpx #EOL
                 beq _gs2
 
                 cpy arg3                ; first char?
@@ -210,7 +210,7 @@ _fo1            lda inbuf,y
 
                 lda #':'
                 sta inbuf+2
-                bne _fo3                ; uncond.
+                bne _fo3                ; [unc]
 
 _fo2            lda inbuf+1
                 cmp #'?'                ; read directory?

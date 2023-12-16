@@ -208,6 +208,6 @@ _cl4            jsr rstcur
 
 _cl5            lda #<zero
                 ldx #>zero
-                bne _cl2                ; uncond.
+                bne _cl2                ; [unc]
 
                 .endproc

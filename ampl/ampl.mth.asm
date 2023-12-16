@@ -8,39 +8,45 @@
 ; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
 
 
-math            .proc
+math            .block
 _a             = aflast+1
 _b             = aflast
 _c             = afcur+1
 _d             = afcur
+
 _rl            = afsize
 _rh            = afsize+1
+
 _t1            = addr
 _t2            = addr+1
+
 _sign          = token
-                .endproc
+                .endblock
 
 
 ;======================================
 ;   MultI(op1, op2)
-;======================================
-multi           .proc
+;--------------------------------------
 ; op2 is in c & d
 ;  r = ab * cd
 ;  r = (a*d + c*b)*2^8 + b*d
+;======================================
+multi           .proc
                 jsr smops
 
                 ldx math._b
                 beq _mc5
 
                 stx math._t1
+
                 ldx math._d
                 beq _mc5
 
                 dex
                 stx math._t2
+
                 ldx #8
-_mc3            asl a                   ; b*d, 16 bit result
+_mc3            asl                   ; b*d, 16 bit result
                 rol math._rh
                 asl math._t1
                 bcc _mc4
@@ -49,9 +55,12 @@ _mc3            asl a                   ; b*d, 16 bit result
                 bcc _mc4
 
                 inc math._rh
+
 _mc4            dex
                 bne _mc3
+
 _mc5            sta math._rl
+
                 lda math._b
                 ldx math._c
                 jsr mulb                ; b*c, 8 bit result
@@ -59,7 +68,6 @@ _mc5            sta math._rl
                 lda math._a
                 ldx math._d
                 jsr mulb                ; a*d, 8 bit result
-
 
 _setsign        ldy math._sign
                 bpl _ss2
@@ -71,16 +79,20 @@ _setsign        ldy math._sign
                 nop
                 nop
         .endif
+
 _ss1            sta math._rl
                 stx math._rh
+
                 sec
                 lda #0
                 sbc math._rl
+
                 tay
                 lda #0
                 sbc math._rh
                 tax
                 tya
+
 _ss2            rts
                 .endproc
 
@@ -93,13 +105,15 @@ mulb            .proc
 
                 dex
                 stx math._t2
+
                 tax
                 beq _mb3
 
                 stx math._t1
+
                 lda #0
                 ldx #8
-_mb1            asl a
+_mb1            asl
                 asl math._t1
                 bcc _mb2
 
@@ -110,8 +124,10 @@ _mb2            dex
                 clc
                 adc math._rh
                 sta math._rh
+
 _mb3            lda math._rl
                 ldx math._rh
+
                 rts
                 .endproc
 
@@ -128,19 +144,23 @@ smops           .proc
 
 _smo1           sta math._b
                 stx math._a
+
                 lda math._c
                 bpl _smo2
 
                 tax
                 eor math._sign
                 sta math._sign
+
                 lda math._d
                 jsr multi._ss1
 
                 sta math._d
                 stx math._c
+
 _smo2           lda #0
                 sta math._rh
+
                 rts
                 .endproc
 
@@ -159,9 +179,11 @@ _dlarge         ldx #8
 _dl1            rol math._b
                 rol math._a
                 rol math._rh
+
                 sec
                 lda math._a
                 sbc math._d
+
                 tay
                 lda math._rh
                 sbc math._c
@@ -169,14 +191,17 @@ _dl1            rol math._b
 
                 sta math._rh
                 sty math._a
+
 _dl2            dex
                 bne _dl1
 
                 lda math._b
                 rol a
+
                 ldx #0
                 ldy math._a
                 sty math._rl                 ; save low byte of REM
+
                 jmp multi._setsign
 
 _dsmall         ldx #16
@@ -190,14 +215,17 @@ _ds1            rol math._b
 
 _ds1a           sbc math._d
                 sec                     ; for carry out in ROL A above
+
 _ds2            dex
                 bne _ds1
 
                 rol math._b
                 rol math._a
                 sta math._rl
+
                 lda math._b
                 ldx math._a
+
                 jmp multi._setsign
 
                 .endproc
@@ -211,6 +239,7 @@ remi            .proc
 
                 lda math._rl
                 ldx math._rh
+
 _rem1           rts
                 .endproc
 
@@ -223,12 +252,15 @@ rshift          .proc
                 beq _rshret
 
                 stx math._c
+
 _rsh1           lsr math._c
                 ror a
+
                 dey
                 bne _rsh1
 
                 ldx math._c
+
 _rshret         rts
                 .endproc
 
@@ -240,28 +272,38 @@ sargs           .proc                   ; saves args for call
                 sta arg0
                 stx arg1
                 sty arg2
+
                 clc
                 pla
                 sta afcur
+
                 adc #3                  ; jump over data
                 tay
+
                 pla
                 sta afcur+1
+
                 adc #0
                 pha
+
                 tya
                 pha
+
                 ldy #1
                 lda (afcur),y           ; local address
                 sta aflast
+
                 iny
                 lda (afcur),y
                 sta aflast+1
+
                 iny
                 lda (afcur),y           ; # of bytes
                 tay
+
 _sa1            lda args,y
                 sta (aflast),y
+
                 dey
                 bpl _sa1
 
@@ -270,6 +312,7 @@ _sa1            lda args,y
                 bne _sa2
 
                 inc brkkey
+
                 jmp break
 
 _sa2            rts

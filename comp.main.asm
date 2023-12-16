@@ -232,7 +232,7 @@ _dcl0           cmp #typeid
                 ldx nxttoken
                 lda #typet-(vart-char)-1
                 sta type
-                bne _dcl2               ; uncond.
+                bne _dcl2               ; [unc]
 
 _dcl1           cmp #define
                 beq _define
@@ -254,7 +254,7 @@ _dcl2           cpx #pointer
 
                 ldy #0
                 sty afcur
-                beq dclerr._arrdcl      ; uncond.
+                beq dclerr._arrdcl      ; [unc]
 
 ; <simple dcl> _:= <type> <id eq list>
 ; <id eq list> _:= <id eq list> , <id eq> | <id eq>
@@ -389,7 +389,7 @@ _arrd3          lda numargs
                 bne _ard3b
 
                 inc qcode+1
-                bne _arrd4          ; uncond.
+                bne _arrd4          ; [unc]
 
     ; array var
 
@@ -448,7 +448,7 @@ _arrd6          ldy #0
                 jsr getcdoff
                 jsr storprops
 
-                bne _ard2a              ; uncond.
+                bne _ard2a              ; [unc]
 
 chkparam
                 ldx param
@@ -663,11 +663,11 @@ _sl1            ldx nxttoken
                 beq _sl2
 
                 jsr push2               ; 2 byte number
-                bcs _sl3                ; uncond.
+                bcs _sl3                ; [unc]
 
 _sl2            jsr push1               ; single byte
 _sl3            jsr getnext
-                bne _sl1                ; uncond.
+                bne _sl1                ; [unc]
 
 _sl4            jsr getnext
 
@@ -685,14 +685,14 @@ _sl5            ldx nxttoken
                 beq call
 
                 jsr procref
-                bne assign.ass0         ; uncond.
+                bne assign.ass0         ; [unc]
 
 _sl6            cmp #undec
                 bne _sl7
 
                 jsr getalias
 
-                bne _sl5                ; uncond.
+                bne _sl5                ; [unc]
 
 _sl7            cmp #typet
                 bne _sl8
@@ -795,7 +795,7 @@ arass1          ldy #0
                 bcc assign.asserr       ; const
 
 _ara1           jsr getnext
-                bne assign.ass1         ; uncond.
+                bne assign.ass1         ; [unc]
 
                 .endproc
 
@@ -910,7 +910,7 @@ dostmt          .proc
                 lda #0
                 ldy #3
                 sta (frame),y
-                bne whstmt.wh1          ; uncond.
+                bne whstmt.wh1          ; [unc]
 
 fierr           cmp #undec
                 bne sterr
@@ -935,7 +935,7 @@ wh2             cmp #untilid
                 bne _wh3
 
                 jsr condexp
-                bne _wh4                ; uncond.
+                bne _wh4                ; [unc]
 
 _wh3            ldy #4
                 jsr frameadr.fadr1
@@ -1476,7 +1476,7 @@ _cexp1          pla                     ; token value
 
 _ce1a           ldy #4
                 jsr frameadr.fadr1
-                bne _cexp3              ; uncond.
+                bne _cexp3              ; [unc]
 
 _cexp2          jsr framecd
 
@@ -1822,7 +1822,7 @@ _exp3a          ldx nxttoken
                 bne _exp3c
 
 _exp3b          jsr etype
-                bne _exp7               ; uncond.
+                bne _exp7               ; [unc]
 
 _exp3c          cmp #typet+8
                 bcc _exp3d              ; field
@@ -1853,7 +1853,7 @@ _exp3e          cmp #constt
 
 _expvar
                 jsr pushnext
-                bne exp1                ; uncond.
+                bne exp1                ; [unc]
 
 _exp4           cmp #funct
                 bcs _expproc
@@ -1896,13 +1896,13 @@ _exp9           lda token
 
 _expund
                 jsr getalias
-                bne _exp3a              ; uncond.
+                bne _exp3a              ; [unc]
 
 _expproc
                 bne parenerr._expfunc
 
 _expp1          jsr procref
-                bne _expvar             ; uncond.
+                bne _expvar             ; [unc]
 
 _expstr
                 lda #$4c                ; JMP around string
@@ -1928,7 +1928,7 @@ _es2            jsr push2
 
                 dec choff
                 jsr getnext
-                bne _exp7               ; uncond.
+                bne _exp7               ; [unc]
 
 parenerr
                 ldy #parer
@@ -2325,8 +2325,8 @@ gops            ldy #0
                 tax
                 lda vartype-1,x
                 sta arg3
-                asl a
-                asl a
+                asl
+                asl
                 sta arg5
                 ldy #7
                 lda (stack),y
@@ -2405,7 +2405,7 @@ codegen         .proc
 cg1             jsr cgend
 
                 lda arg0
-                asl a
+                asl
                 clc
                 adc arg0
                 tay
@@ -2511,7 +2511,7 @@ _cgc1           ldy #1
                 jsr loady
 
                 lda #$84                ; STY
-                bne _avb2               ; uncond.
+                bne _avb2               ; [unc]
 
 _ass1           cmp #typet
                 bcc cgexperr            ; cond. exp.
@@ -2604,7 +2604,7 @@ _cgata          lda arg3
 
                 ldy #5
                 jsr ldcdz
-                bne cgassign._avi1      ; uncond.
+                bne cgassign._avi1      ; [unc]
 
 _cgatb          ldy #3
                 jsr loadcd
@@ -2616,7 +2616,7 @@ _cgatb          ldy #3
 
     ; oh if I only had more qcode space!
     ; could handle Y, see _OpA in CGU
-                bne cgassign._avb1      ; uncond.
+                bne cgassign._avb1      ; [unc]
 
                 .endproc
 
@@ -2711,7 +2711,7 @@ _a2             tax
                 bne cgadd4
 
                 lda #constt+intt
-                bne cgadd5              ; uncond.
+                bne cgadd5              ; [unc]
 
     ; normal add or sub.
 _a3             ldx arg8
@@ -2767,7 +2767,7 @@ cgshift         .proc
                 ldx #0
                 stx arg9
                 lda #constt+bytet
-                bne cgadd.cgadd5        ; uncond.
+                bne cgadd.cgadd5        ; [unc]
 
 _s1             sta arg1
                 lda #$0a                ; ASL A
@@ -2880,7 +2880,7 @@ _or2            jsr savrel
                 lda (stack),y
                 sec
                 jsr comprel.crel2       ; patch in T2
-                beq cgand.and3          ; uncond.
+                beq cgand.and3          ; [unc]
 
                 .endproc
 
@@ -3044,7 +3044,7 @@ cgge            jsr relop
 
                 lda #$e1                ; SBC
                 jsr op2h
-                bcs cgeq.cge2           ; uncond., see CodeIncr
+                bcs cgeq.cge2           ; [unc], see CodeIncr
 
                 .endproc
 
@@ -3066,7 +3066,7 @@ cgle            jsr relop
 
                 lda #$e1                ; SBC
                 jsr op1h
-                bcs cgeq.cge2           ; uncond., see CodeIncr
+                bcs cgeq.cge2           ; [unc], see CodeIncr
 
                 .endproc
 

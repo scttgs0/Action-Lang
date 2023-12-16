@@ -196,7 +196,7 @@ _del1           sta arg3
                 sta (buf),y
                 iny
                 sty dirtyf
-                bne return.ret3         ; uncond.
+                bne return.ret3         ; [unc]
 
 _del2           jsr delcur
                 beq _del3
@@ -241,7 +241,7 @@ delfree         .proc
                 beq delend.de1
 
                 jsr delln
-                bne delfree             ; uncond.
+                bne delfree             ; [unc]
                 .endproc
 
 

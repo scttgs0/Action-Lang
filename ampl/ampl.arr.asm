@@ -46,10 +46,11 @@ _arptr          ldy #0
                 lda (stack),y
                 ora #$b0                ; temp array mode
                 sta (stack),y
+
                 rts
 
 _arpt1          jsr zerost
-                bne _ar0                ; uncond.
+                bne _ar0                ; [unc]
 
 _arr0           jsr pushnext
 
@@ -67,8 +68,10 @@ _arr0           jsr pushnext
 _ar0            ldy #7
                 lda (stack),y
 arra0           pha
+
                 lda #vart+cardt
                 sta (stack),y
+
                 lda #plusid
                 jsr genops
 
@@ -80,6 +83,7 @@ arra0           pha
                 tax
                 ora #$b0                ; temp array mode
                 sta arg7
+
                 ldy arg1
                 cpy #constt+strt
                 ldy #1                  ; clear Z flag if we branch
@@ -96,6 +100,7 @@ _ar1            sta fr1
 
 ; CPY #3
 ; BEQ _ARReal
+
 ; integer or cardinal
 
 _arint          jsr gettemps
@@ -118,6 +123,7 @@ _arint          jsr gettemps
                 nop
                 nop
         .endif
+
 _ari1           jsr loadx.op1l
                 jsr stempl
 
@@ -142,6 +148,7 @@ _arbyte         jmp codegen.cg1
 
 _arsmall        ldy #7
                 sta (stack),y           ; restore correct type
+
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
@@ -150,11 +157,13 @@ _arsmall        ldy #7
 
                 ldy #10
                 sta (stack),y
+
                 ldy #2
                 jsr loadi
 
                 ldy #11
                 jsr savecd.savstk
+
                 jmp popst
 
                 .endproc

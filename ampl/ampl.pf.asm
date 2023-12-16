@@ -9,20 +9,23 @@
 
 
 ;======================================
-;   PF()
+;
 ;======================================
-ld1             ldy #0
+ld1             .proc
+                ldy #0
                 lda (stack),y
                 cmp #arrayt
                 bcs pf._c5a
 
                 inc abt-args,x
+
                 ldy #7
                 lda (stack),y
                 cmp #tempt+bytet
                 beq pf._c5b
 
                 dec abt+1-args,x
+
                 cpx #args+2
                 bcc pf._c5b
 
@@ -34,34 +37,46 @@ ld1             ldy #0
 
                 jmp pf._c5b
 
-pf              lda #0                  ; load arg types flag
+                .endproc
+
+
+;======================================
+; PF()
+;======================================
+pf              .proc
+                lda #0                  ; load arg types flag
                 jsr getargs
                 jsr pushst
                 jsr getnext
 
                 ldx #args
                 stx argbytes
+
                 ldx nxttoken
                 cpx #rparen
                 bne _c4
 
                 jsr getnext
 
-                bne _c7                 ; uncond.
+                bne _c7                 ; [unc]
 
 _c4             ldx numargs
                 ldy #tempt+bytet
                 lda argtypes-1,x
+
                 ldx argbytes
                 stx abt+3
                 cmp #$7f
                 bcs _c5                 ; one byte arg
 
                 sta temps-args+1,x
+
                 inc argbytes
                 iny
 _c5             sta temps-args,x
+
                 inc argbytes
+
                 txa
                 jsr storst
                 jsr getexp
@@ -113,11 +128,16 @@ _c10            ldx #args
 
 callerr         jmp segment.argerr
 
+
+;======================================
+;
+;======================================
 _push           lda abt-args,x
                 bne _p1
 
                 lda _ops-args,x
                 ora #$04
+
                 jmp push2
 
 _p1             stx arg0
@@ -141,6 +161,7 @@ _p1             stx arg0
 
                 pha
                 sty arg0
+
                 ldy #2
                 jsr loadi
 
@@ -172,3 +193,5 @@ _p4             jsr op2l
 ;--------------------------------------
 
 _ops            .byte $a1,$a2,$a0       ; LDA, LDX, LDY
+
+                .endproc

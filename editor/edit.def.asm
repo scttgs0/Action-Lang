@@ -228,7 +228,7 @@ windent         = 14
 
 ; system defs
 ;-------------
-eol             = $9b
+EOL             = $9b
 esc             = $1b
 
 

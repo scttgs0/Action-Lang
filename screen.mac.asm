@@ -54,10 +54,10 @@ putch           .proc
                 lda #0
                 tax
 putch1          stx DSPFLG
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 tax
                 lda #$0b                ; PUTCHR
 putch2          sta IOCB0+ICCOM,x
@@ -303,7 +303,7 @@ getnl0          cmp #eofid
                 bpl getnr1
 
                 and #$7f
-                bne _getnr0              ; uncond.
+                bne _getnr0              ; [unc]
 
 _getnl1         jsr alpha
                 bne _getnid
@@ -316,7 +316,7 @@ _getnl1         jsr alpha
 
                 cmp #']'
                 beq getnr1
-                bne getnloop            ; uncond.
+                bne getnloop            ; [unc]
 
 _getnid         jsr getname
                 bmi getnr1
@@ -344,7 +344,7 @@ ismt            lda token
 ;======================================
 lexcom          .proc
                 jsr nextline
-                bne getnext.getnl0      ; uncond.
+                bne getnext.getnl0      ; [unc]
 
                 .endproc
 
@@ -416,7 +416,7 @@ lexne           .proc
                 bne lexeq.leq1
 
                 lda #neid
-                bne getnext.getnr1      ; uncond.
+                bne getnext.getnr1      ; [unc]
 
                 .endproc
 
@@ -431,7 +431,7 @@ leq1            cmp #'='
                 bne putback
 
                 inc nxttoken
-                bne getnext.getnr2      ; uncond.
+                bne getnext.getnr2      ; [unc]
 
                 .endproc
 
@@ -445,7 +445,7 @@ lexhex          .proc
                 inc choff
                 jsr lexbuf
                 jsr htocar
-                bne lexdig.ldig2        ; uncond.
+                bne lexdig.ldig2        ; [unc]
 
                 .endproc
 
@@ -474,7 +474,7 @@ lexpf           .proc
                 sta symtab
                 lda gbase+1
                 sta symtab+1
-                bne putback.pback       ; uncond.
+                bne putback.pback       ; [unc]
 
                 .endproc
 
@@ -512,7 +512,7 @@ _lstr4          jsr nextchar
                                         ; end of string
 
                 ldy arg9
-                lda #eol
+                lda #EOL
                 sta (symtab),y
                 dey
                 tya
@@ -586,7 +586,7 @@ _nln3           ldy #0
                 tay
                 iny
                 sty sp
-                lda #eol
+                lda #EOL
                 sta (buf),y
                 ldy #0
 
@@ -613,7 +613,7 @@ lexdef          .proc
                 lda defflg
                 sta choff
                 sty defflg
-                bcc nextchar.nxtch0     ; uncond.
+                bcc nextchar.nxtch0     ; [unc]
 
 ldef1           ldy choff
                 lda (delnxt),y

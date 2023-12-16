@@ -179,52 +179,52 @@ _sa5            txa
 ; .BYTE 6,17,12,12,12,12,12
 
 _en7            .text 4,"Open",200
-                .word opn               ; #96
+                .word libIOOpen         ; #96
                 .byte 4,138,17,138,138
 _en8            .text 6,"PrintE",200
-                .word prte              ; #116
+                .word libIOPrintE       ; #116
                 .byte 1,17
 _en9            .text 7,"PrintDE",200
-                .word prtde             ; #75
+                .word libIOPrintDE      ; #75
                 .byte 2,138,17
 _en10           .text 5,"Close",200
-                .word clos              ; #253
+                .word libIOClose        ; #253
                 .byte 1,138
 _en11           .text 5,"Print",200
-                .word prt               ; #135
+                .word libIOPrint        ; #135
                 .byte 1,17
 _en12           .text 6,"PrintD",200
-                .word prtd              ; #115
+                .word libIOPrintD       ; #115
                 .byte 2,138,17
 _en13           .text 6,"InputS",200
-                .word ins               ; #249
+                .word libIOInputS       ; #249
                 .byte 1,17
 _en14           .text 7,"InputSD",200
-                .word insd              ; #87
+                .word libIOInputSD      ; #87
                 .byte 2,138,17
 _en15           .text 7,"InputMD",200
-                .word inmd              ; #75
+                .word libIOInputMD      ; #75
                 .byte 3,138,17,138
 _en16           .text 4,"GetD",202
-                .word getd              ; #138
+                .word libIOGetD         ; #138
                 .byte 1,138
 _en17           .text 4,"PutE",200
-                .word pute              ; #162
+                .word libIOPutE         ; #162
                 .byte 0
 _en18           .text 3,"Put",200
-                .word put               ; #158
+                .word libIOPut          ; #158
                 .byte 1,137
 _en19           .text 4,"PutD",200
-                .word putd              ; #161
+                .word libIOPutD         ; #161
                 .byte 2,138,137
 _en20           .text 5,"PutDE",200
-                .word putde             ; #168
+                .word libIOPutDE        ; #168
                 .byte 1,138
 _en21           .text 3,"XIO",200
-                .word xio               ; #225
+                .word libIOXIO          ; #225
                 .byte 6,138,138,138,138,138,17
 _en22           .text 6,"PrintB",200
-                .word prtb              ; #113
+                .word libIOPrintB       ; #113
                 .byte 1,138
 _en23           .text 7,"PrintBE",200
                 .word prtbe             ; #71
@@ -238,7 +238,7 @@ _en25           .text 8,"PrintBDE",200
                 .word prtbde            ; #241
                 .byte 2,138,138
 _en26           .text 6,"PrintC",200
-                .word prtc              ; #114
+                .word libIOPrintC       ; #114
                 .byte 1,12
 _en27           .text 7,"PrintCE",200
                 .word prtce             ; #73
@@ -304,25 +304,25 @@ _en47           .text 5,"Point",200
                 .word point             ; #110
                 .byte 3,138,12,138
 _en48           .text 8,"Graphics",200
-                .word graphics          ; #108
+                .word libGrGraphics     ; #108
                 .byte 1,138
 _en49           .text 6,"DrawTo",200
-                .word drawto            ; #231
+                .word libGrDrawTo       ; #231
                 .byte 2,12,138
 _en50           .text 8,"Position",200
-                .word position          ; #94
+                .word libGrPosition     ; #94
                 .byte 2,12,138
 _en51           .text 6,"Locate",202
-                .word locate            ; #97
+                .word libGrLocate       ; #97
                 .byte 2,12,138
 _en52           .text 4,"Plot",200
-                .word plot              ; #131
+                .word libGrPlot         ; #131
                 .byte 2,12,138
 _en53           .text 8,"SetColor",200
-                .word setcolor          ; #6
+                .word libGrSetColor     ; #6
                 .byte 3,138,138,138
 _en54           .text 4,"Fill",200
-                .word fill              ; #122
+                .word libGrFill         ; #122
                 .byte 2,12,138
 _en55           .text 4,"Rand",202
                 .word rand              ; #117
@@ -558,7 +558,7 @@ paddle          .proc
 ; .BYTE 0,0,0,0,0,0,0,0,0               ; 17
 
 _en6            .text 6,"PrintF",200
-                .word prtf        ; #117
+                .word libIOPrintF       ; #117
                 .byte 6,17,12,12,12,12,12
 ;
                 .byte <_en61

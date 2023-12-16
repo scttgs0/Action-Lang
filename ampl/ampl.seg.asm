@@ -28,11 +28,12 @@ segment         .proc
 
 _proc           lda #funct-vart+char-1
                 sta type
-                bne _func1              ; uncond.
+                bne _func1              ; [unc]
 
 _func           clc
                 adc #funct-vart
                 sta type
+
                 jsr getnext
 
 _func1          jsr makeentry
@@ -42,6 +43,7 @@ _func1          jsr makeentry
                 sta curproc
                 lda addr+1
                 sta curproc+1
+
                 sta qglobal
 
                 lda #1
@@ -54,6 +56,7 @@ _func1          jsr makeentry
 
                 tay
 _funcst         sta (stlocal),y
+
                 iny                     ; zap local st
                 bne _funcst
 
@@ -75,6 +78,7 @@ _funcst         sta (stlocal),y
                 eor #equalid
                 sta param               ; this is very tricky!!
                 bne _funchd
+
                 jsr ideq                ; param must = 0 here
 
                 iny
@@ -85,7 +89,9 @@ _funcst         sta (stlocal),y
                 ora #8
                 sta (props),y           ; set Sys flag
                 sta param
+
                 jsr getnext
+
 _funchd         jsr getnext
 
                 cmp #lparen
@@ -94,7 +100,6 @@ _funchd         jsr getnext
 
 ; low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
 ; low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
-
 
                 jsr getnext
 
@@ -116,6 +121,7 @@ argerr          ldy #arger
 
 _func2          lda param
                 pha
+
                 lda #0
                 sta param
 
@@ -133,6 +139,7 @@ _func2          lda param
 
                 sta arg0
                 stx arg1
+
                 jsr getcdoff
                 jsr storprops
 
@@ -145,6 +152,7 @@ _func2          lda param
                 bcc _fh2
 
                 inx
+
 _fh2            jsr push2
 
     ; qcode to transfer arguments to
@@ -166,8 +174,11 @@ _fh3            lda argbytes
                 bne _fh4
 
                 iny
+
 _fh4            jsr push3
+
                 dec argbytes
+
                 jmp _fh3
 
 _f4             jmp _func4
@@ -177,8 +188,10 @@ _fh5            ldx #10
 
                 lda arg0
                 ldx arg1
+
                 ldy argbytes
                 dey
+
                 jsr push3
 
 _func3          lda trace               ; check for trace
@@ -187,19 +200,23 @@ _func3          lda trace               ; check for trace
                 lda #$20                ; JSR CTrace
                 ldx #<ctrace
                 ldy #>ctrace
+
                 jsr push3
 
                 ldy #0
                 lda (curproc),y
+
                 tay
                 tax
 _f3a            lda (curproc),y
                 sta (qcode),y
+
                 dey
                 bpl _f3a
 
                 inx
                 txa
+
                 jsr codeincr
 
                 lda arg0
@@ -211,13 +228,16 @@ _f3a            lda (curproc),y
 
                 tay
                 tax
+
 _f3b            lda (props),y
                 sta (qcode),y
+
                 dey
                 bpl _f3b
 
                 inx
                 txa
+
                 jsr codeincr
 
 _func4          jsr stmtlist

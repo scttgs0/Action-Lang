@@ -38,7 +38,7 @@ _rand1          stx args
 ; and volume.  Assumes volume low  16.
 ;======================================
 sound           .proc
-                asl a
+                asl
                 sty arg2
                 tay
                 cmp #7
@@ -50,10 +50,10 @@ sound           .proc
 _snd1           txa
                 sta AUDF1,y
                 lda arg2
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 ora arg3
                 sta AUDC1,y
                 rts
@@ -129,10 +129,10 @@ _stk1           tay
                 dey
                 bne _stk2
 
-                lsr a
-                lsr a
-                lsr a
-                lsr a
+                lsr
+                lsr
+                lsr
+                lsr
 _stk2           and #$0f
                 sta args
                 rts
@@ -328,10 +328,10 @@ ctrace          .proc                   ; Call Trace handler
     ; ok, let's print the name
                 lda arg10
                 ldx arg11
-                jsr prt
+                jsr libIOPrint
 
                 lda #'('
-                jsr put
+                jsr libIOPut
 
     ; now get addr of args
                 sec
@@ -377,14 +377,14 @@ _ct2            inc arg14
 _ct4            ldx #0
                 ldy arg15
 _ct5            lda (arg12),y
-                jsr prtc
+                jsr libIOPrintC
 
 _ct6            inc arg15
                 dec arg9
                 beq _ct7                ; all done
 
                 lda #','
-                jsr put
+                jsr libIOPut
 
                 jmp _ct2
 
@@ -399,9 +399,9 @@ _ct7            clc
                 txa
                 pha
                 lda #')'
-                jsr put
+                jsr libIOPut
 
-                jmp pute
+                jmp libIOPutE
 
                 .endproc
 

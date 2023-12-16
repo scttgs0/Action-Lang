@@ -15,16 +15,20 @@ stm             .proc
                 sta arg2
                 stx arg3
                 sta arg4
+
                 inx
                 stx arg5
+
                 ldy arg15
                 sty arg13
+
 _stm1           lda (arg2),y
                 sta nxtaddr+1
                 beq _stm3
 
                 lda (arg4),y
                 sta nxtaddr
+
                 ldy #0
 _stm2           lda (nxtaddr),y
                 eor (symtab),y
@@ -36,6 +40,7 @@ _stm2           lda (nxtaddr),y
                 bcc _stm2
 
                 lda (nxtaddr),y         ; matched
+
 _stm3           rts
 
 _stm4           inc arg13               ; try next entry
@@ -49,6 +54,7 @@ _stm4           inc arg13               ; try next entry
                 beq _stm5
 
                 iny
+
 _stm5           jmp splerr
 
 stmres          jmp (stmradr)
@@ -57,6 +63,7 @@ stmres          jmp (stmradr)
 
 
 ; this normially goes to ISTMres below
+
 
 ;======================================
 ;   STMres() lookup reserved names
@@ -69,8 +76,10 @@ _stmr0          lda #$ff                ; if name too long!
 
                 iny
                 sty arg0
+
                 ldx rwstrt-2,y
 _stmr1          stx arg1
+
                 ldy #1
 _stmr2          lda resw1,x
                 bmi _stmr3
@@ -86,11 +95,13 @@ _stmr2          lda resw1,x
 
     ; we have a match
                 lda resw1,x             ; get token value
+
 _stmr3          rts
 
 _stmr4          clc
                 lda arg1
                 adc arg0
+
                 tax
                 bne _stmr1              ; try next entry
 
@@ -103,30 +114,36 @@ _stmr4          clc
 lgetname        .proc
                 ldy #0
                 sta frstchar
+
                 tax
                 ora #$20
                 sta arg15               ; initial hash
+
                 txa
 _gname1         iny
                 sty arg14
                 sta (symtab),y
+
                 ora #$20
                 asl arg15
                 adc arg15
                 sta arg15
+
                 jsr nextchar
 
                 ldy arg14
                 cmp #'_'
                 beq _gname1
-                jsr alphanum
 
+                jsr alphanum
                 bne _gname1
 
                 tya
                 ldy #0
                 sta (symtab),y
+
                 dec choff               ; put character back
+
                 jsr stm.stmres          ; check for res. name
                 bpl istmres._stmr3      ; return
 
@@ -140,6 +157,7 @@ _gname1         iny
 
 gnglobal        lda stglobal
                 ldx stglobal+1
+
                 ldy frstchar
                 cpy bigst
                 bpl _gng1
@@ -168,14 +186,14 @@ lgnlocal        lda stlocal
 
 
 ;======================================
-;
+; Make new entry in symbol table
 ;======================================
 newentry        .proc
-    ; Make new entry in symbol table
                 lda symtab+1
                 sta (arg2),y
                 lda symtab
                 sta (arg4),y
+
                 lda #<libst
                 ldx #>libst
                 jsr stm                 ; lookup shadow name
@@ -184,23 +202,29 @@ newentry        .proc
                 ldy arg14
                 iny
                 sta (symtab),y
+
                 lda nxtaddr
                 iny
                 sta (symtab),y          ; save shadow entry
+
                 lda nxtaddr+1
                 iny
                 sta (symtab),y
+
                 lda symtab
                 sta nxtaddr
                 ldx symtab+1
                 stx nxtaddr+1
+
                 iny
                 tya
                 jsr stincr
 
                 lda #undec
+
                 rts
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------

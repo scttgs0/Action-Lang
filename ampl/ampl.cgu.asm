@@ -36,6 +36,7 @@ _ly3            lda #$a0
 
 _ly4            lda arg12
                 sta cury
+
                 ldy arg13
 _lyret          rts
                 .endproc
@@ -47,16 +48,18 @@ _lyret          rts
 trashy          .proc
                 lda #$ff
                 sta cury
+
                 rts
                 .endproc
 
 
 ;======================================
 ;   LoadX(,,offset)
+;--------------------------------------
+;   NOTE:  this proc can only be called
+;   from Op below, see _LXC
 ;======================================
 loadx           .proc
-    ; NOTE:  this proc can only be called
-    ; from Op below, see _LXC
                 lda (stack),y
                 iny
                 bit tempmode
@@ -76,21 +79,23 @@ loadx           .proc
 _lxt            lda (stack),y
                 tax
                 dec temps-args,x
+
 _lxz            lda #$a6                ; LDX addr
 _lx1            jmp push2
 
 _lxc            lda (stack),y
 
-; TAX
-; LDA #$A2 ; LDX data
-; BNE _LX1
+                ; TAX
+                ; LDA #$A2 ; LDX data
+                ; BNE _LX1
 
                 sta arg12
+
                 pla
                 pla
                 pla
                 tay
-                bne ophigh._opv         ; uncond.
+                bne ophigh._opv         ; [unc]
 
 _optype         and #$20
                 beq ophigh._operr       ; con. exp.
@@ -112,11 +117,14 @@ _optype         and #$20
 ;======================================
 load1l          lda #$a1                ; LDA op
 
+                ;[fall-through]
+
 
 ;======================================
 ;   Op1L(op)
 ;======================================
 op1l            pha
+
                 lda arg2
                 ldy #8
 oplow           ldx #0
@@ -161,12 +169,13 @@ _opa            bit cnstmode
 
                 jsr loady
 
-; LDA arg7
-; AND #$F7
-; STA arg7 ; flag Y reg used
+                ; LDA arg7
+                ; AND #$F7
+                ; STA arg7 ; flag Y reg used
 
                 lda #0
                 sta arg12
+
                 lda #$10                ; (addr),Y
 _opa1           sta arg10
                 lda (stack),y
@@ -180,12 +189,14 @@ _opa1           sta arg10
 
                 tax
                 dec temps-args,x        ; free temp
-                bcc _opc3               ; uncond.
+                bcc _opc3               ; [unc]
 
 _opa2           tya                     ; small array
                 pha
+
                 iny
                 iny
+
                 jsr loadx
 
                 pla
@@ -199,10 +210,12 @@ _opa2           tya                     ; small array
 
 _opa2a          pla
                 ora #$14                ; addr,X
+
                 jmp push2
 
 _opc            lda #$08                ; data
                 sta arg10
+
                 lda arg12
                 beq _opc1
 
@@ -214,7 +227,7 @@ _opc3           pla
                 jmp push2
 
 _opt            lda #$04                ; addr
-                bne _opa1               ; uncond.
+                bne _opa1               ; [unc]
 
 _opz            pla
                 ora #$04                ; addr
@@ -228,7 +241,10 @@ _opz            pla
 ;======================================
 load2l          .proc
                 lda #$a1                ; LDA op
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -236,6 +252,7 @@ load2l          .proc
 ;======================================
 op2l            .proc
                 pha
+
                 lda arg1
                 ldy #1
                 jmp loadx.oplow
@@ -248,7 +265,10 @@ op2l            .proc
 ;======================================
 load1h          .proc
                 lda #$a1                ; LDA op
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -271,8 +291,11 @@ op1h1           ldx #1
 ;   Load2H()
 ;======================================
 load2h          .proc
-                lda #$a1                ; LDA op
+                lda #$A1                ; LDA op
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -291,6 +314,7 @@ ophz            ora #$08
                 jmp push2
 
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -322,10 +346,12 @@ _gtl1           dex
                 bne _gtl1
 
                 inc temps-args,x
+
                 lda arg5                ; see if byte temp
                 beq _gt2                ; yes
 
                 inc temps-args+1,x
+
         .if ramzap
                 inc sargs,x
         .else
@@ -333,7 +359,9 @@ _gtl1           dex
                 nop
                 nop
         .endif
+
 _gt2            stx arg9
+
                 rts
 
 _gtlerr         jmp experr
@@ -347,10 +375,13 @@ _gtlerr         jmp experr
 loadi           .proc
                 lda (stack),y
                 sta arg15
+
                 tax
                 dey
+
                 lda (stack),y
                 sta arg14
+
                 rts
                 .endproc
 
@@ -360,7 +391,10 @@ loadi           .proc
 ;======================================
 ldcdz           .proc
                 lda #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -370,10 +404,12 @@ loadcd          .proc
                 clc
                 adc (stack),y
                 sta qcode
+
                 iny
                 lda #0
                 adc (stack),y
                 sta qcode+1
+
                 rts
                 .endproc
 
@@ -385,9 +421,11 @@ savecd          .proc
                 lda qcode
                 ldx qcode+1
 savstk          sta (stack),y
+
                 txa
                 iny
                 sta (stack),y
+
                 rts
                 .endproc
 
@@ -397,10 +435,11 @@ savstk          sta (stack),y
 ;======================================
 relop           .proc
                 lda arg6
-                bpl _ro1
+                bpl _XIT
 
                 inc arg8
-_ro1            rts
+
+_XIT            rts
                 .endproc
 
 
@@ -409,17 +448,18 @@ _ro1            rts
 ;======================================
 chkzero         .proc
                 lda arg3
-                bne _cz1
+                bne _XIT
 
                 lda arg1
-                bpl _cz1                ; not const
+                bpl _XIT                ; not const
 
                 cmp #vart
-                bcs _cz1
+                bcs _XIT
 
                 ldy #1
                 lda (stack),y
-_cz1            rts
+
+_XIT            rts
                 .endproc
 
 
@@ -429,6 +469,7 @@ _cz1            rts
 opcd1           .proc
                 ldx arg8
                 lda cgopscd+1,x
+
                 rts
                 .endproc
 
@@ -439,9 +480,11 @@ opcd1           .proc
 stkaddr         .proc
                 lda (stack),y
                 tax
+
                 iny
                 lda (stack),y
                 tay
+
                 rts
                 .endproc
 
@@ -463,7 +506,10 @@ stkp            .proc
 ;======================================
 stkpz           .proc
                 lda #0
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -471,7 +517,10 @@ stkpz           .proc
 ;======================================
 stkps           .proc
                 sta arg12
+
                 .endproc
+
+                ;[fall-through]
 
 
 ;======================================
@@ -482,11 +531,14 @@ stkprop         .proc
 
                 clc
                 adc arg12
+
                 tax
                 iny
+
                 lda (props),y
                 adc #0
                 tay
+
                 rts
                 .endproc
 
@@ -504,7 +556,8 @@ jsrtable        .proc
                 lda lsh,x
 ;.ENDIF
                 tax
-                lda #$20                ; JSR
+                lda #$20                ; JSR opcode
+
                 jmp push3
 
                 .endproc
@@ -515,11 +568,14 @@ jsrtable        .proc
 ;======================================
 push0           .proc
                 sty arg13
+
                 ldy qcode
                 sty arg14
                 ldy qcode+1
                 sty arg15
+
                 ldy #0
+
                 rts
                 .endproc
 
@@ -535,6 +591,7 @@ pushtrue        .proc
 
                 lda #0                  ; no other true branches
                 sta arg9
+
                 .endproc
 
                 ;[fall-through]
@@ -551,6 +608,8 @@ push1           .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   Insrt1(op)
@@ -561,6 +620,7 @@ insrt1          .proc
 
 i11             iny
                 tya
+
                 jmp codeincr
 
                 .endproc
@@ -571,8 +631,9 @@ i11             iny
 ;======================================
 stemph          .proc
                 inc arg9
+
                 ldy #12
-                bne stempl.stemp        ; uncond.
+                bne stempl.stemp        ; [unc]
 
                 .endproc
 
@@ -582,13 +643,16 @@ stemph          .proc
 ;======================================
 stempl          .proc
                 ldy #10
+
 stemp           jsr savecd
 
                 lda arg9
                 tax
                 and #$fe                ; set to low address
                 sta arg9
+
                 lda #$85                ; STA addr
+
                 .endproc
 
                 ;[fall-through]
@@ -605,6 +669,8 @@ push2           .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   Insrt2(op,data)
@@ -620,6 +686,8 @@ i21             txa
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   Push3(op,data16)
@@ -632,13 +700,17 @@ push3           .proc
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   Insrt3(op,data16)
 ;======================================
 insrt3          .proc            
                 sty arg13
+
                 ldy #3
+
 i30             jsr addcdsp
 
 i31             txa
@@ -649,21 +721,27 @@ i31             txa
 
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ;   AddCdSp()
+;--------------------------------------
+;   AddCdSp(,,size) add qcode space
+;   does NOT change qcode or codeOff
 ;======================================
 addcdsp         .proc
-    ; AddCdSp(,,size) add qcode space
-    ; does NOT change qcode or codeOff
                 pha
+
                 clc
                 tya
                 adc arg14
                 sta arg10
+
                 lda #0
                 adc arg15
                 sta arg11
+
                 sec
                 lda qcode
                 sbc arg14
@@ -673,12 +751,15 @@ addcdsp         .proc
 
 _acs1           lda (arg14),y
                 sta (arg10),y
+
                 dey
                 bne _acs1
 
                 lda (arg14),y
                 sta (arg10),y
+
 _acsret         pla
                 sta (arg14),y
+
                 rts
                 .endproc

@@ -36,7 +36,7 @@ print           .proc
 
                 lda #$0b
                 sta IOCB0+ICCOM,x
-                lda #eol
+                lda #EOL
                 jmp CIOV
 
 print1          rts
@@ -79,10 +79,10 @@ input1          stx arg5
 ;   XIOstr(device,,cmd,aux1,aux2,str)
 ;======================================
 xiostr          .proc
-                asl a
-                asl a
-                asl a
-                asl a
+                asl
+                asl
+                asl
+                asl
                 tax
                 tya
                 sta IOCB0+ICCOM,x       ; command
@@ -426,7 +426,7 @@ _htcok          sta arg5
                 sta fr0
                 stx fr0+1
                 inc cix
-                bne _htc1               ; uncond.
+                bne _htc1               ; [unc]
 
                 .endproc
 
@@ -475,7 +475,7 @@ putsp           .proc
 ;   PutEOL()
 ;======================================
 puteol          .proc
-                ldy #eol
+                ldy #EOL
                 .endproc
 
 
@@ -583,7 +583,7 @@ _ps10           lda arg3
                 bne _ps8
 
                 tay
-                beq _ps5                ; uncond.
+                beq _ps5                ; [unc]
 
                 .endproc
 

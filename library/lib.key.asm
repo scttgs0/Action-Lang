@@ -48,7 +48,7 @@ _gk2            lda CH_
                 bcc _gk3                ; not Ctrl-Shft
 
 _cskey          jsr click
-                bmi _gk4                ; uncond.
+                bmi _gk4                ; [unc]
 
 _gk3            and #$3f
                 cmp #$3c                ; caps key

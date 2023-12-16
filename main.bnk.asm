@@ -270,7 +270,7 @@ prth            .proc                   ; call only from LBANK!
                 jsr printh
 
                 sty bank+lbank
-                jmp chkerr
+                jmp libIOChkErr
 
                 .endproc
 
