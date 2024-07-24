@@ -148,7 +148,6 @@ arrerr          ldy #arrayERR           ; bad array ref
 _XIT2           jmp codegen._ENTRY1
 
 ;   small arrary
-
 _small          ldy #7
                 sta (stack),Y           ; restore correct type
 

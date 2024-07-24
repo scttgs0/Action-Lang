@@ -6,7 +6,7 @@ mkdir -p obj/
 64tass  --m65c02 \
         --flat \
         --nostart \
-        -o obj/actionJR.bin \
-        --list=obj/actionJR.lst \
-        --labels=obj/actionJR.lbl \
+        -o obj/action.bin \
+        --list=obj/action.lst \
+        --labels=obj/action.lbl \
         action.asm
