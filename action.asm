@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: action.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
                 .enc "atari-screen-inverse"
@@ -27,24 +27,28 @@
 
 ;--------------------------------------
 ;--------------------------------------
-                * = $6000
+                * = $7FE0
 ;--------------------------------------
 
 ;   Boot from RAM data block
 
+.if PGZ=0
                 .byte $F2,$56           ; signature
                 .byte $03               ; slot count
-                .byte $03               ; start slot
+                .byte $03               ; START slot
                 .addr BOOT_             ; execute address
                 .word $0306             ; version       ; TODO: assemble date of latest version!
                 .word $0000             ; kernel
                 .null 'Action!'         ; binary name
-
+.endif
 
 ;--------------------------------------
 
-BOOT_           ldx #$FF                ; initialize the stack
+BOOT_           cld
+
+                ldx #$FF                ; initialize the stack
                 txs
+
                 jmp INIT
 
 
@@ -52,14 +56,9 @@ BOOT_           ldx #$FF                ; initialize the stack
 ;--------------------------------------
 ; Initialization code
 
-;--------------------------------------
-;--------------------------------------
-                * = $7FE0
-;--------------------------------------
-
 INIT            clc
-                jsr cstart
-                jmp Start
+                jsr CSTART
+                jmp START
 
 ;--------------------------------------
 ;--------------------------------------
@@ -71,7 +70,9 @@ date            .byte $07,$05,$23        ; TODO: assemble date of latest version
 
 
                 .include "main.io.asm"
+
 propid          ldx arg0
+
                 .include "screen.mac.asm"
                 .include "main.msc.asm"
                 .include "main.bank.asm"
@@ -81,7 +82,10 @@ amplfin
 ;    ACTION! - Editor Routines
 ;    ----------------------------------
 
+;--------------------------------------
                 .fill 4,$00
+;--------------------------------------
+
                 .include "editor/edit.find.asm"
                 .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"

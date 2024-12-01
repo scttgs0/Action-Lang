@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: compiler.main.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================

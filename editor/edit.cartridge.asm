@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: edit.cartridge.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
@@ -66,7 +66,7 @@ serial          .word $0A00             ; serial number of ROM
 ;======================================
 ;   Init RTS
 ;======================================
-Start           .proc
+START           .proc
                 jsr InitKeys            ; get keyboard
 
                 lda WARMST

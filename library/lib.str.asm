@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.str.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
@@ -85,9 +85,9 @@ _XIT            rts
 
 
 ;======================================
-;PROC SCopyS(STRING dest, src, BYTE start, stop)
+;PROC SCopyS(STRING dest, src, BYTE START, stop)
 ; if LEN(src)<stop then stop=LEN(src)
-; dest = src(start, stop)
+; dest = src(START, stop)
 ;======================================
 libStrSCopyS    .proc
                 sta arg0
@@ -124,12 +124,12 @@ _XIT            jmp libStrSCopy._ENTRY1
 
 
 ;======================================
-;PROC SAssign(STRING dest, src, BYTE start, stop)
-; IF stop-start+1>LEN(src) THEN
-;   stop = LEN(src)+start-1
+;PROC SAssign(STRING dest, src, BYTE START, stop)
+; IF stop-START+1>LEN(src) THEN
+;   stop = LEN(src)+START-1
 ; IF LEN(dest)<stop THEN
 ;   LEN(dest) = stop
-; dest(start, stop) = src
+; dest(START, stop) = src
 ;======================================
 libStrSAssign   .proc
                 sta arg0

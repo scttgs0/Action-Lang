@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: main.bank.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 en0             .ptext "Error"
@@ -37,12 +37,12 @@ en5             .ptext "TRACE"
 ;======================================
 ;   CStrt()
 ;======================================
-cstart          .proc
+CSTART          .proc
                 ;!!ldy #ebank
                 sty jt_curbank
                 ;!!sty bank+ebank
 
-                jmp start
+                jmp START
 
                 .endproc
 

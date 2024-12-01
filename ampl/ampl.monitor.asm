@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: ampl.monitor.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
@@ -230,7 +230,7 @@ Boot            .proc
                 jsr YesNo
                 bne MRun._XIT
 
-                jmp Start.cold
+                jmp START.cold
 
 ;--------------------------------------
 
@@ -337,7 +337,7 @@ _1              dec arg14
                 ;!!jsr CIOV
                 bmi MWOut._mwerr
 
-;   save start address
+;   save START address
                 ldx #4
 _next1          lda _mwinit,X
                 sta arg9,X

@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.msc.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
@@ -170,7 +170,7 @@ _2              and #$0F
 ;BYTE FUNC Peek(CARD address)
 ; returns value stored at address
 ;======================================
-libMscPeek      
+libMscPeek
                 ;[fall-through]
 
 
