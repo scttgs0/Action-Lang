@@ -23,7 +23,6 @@ loady           .proc
 
                 lda #$88                ; DEY
 _next1          jsr insrt1
-
                 jmp _3
 
 _1              cmp #0
@@ -721,7 +720,6 @@ insrt3          .proc
                 sty arg13
 
                 ldy #3
-
 _ENTRY1         jsr addcdsp
 
 _ENTRY2         txa
