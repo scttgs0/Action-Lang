@@ -15,30 +15,30 @@ insrtch         .proc
                 jsr setsp
 
 _padbuf         ldy #0
-                lda (buf),y
+                lda (buf),Y
                 cmp linemax
                 bcc _pbuf0              ; test line too long
 
                 jsr scrbell
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
 _pbuf0          cmp sp
                 bcs _pbuf2
 
                 sta arg0
                 lda sp
-                sta (buf),y
+                sta (buf),Y
                 ldy arg0
                 lda #$20                ; pad with spaces
 _pbuf1          iny
-                sta (buf),y
+                sta (buf),Y
                 cpy sp
                 bcc _pbuf1
 
 _pbret          ldy sp
                 lda curch
-                sta (buf),y
+                sta (buf),Y
                 lda #$ff
                 sta dirtyf
                 jsr dspbuf
@@ -50,12 +50,12 @@ _pbuf2          ldx insert
 
     ; move buf right one char
 _movert         adc #0                  ; really 1, carry set
-                sta (buf),y
+                sta (buf),Y
                 tay
 _mrt1           dey
-                lda (buf),y
+                lda (buf),Y
                 iny
-                sta (buf),y
+                sta (buf),Y
                 dey
                 cpy sp
                 bne _mrt1
@@ -97,7 +97,7 @@ insrt           .proc
 
 insert2         lda #0
                 tay
-insert3         sta (buf),y
+insert3         sta (buf),Y
                 iny
                 sty dirty
                 jmp instb
@@ -114,14 +114,14 @@ csret           .proc
                 jsr delch
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 pha
                 jsr setsp
 
                 sta dirtyf              ; always non-zero
                 sec
                 sbc #1
-                sta (buf),y
+                sta (buf),Y
                 jsr clnln
 
                 pla
@@ -131,10 +131,10 @@ csret           .proc
                 sta arg0
                 beq _csr2
 
-_csr1           lda (buf),y
+_csr1           lda (buf),Y
                 inc arg0
                 ldy arg0
-                sta (buf),y
+                sta (buf),Y
                 inc sp
 _csr2           ldy sp
                 cpy arg1
@@ -193,7 +193,7 @@ _del1           sta arg3
                 bne _del2               ; no, delete it
 
                 tay
-                sta (buf),y
+                sta (buf),Y
                 iny
                 sty dirtyf
                 bne return.ret3         ; [unc]
@@ -250,10 +250,10 @@ delfree         .proc
 ;======================================
 delnext         .proc
                 ldy #5
-                lda (delnxt),y
+                lda (delnxt),Y
                 tax
                 dey
-                lda (delnxt),y
+                lda (delnxt),Y
                 sta delnxt
                 stx delnxt+1
                 jmp delend
@@ -280,16 +280,16 @@ delch           .proc
                 bcc chkdwn.cdwn1
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 sta dirtyf
                 sec
                 sbc #1
-                sta (buf),y
+                sta (buf),Y
                 ldy sp
 _dch1           iny
-                lda (buf),y
+                lda (buf),Y
                 dey
-                sta (buf),y
+                sta (buf),Y
                 iny
                 cpy dirtyf
                 bcc _dch1               ; really checking for =
@@ -316,7 +316,7 @@ chkdwn          .proc
                 beq cdwn1
 
                 ldy #5
-                lda (cur),y
+                lda (cur),Y
 cdwn1           rts
                 .endproc
 
@@ -335,7 +335,7 @@ bsp1            jsr scrllft
 
                 tay
                 lda #$20
-                sta (buf),y
+                sta (buf),Y
                 sta dirtyf
                 lda insert
                 bne delch
@@ -358,7 +358,7 @@ csbs            .proc
                 beq chkdwn.cdwn1        ; no lines at all!
 
                 ldy #1
-                lda (cur),y
+                lda (cur),Y
                 beq chkdwn.cdwn1        ; no line to merge with
 
     ; merge
@@ -371,20 +371,20 @@ csbs            .proc
 
                 clc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 sta arg2
-                adc (arg0),y
-                sta (buf),y
-                lda (arg0),y
+                adc (arg0),Y
+                sta (buf),Y
+                lda (arg0),Y
                 beq _cb2
 
                 sta arg3
 _cb1            iny
                 sty arg4
-                lda (arg0),y
+                lda (arg0),Y
                 inc arg2
                 ldy arg2
-                sta (buf),y
+                sta (buf),Y
                 ldy arg4
                 cpy arg3
                 bne _cb1

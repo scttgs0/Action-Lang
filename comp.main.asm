@@ -74,26 +74,26 @@ _rtn            lda #$60                ; RTS
                 beq _splrtn
 
 _spl3           ldy #1
-                lda (arrayptr),y
+                lda (arrayptr),Y
                 sta arg1
                 dey
-                lda (arrayptr),y
+                lda (arrayptr),Y
                 sta arg0
                 jsr getcdoff
 
-                sta (arrayptr),y
+                sta (arrayptr),Y
                 txa
                 iny
-                sta (arrayptr),y
+                sta (arrayptr),Y
 
                 clc
                 iny
                 lda qcode
-                adc (arrayptr),y
+                adc (arrayptr),Y
                 sta qcode
                 iny
                 lda qcode+1
-                adc (arrayptr),y
+                adc (arrayptr),Y
                 sta qcode+1
 
                 lda arg0
@@ -183,7 +183,7 @@ _t1             cmp #char
                 clc
                 adc #+typet-vart
                 sta type
-                lda varsize-char,x
+                lda varsize-char,X
                 sta afcur
 _t2             jsr makeentry
 
@@ -240,7 +240,7 @@ _dcl1           cmp #define
 
                 sta type
                 tax
-                ldy varsize-char,x
+                ldy varsize-char,X
                 sty afcur
                 ldx nxttoken
                 cpx #func
@@ -302,7 +302,7 @@ _define
 
                 ldy #0
                 lda #defid
-                sta (props),y
+                sta (props),Y
                 jsr getnext
 
                 cmp #equalid
@@ -313,7 +313,7 @@ _define
                 bne dclerr
 
                 ldy #0
-                lda (symtab),y
+                lda (symtab),Y
                 clc
                 adc #2                  ; real size + EOL
                 jsr stincr
@@ -365,10 +365,10 @@ _arrd1          jsr makeentry
 
                 ldy #2
                 lda #0
-                cmp (qcode),y
+                cmp (qcode),Y
                 iny
                 lda #1
-                sbc (qcode),y
+                sbc (qcode),Y
                 bcs _arrd6              ; size <= 256
 
 _ard2a          jsr getnext
@@ -385,7 +385,7 @@ _arrd3          lda numargs
 
     ; small array
                 ldy #2
-                lda (qcode),y
+                lda (qcode),Y
                 bne _ard3b
 
                 inc qcode+1
@@ -436,14 +436,14 @@ _ard2b          ldy #1
                 jmp _ard3b
 
 _arrd6          ldy #0
-                lda (props),y
+                lda (props),Y
                 cmp #arrayt+intt
                 bcs _ard2a
 
     ; small byte array
                 sty numargs
                 ora #8
-                sta (props),y
+                sta (props),Y
                 iny
                 jsr getcdoff
                 jsr storprops
@@ -493,10 +493,10 @@ _me1            lda #0
                 sec
                 lda #vart-char
                 adc type
-                sta (props),y           ; type
+                sta (props),Y           ; type
                 and #7
                 tax
-                lda vartype-1,x
+                lda vartype-1,X
                 sta op
 
                 iny
@@ -552,10 +552,10 @@ _gas            clc
 ;   StorProps(low, high, index)
 ;======================================
 storprops       .proc
-                sta (props),y
+                sta (props),Y
                 txa
                 iny
-                sta (props),y
+                sta (props),Y
                 rts
                 .endproc
 
@@ -573,7 +573,7 @@ storprops       .proc
 ;======================================
 params          .proc
                 ldy #0
-                lda (props),y           ; get var type
+                lda (props),Y           ; get var type
                 pha
                 lda #3
                 jsr cprop
@@ -582,7 +582,7 @@ params          .proc
                 bcs perr
 
                 adc #1
-                sta (props),y
+                sta (props),Y
                 tay
 
     ; see if time to update gbase
@@ -616,7 +616,7 @@ _par2           and #$1f
                 inc argbytes
 _par3           and #$9f
                 inc argbytes
-                sta (props),y
+                sta (props),Y
                 rts
                 .endproc
 
@@ -756,12 +756,12 @@ ass1            eor #equalid
                 bne _a1a
 
                 ldy #3
-                lda (stack),y
+                lda (stack),Y
 _a1a            and #$20
                 beq _a1b
 
                 iny
-                lda (stack),y
+                lda (stack),Y
                 tax
     ; incr temps
                 cpx #args               ;
@@ -770,7 +770,7 @@ _a1a            and #$20
                 cpx #args+16            ; needed?
                 bcs _a1b                ;
 
-                inc temps-args,x
+                inc temps-args,X
 _a1b            jsr getnext
 _ass2           jsr exp.exp1
                 jsr cgassign
@@ -788,7 +788,7 @@ arassign        .proc
                 jsr arrref
 
 arass1          ldy #0
-                lda (stack),y
+                lda (stack),Y
                 bpl _ara1               ; record element
 
                 cmp #vart
@@ -809,7 +809,7 @@ ifstmt          .proc
 
                 ldy #5
                 lda #0
-                sta (frame),y
+                sta (frame),Y
 
 _if             jsr condexp
 
@@ -819,13 +819,13 @@ _if             jsr condexp
     ; save current Y
                 lda cury
                 ldy #6
-                sta (frame),y
+                sta (frame),Y
                 jsr recret.nxtstmt
 
     ; restore Y
                 tax
                 ldy #6
-                lda (frame),y
+                lda (frame),Y
                 sta cury
                 txa
 
@@ -889,10 +889,10 @@ nxtstmt         jsr getnext
 ;    ----------
 freeframe       .proc
                 ldy #0
-                lda (frame),y
+                lda (frame),Y
                 tax
                 iny
-                lda (frame),y
+                lda (frame),Y
                 stx frame
                 sta frame+1
                 rts
@@ -909,7 +909,7 @@ dostmt          .proc
 
                 lda #0
                 ldy #3
-                sta (frame),y
+                sta (frame),Y
                 bne whstmt.wh1          ; [unc]
 
 fierr           cmp #undec
@@ -965,17 +965,17 @@ exitstmt        .proc
                 beq sterr
 
                 ldy #2                  ; get pointer to EXIT list
-                lda (whaddr),y
+                lda (whaddr),Y
                 tax
                 iny
-                lda (whaddr),y
+                lda (whaddr),Y
                 pha
 
                 lda qcode+1             ; link in JMP for EXIT
-                sta (whaddr),y
+                sta (whaddr),Y
                 lda qcode
                 dey
-                sta (whaddr),y
+                sta (whaddr),Y
 
                 pla
                 tay
@@ -1021,7 +1021,7 @@ forstmt         .proc
 
     ; get initial value
 _fs1            ldy #8
-                sta (frame),y
+                sta (frame),Y
                 iny
                 lda addr
                 ldx addr+1
@@ -1042,7 +1042,7 @@ _f1             bne forerr
                 lda #0
                 ldx #9
                 ldy #12
-_fz             sta (frame),y
+_fz             sta (frame),Y
                 iny
                 dex
                 bne _fz
@@ -1082,13 +1082,13 @@ _fnostep        cmp #do
                 jsr genops.gops
 
                 ldy #16
-                lda (frame),y
+                lda (frame),Y
                 cmp #vart
                 bcs _f3                 ; temp variable
 
     ; constant
                 iny
-                lda (frame),y
+                lda (frame),Y
                 tax
                 lda #$a9
                 jsr push2               ; LDA #low
@@ -1100,7 +1100,7 @@ _fnostep        cmp #do
                 beq _fbody
 
                 ldy #18
-                lda (frame),y
+                lda (frame),Y
                 tax
 _f2             lda #$a9
                 jsr push2               ; LDA #high
@@ -1120,7 +1120,7 @@ _f3             ldy #17
 
                 ldx #0
                 ldy #16
-                lda (frame),y
+                lda (frame),Y
                 cmp #vart+intt
                 bcc _f2                 ; only byte var
 
@@ -1157,7 +1157,7 @@ _f5             jsr push1
 
     ; handle symtab
                 ldy #11
-                lda (frame),y
+                lda (frame),Y
                 cmp #vart
                 bcc _f6
 
@@ -1168,7 +1168,7 @@ _f5             jsr push1
 
                 lda #0
                 tay
-                sta (symtab),y
+                sta (symtab),Y
                 lda #4
                 jsr stincr
 
@@ -1210,13 +1210,13 @@ _f7             pha
                 pha
                 clc
                 ldy #4
-                lda (frame),y
+                lda (frame),Y
                 sbc stkbase-9           ; see CGPlus
                 bpl _f8
 
                 tax
                 iny
-                lda (frame),y
+                lda (frame),Y
                 sbc stkbase-8
                 cmp #$ff
                 bne _f8                 ; yes, branch to top
@@ -1227,7 +1227,7 @@ _f7             pha
                 sta arg1
                 ldy #0
                 txa
-                sta (arg0),y
+                sta (arg0),Y
 _f8             pla
 _f9             sta token
                 jmp whstmt.wh2
@@ -1256,9 +1256,9 @@ _fe0            lda arg1
 
     ; constant
                 ldy #11
-                lda (frame),y
+                lda (frame),Y
                 ldy arg0
-                sta (frame),y
+                sta (frame),Y
                 ldy #2
                 jsr loadi
 
@@ -1267,7 +1267,7 @@ _fe0            lda arg1
                 jmp framecd.fcd2
 
 _fe1            ldy #8
-                lda (frame),y
+                lda (frame),Y
                 and #7
                 cmp #intt
                 bmi _fe2
@@ -1276,10 +1276,10 @@ _fe1            ldy #8
                 and #7
 _fe2            ora #vart
                 ldy #1
-                sta (symtab),y
+                sta (symtab),Y
                 sta arg2
                 ldy arg0
-                sta (frame),y
+                sta (frame),Y
                 inc arg0
 
                 lda arg1
@@ -1342,7 +1342,7 @@ _ft1            jsr loadcd
 ;======================================
 ;
 ;======================================
-fmem            lda (frame),y
+fmem            lda (frame),Y
                 cmp #vart
                 bcc forexp.fexp2._fe3   ; const
 
@@ -1350,15 +1350,15 @@ fmem            lda (frame),y
                 jsr getcdoff            ; save address for step
 
                 ldy #2
-                sta (symtab),y
+                sta (symtab),Y
                 txa
                 iny
-                sta (symtab),y
+                sta (symtab),Y
                 ldy arg2
                 jsr _fm1
 
                 ldy arg2
-                lda (frame),y
+                lda (frame),Y
                 cmp #vart+intt
                 bcc forexp.fexp2._fe3   ; byte only
 
@@ -1375,7 +1375,7 @@ _fm1            iny
 ;======================================
 ;
 ;======================================
-fstk            lda (frame),y
+fstk            lda (frame),Y
                 sta token
                 iny
                 jsr frameadr.fadr1
@@ -1450,7 +1450,7 @@ condexp         .proc
 
                 pha
                 ldy #0
-                lda (stack),y
+                lda (stack),Y
                 cmp #condt
                 beq _cexp1
 
@@ -1529,10 +1529,10 @@ _fb1            jsr savrel
 ;======================================
 frameadr        .proc
                 ldy #2
-fadr1           lda (frame),y
+fadr1           lda (frame),Y
                 tax
                 iny
-                lda (frame),y
+                lda (frame),Y
                 tay
 fadr2           stx arg4
                 sty arg5
@@ -1547,10 +1547,10 @@ framecd         .proc
                 ldy #2
 fcd1            lda qcode
                 ldx qcode+1
-fcd2            sta (frame),y
+fcd2            sta (frame),Y
                 iny
                 txa
-                sta (frame),y
+                sta (frame),Y
                 rts
                 .endproc
 
@@ -1573,10 +1573,10 @@ fjmp1           jsr saven
 ;   Save4(value)
 ;======================================
 save4           .proc
-                sta (arg4),y
+                sta (arg4),Y
                 iny
                 txa
-                sta (arg4),y
+                sta (arg4),Y
                 rts
                 .endproc
 
@@ -1586,10 +1586,10 @@ save4           .proc
 ;======================================
 saven           .proc
                 ldy #1
-                lda (arg4),y
+                lda (arg4),Y
                 sta arg0
                 iny
-                lda (arg4),y
+                lda (arg4),Y
                 sta arg1
                 dey
                 rts
@@ -1667,7 +1667,7 @@ setrel          .proc
 savrel          .proc
                 ldy #0
                 ldx #0
-                lda (arg4),y
+                lda (arg4),Y
                 beq _sr2
                 bpl _sr1
 
@@ -1690,7 +1690,7 @@ comprel         .proc
 crel1           clc                     ; extra -1 for offset byte
 crel2           sbc arg4
                 ldy #0
-                sta (arg4),y
+                sta (arg4),Y
                 rts
                 .endproc
 
@@ -1701,7 +1701,7 @@ crel2           sbc arg4
 clrtemps        .proc
                 lda #0
                 ldx #16
-_sl0            sta temps-1,x
+_sl0            sta temps-1,X
                 dex
                 bne _sl0                ; free temps
 
@@ -1875,7 +1875,7 @@ _expop          ldx op
                 lda #uminusid
                 sta token
 _exp5           tax
-                lda prec-1,x
+                lda prec-1,X
                 sta op
                 jsr rollops
                 jsr pushop
@@ -1915,7 +1915,7 @@ _expstr
                 inx
                 clc
 _es1            ldy #0
-                adc (addr),y            ; size
+                adc (addr),Y            ; size
                 bcc _es2
 
                 inx
@@ -1948,7 +1948,7 @@ _expfunc
 
                 ldy #16
                 lda op
-                sta (frame),y
+                sta (frame),Y
 
     ; save temps
                 sty arg0
@@ -1956,8 +1956,8 @@ _expfunc
                 sta arg1
 _ef1            dec arg0
                 ldy arg0
-                lda temps,y
-                sta (frame),y
+                lda temps,Y
+                sta (frame),Y
                 beq _ef2
 
                 lda #$a5                ; LDA addr
@@ -1983,8 +1983,8 @@ _ef2            dec arg1
                 sta arg1
 _ef3            inc arg0
                 ldy arg0
-                lda (frame),y
-                sta temps,y
+                lda (frame),Y
+                sta temps,Y
                 beq _ef4
 
                 lda #$68                ; PLA
@@ -1998,14 +1998,14 @@ _ef4            inc arg1
                 bne _ef3
 
                 iny
-                lda (frame),y
+                lda (frame),Y
                 sta op
 
                 jsr freeframe
 
     ; set result type
                 ldy #0
-                lda (stack),y
+                lda (stack),Y
                 and #7
                 ora #tempt
                 ldx #args
@@ -2038,7 +2038,7 @@ popop           .proc
                 bmi experr              ; this should never happen
 
                 ldy stackptr
-                lda opstack,y
+                lda opstack,Y
                 rts
                 .endproc
 
@@ -2075,7 +2075,7 @@ pushst          .proc
 
                 ldy #0
                 lda token
-                sta (stack),y
+                sta (stack),Y
                 iny
                 lda addr
                 ldx addr+1
@@ -2093,7 +2093,7 @@ etypep          .proc
                 jsr getnext
 
                 ldy #0
-                sta (stack),y
+                sta (stack),Y
                 tax
                 and #$f8
                 ldy #typer
@@ -2132,10 +2132,10 @@ _e1             jsr etypep              ; set type
 
                 tya
                 ldy #2
-                sta (stack),y
+                sta (stack),Y
                 dey
                 txa
-                sta (stack),y
+                sta (stack),Y
                 rts
                 .endproc
 
@@ -2165,7 +2165,7 @@ _e1             jsr etypep              ; set type
                 ldy #0
                 pla
                 ora #$b0                ; temp array
-                sta (stack),y
+                sta (stack),Y
                 rts
                 .endproc
 
@@ -2196,8 +2196,8 @@ copyst          .proc
                 jsr pushst
 
                 ldy #6
-_cst1           lda (arg4),y
-                sta (stack),y
+_cst1           lda (arg4),Y
+                sta (stack),Y
                 dey
                 bpl _cst1
 
@@ -2216,7 +2216,7 @@ rollops         .proc
                 beq _rops1
 
                 tax
-                ldy prec-1,x
+                ldy prec-1,X
                 cpy op
                 bcc _rops1              ; prec < op
                                         ; check for simple add
@@ -2287,7 +2287,7 @@ popst           .proc
 pushop          .proc
                 ldy stackptr
                 inc stackptr
-                sta opstack,y
+                sta opstack,Y
                 rts
                 .endproc
 
@@ -2319,31 +2319,31 @@ prec            .byte 5,5,6,6,2,3,4,4,4,4,4,4
 genops          .proc
                 sta arg0
 gops            ldy #0
-                lda (stack),y
+                lda (stack),Y
                 sta arg1
                 and #7
                 tax
-                lda vartype-1,x
+                lda vartype-1,X
                 sta arg3
                 asl
                 asl
                 sta arg5
                 ldy #7
-                lda (stack),y
+                lda (stack),Y
                 sta arg2
                 and #7
                 tax
-                lda vartype-1,x
+                lda vartype-1,X
                 sta arg4
                 ora arg5
                 tax
-                lda outtype,x
+                lda outtype,X
                 sta arg6                ; high bit on for card.
                 and #7                  ; get rid of flag bits
                 tax
                 ora #tempt
                 sta arg7
-                lda vartype-1,x
+                lda vartype-1,X
                 sta arg5                ; output type
 
                 jmp push0
@@ -2409,10 +2409,10 @@ _ENTRY1         jsr cgend
                 clc
                 adc arg0
                 tay
-                lda cgops-3,y
+                lda cgops-3,Y
                 sta arg8
-                lda cgops-2,y
-                ldx cgops-1,y
+                lda cgops-2,Y
+                ldx cgops-1,Y
                 jmp jsrind              ; jmp to qcode for op
 
                 .endproc
@@ -2492,7 +2492,7 @@ _cgc0           ldx arg4
                 beq _cgc1               ; byte
 
                 ldy #2
-                lda (stack),y
+                lda (stack),Y
                 cmp #2
                 bcs _cgavi
 
@@ -2503,7 +2503,7 @@ _cgc0           ldx arg4
                 jsr op1h
 
 _cgc1           ldy #1
-                lda (stack),y
+                lda (stack),Y
                 cmp #2
                 bcs _cgavb
 
@@ -2541,7 +2541,7 @@ _cgat           and #$10                ; rhs array?
 
     ; special case for arg0
                 ldy #1
-                lda (stack),y
+                lda (stack),Y
                 cmp #args
                 beq cgassign._cgav      ; function return value
 
@@ -2594,7 +2594,7 @@ _cgat3          and #$40                ; proc?
 
 _cgat4          ldy #1
                 txa
-                sta (arg14),y
+                sta (arg14),Y
                 lda #0
                 beq _cgat2
 
@@ -2649,8 +2649,8 @@ chstkeq         ldx #2
                 bne _cse1               ; no
 
                 ldx #5
-_cse1           lda stkbase-14,x
-                cmp stkbase-7,x
+_cse1           lda stkbase-14,X
+                cmp stkbase-7,X
                 bne _cse2
 
                 dex
@@ -2684,25 +2684,25 @@ cgadd           .proc
 
     ; add constants
                 clc
-                lda (stack),y
+                lda (stack),Y
                 ldy #1
-                adc (stack),y
+                adc (stack),Y
                 sta arg9
                 ldy #9
-                lda (stack),y
+                lda (stack),Y
                 ldy #2
-                adc (stack),y
+                adc (stack),Y
                 jmp _a2
 
 _a1             sec
-                lda (stack),y
+                lda (stack),Y
                 ldy #1
-                sbc (stack),y
+                sbc (stack),Y
                 sta arg9
                 ldy #9
-                lda (stack),y
+                lda (stack),Y
                 ldy #2
-                sbc (stack),y
+                sbc (stack),Y
 
 _a2             tax
                 beq cgadd4
@@ -2715,7 +2715,7 @@ _a2             tax
 
     ; normal add or sub.
 _a3             ldx arg8
-                lda cgopscd,x
+                lda cgopscd,X
                 jsr push1
 
 _ENTRY1         jsr gettemps
@@ -2736,7 +2736,7 @@ _ENTRY2         jsr stemph
 cgadd3          ldx #0
 cgadd4          lda arg7
 cgadd5          ldy #7
-                sta (stack),y
+                sta (stack),Y
                 iny
                 lda arg9
                 jsr savecd.savstk
@@ -2758,7 +2758,7 @@ cgshift         .proc
                 bcs cgmul.cgmd          ; no
 
                 ldy #1
-                lda (stack),y
+                lda (stack),Y
                 beq cgadd.cgadd6        ; ignore shift
 
                 cmp #8                  ; shift high  7
@@ -2801,7 +2801,7 @@ cgmul           .proc
                 sta arg7
 
         .if ramzap
-                sta (adress),y
+                sta (adress),Y
         .else
                 nop
                 nop
@@ -2877,7 +2877,7 @@ _or2            jsr savrel
                 bne _or2                ; get end of T1
 
                 ldy #3
-                lda (stack),y
+                lda (stack),Y
                 sec
                 jsr comprel.crel2       ; patch in T2
                 beq cgand.and3          ; [unc]
@@ -2900,11 +2900,11 @@ _and1           jsr saven               ; patch addresses
                 clc
                 lda arg0
                 adc #3
-                sta (arg4),y
+                sta (arg4),Y
                 iny
-                lda (arg4),y
+                lda (arg4),Y
                 adc #0
-                sta (arg4),y
+                sta (arg4),Y
                 jsr loadn
                 bne _and1
 
@@ -3083,23 +3083,23 @@ cgum            .proc
                 sec
                 ldy #0
                 lda #constt+intt
-                sta (stack),y
+                sta (stack),Y
                 sec
                 tya
                 iny
-                sbc (stack),y
-                sta (stack),y
+                sbc (stack),Y
+                sta (stack),Y
                 iny
                 lda #0
-                sbc (stack),y
-                sta (stack),y
+                sbc (stack),Y
+                sta (stack),Y
                 rts
 
 _cgum1          jsr copyst
 
                 ldy #7
                 lda #constt+intt
-                sta (stack),y
+                sta (stack),Y
                 lda #0
                 tax
                 iny
@@ -3130,7 +3130,7 @@ cgat            .proc
 
 _cgat1          ldy #0
                 lda #constt+cardt
-                sta (stack),y
+                sta (stack),Y
                 rts
 
 _cgat2          and #$f8

@@ -48,14 +48,14 @@ sound           .proc
                 jsr error
 
 _snd1           txa
-                sta AUDF1,y
+                sta AUDF1,Y
                 lda arg2
                 asl
                 asl
                 asl
                 asl
                 ora arg3
-                sta AUDC1,y
+                sta AUDC1,Y
                 rts
                 .endproc
 
@@ -71,7 +71,7 @@ sndrst          .proc
                 sta SKCTL
                 lda #0
                 ldx #8
-_sr1            sta AUDF1,x             ; zero sound regs
+_sr1            sta AUDF1,X             ; zero sound regs
                 dex
                 bpl _sr1
 
@@ -101,8 +101,8 @@ ptrig           .proc
                 inx
                 and #3
 _pt1            tay
-                lda PORTA,x
-                and _pt2,y
+                lda PORTA,X
+                and _pt2,Y
                 sta args
                 rts
 
@@ -125,7 +125,7 @@ stick           .proc
                 inx
                 and #1
 _stk1           tay
-                lda PORTA,x
+                lda PORTA,X
                 dey
                 bne _stk2
 
@@ -170,10 +170,10 @@ peekc           .proc
                 sta arg2
                 stx arg3
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 sta args
                 iny
-                lda (arg2),y
+                lda (arg2),Y
                 sta args+1
                 rts
                 .endproc
@@ -189,7 +189,7 @@ poke            .proc
                 stx arg1
                 tya
                 ldy #0
-                sta (arg0),y
+                sta (arg0),Y
                 rts
                 .endproc
 
@@ -204,7 +204,7 @@ pokec           .proc
 
                 iny
                 lda arg3
-                sta (arg0),y
+                sta (arg0),Y
                 rts
                 .endproc
 
@@ -242,7 +242,7 @@ setblock        .proc
                 ldx arg3
                 beq _sb3
 
-_sb1            sta (arg0),y
+_sb1            sta (arg0),Y
                 iny
                 bne _sb1
 
@@ -251,7 +251,7 @@ _sb1            sta (arg0),y
                 bne _sb1
                 beq _sb3
 
-_sb2            sta (arg0),y
+_sb2            sta (arg0),Y
                 iny
 _sb3            cpy arg2
                 bne _sb2
@@ -275,8 +275,8 @@ moveblock       .proc
                 lda arg5
                 beq _mb4
 
-_mb2            lda (arg2),y
-                sta (arg0),y
+_mb2            lda (arg2),Y
+                sta (arg0),Y
                 iny
                 bne _mb2
 
@@ -286,8 +286,8 @@ _mb2            lda (arg2),y
                 bne _mb2
                 beq _mb4
 
-_mb3            lda (arg2),y
-                sta (arg0),y
+_mb3            lda (arg2),Y
+                sta (arg0),Y
                 iny
 _mb4            cpy arg4
                 bne _mb3
@@ -338,45 +338,45 @@ ctrace          .proc                   ; Call Trace handler
                 lda arg10
                 ldy #0
                 sty arg15
-                adc (arg10),y
+                adc (arg10),Y
                 sta arg10
                 bcc _ct1
 
                 inc arg11
-_ct1            lda (arg10),y
+_ct1            lda (arg10),Y
                 sta arg12
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg13
     ; get number of args
                 iny
-                lda (arg10),y
+                lda (arg10),Y
                 sta arg9
                 sty arg14
                 beq _ct7                ; no args
 
 _ct2            inc arg14
                 ldy arg14
-                lda (arg10),y
+                lda (arg10),Y
                 bmi _ct4                ; byte
 
                 cmp #cardt
                 inc arg15
                 ldy arg15
-                lda (arg12),y
+                lda (arg12),Y
                 tax
                 dey
                 bcs _ct5                ; cardinal
 
     ; integer
-                lda (arg12),y
+                lda (arg12),Y
                 jsr prti
 
                 jmp _ct6
 
 _ct4            ldx #0
                 ldy arg15
-_ct5            lda (arg12),y
+_ct5            lda (arg12),Y
                 jsr libIOPrintC
 
 _ct6            inc arg15

@@ -33,7 +33,7 @@ find2           lda findbuf
                 beq _f7
 
 _f2             ldy #0
-                lda (buf),y
+                lda (buf),Y
                 tay
                 iny
                 sty arg0
@@ -46,9 +46,9 @@ _f3             ldy sp
                 sty sp
                 ldx #0
 
-_f4             lda (buf),y
+_f4             lda (buf),Y
                 inx
-                cmp findbuf,x
+                cmp findbuf,X
                 bne _f3
 
                 iny

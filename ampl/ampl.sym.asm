@@ -22,16 +22,16 @@ stm             .proc
                 ldy arg15
                 sty arg13
 
-_stm1           lda (arg2),y
+_stm1           lda (arg2),Y
                 sta nxtaddr+1
                 beq _stm3
 
-                lda (arg4),y
+                lda (arg4),Y
                 sta nxtaddr
 
                 ldy #0
-_stm2           lda (nxtaddr),y
-                eor (symtab),y
+_stm2           lda (nxtaddr),Y
+                eor (symtab),Y
                 and stmask
                 bne _stm4
 
@@ -39,7 +39,7 @@ _stm2           lda (nxtaddr),y
                 iny
                 bcc _stm2
 
-                lda (nxtaddr),y         ; matched
+                lda (nxtaddr),Y         ; matched
 
 _stm3           rts
 
@@ -77,14 +77,14 @@ _stmr0          lda #$ff                ; if name too long!
                 iny
                 sty arg0
 
-                ldx rwstrt-2,y
+                ldx rwstrt-2,Y
 _stmr1          stx arg1
 
                 ldy #1
-_stmr2          lda resw1,x
+_stmr2          lda resw1,X
                 bmi _stmr3
 
-                eor (symtab),y
+                eor (symtab),Y
                 and stmask
                 bne _stmr4
 
@@ -94,7 +94,7 @@ _stmr2          lda resw1,x
                 bcc _stmr2
 
     ; we have a match
-                lda resw1,x             ; get token value
+                lda resw1,X             ; get token value
 
 _stmr3          rts
 
@@ -122,7 +122,7 @@ lgetname        .proc
                 txa
 _gname1         iny
                 sty arg14
-                sta (symtab),y
+                sta (symtab),Y
 
                 ora #$20
                 asl arg15
@@ -140,7 +140,7 @@ _gname1         iny
 
                 tya
                 ldy #0
-                sta (symtab),y
+                sta (symtab),Y
 
                 dec choff               ; put character back
 
@@ -176,7 +176,7 @@ lgnlocal        lda stlocal
                 bne istmres._stmr3
 
         .if ramzap
-                inc stm,x
+                inc stm,X
         .else
                 nop
                 nop
@@ -190,9 +190,9 @@ lgnlocal        lda stlocal
 ;======================================
 newentry        .proc
                 lda symtab+1
-                sta (arg2),y
+                sta (arg2),Y
                 lda symtab
-                sta (arg4),y
+                sta (arg4),Y
 
                 lda #<libst
                 ldx #>libst
@@ -201,15 +201,15 @@ newentry        .proc
                 lda #undec
                 ldy arg14
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda nxtaddr
                 iny
-                sta (symtab),y          ; save shadow entry
+                sta (symtab),Y          ; save shadow entry
 
                 lda nxtaddr+1
                 iny
-                sta (symtab),y
+                sta (symtab),Y
 
                 lda symtab
                 sta nxtaddr

@@ -62,12 +62,12 @@ next            .proc
                 jsr chkcur
                 beq next1
 
-                lda (cur),y
+                lda (cur),Y
                 beq next1
 
                 tax
                 dey
-                lda (cur),y
+                lda (cur),Y
                 sta cur
                 txa
                 sta cur+1
@@ -155,10 +155,10 @@ _mn2b           ldy #0
                 cmp #'^'
                 bne _mn3
 
-                lda (afsize),y
+                lda (afsize),Y
                 tax
                 iny
-                lda (afsize),y
+                lda (afsize),Y
                 stx afsize
                 jmp _mn2a
 
@@ -206,7 +206,7 @@ _mnundec        lda #1
 
                 tax
                 iny
-                lda (props),y
+                lda (props),Y
                 beq _varerr
 
                 tay
@@ -256,12 +256,12 @@ copystr         .proc
                 pha
 
                 ldy #0
-                lda (nxtaddr),y         ; size
-                sta (qcode),y
+                lda (nxtaddr),Y         ; size
+                sta (qcode),Y
                 tax
                 tay
-_cs1            lda (nxtaddr),y
-                sta (qcode),y
+_cs1            lda (nxtaddr),Y
+                sta (qcode),Y
                 dey
                 bne _cs1
 
@@ -300,10 +300,10 @@ getcdoff        .proc
 ;   StoreVar(low, high, index)
 ;======================================
 storevar        .proc
-                sta (qcode),y
+                sta (qcode),Y
                 iny
                 txa
-                sta (qcode),y
+                sta (qcode),Y
                 rts
                 .endproc
 
@@ -315,7 +315,7 @@ lookup          .proc
                 sty arg2
 
         .if ramzap
-                sta (arg1),y            ; zap RAM if any
+                sta (arg1),Y            ; zap RAM if any
         .else
                 nop
                 nop
@@ -324,10 +324,10 @@ lookup          .proc
 lu1             stx arg1
                 tax
                 ldy #2
-                lda (arg1),y
+                lda (arg1),Y
                 tay
                 txa
-_fml1           cmp (arg1),y
+_fml1           cmp (arg1),Y
                 beq _fmjmp
 
                 dey
@@ -337,10 +337,10 @@ _fml1           cmp (arg1),y
                 bne _fml1
 
 _fmjmp          dey
-                lda (arg1),y
+                lda (arg1),Y
                 sta arg4
                 dey
-                lda (arg1),y
+                lda (arg1),Y
                 sta arg3
                 jmp (arg3)
 
@@ -475,17 +475,17 @@ gprop           .proc
                 inx
 _gp1            sec
                 ldy #0
-                adc (props),y
+                adc (props),Y
                 sta props
                 bcc _gp2
 
                 inx
 _gp2            stx props+1
                 iny
-                lda (props),y
+                lda (props),Y
                 tax
                 dey
-                lda (props),y
+                lda (props),Y
                 rts
                 .endproc
 

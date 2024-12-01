@@ -58,7 +58,7 @@ rstbank         .proc
                 pha
                 tya
                 ldy curbank
-rbank1          sta bank,y
+rbank1          sta bank,Y
                 tay
                 pla
                 plp
@@ -243,7 +243,7 @@ getargs         .proc
                 sta abt+2               ; (default)
 
                 ldy #2
-                lda (props),y
+                lda (props),Y
                 sta numargs
                 beq _ga2
 
@@ -252,9 +252,9 @@ getargs         .proc
                 bcs _ga2
 
 _ga1            iny
-                lda (props),y
+                lda (props),Y
                 dex
-                sta argtypes,x          ; args inverted
+                sta argtypes,X          ; args inverted
                 bne _ga1
 
 _ga2            jmp rstbank

@@ -25,8 +25,8 @@ scompare        .proc
                 ldy #0
                 sty args
                 sty args+1
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 beq _sc1
 
                 jsr _sc4
@@ -38,8 +38,8 @@ _sc1            cmp #0
 
 _sc2            sta arg6
 _sc3            iny
-                lda (arg4),y
-                cmp (arg2),y
+                lda (arg4),Y
+                cmp (arg2),Y
                 bne _sc4
 
                 cpy arg6
@@ -51,7 +51,7 @@ _sc4            ldx #$ff
                 stx args
                 bcc _sc5
 
-                lda (arg2),y
+                lda (arg2),Y
                 inx
 _sc5            stx args+1
                 rts
@@ -67,13 +67,13 @@ scopy           .proc
                 stx arg1
                 sty arg2
                 ldy #0
-                lda (arg2),y
-_scopy1         sta (arg0),y
+                lda (arg2),Y
+_scopy1         sta (arg0),Y
                 beq _scp2
 
 _scopy2         tay
-_scp1           lda (arg2),y
-                sta (arg0),y
+_scp1           lda (arg2),Y
+                sta (arg0),Y
                 dey
                 bne _scp1
 
@@ -91,7 +91,7 @@ scopys          .proc
                 stx arg1
                 sty arg2
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 cmp arg5
                 bcs _scs1
 
@@ -128,7 +128,7 @@ sassign         .proc
                 stx arg1
                 sty arg2
                 ldy #0
-                lda (arg2),y
+                lda (arg2),Y
                 beq _sa1
 
                 sta arg6
@@ -151,10 +151,10 @@ _sa2            tax
                 adc arg4
                 sta arg5
 _sa3            lda arg5
-                cmp (arg0),y
+                cmp (arg0),Y
                 bcc _sa4
 
-                sta (arg0),y
+                sta (arg0),Y
                 clc
 _sa4            lda arg0
                 adc arg4
@@ -526,7 +526,7 @@ libst           .byte 0                 ; 1
 ;======================================
 strig           .proc
                 tax
-                lda TRIG0,x
+                lda TRIG0,X
                 sta args
                 rts
                 .endproc
@@ -542,7 +542,7 @@ strig           .proc
 ;======================================
 paddle          .proc
                 tax
-                lda PADDL0,x
+                lda PADDL0,X
                 sta args
                 rts
                 .endproc

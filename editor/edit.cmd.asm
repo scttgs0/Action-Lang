@@ -29,7 +29,7 @@ front           .proc
 ;======================================
 back            .proc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
 back0           pha
                 clc
                 adc lmargin
@@ -129,7 +129,7 @@ _p1             jsr strptr
 _p2             jsr rstcur
 
                 ldy curwdw
-                lda w1+wcur+1,y
+                lda w1+wcur+1,Y
                 beq _p3
 
                 jsr nextdwn
@@ -295,7 +295,7 @@ chkcol          .proc
                 jsr setsp
 
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 cmp sp
                 bcs chkc1
 
@@ -412,8 +412,8 @@ _mu1            lda arg0
                 sta arg1
 
                 ldy #39
-_mu2            lda (arg0),y
-                sta (arg2),y
+_mu2            lda (arg0),Y
+                sta (arg2),Y
                 dey
                 bpl _mu2
 

@@ -18,18 +18,18 @@ minit           .proc                   ; initialize memory
                 sta afbase+1
                 lda #0
                 tay
-                sta (afbase),y
+                sta (afbase),Y
                 iny
-                sta (afbase),y
+                sta (afbase),Y
                 sec
                 lda MEMTOP
                 sbc afbase
                 iny
-                sta (afbase),y
+                sta (afbase),Y
                 lda MEMTOP+1
                 sbc afbase+1
                 iny
-                sta (afbase),y
+                sta (afbase),Y
 
                 lda #0                  ; allocate 2 pages of
                 ldx #2                  ; spare memory
@@ -50,13 +50,13 @@ zerow           .proc                   ; initialize window
                 lda #0
                 ldx #15
 _zw1            dex                     ; zero page0 window table
-                sta sp,x
+                sta sp,X
                 bne _zw1
 
                 sta dirtyf
                 sta inbuf
                 tay
-                sta (buf),y
+                sta (buf),Y
                 rts
                 .endproc
 

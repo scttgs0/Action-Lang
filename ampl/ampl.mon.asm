@@ -196,11 +196,11 @@ _mp1            jsr printc
 ;======================================
 mpload          .proc
                 ldy #1
-                lda (arg11),y
+                lda (arg11),Y
                 tax
 
                 dey
-                lda (arg11),y
+                lda (arg11),Y
 
                 rts
                 .endproc
@@ -319,25 +319,25 @@ _mw2            dec arg14
     ; write the qcode
                 ldx #$10
                 lda #$0B                ; output command
-                sta IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,X
 
                 lda codebase
-                sta IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,X       ; buffer address
                 lda codebase+1
-                sta IOCB0+ICBAH,x
+                sta IOCB0+ICBAH,X
 
                 lda codesize
-                sta IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLL,X       ; size
                 lda codesize+1
-                sta IOCB0+ICBLH,x
+                sta IOCB0+ICBLH,X
 
                 jsr CIOV
                 bmi mwout._mwerr
 
     ; save start address
                 ldx #4
-_mw3            lda _mwinit,x
-                sta arg9,x
+_mw3            lda _mwinit,X
+                sta arg9,X
 
                 dex
                 bpl _mw3
@@ -405,7 +405,7 @@ _mx                                     ; execute command line
 
                 lda #$60                ; RTS
                 ldy #0
-                sta (qcode),y
+                sta (qcode),Y
 
                 pla
                 tax

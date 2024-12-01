@@ -131,7 +131,7 @@ _l1             lda linemax
                 tax
                 tya
                 and #$9f
-                ora stoa_,x
+                ora stoa_,X
                 tay
                 ldx #emsg-optmsg
                 jsr _yn2
@@ -142,7 +142,7 @@ _l1             lda linemax
                 tax
                 tya
                 and #$9f
-                ora chcvt,x
+                ora chcvt,X
                 sta eolch
                 rts
 
@@ -222,8 +222,8 @@ gettmpbuf       .proc
 
     ; copy string to tempBuf+10
                 ldy #20
-_gt1            lda optmsg+20,x
-                sta tempbuf+10,y
+_gt1            lda optmsg+20,X
+                sta tempbuf+10,Y
                 dex
                 dey
                 bpl _gt1
@@ -231,7 +231,7 @@ _gt1            lda optmsg+20,x
     ; put space at end
                 tay
                 lda #' '
-                sta tempbuf+10,y
+                sta tempbuf+10,Y
 
                 lda #<(tempbuf+10)
                 ldx #>(tempbuf+10)

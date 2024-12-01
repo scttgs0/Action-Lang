@@ -57,8 +57,8 @@ savwd1          clc
                 tax
                 adc curwdw
                 tay
-_sw1            lda sp,x
-                sta w1,y
+_sw1            lda sp,X
+                sta w1,Y
                 dey
                 dex
                 bpl _sw1
@@ -76,8 +76,8 @@ rstwd           .proc
                 tax
                 adc curwdw
                 tay
-_rw1            lda w1,y
-                sta sp,x
+_rw1            lda w1,Y
+                sta sp,X
                 dey
                 dex
                 bpl _rw1
@@ -193,7 +193,7 @@ _cl2            jsr putstr
                 bne _cl3
 
                 tay
-                sta (arg0),y
+                sta (arg0),Y
 _cl3            inc rowcrs
                 jsr nextdwn
 

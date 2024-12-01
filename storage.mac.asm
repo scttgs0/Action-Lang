@@ -25,27 +25,27 @@ allocate        .proc
                 lda #>afbase
                 sta aflast+1
 _afl1           ldy #0
-                lda (aflast),y          ; cur = last(0)
+                lda (aflast),Y          ; cur = last(0)
                 sta afcur
                 bne _afl2               ; while cur # 0
 
                 iny
-                lda (aflast),y
+                lda (aflast),Y
                 sta afcur+1
                 bne _afl3
                 beq _afl6               ; done
 
 _afl2           iny
-                lda (aflast),y
+                lda (aflast),Y
                 sta afcur+1
 _afl3           ldy #3
-                lda (afcur),y           ; get size
+                lda (afcur),Y           ; get size
                 cmp afsize+1            ; high bytes
                 bcc _afl5               ; size too small
                 bne _afl4               ; size too big
 
                 dey
-                lda (afcur),y
+                lda (afcur),Y
                 cmp afsize              ; low bytes
                 bcc _afl5               ; size too small
                 beq _afl9               ; sizes equal
@@ -53,19 +53,19 @@ _afl3           ldy #3
     ; Check for best fit
 
 _afl4           ldy #2
-                lda (afcur),y
+                lda (afcur),Y
                 cmp afbsze
                 iny
-                lda (afcur),y
+                lda (afcur),Y
                 sbc afbsze+1
                 bcs _afl5
 
     ; save best guess so far
 
-                lda (afcur),y
+                lda (afcur),Y
                 sta afbsze+1
                 dey
-                lda (afcur),y
+                lda (afcur),Y
                 sta afbsze
                 lda aflast
                 sta afbest
@@ -107,57 +107,57 @@ _afl7           lda afbsze+1
 
     ; don't split
 _afl8           ldy #0
-                lda (afbest),y          ; cur =  best(0)
+                lda (afbest),Y          ; cur =  best(0)
                 sta afcur
                 iny
-                lda (afbest),y
+                lda (afbest),Y
                 sta afcur+1
 
-                lda (afcur),y           ; best(0) = cur(0)
-                sta (afbest),y
+                lda (afcur),Y           ; best(0) = cur(0)
+                sta (afbest),Y
                 dey
-                lda (afcur),y
-                sta (afbest),y
+                lda (afcur),Y
+                sta (afbest),Y
                 rts
 
     ; found entry of right size
 _afl9           ldy #0
-                lda (afcur),y
-                sta (aflast),y
+                lda (afcur),Y
+                sta (aflast),Y
                 iny
-                lda (afcur),y
-                sta (aflast),y
+                lda (afcur),Y
+                sta (aflast),Y
 _afl10          rts
 
     ; split best block
 
 _afl11          ldy #0
-                lda (afbest),y          ; cur = best(0)
+                lda (afbest),Y          ; cur = best(0)
                 sta afcur
                 clc
                 adc afsize
-                sta (afbest),y          ; best(0)=cur+size
+                sta (afbest),Y          ; best(0)=cur+size
                 sta aflast              ; last = cur + size
                 iny
-                lda (afbest),y
+                lda (afbest),Y
                 sta afcur+1
                 adc afsize+1
-                sta (afbest),y
+                sta (afbest),Y
                 sta aflast+1
 
                 iny
                 sec
-                lda (afcur),y
+                lda (afcur),Y
                 sbc afsize              ; last(1) = bsze-size
-                sta (aflast),y
+                sta (aflast),Y
                 lda afsize
-                sta (afcur),y           ; cur(1) = size
+                sta (afcur),Y           ; cur(1) = size
                 iny
-                lda (afcur),y
+                lda (afcur),Y
                 sbc afsize+1
-                sta (aflast),y
+                sta (aflast),Y
                 lda afsize+1
-                sta (afcur),y
+                sta (afcur),Y
                 clc
                 bcc _afl9
 
@@ -182,11 +182,11 @@ _afl12          lda afcur               ; last = cur
                 sta aflast+1
 
                 ldy #0
-                lda (aflast),y          ; cur = last(0)
+                lda (aflast),Y          ; cur = last(0)
                 sta afcur
                 cmp afbest
                 iny
-                lda (aflast),y
+                lda (aflast),Y
                 sta afcur+1
                 sbc afbest+1
                 bcs _afl13              ; while cur ULS block
@@ -199,13 +199,13 @@ _afl12          lda afcur               ; last = cur
 
 _afl13          iny
                 clc
-                lda (afbest),y
+                lda (afbest),Y
                 adc afbest
                 tax
                 iny
-                lda (afbest),y
+                lda (afbest),Y
                 and #$7f                ; clear tag flag
-                sta (afbest),y
+                sta (afbest),Y
                 adc afbest+1
                 cmp afcur+1
                 bne _afl15
@@ -215,38 +215,38 @@ _afl13          iny
 
                 dey
                 clc                     ; block(1) =
-                lda (afbest),y          ;  block(1) +  cur(1)
-                adc (afcur),y
-                sta (afbest),y
+                lda (afbest),Y          ;  block(1) +  cur(1)
+                adc (afcur),Y
+                sta (afbest),Y
                 iny
-                lda (afbest),y
-                adc (afcur),y
-                sta (afbest),y
+                lda (afbest),Y
+                adc (afcur),Y
+                sta (afbest),Y
                 ldy #0                  ; block(0) = cur(0)
-                lda (afcur),y
-                sta (afbest),y
+                lda (afcur),Y
+                sta (afbest),Y
                 iny
-                lda (afcur),y
-                sta (afbest),y
+                lda (afcur),Y
+                sta (afbest),Y
                 clc
                 bcc _afl16
 
 ;:AFL14 PLP
 _afl15          ldy #0                  ; block(0) = cur
                 lda afcur
-                sta (afbest),y
+                sta (afbest),Y
                 iny
                 lda afcur+1
-                sta (afbest),y
+                sta (afbest),Y
 
 _afl16          iny                     ; if block =
                 clc                     ; (last + last(1))
                 lda aflast
-                adc (aflast),y
+                adc (aflast),Y
                 tax
                 iny
                 lda aflast+1
-                adc (aflast),y
+                adc (aflast),Y
                 cmp afbest+1
                 bne _afl18
 
@@ -255,28 +255,28 @@ _afl16          iny                     ; if block =
 
                 clc                     ; last(1) =
                 dey                     ;   last(1)+block(1)
-                lda (aflast),y
-                adc (afbest),y
-                sta (aflast),y
+                lda (aflast),Y
+                adc (afbest),Y
+                sta (aflast),Y
                 iny
-                lda (aflast),y
-                adc (afbest),y
-                sta (aflast),y
+                lda (aflast),Y
+                adc (afbest),Y
+                sta (aflast),Y
 
                 ldy #0                  ; last(0) = block(0)
-                lda (afbest),y
-                sta (aflast),y
+                lda (afbest),Y
+                sta (aflast),Y
                 iny
-                lda (afbest),y
-                sta (aflast),y
+                lda (afbest),Y
+                sta (aflast),Y
                 rts
 
 ;:AFL17 PLP
 _afl18          ldy #0                  ; last(0) = block
                 lda afbest
-                sta (aflast),y
+                sta (aflast),Y
                 iny
                 lda afbest+1
-                sta (aflast),y
+                sta (aflast),Y
                 rts
                 .endproc

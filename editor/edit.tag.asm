@@ -29,10 +29,10 @@ settag          .proc
 
                 ldy #1
                 lda taglist+1
-                sta (afcur),y
+                sta (afcur),Y
                 dey
                 lda taglist
-                sta (afcur),y
+                sta (afcur),Y
                 lda afcur
                 sta taglist
                 ldx afcur+1
@@ -40,23 +40,23 @@ settag          .proc
 
 _st1            ldy #4
                 lda tempbuf+1
-                sta (afcur),y
+                sta (afcur),Y
                 iny
                 lda cur
-                sta (afcur),y
+                sta (afcur),Y
                 iny
                 lda cur+1
-                sta (afcur),y
+                sta (afcur),Y
                 iny
                 jsr setsp
 
-                sta (afcur),y
+                sta (afcur),Y
 
     ; flag line as taged
                 ldy #3
-                lda (cur),y
+                lda (cur),Y
                 ora #$80
-                sta (cur),y
+                sta (cur),Y
                 rts
                 .endproc
 
@@ -105,19 +105,19 @@ loctag          .proc
                 beq notag
 
                 ldy #6
-                lda (afcur),y
+                lda (afcur),Y
                 tax
                 dey
-                lda (afcur),y
+                lda (afcur),Y
                 jsr findln
                 beq notag
 
                 ldy #3
-                lda (arg2),y
+                lda (arg2),Y
                 bpl notag
 
                 ldy #7
-                lda (afcur),y
+                lda (afcur),Y
                 sta sp
                 lda arg2
                 sta cur
@@ -140,15 +140,15 @@ gettag          .proc
 _ltret          rts
 
 _gt1            ldy #4
-                lda (afcur),y
+                lda (afcur),Y
                 cmp arg0
                 beq _gt3
 
                 ldy #1
-                lda (afcur),y
+                lda (afcur),Y
                 tax
                 dey
-                lda (afcur),y
+                lda (afcur),Y
 _gt2            sta afcur
                 stx afcur+1
                 txa
@@ -170,10 +170,10 @@ freetags        .proc
 _ft1            sta afbest
                 stx afbest+1
                 ldy #0
-                lda (afbest),y
+                lda (afbest),Y
                 sta arg0
                 iny
-                lda (afbest),y
+                lda (afbest),Y
                 sta arg1
                 jsr free.free1
 
@@ -198,10 +198,10 @@ findln          .proc
                 rts
 
 _fl1            ldy #5
-                lda (arg2),y
+                lda (arg2),Y
                 tax
                 dey
-                lda (arg2),y
+                lda (arg2),Y
 _fl2            sta arg2
                 stx arg3
                 cmp arg0

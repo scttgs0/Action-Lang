@@ -82,14 +82,14 @@ _w1             jmp gmerr.punt          ; editor
 
 cold            lda #0
                 tay
-_c0             sta $0480,y             ; zero RAM
+_c0             sta $0480,Y             ; zero RAM
                 dey
                 bne _c0
 
                 ldy #$3a
-_cold1          lda emjmps-1,y          ; init RAM
+_cold1          lda emjmps-1,Y          ; init RAM
                 dey
-                sta jmps,y
+                sta jmps,Y
                 bne _cold1
 
     ; STY ChCvt1 ; Y=0

@@ -19,7 +19,7 @@ splsetup        .proc
                 sta chan
                 sta symtab
                 sta INITAD+1
-                sta (buf),y
+                sta (buf),Y
                 sta param
                 sta qglobal
                 sta stackptr
@@ -32,12 +32,12 @@ splsetup        .proc
                 ldx bigst               ; big symbol table?
                 beq _spls0              ;   no
 
-_s0             sta (stg2),y
+_s0             sta (stg2),Y
 
                 iny
                 bne _s0
 
-_spls0          sta (stglobal),y
+_spls0          sta (stglobal),Y
                 iny
                 bne _spls0
 
@@ -48,12 +48,12 @@ _spls0          sta (stglobal),y
                 stx arg1
 
 _spls1          ldy #1
-                lda (arg0),y
+                lda (arg0),Y
                 beq _spls2
 
                 tax
                 dey
-                lda (arg0),y
+                lda (arg0),Y
                 sta arg0
                 stx arg1
 

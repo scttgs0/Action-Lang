@@ -15,10 +15,10 @@ tab             .proc
                 jsr setsp
                 jsr tabloc._tabpos
 
-_t1             lda TABMAP,x
+_t1             lda TABMAP,X
                 beq _t3
 
-                and _onbit,y
+                and _onbit,Y
                 beq _t2
 
     ; found tab setting
@@ -45,6 +45,7 @@ _t3             ldy #0
 
 _onbit          .byte $80,$40,$20,$10,8,4,2,1,0
 _offbit         .byte $7f,$bf,$df,$ef,$f7,$fb,$fd,$fe,$ff
+
                 .endproc
 
 
@@ -54,9 +55,10 @@ _offbit         .byte $7f,$bf,$df,$ef,$f7,$fb,$fd,$fe,$ff
 settab          .proc
                 jsr tabloc
 
-                lda TABMAP,x
-                ora tab._onbit,y
-                sta TABMAP,x
+                lda TABMAP,X
+                ora tab._onbit,Y
+                sta TABMAP,X
+
                 rts
                 .endproc
 
@@ -67,9 +69,10 @@ settab          .proc
 clrtab          .proc
                 jsr tabloc
 
-                lda TABMAP,x
-                and tab._offbit,y
-                sta TABMAP,x
+                lda TABMAP,X
+                and tab._offbit,Y
+                sta TABMAP,X
+
                 rts
                 .endproc
 

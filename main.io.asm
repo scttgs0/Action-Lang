@@ -35,7 +35,7 @@ print           .proc
                 bne print1
 
                 lda #$0b
-                sta IOCB0+ICCOM,x
+                sta IOCB0+ICCOM,X
                 lda #EOL
                 jmp CIOV
 
@@ -51,7 +51,7 @@ close           .proc
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
         .if ramzap
-                 sta (arg5),y
+                 sta (arg5),Y
         .else
                  nop
                  nop
@@ -85,28 +85,28 @@ xiostr          .proc
                 asl
                 tax
                 tya
-                sta IOCB0+ICCOM,x       ; command
+                sta IOCB0+ICCOM,X       ; command
                 lda arg3
                 beq _xs1
 
-                sta IOCB0+ICAX1,x
+                sta IOCB0+ICAX1,X
                 lda arg4
-                sta IOCB0+ICAX2,x
+                sta IOCB0+ICAX2,X
                 lda #0
 _xs1            tay
-                sta IOCB0+ICBLH,x
-                lda (arg5),y
-                sta IOCB0+ICBLL,x       ; size
+                sta IOCB0+ICBLH,X
+                lda (arg5),Y
+                sta IOCB0+ICBLL,X       ; size
 
                 beq print.print1        ; return
 
                 clc
                 lda arg5
                 adc #1
-                sta IOCB0+ICBAL,x       ; buffer address
+                sta IOCB0+ICBAL,X       ; buffer address
                 lda arg6
                 adc #0
-                sta IOCB0+ICBAH,x
+                sta IOCB0+ICBAH,X
                 jmp CIOV
 
                 .endproc
@@ -142,7 +142,7 @@ dspstr          .proc
                 jsr scrrt
 
                 ldy #0
-                lda (arg12),y
+                lda (arg12),Y
                 beq _ds2
 
                 sta arg3
@@ -150,7 +150,7 @@ dspstr          .proc
 
 _ds1            inc arg4
                 ldy arg4
-                lda (arg12),y
+                lda (arg12),Y
                 eor arg2
                 jsr scrch
 
@@ -172,20 +172,20 @@ rdbuf           .proc
                 ldy #0
                 tax
                 lda #240
-                sta (buf),y
+                sta (buf),Y
                 txa
                 ldx buf
                 ldy buf+1
 inputs          jsr input
 
                 sty arg0
-                lda IOCB0+ICBLL,x       ; size
+                lda IOCB0+ICBLL,X       ; size
                 beq _rb1
 
                 sec
                 sbc #1
 _rb1            ldy #0
-                sta (arg5),y
+                sta (arg5),Y
                 ldy arg0
                 rts
                 .endproc
@@ -207,9 +207,9 @@ wrtbuf          .proc
 ;======================================
 rstcur          .proc
                 ldy curwdw
-                lda w1+wcur,y
+                lda w1+wcur,Y
                 sta cur
-                lda w1+wcur+1,y
+                lda w1+wcur+1,Y
                 sta cur+1
                 jmp ldbuf
 
@@ -269,12 +269,12 @@ rtostr          ;.proc
                 ldx #0
 _rts1           iny
                 inx
-                lda (inbuff),y
-                sta numbuf,x
+                lda (inbuff),Y
+                sta numbuf,X
                 bpl _rts1
 
                 eor #$80
-                sta numbuf,x
+                sta numbuf,X
                 stx numbuf
                 rts
                 ;.endproc
@@ -332,11 +332,11 @@ openchan        .proc
     ; check for default device
                 lda #':'
                 ldy #2
-                cmp (nxtaddr),y
+                cmp (nxtaddr),Y
                 beq _oc2
 
                 iny
-                cmp (nxtaddr),y
+                cmp (nxtaddr),Y
                 beq _oc2
 
     ; stuff in D: for device
@@ -349,21 +349,21 @@ openchan        .proc
                 sta fr0+1
 
                 ldy #0
-                lda (nxtaddr),y         ; add 2 to length of string
+                lda (nxtaddr),Y         ; add 2 to length of string
                 adc #2                  ;  so we can insert 'D:'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
                 tay
-_oc1            lda (nxtaddr),y         ; move string up...
-                sta (fr0),y
+_oc1            lda (nxtaddr),Y         ; move string up...
+                sta (fr0),Y
                 dey
                 bne _oc1
 
                 iny
                 lda #'D'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
                 iny
                 lda #':'
-                sta (nxtaddr),y
+                sta (nxtaddr),Y
 
 _oc2            lda chan
                 ldx nxtaddr
@@ -400,7 +400,7 @@ htocar          .proc
                 sta fr0+1
 
 _htc1           ldy cix
-                lda (arg1),y
+                lda (arg1),Y
                 sec
                 sbc #'0'
                 bmi rtocar.htcrtn
@@ -509,7 +509,7 @@ _ps1            stx arg5
 
                 ldy #39
                 lda arg2
-_ps2            sta (arg0),y            ; clear line
+_ps2            sta (arg0),Y            ; clear line
                 dey
                 bpl _ps2
 
@@ -522,7 +522,7 @@ _ps2            sta (arg0),y            ; clear line
                 inc arg1
 _ps3            iny                     ; sets Y to 0
                 clc
-                lda (arg6),y
+                lda (arg6),Y
                 sbc arg3
                 bcc _ps10               ; no chars
 
@@ -544,14 +544,14 @@ _ps3a           lda #$80
                 sta arg7
 
 _ps4            lda arg2
-                eor (arg4),y
+                eor (arg4),Y
                 pha
                 and #$60
                 tax
                 pla
                 and #$9f
-                ora chcvt,x
-                sta (arg0),y
+                ora chcvt,X
+                sta (arg0),Y
                 dey
                 bpl _ps4
 
@@ -564,19 +564,19 @@ _ps4            lda arg2
 
                 iny
 _ps5            lda eolch
-                sta (arg0),y
+                sta (arg0),Y
                 jmp _ps7
 
-_ps6            eor (arg0),y
-                sta (arg0),y
+_ps6            eor (arg0),Y
+                sta (arg0),Y
 
 _ps7            lda arg3
                 beq _ps9
 
 _ps8            ldy #0
-                lda (arg0),y
+                lda (arg0),Y
                 eor #$80
-                sta (arg0),y
+                sta (arg0),Y
 _ps9            rts
 
 _ps10           lda arg3
@@ -652,18 +652,18 @@ ldbuf           .proc
                 bne _ldb0
 
                 tay
-                sta (buf),y
+                sta (buf),Y
                 rts
 
 _ldb0           jsr curstr
 
 ldbuf1          ldy #0
-                lda (arg0),y
-                sta (buf),y
+                lda (arg0),Y
+                sta (buf),Y
                 tay
 
-_ldb1           lda (arg0),y
-                sta (buf),y
+_ldb1           lda (arg0),Y
+                sta (buf),Y
                 dey
                 bne _ldb1
 
@@ -728,6 +728,6 @@ zapcsr          .proc
 rstcsr          .proc
                 ldy #0
                 lda oldchr
-                sta (oldadr),y
+                sta (oldadr),Y
                 rts
                 .endproc

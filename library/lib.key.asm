@@ -25,15 +25,15 @@ _bc1            lda CH_                 ; key down?
                 bpl _bc1
 
                 ldy #0
-                lda (oldadr),y
+                lda (oldadr),Y
                 eor #$80
-                sta (oldadr),y
+                sta (oldadr),Y
                 jmp lgetkey
 
 _gk0            ldy #0
                 lda oldchr
                 eor #$80
-                sta (oldadr),y          ; restore cursor
+                sta (oldadr),Y          ; restore cursor
                 ldx SRTIMR              ; faster repeat
                 cpx #$0c
                 bcs _gk5

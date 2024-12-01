@@ -69,15 +69,15 @@ _s4             clc
                 tay
                 adc buf+1
                 sta arg1
-                lda (buf),y
+                lda (buf),Y
                 plp
                 bcc _s6                 ; need to remove space
                 beq _s8                 ; same size
 
     ; need to add space
                 tay
-_s5             lda (buf),y
-                sta (arg0),y
+_s5             lda (buf),Y
+                sta (arg0),Y
                 dey
                 cpy sp
                 bcs _s5
@@ -87,8 +87,8 @@ _s6             sta arg2
                 ldy sp
                 dey
 _s7             iny
-                lda (arg0),y
-                sta (buf),y
+                lda (arg0),Y
+                sta (buf),Y
                 cpy arg2
                 bcc _s7
 
@@ -97,17 +97,17 @@ _s8             ldy sp
                 beq _s10
 
 _s9             inx
-                lda subbuf,x
-                sta (buf),y
+                lda subbuf,X
+                sta (buf),Y
                 iny
 _s10            cpx subbuf
                 bne _s9
 
                 clc
                 ldy #0
-                lda (buf),y
+                lda (buf),Y
                 adc arg3
-                sta (buf),y
+                sta (buf),Y
                 jmp rfrshbuf
 
                 .endproc

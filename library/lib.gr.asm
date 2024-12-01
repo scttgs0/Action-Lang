@@ -163,8 +163,8 @@ libGrSetColor   .proc
                 ora arg2
 
                 ldx arg0
-                sta COLOR0,x
-                sta COLPF0,x
+                sta COLOR0,X
+                sta COLPF0,X
 
 _XIT            rts
                 .endproc

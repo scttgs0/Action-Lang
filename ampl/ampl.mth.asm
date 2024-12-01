@@ -73,7 +73,7 @@ _setsign        ldy math._sign
                 bpl _ss2
 
         .if ramzap
-                sta mulb,x
+                sta mulb,X
         .else
                 nop
                 nop
@@ -290,19 +290,19 @@ sargs           .proc                   ; saves args for call
                 pha
 
                 ldy #1
-                lda (afcur),y           ; local address
+                lda (afcur),Y           ; local address
                 sta aflast
 
                 iny
-                lda (afcur),y
+                lda (afcur),Y
                 sta aflast+1
 
                 iny
-                lda (afcur),y           ; # of bytes
+                lda (afcur),Y           ; # of bytes
                 tay
 
-_sa1            lda args,y
-                sta (aflast),y
+_sa1            lda args,Y
+                sta (aflast),Y
 
                 dey
                 bpl _sa1

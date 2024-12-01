@@ -51,11 +51,11 @@ _func1          jsr makeentry
 
                 ldy #3
                 lda #0                  ; no args yet
-                sta (props),y
+                sta (props),Y
                 sta argbytes
 
                 tay
-_funcst         sta (stlocal),y
+_funcst         sta (stlocal),Y
 
                 iny                     ; zap local st
                 bne _funcst
@@ -85,9 +85,9 @@ _funcst         sta (stlocal),y
                 jsr storprops
 
                 ldy #0
-                lda (props),y
+                lda (props),Y
                 ora #8
-                sta (props),y           ; set Sys flag
+                sta (props),Y           ; set Sys flag
                 sta param
 
                 jsr getnext
@@ -204,12 +204,12 @@ _func3          lda trace               ; check for trace
                 jsr push3
 
                 ldy #0
-                lda (curproc),y
+                lda (curproc),Y
 
                 tay
                 tax
-_f3a            lda (curproc),y
-                sta (qcode),y
+_f3a            lda (curproc),Y
+                sta (qcode),Y
 
                 dey
                 bpl _f3a
@@ -229,8 +229,8 @@ _f3a            lda (curproc),y
                 tay
                 tax
 
-_f3b            lda (props),y
-                sta (qcode),y
+_f3b            lda (props),Y
+                sta (qcode),Y
 
                 dey
                 bpl _f3b

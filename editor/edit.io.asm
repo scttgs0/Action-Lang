@@ -24,7 +24,7 @@ _gs1            jsr getkey
 
 _gs1a           ldy #0
                 clc
-                lda (arg12),y
+                lda (arg12),Y
                 adc #1
 
                 cpx #$1b                ; ESC
@@ -41,10 +41,10 @@ _gs1a           ldy #0
                 cpx rmargin
                 bcs _gs1                ; don't go off screen
 
-                sta (arg12),y
+                sta (arg12),Y
                 tay
                 lda arg3
-                sta (arg12),y
+                sta (arg12),Y
                 eor arg2
                 jsr scrch
 
@@ -52,21 +52,21 @@ _gs1a           ldy #0
 
 _gs1b           lda #0
                 sta curch
-                sta (arg12),y
+                sta (arg12),Y
                 iny
                 tya
 _gs2            tay
                 txa                     ; EOL
-                sta (arg12),y
+                sta (arg12),Y
                 rts
 
 _gs3            stx arg3
 _gs4            ldy #0
-                lda (arg12),y
+                lda (arg12),Y
                 beq _gs5
                 sec
                 sbc #1
-                sta (arg12),y
+                sta (arg12),Y
 
                 jsr scrlft
 
@@ -203,8 +203,8 @@ fopen           .proc
                 iny
                 iny
                 sty inbuf
-_fo1            lda inbuf,y
-                sta inbuf+2,y
+_fo1            lda inbuf,Y
+                sta inbuf+2,Y
                 dey
                 bne _fo1
 
