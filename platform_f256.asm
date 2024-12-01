@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: platform_f256.asm
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -122,18 +122,61 @@ Bcd2Bin         .proc
                 pha                     ; n*2
                 lsr
                 lsr                     ; n*8
-                sta zpTemp1
+                sta _tmp
 
                 pla                     ; A=n*2
                 clc
-                adc zpTemp1             ; A=n*8+n*2 := n*10
-                sta zpTemp1
+                adc _tmp                ; A=n*8+n*2 := n*10
+                sta _tmp
 
 ;   add the lower-nibble
                 pla
                 and #$0F
                 clc
-                adc zpTemp1
+                adc _tmp
+
+                rts
+
+;--------------------------------------
+
+_tmp            .byte $00
+
+                .endproc
+
+
+;======================================
+; Convert BCD to Binary
+;======================================
+Bin2Bcd         .proc
+                ldx #00
+                ldy #00
+_next1          cmp #10
+                bcc _done
+
+                sec
+                sbc #10
+
+                inx
+                bra _next1
+
+_done           tay
+                txa
+                asl
+                asl
+                asl
+                asl
+                and #$F0
+                sta _tmp
+
+                tya
+                clc
+                adc _tmp
+
+                rts
+
+;--------------------------------------
+
+_tmp            .byte $00
 
                 .endproc
 
@@ -162,22 +205,23 @@ _next1          sta SID1_BASE,X
                 dex
                 bpl _next1
 
-                lda #$09                ; Attack/Decay = 9
+                lda #sidAttack2ms|sidDecay750ms
                 sta SID1_ATDCY1
                 sta SID1_ATDCY2
                 sta SID1_ATDCY3
                 sta SID2_ATDCY1
 
+                ; 0%|sidDecay6ms
                 stz SID1_SUREL1         ; Susatain/Release = 0 [square wave]
                 stz SID1_SUREL2
                 stz SID1_SUREL3
                 stz SID2_SUREL1
 
-                ;lda #$21
-                ;sta SID1_CTRL1
-                ;sta SID1_CTRL2
-                ;sta SID1_CTRL3
-                ;sta SID2_CTRL1
+                lda #sidcSaw|sidcGate
+                sta SID1_CTRL1
+                sta SID1_CTRL2
+                sta SID1_CTRL3
+                sta SID2_CTRL1
 
                 lda #$08                ; Volume = 8 (mid-range)
                 sta SID1_SIGVOL
@@ -288,6 +332,7 @@ _Text_CLUT      .dword $00282828        ; 0: Dark Jungle Green
 ;======================================
 InitGfxPalette  .proc
                 pha
+                phx
                 phy
 
 ;   preserve IOPAGE control
@@ -313,6 +358,7 @@ _next1          lda Palette,Y
                 sta IOPAGE_CTRL
 
                 ply
+                plx
                 pla
                 rts
                 .endproc
@@ -359,8 +405,11 @@ worldmap        = $04_E000
                 sta TILE0_SIZE_X
                 lda #255
                 sta TILE0_SIZE_Y
+                stz TILE0_SIZE_Y+1
 
+                stz TILE0_SCROLL_X+1
                 stz TILE0_SCROLL_X
+                stz TILE0_SCROLL_Y+1
                 stz TILE0_SCROLL_Y
 
 ;   enable the tilemap, use 16x16 tiles
@@ -398,101 +447,17 @@ InitSprites     .proc
                 stz IOPAGE_CTRL
 
 ;   set player sprites (sprite-00 & sprint-01)
-                .frsSpriteInit SPR_Balloon, scEnable|scLUT0|scDEPTH0|scSIZE_16, 0
-                .frsSpriteInit SPR_Balloon, scEnable|scLUT1|scDEPTH0|scSIZE_16, 1
+                ; .frsSpriteInit SPR_Balloon, scEnable|scLUT0|scDEPTH0|scSIZE_16, 0
+                ; .frsSpriteInit SPR_Balloon, scEnable|scLUT1|scDEPTH0|scSIZE_16, 1
 
 ;   set bomb sprites (sprite-02 & sprint-03)
-                .frsSpriteInit SPR_Bomb, scEnable|scLUT0|scDEPTH0|scSIZE_16, 2
-                .frsSpriteInit SPR_Bomb, scEnable|scLUT0|scDEPTH0|scSIZE_16, 3
+                ; .frsSpriteInit SPR_Bomb, scEnable|scLUT0|scDEPTH0|scSIZE_16, 2
+                ; .frsSpriteInit SPR_Bomb, scEnable|scLUT0|scDEPTH0|scSIZE_16, 3
 
 ;   restore IOPAGE control
                 pla
                 sta IOPAGE_CTRL
 
-                pla
-                rts
-                .endproc
-
-
-;======================================
-;
-;--------------------------------------
-; preserve      A, X, Y
-;======================================
-CheckCollision  .proc
-                pha
-                phx
-                phy
-
-                ldx #1                  ; Given: SP02_Y=112
-_nextBomb       lda zpBombDrop,X        ; A=112
-                beq _nextPlayer
-
-                cmp #132
-                bcs _withinRange
-                bra _nextPlayer
-
-_withinRange    sec
-                sbc #132                ; A=8
-                lsr             ; /2    ; A=4
-                lsr             ; /4    ; A=2
-                lsr             ; /8    ; A=1
-                sta zpTemp1             ; zpTemp1=1 (row)
-
-                lda PlayerPosX,X
-                lsr             ; /4
-                lsr
-                sta zpTemp2             ; (column)
-
-                lda #<CANYON
-                sta zpSource
-                lda #>CANYON
-                sta zpSource+1
-
-                ldy zpTemp1
-_nextRow        beq _checkRock
-
-                lda zpSource
-                clc
-                adc #40
-                sta zpSource
-                bcc _1
-
-                inc zpSource+1
-
-_1              dey
-                bra _nextRow
-
-_checkRock      ldy zpTemp2
-                lda (zpSource),Y
-                beq _nextPlayer
-
-                cmp #4
-                bcs _nextPlayer
-
-                sta P2PF,X
-
-                stz zpTemp1
-                txa
-                asl                     ; *2
-                rol zpTemp1
-                tay
-
-                lda zpSource
-                stz zpTemp2+1
-                clc
-                adc zpTemp2
-                sta P2PFaddr,Y          ; low-byte
-
-                lda zpSource+1
-                adc #$00
-                sta P2PFaddr+1,Y        ; high-byte
-
-_nextPlayer     dex
-                bpl _nextBomb
-
-                ply
-                plx
                 pla
                 rts
                 .endproc
@@ -539,8 +504,7 @@ InitBitmap      .proc
 ; preserve      A, X, Y
 ;======================================
 ClearScreen     .proc
-v_QtyPages      .var $04                ; 40x30 = $4B0... 4 pages + 176 bytes
-                                        ; remaining 176 bytes cleared via ClearGamePanel
+v_QtyPages      .var $05                ; 40x30 = $4B0... 4 pages + 176 bytes
 
 v_EmptyText     .var $00
 v_TextColor     .var $40
@@ -613,7 +577,7 @@ _nextByteT      sta (zpDest),Y
 
 
 ;======================================
-; Render Player Scores & Bombs
+; Render Debug Info
 ;--------------------------------------
 ; preserve      A, X, Y
 ;======================================
@@ -824,13 +788,13 @@ InitMMU         .proc
                 sta MMU_Block7
 
 ;   restore MMU control
-                pla                     ; restore
+                pla
                 sta MMU_CTRL
 
                 cli
 
 ;   restore IOPAGE control
-                pla                     ; restore
+                pla
                 sta IOPAGE_CTRL
 
                 pla
@@ -864,9 +828,9 @@ InitIRQs        .proc
                 ;lda #>vecIRQ_BRK
                 ;sta IRQ_PRIOR+1
 
-                lda #<HandleIrq
+                lda #<irqMain
                 sta vecIRQ_BRK
-                lda #>HandleIrq
+                lda #>irqMain
                 sta vecIRQ_BRK+1
 
 ;   initialize the console
@@ -901,6 +865,11 @@ InitIRQs        .proc
                 lda INT_MASK_REG0
                 and #~INT00_SOF
                 sta INT_MASK_REG0
+
+;   enable Start-of-Line IRQ
+                ;!!lda INT_MASK_REG0
+                ;!!and #~INT00_SOL
+                ;!!sta INT_MASK_REG0
 
 ;   enable Keyboard IRQ
                 ; lda INT_MASK_REG1
@@ -951,7 +920,7 @@ FONT0           lda #<GameFont
                 sta zpDest+1
                 stz zpDest+2
 
-                ldx #$07                ; 7 pages
+                ldx #$08                ; 8 pages
 _nextPage       ldy #$00
 _next1          lda (zpSource),Y
                 sta (zpDest),Y

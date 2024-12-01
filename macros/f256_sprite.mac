@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: f256_sprite.mac
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -15,12 +15,14 @@ Y               .word ?
 SPR             .sfunction field,idx,(SPRITE_BASE+field+(idx<<3))
 SPR_FIELD       .sfunction field,(SPRITE_BASE+field)
 
+
 frsSpriteInit   .macro source,attr,idx
                 lda #<\source
                 sta SPR(sprite_t.ADDR, \idx)
                 lda #>\source
                 sta SPR(sprite_t.ADDR+1, \idx)
-                stz SPR(sprite_t.ADDR+2, \idx)
+                lda #`\source
+                sta SPR(sprite_t.ADDR+2, \idx)
 
                 stz SPR(sprite_t.X, \idx)
                 stz SPR(sprite_t.X+1, \idx)
@@ -81,6 +83,7 @@ frsSpriteSetY   .macro val,idx
                 sta SPR(sprite_t.Y+1, \idx)
                 .endmacro
 
+
 frsSpriteSetX_ix .macro
                 pha
                 phx
@@ -91,10 +94,12 @@ frsSpriteSetX_ix .macro
                 asl
                 tax
                 sta $D904,X
+                stz $D905,X
 
                 plx
                 pla
                 .endmacro
+
 
 frsSpriteSetY_ix .macro
                 pha
@@ -106,6 +111,7 @@ frsSpriteSetY_ix .macro
                 asl
                 tax
                 sta $D906,X
+                stz $D907,X
 
                 plx
                 pla

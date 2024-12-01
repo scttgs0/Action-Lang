@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: system_f256.equ
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -719,7 +719,7 @@ dmaEnable       = $01                   ; DMA Engine is enabled
 dma2D           = $02                   ; DMA 2D operation (otherwise it is 1D)
 dmaFill         = $04                   ; DMA Fill operation (otherwise DMA Copy)
 dmaIntEnable    = $08                   ; Enable DMA interrupts
-dmaStart        = $80                   ; Start the DMA operation
+dmaStart        = $80                   ; START the DMA operation
 
 DMA_STATUS              = $DF01         ; [read-only]   DMA status
 dmaBusy         = $80                   ; DMA Engine is busy with an operation
