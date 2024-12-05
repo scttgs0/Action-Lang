@@ -12,7 +12,7 @@
 ;
 ;======================================
 scrinit         .proc
-                .frsGraphics mcTextOn,mcVideoMode240    ; 40x30 text mode
+                .frsGraphics mcTextOn,mcVideoMode240    ; 80x60 text mode
                 stz DINDEX              ; text mode
 
                 ; lda #0
@@ -35,7 +35,8 @@ scrinit         .proc
 ;======================================
 ;     ScrCh(char)
 ;    ------------
-; outputs char to screen.  Char passed in A reg.
+; outputs char to screen.
+; Char passed in A reg.
 ; Control characters are ignored.
 ;======================================
 scrch           .proc
@@ -50,7 +51,8 @@ _ENTRY1         ldx #1
 ;======================================
 ;    PutCh(char)
 ;    -----------
-; outputs char to screen.  Char passed in A reg.
+; outputs char to screen.
+; Char passed in A reg.
 ; Processes control characters.
 ;======================================
 putch           .proc
@@ -282,7 +284,7 @@ GetNext         .proc
                 sta spln
 
                 lda token
-                sta lsttoken
+                sta zpAllocPrevToken
 
                 ldx nxtaddr
                 ldy nxtaddr+1
@@ -603,7 +605,7 @@ _1              ldy top+1
                 jsr nextdwn
                 bne _2
 
-        ;    lda #0
+            ;    lda #0
                 sta top+1
 
 _2              lda list
@@ -729,8 +731,8 @@ lexexpand       .proc
 _1              lda #3
                 jsr nxtprop
 
-                lda props
-                ldx props+1
+                lda zpAllocProps
+                ldx zpAllocProps+1
                 jsr rstp
 
                 ldy choff
@@ -765,6 +767,7 @@ _1              lda buf
 
                 rts
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------

@@ -19,10 +19,10 @@ libMscRand      .proc
                 cmp #0
                 beq _1
 
-                stx afcur
+                stx zpAllocCurrent
 
                 ldx #0
-                stx afcur+1
+                stx zpAllocCurrent+1
 
                 jsr MultI
 

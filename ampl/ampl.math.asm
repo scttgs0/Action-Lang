@@ -9,13 +9,13 @@
 
 
 math            .block
-_a             = aflast+1
-_b             = aflast
-_c             = afcur+1
-_d             = afcur
+_a             = zpAllocLast+1
+_b             = zpAllocLast
+_c             = zpAllocCurrent+1
+_d             = zpAllocCurrent
 
-_rl            = afsize
-_rh            = afsize+1
+_rl            = zpAllocSize
+_rh            = zpAllocSize+1
 
 _t1            = addr
 _t2            = addr+1
@@ -254,26 +254,26 @@ SArgs           .proc                   ; saves args for call
                 sty arg2
                 clc
                 pla
-                sta afcur
+                sta zpAllocCurrent
                 adc #3                  ; jump over data
                 tay
                 pla
-                sta afcur+1
+                sta zpAllocCurrent+1
                 adc #0
                 pha
                 tya
                 pha
                 ldy #1
-                lda (afcur),Y           ; local address
-                sta aflast
+                lda (zpAllocCurrent),Y  ; local address
+                sta zpAllocLast
                 iny
-                lda (afcur),Y
-                sta aflast+1
+                lda (zpAllocCurrent),Y
+                sta zpAllocLast+1
                 iny
-                lda (afcur),Y           ; # of bytes
+                lda (zpAllocCurrent),Y  ; # of bytes
                 tay
 _sa1            lda args,Y
-                sta (aflast),Y
+                sta (zpAllocLast),Y
                 dey
                 bpl _sa1
 

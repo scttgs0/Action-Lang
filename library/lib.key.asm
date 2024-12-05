@@ -11,9 +11,9 @@
 ;======================================
 ;   Get next key in buffer
 ;======================================
-libKeyGetKey    .proc
+libKeyGet       .proc
                 clc                     ; blink cursor
-                ;!!lda RTCLOK+2
+                lda JIFFYCLOCK
                 adc #14
 
                 tax
@@ -21,7 +21,7 @@ _waitForKey     lda KEYCHAR             ; key down?
                 eor #$FF                ; flip the bits
                 bne _faster
 
-                ;!!cpx RTCLOK+2
+                cpx JIFFYCLOCK
                 bpl _waitForKey
 
                 ldy #0
@@ -29,7 +29,7 @@ _waitForKey     lda KEYCHAR             ; key down?
                 eor #$80
                 sta (OLDADR),Y
 
-                jmp libKeyGetKey
+                jmp libKeyGet
 
 _1              ldy #0
                 lda OLDCHR
@@ -85,7 +85,7 @@ _7              lda KEYCHAR             ; last key pressed
                 ;!!sta SHFLOK
 
 _next3          jsr libKeyClick
-                bmi libKeyGetKey
+                bmi libKeyGet
 
 _8              ;!!lda INVFLG
                 eor #$80

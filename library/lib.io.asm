@@ -103,11 +103,11 @@ _next1          lda args+2,X
                 dex
                 bne _next1
 
-                stx lsttoken
-                stx op
+                stx zpAllocPrevToken
+                stx zpAllocOP
 
-_next2          inc op
-                ldy op
+_next2          inc zpAllocOP
+                ldy zpAllocOP
                 cpy token
                 bcs libIOBreak1._XIT
 
@@ -115,7 +115,7 @@ _next2          inc op
                 cmp #'%'
                 bne _next3
 
-                inc op
+                inc zpAllocOP
 
                 iny
                 lda (addr),Y
@@ -130,9 +130,9 @@ _next3          jsr libIOPut
 
                 jmp _next2
 
-_1              ldy lsttoken
-                inc lsttoken
-                inc lsttoken
+_1              ldy zpAllocPrevToken
+                inc zpAllocPrevToken
+                inc zpAllocPrevToken
                 sta args
 
                 lda temps,Y

@@ -12,12 +12,12 @@
 ;   LShift(val, cnt)
 ;======================================
 lsh1            .proc
-_a              = aflast+1
-_b              = aflast
-_c              = afcur+1
-_d              = afcur
-_rl             = afsize
-_rh             = afsize+1
+_a              = zpAllocLast+1
+_b              = zpAllocLast
+_c              = zpAllocCurrent+1
+_d              = zpAllocCurrent
+_rl             = zpAllocSize
+_rh             = zpAllocSize+1
 _t1             = addr
 _t2             = addr+1
 _sign           = token
@@ -113,8 +113,8 @@ _1              stx arg1
 ;======================================
 mnum            .proc
                 lda #0
-                sta afsize
-                sta afsize+1
+                sta zpAllocSize
+                sta zpAllocSize+1
 
 _next1          lda nxttoken
                 cmp #tokMULT
@@ -147,12 +147,12 @@ _1              lda #1
 _next2          jsr rstp
 
 _next3          clc
-                adc afsize
-                sta afsize
+                adc zpAllocSize
+                sta zpAllocSize
 
                 txa
-                adc afsize+1
-_next4          sta afsize+1
+                adc zpAllocSize+1
+_next4          sta zpAllocSize+1
 
                 jsr nextchar
 
@@ -166,18 +166,18 @@ _2              ldy #0
                 cmp #'^'
                 bne _3
 
-                lda (afsize),Y
+                lda (zpAllocSize),Y
                 tax
                 iny
 
-                lda (afsize),Y
-                stx afsize
+                lda (zpAllocSize),Y
+                stx zpAllocSize
 
                 jmp _next4
 
 _3              dec choff               ; put back character
-                lda afsize
-                ldx afsize+1
+                lda zpAllocSize
+                ldx zpAllocSize+1
 ;               ldy #0
 
                 rts
@@ -204,7 +204,7 @@ _next5          lda nxttoken            ; body of table
                 ldy #0
                 jsr storevar
 
-                lda op
+                lda zpAllocOP
                 beq _7                  ; byte?
 
                 iny                     ; no, word
@@ -218,7 +218,7 @@ _9              lda #1
 
                 tax
                 iny
-                lda (props),Y
+                lda (zpAllocProps),Y
                 beq _varerr
 
                 tay
@@ -465,10 +465,10 @@ cderr           ;!!sta bank+ebank
 ;   NxtProp(offset)
 ;======================================
 nxtprop         .proc
-                ldx props
-                stx aflast
-                ldx props+1
-                stx aflast+1
+                ldx zpAllocProps
+                stx zpAllocLast
+                ldx zpAllocProps+1
+                stx zpAllocLast+1
 
                 ldx nxtaddr
                 ldy nxtaddr+1
@@ -508,32 +508,32 @@ getprop         .proc
 ;   GProp(offset, addr)
 ;======================================
 gprop           .proc
-                stx props
-                sty props+1
+                stx zpAllocProps
+                sty zpAllocProps+1
 
-                ldx props+1
+                ldx zpAllocProps+1
                 clc
-                adc props
+                adc zpAllocProps
                 bcc _1
 
                 inx
 
 _1              sec
                 ldy #0
-                adc (props),Y
-                sta props
+                adc (zpAllocProps),Y
+                sta zpAllocProps
                 bcc _2
 
                 inx
 
-_2              stx props+1
+_2              stx zpAllocProps+1
 
                 iny
-                lda (props),Y
+                lda (zpAllocProps),Y
 
                 tax
                 dey
-                lda (props),Y
+                lda (zpAllocProps),Y
 
                 rts
                 .endproc
@@ -543,10 +543,10 @@ _2              stx props+1
 ;
 ;======================================
 rstp            .proc
-                ldy aflast
-                sty props
-                ldy aflast+1
-                sty props+1
+                ldy zpAllocLast
+                sty zpAllocProps
+                ldy zpAllocLast+1
+                sty zpAllocProps+1
 
                 rts
                 .endproc

@@ -196,11 +196,11 @@ _next1          cmp #tokCHAR
                 sta type
 
                 lda varsize-tokCHAR,X
-                sta afcur
+                sta zpAllocCurrent
 
 _next2          jsr makeentry
 
-                lda afcur
+                lda zpAllocCurrent
                 jsr codeincr
                 jsr GetNext
 
@@ -246,7 +246,7 @@ _1              cmp #tokTYPE
                 lda #0
                 jsr getprop
 
-                stx afcur
+                stx zpAllocCurrent
 
                 ldx nxttoken
                 lda #tokTYPE_t-(tokVAR_t-tokCHAR)-1
@@ -261,7 +261,7 @@ _2              cmp #tokDEFINE
 
                 tax
                 ldy varsize-tokCHAR,X
-                sty afcur
+                sty zpAllocCurrent
 
                 ldx nxttoken
                 cpx #tokFUNC
@@ -274,7 +274,7 @@ _3              cpx #tokPOINTER
                 bne _next1
 
                 ldy #0
-                sty afcur
+                sty zpAllocCurrent
                 bra arrDeclaration
 
 
@@ -306,7 +306,7 @@ _4              lda nxttoken
                 jsr GetNext
                 bne _6
 
-_5              lda afcur
+_5              lda zpAllocCurrent
                 jsr codeincr
 
 _6              jsr GetNext
@@ -326,7 +326,7 @@ _define         jsr makeentry
 
                 ldy #0
                 lda #tokDef
-                sta (props),Y
+                sta (zpAllocProps),Y
 
                 jsr GetNext
 
@@ -378,7 +378,7 @@ _next1          jsr makeentry
                 bne _2
 
                 lda nxttoken
-                ldx afcur
+                ldx zpAllocCurrent
                 beq _3                  ; no size for pointers
 
                 cmp #tokLParen
@@ -472,14 +472,14 @@ _5              ldy #1
                 jmp _next4
 
 _6              ldy #0
-                lda (props),Y
+                lda (zpAllocProps),Y
                 cmp #tokARRAY_t+tokINT_t
                 bcs _next2
 
 ;   small byte array
                 sty numargs
                 ora #8
-                sta (props),Y
+                sta (zpAllocProps),Y
 
                 iny
                 jsr getcdoff
@@ -539,12 +539,12 @@ _3              lda #0
                 sec
                 lda #tokVAR_t-tokCHAR
                 adc type
-                sta (props),Y           ; type
+                sta (zpAllocProps),Y    ; type
 
                 and #7
                 tax
                 lda vartype-1,X
-                sta op
+                sta zpAllocOP
 
                 iny
 
@@ -579,14 +579,14 @@ getarsz         .proc
                 sty arg0                ; Y should = 0
                 sty arg1
 
-                ldy afcur               ; #elements * element size
+                ldy zpAllocCurrent      ; #elements * element size
 _next1          clc
                 lda arg0
-                adc afsize
+                adc zpAllocSize
                 sta arg0
 
                 lda arg1
-                adc afsize+1
+                adc zpAllocSize+1
                 sta arg1
 
                 dey
@@ -605,11 +605,11 @@ _next1          clc
 ;   StorProps(low, high, index)
 ;======================================
 storprops       .proc
-                sta (props),Y
+                sta (zpAllocProps),Y
 
                 txa
                 iny
-                sta (props),Y
+                sta (zpAllocProps),Y
 
                 rts
                 .endproc
@@ -630,7 +630,7 @@ storprops       .proc
 ;======================================
 params          .proc
                 ldy #0
-                lda (props),Y           ; get var type
+                lda (zpAllocProps),Y    ; get var type
                 pha
 
                 lda #3
@@ -640,7 +640,7 @@ params          .proc
                 bcs _err
 
                 adc #1
-                sta (props),Y
+                sta (zpAllocProps),Y
                 tay
 
 ;   see if time to update gbase
@@ -676,7 +676,7 @@ _3              and #$1F
 
 _4              and #$9F
                 inc argbytes
-                sta (props),Y
+                sta (zpAllocProps),Y
 
                 rts
                 .endproc
@@ -705,7 +705,7 @@ varsize         .byte 1,1,2,2,2,6
 stmtlist        .proc
                 jsr clrtemps
 
-                sta op
+                sta zpAllocOP
                 jsr jt_smtend
 
                 cmp #tokLBracket
@@ -802,12 +802,12 @@ _ENTRY2         eor #tokEQU
                 jsr pushop              ; push 0 on op stack
                 jsr GetNext
 
-                sta op
+                sta zpAllocOP
                 cmp #tokEQU
                 bne _3
 
                 lda #0
-                sta op
+                sta zpAllocOP
 
                 jsr copyst
 
@@ -1940,7 +1940,7 @@ exp             .proc
                 jsr pushop
 
                 lda token               ; always non-zero
-                sta op
+                sta zpAllocOP
 
 _ENTRY1         jsr jt_expend
 
@@ -1950,7 +1950,7 @@ _ENTRY1         jsr jt_expend
                 cmp #tokRParen
                 bne _1
 
-                ldx op
+                ldx zpAllocOP
                 bne _err
 
                 jsr rollops
@@ -1965,16 +1965,16 @@ _ENTRY1         jsr jt_expend
 _1              cmp #tokLParen
                 bne _2
 
-                ldx op
+                ldx zpAllocOP
                 bne _9
 
 _err            jmp experr
 
-_2              ldx op
+_2              ldx zpAllocOP
                 beq _10
 
                 ldx #0
-                stx op
+                stx zpAllocOP
                 cmp #tokQuote
                 beq _13
 
@@ -2028,7 +2028,7 @@ _6              cmp #tokFUNC_t
                 jmp _next4
 
 ;   pop
-_7              ldx op
+_7              ldx zpAllocOP
                 beq _8
 
                 cmp #tokAT
@@ -2042,7 +2042,7 @@ _7              ldx op
 
 _8              tax
                 lda prec-1,X
-                sta op
+                sta zpAllocOP
 
                 jsr rollops
                 jsr pushop
@@ -2115,7 +2115,7 @@ _16             cmp #tokFUNC_t+8
                 jsr getframe
 
                 ldy #16
-                lda op
+                lda zpAllocOP
                 sta (frame),Y
 
 ;   save temps
@@ -2174,7 +2174,7 @@ _18             inc arg1
 
                 iny
                 lda (frame),Y
-                sta op
+                sta zpAllocOP
 
                 jsr freeframe
 
@@ -2424,10 +2424,10 @@ rollops         .proc
 
                 tax
                 ldy prec-1,X
-                cpy op
+                cpy zpAllocOP
                 bcc _XIT                ; prec < op
                                         ; check for simple add
-                ldy op                  ; see if end of exp
+                ldy zpAllocOP           ; see if end of exp
                 bne _4
 
                 ldy stack
@@ -3059,7 +3059,7 @@ cgdiv           .proc
                 jsr Load2H
 
                 lda #$85                ; STA AFcur+1
-                ldx #afcur+1
+                ldx #zpAllocCurrent+1
 
                 jsr Push2
 
@@ -3076,7 +3076,7 @@ cgmd            .proc
                 jsr Load2L
 
                 lda #$85                ; STA AFcur
-                ldx #afcur
+                ldx #zpAllocCurrent
 
                 jsr Push2
 

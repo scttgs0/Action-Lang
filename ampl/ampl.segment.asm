@@ -51,7 +51,7 @@ _1              jsr makeentry
 
                 ldy #3
                 lda #0                  ; no args yet
-                sta (props),Y
+                sta (zpAllocProps),Y
                 sta argbytes
 
                 tay
@@ -84,9 +84,9 @@ _next1          sta (symTblLocal),Y
                 jsr storprops
 
                 ldy #0
-                lda (props),Y
+                lda (zpAllocProps),Y
                 ora #8
-                sta (props),Y           ; set Sys flag
+                sta (zpAllocProps),Y    ; set Sys flag
                 sta param
 
                 jsr GetNext
@@ -107,8 +107,8 @@ _2              jsr GetNext
 
 _next2          jsr declare
 
-                ldx lsttoken
-                inc lsttoken            ; in case 2 ,'s
+                ldx zpAllocPrevToken
+                inc zpAllocPrevToken    ; in case 2 ,'s
                 cpx #tokComma
                 beq _next2
 
@@ -230,7 +230,7 @@ _next4          lda (curproc),Y
                 tay
                 tax
 
-_next5          lda (props),Y
+_next5          lda (zpAllocProps),Y
                 sta (QCODE),Y
 
                 dey

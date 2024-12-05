@@ -208,7 +208,7 @@ lproceed        .proc
 ;======================================
 options         .proc
                 jsr lproceed
-                jsr libOptSetOpts
+                jsr libOptSet
 
                 jmp EditBank
 
@@ -221,7 +221,7 @@ options         .proc
 GetKey          .proc
                 ;!!sta bank+lbank
 
-                jsr libKeyGetKey
+                jsr libKeyGet
 
                 jmp RestoreBank
 
@@ -272,7 +272,7 @@ GetArgs         .proc
                 sta abt+2               ; (default)
 
                 ldy #2
-                lda (props),Y
+                lda (zpAllocProps),Y
                 sta numargs
                 beq _XIT
 
@@ -281,7 +281,7 @@ GetArgs         .proc
                 bcs _XIT
 
 _next1          iny
-                lda (props),Y
+                lda (zpAllocProps),Y
                 dex
                 sta argtypes,X          ; args inverted
                 bne _next1

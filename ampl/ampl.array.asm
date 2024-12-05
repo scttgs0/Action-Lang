@@ -63,7 +63,7 @@ _2              jsr pushnext
                 cmp #tokRParen
                 bne arrerr
 
-                ldx op
+                ldx zpAllocOP
                 bne arrerr
 
 _3              ldy #7

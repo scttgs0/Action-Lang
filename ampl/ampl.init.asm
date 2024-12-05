@@ -42,8 +42,8 @@ _next2          sta (symTblGlobal),Y
                 bne _next2
 
 ;   get last block in heap
-                lda afbase
-                ldx afbase+1
+                lda zpAllocBase
+                ldx zpAllocBase+1
                 sta arg0
                 stx arg1
 

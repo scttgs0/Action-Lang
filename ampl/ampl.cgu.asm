@@ -547,7 +547,7 @@ StkProp         .proc
                 tax
                 iny
 
-                lda (props),Y
+                lda (zpAllocProps),Y
                 adc #0
                 tay
 

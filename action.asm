@@ -53,8 +53,7 @@ BOOT_           cld
 
 
 ;--------------------------------------
-;--------------------------------------
-; Initialization code
+;   Initialization code
 
 INIT            clc
                 jsr CSTART
@@ -66,7 +65,7 @@ INIT            clc
 ;--------------------------------------
 
 version         .byte $40
-date            .byte $07,$05,$23        ; TODO: assemble date of latest version!
+date            .byte $12,$04,$24        ; TODO: assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -79,20 +78,17 @@ propid          ldx arg0
 
 amplfin
 
+;--------------------------------------
 ;    ACTION! - Editor Routines
-;    ----------------------------------
 
-;--------------------------------------
                 .fill 4,$00
-;--------------------------------------
-
                 .include "editor/edit.find.asm"
                 .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"
 
 
+;--------------------------------------
 ;    "ACTION! - Compiler Routines
-;    ----------------------------------
 
                 .fill 3,$00
                 .include "ampl/ampl.segment.asm"
@@ -101,8 +97,8 @@ amplfin
                 .include "ampl/ampl.cgu.asm"
 
 
+;--------------------------------------
 ;    ACTION! - Symbol Table
-;    ----------------------------------
 
                 .include "ampl/ampl.math.asm"
                 .include "ampl/ampl.symbol.asm"
@@ -114,20 +110,20 @@ amplfin
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .null " ACTION! (c) 2023 GPL3           Foenix Adaptation           v3.6 July 05, 2022 "
+cpyright        .null " ACTION! (c) 2024 GPL3           Foenix Adaptation           v4.0 Dec 04, 2024 "
 
 
+;--------------------------------------
 ;    "ACTION! - Compiler
-;    -----------------------
 
 main
                 .include "compiler.main.asm"
 
-cright          .text "ACTION! (c) 2023 GPL3      Foenix Adaptation",$00,$00
+cright          .text "ACTION! (c) 2024 GPL3      Foenix Adaptation",$00,$00
 
 
-;    ACTION! 3.6 - Editor
-;    --------------------
+;--------------------------------------
+;    ACTION! 4.0 - Editor
 
                 .include "storage.mac.asm"
                 .include "editor/edit.memory.asm"

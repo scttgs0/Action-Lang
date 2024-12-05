@@ -14,19 +14,19 @@
 GetMemory       .proc
                 clc
                 adc #4
-                sta afsize
+                sta zpAllocSize
                 bcc _1
 
                 inx
-_1              stx afsize+1
+_1              stx zpAllocSize+1
 
 _ENTRY1         jsr Allocate._ENTRY
 
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 beq GeneralMemErr       ; no memory allocated !
 
                 clc
-                lda afcur
+                lda zpAllocCurrent
                 adc #4
                 bcc _XIT
 
@@ -153,71 +153,71 @@ _1              lda arg0
                 sta arg5
 
                 ldy #4                  ; AFcur(2) _= down
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 lda top+1
                 sta arg6
 
                 iny
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur               ; top _= AFcur
+                lda zpAllocCurrent      ; top _= AFcur
                 sta top
-                lda afcur+1
+                lda zpAllocCurrent+1
                 sta top+1
 
                 ldy #0                  ; AFcur(0) _= 0
                 tya
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
 _next2          lda arg6
                 bne _2                  ; down # 0
 
-                lda afcur               ; bot _= AFcur
+                lda zpAllocCurrent      ; bot _= AFcur
                 sta bot
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx bot+1
 
                 rts
 
 _2              ldy #1
-                lda afcur+1             ; @down _= AFcur
+                lda zpAllocCurrent+1    ; @down _= AFcur
                 sta (arg5),Y
 
                 dey
-                lda afcur
+                lda zpAllocCurrent
                 sta (arg5),Y
 
-                ldx afcur+1
+                ldx zpAllocCurrent+1
 
                 rts
 
 _3              ldy #4
                 lda (arg3),Y
                 sta arg5                ; down _= Next(up)
-                sta (afcur),Y           ; AFcur(2) _= down
+                sta (zpAllocCurrent),Y  ; AFcur(2) _= down
 
-                lda afcur
+                lda zpAllocCurrent
                 sta (arg3),Y            ; up(2) _= AFcur
 
                 iny
                 lda (arg3),Y
                 sta arg6
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur+1
+                lda zpAllocCurrent+1
                 sta (arg3),Y
 
                 ldy #0
                 lda arg3
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda arg4
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 jmp _next2
 

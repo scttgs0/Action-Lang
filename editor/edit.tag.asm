@@ -29,34 +29,34 @@ SetTag          .proc
 
                 ldy #1
                 lda taglist+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 dey
                 lda taglist
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur
+                lda zpAllocCurrent
                 sta taglist
 
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx taglist+1
 
 _1              ldy #4
                 lda tempbuf+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda cur
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda cur+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 jsr SetSpacing
 
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
 ;   flag line as tagged
                 ldy #3
@@ -116,11 +116,11 @@ LocateTag       .proc
                 beq notag
 
                 ldy #6
-                lda (afcur),Y
+                lda (zpAllocCurrent),Y
 
                 tax
                 dey
-                lda (afcur),Y
+                lda (zpAllocCurrent),Y
                 jsr FindLine
                 beq notag
 
@@ -129,7 +129,7 @@ LocateTag       .proc
                 bpl notag
 
                 ldy #7
-                lda (afcur),Y
+                lda (zpAllocCurrent),Y
                 sta sp
 
                 lda arg2
@@ -155,23 +155,23 @@ GetTag          .proc
 _XIT            rts
 
 _next1          ldy #4
-                lda (afcur),Y
+                lda (zpAllocCurrent),Y
                 cmp arg0
                 beq _2
 
                 ldy #1
-                lda (afcur),Y
+                lda (zpAllocCurrent),Y
 
                 tax
                 dey
-                lda (afcur),Y
-_1              sta afcur
-                stx afcur+1
+                lda (zpAllocCurrent),Y
+_1              sta zpAllocCurrent
+                stx zpAllocCurrent+1
 
                 txa
                 bne _next1
 
-_2              ldx afcur+1
+_2              ldx zpAllocCurrent+1
 
                 rts
                 .endproc
@@ -185,15 +185,15 @@ FreeTags        .proc
                 ldx taglist+1
                 beq _XIT
 
-_next1          sta afbest
-                stx afbest+1
+_next1          sta zpAllocBest
+                stx zpAllocBest+1
 
                 ldy #0
-                lda (afbest),Y
+                lda (zpAllocBest),Y
                 sta arg0
 
                 iny
-                lda (afbest),Y
+                lda (zpAllocBest),Y
                 sta arg1
 
                 jsr Free._ENTRY1

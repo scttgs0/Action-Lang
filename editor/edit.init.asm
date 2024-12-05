@@ -13,37 +13,37 @@
 ;======================================
 MemoryInit      .proc
                 lda MEMLO
-                sta afbase
+                sta zpAllocBase
                 lda MEMLO+1
-                sta afbase+1
+                sta zpAllocBase+1
 
                 lda #0
                 tay
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 sec
                 lda MEMTOP
-                sbc afbase
+                sbc zpAllocBase
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 lda MEMTOP+1
-                sbc afbase+1
+                sbc zpAllocBase+1
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 lda #0                  ; allocate 2 pages of spare memory
                 ldx #2
                 jsr Allocate
 
-                lda afcur
+                lda zpAllocCurrent
                 sta sparem
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx sparem+1
 
                 rts
@@ -123,9 +123,9 @@ EditorInit      .proc
                 ldx #1
                 jsr Allocate            ; get edit buffer
 
-                lda afcur
+                lda zpAllocCurrent
                 sta buf
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx buf+1
 
                 lda #$40

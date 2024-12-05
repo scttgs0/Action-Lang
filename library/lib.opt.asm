@@ -11,7 +11,7 @@
 ;======================================
 ;   SetOpts()
 ;======================================
-libOptSetOpts   .proc
+libOptSet       .proc
 ;   Display On?
                 ldx #domsg-optmsg
                 ldy jt_tvdisp
