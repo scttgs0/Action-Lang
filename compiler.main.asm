@@ -30,7 +30,7 @@ spl             ;.proc
 _1              lda top1
                 sta top+1
 
-                jsr chkcur._ENTRY1
+                jsr ChkCursor._ENTRY1
                 beq _XIT1               ; no program !
 
                 jsr GetNext

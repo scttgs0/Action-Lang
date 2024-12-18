@@ -60,8 +60,8 @@ _1              lda #w2-w1
 ;======================================
 SaveWorld       .proc
                 jsr CleanLine
-                jsr savecol
-                jsr rstcsr
+                jsr SaveColumn
+                jsr RestoreCursorChar
                 jsr SetSpacing
 
                 jmp SaveWindow
@@ -118,9 +118,9 @@ RestoreWorld    .proc
                 sta currentWindow
 
                 jsr RestoreWindow
-                jsr ldbuf
+                jsr LoadBuffer
 
-                jmp rstcol
+                jmp ResetColumn
 
                 .endproc
 
@@ -189,7 +189,7 @@ CommandString   .proc
                 sta arg0
                 sty arg2
 
-                jsr cmdcol
+                jsr CmdColumn
 
                 lda #$80
                 sta arg4
@@ -198,9 +198,9 @@ CommandString   .proc
                 ldy arg2
 
                 jsr GetString
-                jsr rstcsr
+                jsr RestoreCursorChar
 
-                jmp rstcol
+                jmp ResetColumn
 
                 .endproc
 

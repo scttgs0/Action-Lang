@@ -17,10 +17,10 @@ Front           .proc
                 sbc indent
                 sta choff
 
-                jsr dspbuf
+                jsr DisplayBuffer
 
                 lda LMARGN
-                jmp rstcol+6
+                jmp ResetColumn+6
 
                 .endproc
 
@@ -44,7 +44,7 @@ _ENTRY1         pha
 _1              sbc indent
                 sta choff
 
-                jsr dspbuf
+                jsr DisplayBuffer
 
                 sec
                 pla
@@ -56,7 +56,7 @@ _1              sbc indent
                 clc
                 adc LMARGN
 
-                jmp rstcol+6
+                jmp ResetColumn+6
 
                 .endproc
 
@@ -132,7 +132,7 @@ Paste           .proc
                 jsr DeleteTop
 
 _next1          jsr strptr
-                jsr ldbuf._ENTRY1
+                jsr LoadBuffer._ENTRY1
                 jsr InsertByte
 
                 lda allocerr
@@ -141,7 +141,7 @@ _next1          jsr strptr
                 jsr DeleteNext
                 bne _next1
 
-_1              jsr rstcur
+_1              jsr ResetCursor
 
                 ldy currentWindow
                 lda w1+WCUR+1,Y
@@ -231,9 +231,9 @@ ScrollInit      .proc
                 lda #0
                 sta choff
 
-                jsr dspbuf
+                jsr DisplayBuffer
 
-                jmp ldbuf
+                jmp LoadBuffer
 
 _1              pla
                 pla
@@ -263,7 +263,7 @@ _1              inc lnum
 
                 lda nlines
                 jsr MoveDown
-                jsr rstcol
+                jsr ResetColumn
 
                 jmp RefreshBuf
 
@@ -294,10 +294,10 @@ _1              jsr BottomLine
                 ldx ytop
                 jsr MoveUp
 
-                jsr rstcol
-                jsr dspbuf
+                jsr ResetColumn
+                jsr DisplayBuffer
 
-                jmp rstcol
+                jmp ResetColumn
 
                 .endproc
 
@@ -353,7 +353,7 @@ ScrollLeft      .proc
 
                 dec choff
 
-                jsr dspbuf
+                jsr DisplayBuffer
                 jsr scrrt
 
 _XIT            jmp scrlft
@@ -374,7 +374,7 @@ ScrollRight     .proc
 
                 inc choff
 
-                jsr dspbuf
+                jsr DisplayBuffer
                 jsr scrlft
 
 _XIT            jmp scrrt
@@ -436,8 +436,8 @@ MoveContent     .proc
                 sta arg4
 
                 stx ROWCRS
-                jsr rstcsr
-                jsr DisplayLocation     ; get display address
+                jsr RestoreCursorChar
+                jsr GetDisplayAddr     ; get display address
 
                 ldx arg4
                 dex

@@ -42,7 +42,7 @@ _next1          jsr InitKeys
                 jsr scrinit             ; get Graphics(0)
 
 _1              jsr jt_alarm
-                jsr rstcsr
+                jsr RestoreCursorChar
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
@@ -159,36 +159,36 @@ _1              lda arg11
 MPrint          .proc
                 jsr MpSave
 
-_ENTRY1         jsr printc
+_ENTRY1         jsr PrintCard
 
                 ldy #','
-                jsr putchar
+                jsr PutChar
 
                 lda arg11
                 ldx arg12
                 jsr PrintH
-                jsr putsp
+                jsr PutSpace
 
                 ldy #'='
-                jsr putchar
-                jsr putsp
+                jsr PutChar
+                jsr PutSpace
                 jsr MpLoad
 
                 tay
-                jsr putchar
-                jsr putsp
+                jsr PutChar
+                jsr PutSpace
                 jsr MpLoad
                 jsr PrintH
-                jsr putsp
+                jsr PutSpace
                 jsr MpLoad
 
                 ldx #0
-                jsr printc
-                jsr putsp
+                jsr PrintCard
+                jsr PutSpace
                 jsr MpLoad
-                jsr printc
+                jsr PrintCard
 
-                jmp puteol
+                jmp PutEOL
 
                 .endproc
 
@@ -283,7 +283,7 @@ MWrite          .proc                   ; write object file
                 sta Channel
 
                 lda #8                  ; output
-                jsr openchan
+                jsr OpenChannel
 
 ;   write header
                 lda #6
@@ -354,7 +354,7 @@ _next1          lda _mwinit,X
 
 ;   close file
                 lda #1
-                jmp close
+                jmp Close
 
 ;--------------------------------------
 
@@ -372,7 +372,7 @@ MWOut           .proc
                 lda #1
                 ldx #arg9
                 ldy #0
-                jsr output
+                jsr Output
 
                 bmi _mwerr
 
@@ -419,10 +419,10 @@ _ENTRY1         lda #0                  ; execute command line
 ;======================================
 Comp            .proc
                 jsr SPLsetup
-                jsr dspoff
+                jsr DisplayOff
                 jsr compile
 
-                jmp dspon
+                jmp DisplayOn
 
                 .endproc
 
@@ -472,7 +472,7 @@ PrintH          .proc
                 sta arg2
 
                 ldy #'$'
-                jsr putchar
+                jsr PutChar
 
 _next1          lda #0
                 ldx #4
@@ -491,7 +491,7 @@ _next2          asl arg0
                 adc #6
 
 _1              tay
-                jsr putchar
+                jsr PutChar
 
                 dec arg2
                 bne _next1

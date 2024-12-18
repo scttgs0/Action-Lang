@@ -63,7 +63,7 @@ _next3          lda (buf),Y
 _1              jsr nextdwn
                 beq _2
 
-                jsr ldbuf
+                jsr LoadBuffer
 
                 lda #0
                 sta sp
@@ -71,8 +71,8 @@ _1              jsr nextdwn
 
 _2              sta curch
 
-                jsr rstcur
-                jsr ldbuf
+                jsr ResetCursor
+                jsr LoadBuffer
 
                 lda #<notfnd
                 ldx #>notfnd

@@ -16,7 +16,7 @@ scrinit         .proc
                 stz DINDEX              ; text mode
 
                 ; lda #0
-                ; jsr close             ; close #0, sets X to 0
+                ; jsr Close             ; close #0, sets X to 0
 
                 ; lda #$0C
                 ; sta arg3
@@ -371,7 +371,7 @@ LexDig          .proc
                 sta nxttoken
 
                 jsr lexbuf              ; get buf ptr
-                jsr storeal
+                jsr StrToReal
 
 _next1          jsr nextchar            ; cardinal?
                 jsr alphanum._num
@@ -385,7 +385,7 @@ _next1          jsr nextchar            ; cardinal?
 
                 dec choff
 
-                jsr rtocar
+                jsr RealToCard
                 bcc _1
 
 _err            ldy #constERR
@@ -467,7 +467,7 @@ LexHex          .proc
                 inc choff
 
                 jsr lexbuf
-                jsr htocar
+                jsr HexToCard
                 bra LexDig._ENTRY1
 
                 .endproc
@@ -595,7 +595,7 @@ _next1          dec Channel
 _1              ldy top+1
                 beq _next1              ; set eof, tricky QCODE
 
-                jsr ldbuf
+                jsr LoadBuffer
 
                 lda cur
                 sta curnxt
@@ -673,7 +673,7 @@ _ENTRY1         lda #0
                 inc Channel
 
                 lda #4
-                jsr openchan
+                jsr OpenChannel
                 jsr NextLine
 
                 jmp GetNext._ENTRY2

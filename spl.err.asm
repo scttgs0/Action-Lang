@@ -25,21 +25,21 @@ lsplerr         .proc
                 lda curln+1
                 sta w1+WCUR+1,X
 
-_1              jsr syserr
-                jsr puteol
-                jsr printbuf
+_1              jsr SystemError
+                jsr PutEOL
+                jsr PrintBuffer
 
                 lda #0
-                ldx #<sermsg
-                ldy #>sermsg
-                jsr output
+                ldx #<msgSysErr
+                ldy #>msgSysErr
+                jsr Output
 
                 lda #0
                 sta INITAD+1
 
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr print
+                jsr Print
 
                 jmp emloop
 

@@ -62,7 +62,7 @@ nextdwn         .proc
 ;   Next(,,dir)
 ;======================================
 next            .proc
-                jsr chkcur
+                jsr ChkCursor
                 beq _XIT
 
                 lda (cur),Y

@@ -12,7 +12,7 @@
 ;   GetString(prompt, str, invert)
 ;======================================
 GetString       .proc
-                jsr dspstr
+                jsr DisplayStr
 _next1          jsr GetKey
 
                 tax
@@ -123,7 +123,7 @@ _next1          lda #1
 _1              cpy #$88                ; EOF
                 beq _3
 
-_2              jsr syserr
+_2              jsr SystemError
 _3              jsr FWrite._ENTRY1
 
                 jmp CenterLine
@@ -144,10 +144,10 @@ FWrite          .proc
                 ldy #8
                 jsr FOpen
 
-                jsr chkcur._ENTRY1
+                jsr ChkCursor._ENTRY1
                 beq _1
 
-_next1          jsr ldbuf
+_next1          jsr LoadBuffer
 
                 ; inc COLOR4            ; let user know we're here
 
@@ -166,12 +166,12 @@ _next1          jsr ldbuf
                 sta dirty
 
 _ENTRY1         lda #1
-                jsr close
-                jsr rstcur
+                jsr Close
+                jsr ResetCursor
 
-                jmp dspon
+                jmp DisplayOn
 
-_1              jsr syserr
+_1              jsr SystemError
 
                 jmp _ENTRY1
 
@@ -192,7 +192,7 @@ FOpen           .proc
 
 ;               jsr ClnLn               ; in SaveWd
                 jsr SaveWindow
-                jsr rstcsr
+                jsr RestoreCursorChar
 
                 ldy #<inbuf
                 lda #>inbuf
@@ -203,7 +203,7 @@ FOpen           .proc
                 jsr CommandString
 
                 lda #1
-                jsr close
+                jsr Close
 
                 ldy inbuf
                 beq _5
@@ -239,7 +239,7 @@ _2              lda #'D'
                 sta inbuf+1
 
 _3              stx arg3
-                jsr dspoff
+                jsr DisplayOff
 
                 lda #1
                 sta arg4                ; clear high bit for cassette
@@ -260,7 +260,7 @@ _XIT            rts
 _4              pla
                 pla                     ; pop return
 
-                jmp syserr
+                jmp SystemError
 
 _5              pla
                 pla
@@ -274,7 +274,7 @@ _5              pla
 ;======================================
 InitKeys        .proc
                 lda #7
-                jsr close
+                jsr Close
 
                 lda #4
                 sta arg3                ; read only

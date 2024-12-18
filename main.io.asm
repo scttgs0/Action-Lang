@@ -9,7 +9,7 @@
 
 
 ;======================================
-;   Open(device, name, mode, opt)
+; Open(device, name, mode, opt)
 ;--------------------------------------
 ; returns status
 ;======================================
@@ -18,15 +18,15 @@ Open            .proc
                 sty arg6
 
                 ldy #3
-                bne xiostr              ; [unc]
+                bne XioStr              ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   Print(device, str)
+; Print(device, str)
 ;======================================
-print           .proc
+Print           .proc
                 stx arg5
                 sty arg6
 
@@ -34,7 +34,7 @@ print           .proc
                 stx arg3
 
                 ldy #$09
-                jsr xiostr
+                jsr XioStr
                 bne _XIT
 
                 lda #$0B
@@ -48,29 +48,29 @@ _XIT            rts
 
 
 ;======================================
-;   Close(device)
+; Close(device)
 ;======================================
-close           .proc
+Close           .proc
                 ldx #>$B000      ;; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
             .if ZAPRAM
-                 sta (arg5),Y
+                sta (arg5),Y
             .else
-                 nop
-                 nop
+                nop
+                nop
             .endif
 
                 ldy #$0C
-                bne input._ENTRY1       ; [unc]
+                bne Input._ENTRY1       ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   Input(device, str)
+; Input(device, str)
 ;======================================
-input           .proc
+Input           .proc
                 sty arg6
 
                 ldy #$05
@@ -85,9 +85,9 @@ _ENTRY1         stx arg5
 
 
 ;======================================
-;   XIOstr(device,,cmd,aux1,aux2,str)
+; XioStr(device,,cmd,aux1,aux2,str)
 ;======================================
-xiostr          .proc
+XioStr          .proc
                 asl                     ; *16
                 asl
                 asl
@@ -111,7 +111,7 @@ _1              tay
                 lda (arg5),Y
                 ;!!sta IOCB0+ICBLL,X       ; size
 
-                beq print._XIT          ; return
+                beq Print._XIT          ; return
 
                 clc
                 lda arg5
@@ -128,21 +128,21 @@ _1              tay
 
 
 ;======================================
-;   Output(device, str)
+; Output(device, str)
 ;======================================
-output          .proc
+Output          .proc
                 sty arg6
 
                 ldy #$0B
-                bne input._ENTRY1       ; [unc]
+                bne Input._ENTRY1       ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   DspStr(prompt, str, invert)
+; DisplayStr(prompt, str, invert)
 ;======================================
-dspstr          .proc
+DisplayStr      .proc
                 sty arg12
 
                 ldy arg3
@@ -152,7 +152,7 @@ dspstr          .proc
                 sty arg3
 
                 ldy arg4
-                jsr putstr
+                jsr PutStr
 
                 lda arg6                ; PutStr size
                 clc
@@ -182,7 +182,7 @@ _XIT            rts
 
 
 ;======================================
-;   ReadBuffer(device)
+; ReadBuffer(device)
 ;======================================
 ReadBuffer      .proc
 ;               inc COLOR4
@@ -198,7 +198,7 @@ ReadBuffer      .proc
                 txa
                 ldx buf
                 ldy buf+1
-inputs          jsr input
+inputs          jsr Input
 
                 sty arg0
 
@@ -217,41 +217,41 @@ _1              ldy #0
 
 
 ;======================================
-;   WrtBuf(device)
+; WriteBuffer(device)
 ;======================================
 WriteBuffer     .proc
                 ldx buf
                 ldy buf+1
-                jmp print
+                jmp Print
 
                 .endproc
 
 
 ;======================================
-;   RstCur()
+; ResetCursor()
 ;======================================
-rstcur          .proc
+ResetCursor     .proc
                 ldy currentWindow
                 lda w1+WCUR,Y
                 sta cur
                 lda w1+WCUR+1,Y
                 sta cur+1
 
-                jmp ldbuf
+                jmp LoadBuffer
 
                 .endproc
 
 
 ;======================================
-;   SysErr(,,errnum)
+; SystemError(,,errnum)
 ;======================================
-syserr          .proc
-                jsr dspon
+SystemError     .proc
+                jsr DisplayOn
 
                 tya
                 ldx #0
-                jsr ctostr
-                jsr cmdcol
+                jsr CardToStr
+                jsr CmdColumn
 
                 lda #$80
                 sta arg4
@@ -259,11 +259,11 @@ syserr          .proc
                 sta arg3
                 ldy #<numbuf
 
-                lda #<sermsg
-                ldx #>sermsg
-                jsr dspstr
-                jsr rstcsr
-                jsr rstcol
+                lda #<msgSysErr
+                ldx #>msgSysErr
+                jsr DisplayStr
+                jsr RestoreCursorChar
+                jsr ResetColumn
 
                 jmp scrbell
 
@@ -273,13 +273,13 @@ syserr          .proc
 ;--------------------------------------
 ;--------------------------------------
 
-sermsg          .ptext "Error: "
+msgSysErr       .ptext "Error: "
 
 
 ;======================================
-;   CToStr(num) - Cardinal to string
+; CardToStr(num) - Cardinal to string
 ;======================================
-ctostr          .proc
+CardToStr       .proc
                 sta FR0
                 stx FR0+1
 
@@ -291,9 +291,9 @@ ctostr          .proc
 
 
 ;======================================
-;   RToStr() - real in FR0
+; RealToStr() - real in FR0
 ;======================================
-rtostr          ;.proc
+RealToStr       ;.proc
                 ;!!jsr FASC
 
                 ldy #$FF
@@ -316,9 +316,9 @@ _next1          iny
 
 
 ;======================================
-;   DspOff()
+; DisplayOff()
 ;======================================
-dspoff          .proc
+DisplayOff      .proc
                 lda jt_tvdisp
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
@@ -328,9 +328,9 @@ dspoff          .proc
 
 
 ;======================================
-;   DspOn()
+; DisplayOn()
 ;======================================
-dspon           .proc
+DisplayOn       .proc
                 lda #$22
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
@@ -343,28 +343,28 @@ dspon           .proc
 
 
 ;======================================
-;   PrintC(num)
+; PrintCard(num)
 ;======================================
-printc          .proc
-                jsr ctostr
+PrintCard       .proc
+                jsr CardToStr
 
 pnum            lda device
                 ldx #<numbuf
                 ldy #>numbuf
 
-                jmp output
+                jmp Output
 
                 .endproc
 
 
 ;======================================
-;   OpenChan(mode)
+; OpenChannel(mode)
 ;======================================
-openchan        .proc
+OpenChannel     .proc
                 pha
 
                 lda Channel
-                jsr close
+                jsr Close
 
                 pla
                 sta arg3
@@ -412,7 +412,7 @@ _1              lda Channel
                 ldx nxtaddr
                 ldy nxtaddr+1
                 jsr Open
-                bpl printbuf
+                bpl PrintBuffer
 
                 jmp splerr              ; oops, error in Open
 
@@ -420,11 +420,11 @@ _1              lda Channel
 
 
 ;======================================
-;   PrintBuf()
+; PrintBuffer()
 ;======================================
-printbuf        .proc
+PrintBuffer     .proc
                 lda list
-                bne rtocar._XIT         ; return
+                bne RealToCard._XIT         ; return
 
                 jmp WriteBuffer
 
@@ -432,9 +432,9 @@ printbuf        .proc
 
 
 ;======================================
-;   HToCar(buf,index)
+; HexToCard(buf,index)
 ;======================================
-htocar          .proc
+HexToCard       .proc
                 sty CIX
                 sta arg1
                 stx arg2
@@ -447,17 +447,17 @@ _next1          ldy CIX
                 lda (arg1),Y
                 sec
                 sbc #'0'
-                bmi rtocar._ENTRY1
+                bmi RealToCard._ENTRY1
 
                 cmp #10
                 bmi _1
 
                 cmp #17
-                bmi rtocar._ENTRY1
+                bmi RealToCard._ENTRY1
 
                 sbc #7
                 cmp #16
-                bpl rtocar._ENTRY1
+                bpl RealToCard._ENTRY1
 
 _1              sta arg5
 
@@ -478,9 +478,9 @@ _1              sta arg5
 
 
 ;======================================
-;   RToCar()
+; RealToCard()
 ;======================================
-rtocar          .proc
+RealToCard      .proc
                 ;!!jsr FPI
                 bcs _err
 
@@ -497,9 +497,9 @@ _err            ldy #constERR
 
 
 ;======================================
-;   SToReal(str, index)
+; StrToReal(str, index)
 ;======================================
-storeal         .proc
+StrToReal       .proc
                 sty CIX
                 sta INBUFF
                 stx INBUFF+1
@@ -510,19 +510,19 @@ storeal         .proc
 
 
 ;======================================
-;   PutSp()
+; PutSpace()
 ;======================================
-putsp           .proc
+PutSpace        .proc
                 ldy #$20
-                bne putchar             ; [unc]
+                bne PutChar             ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   PutEOL()
+; PutEOL()
 ;======================================
-puteol          .proc
+PutEOL          .proc
                 ldy #EOL
 
                 .endproc
@@ -531,9 +531,9 @@ puteol          .proc
 
 
 ;======================================
-;   PutChar(,,char)
+; PutChar(,,char)
 ;======================================
-putchar         .proc
+PutChar         .proc
                 lda device
                 jmp scrch._ENTRY1
 
@@ -541,9 +541,9 @@ putchar         .proc
 
 
 ;======================================
-;   PutStr(str, invert, offset)
+; PutStr(str, invert, offset)
 ;======================================
-putstr          .proc
+PutStr          .proc
                 sta arg6
                 stx arg7
                 sty arg2
@@ -557,8 +557,8 @@ putstr          .proc
 
 _1              stx arg5
 
-                jsr DisplayLocation
-                jsr zapcsr
+                jsr GetDisplayAddr
+                jsr ZapCursor
 
                 ldy #39
                 lda arg2
@@ -652,11 +652,11 @@ _6              lda arg3
 
 
 ;======================================
-;   CmdCol()
+; Command column???
 ;======================================
-cmdcol          .proc
-                jsr savecol
-                jsr rstcsr
+CmdColumn       .proc
+                jsr SaveColumn
+                jsr RestoreCursorChar
 
                 ldy cmdln
                 sty ROWCRS
@@ -666,9 +666,9 @@ cmdcol          .proc
 
 
 ;======================================
-;   SaveCol()
+; Preserve column
 ;======================================
-savecol         .proc
+SaveColumn      .proc
                 lda ROWCRS
                 sta y__
 
@@ -680,16 +680,16 @@ savecol         .proc
 
 
 ;======================================
-;   RstCol()
+; Reset column
 ;======================================
-rstcol          .proc
+ResetColumn     .proc
                 lda y__
                 sta ROWCRS
 
                 lda x__
                 sta COLCRS
 
-                jsr zapcsr
+                jsr ZapCursor
 _ENTRY1         jsr scrlft
 
                 jmp scrrt
@@ -698,9 +698,9 @@ _ENTRY1         jsr scrlft
 
 
 ;======================================
-;   ChkCur()
+; Check cursor bounds
 ;======================================
-chkcur          .proc
+ChkCursor       .proc
                 lda cur+1
                 bne _XIT
 
@@ -714,10 +714,10 @@ _XIT            rts
 
 
 ;======================================
-;   LdBuf() load buf
+; Load buffer
 ;======================================
-ldbuf           .proc
-                jsr chkcur
+LoadBuffer      .proc
+                jsr ChkCursor
                 bne _1
 
                 tay
@@ -743,9 +743,9 @@ _next1          lda (arg0),Y
 
 
 ;======================================
-;   DspBuf() - display buffer
+;   Display content from buffer
 ;======================================
-dspbuf          .proc
+DisplayBuffer   .proc
                 clc
                 lda indent
                 adc choff
@@ -755,15 +755,15 @@ dspbuf          .proc
                 lda buf
                 ldx buf+1
 
-                jmp putstr
+                jmp PutStr
 
                 .endproc
 
 
 ;======================================
-;   DisplayLocation() get address of display
+; Get address of the display
 ;======================================
-DisplayLocation .proc
+GetDisplayAddr  .proc
                 lda #<CS_TEXT_MEM_PTR
                 ldx #>CS_TEXT_MEM_PTR
                 ldy ROWCRS
@@ -786,9 +786,9 @@ _2              sta arg0
 
 
 ;======================================
-;   ZapCsr() get rid of old cursor
+; Get rid of the old cursor
 ;======================================
-zapcsr          .proc
+ZapCursor       .proc
                 lda #<CSRCH
                 sta OLDADR
                 lda #>CSRCH
@@ -799,9 +799,9 @@ zapcsr          .proc
 
 
 ;======================================
-;   RstCsr() restore char under Csr
+; Restore char under cursor
 ;======================================
-rstcsr          .proc
+RestoreCursorChar .proc
                 ldy #0
                 lda OLDCHR
                 sta (OLDADR),Y

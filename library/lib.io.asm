@@ -231,7 +231,7 @@ libIOPrintE     .proc
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
 libIOPrintDE    .proc
-                jsr print
+                jsr Print
                 jmp libIOChkErr
 
                 .endproc
@@ -243,7 +243,7 @@ libIOPrintDE    .proc
 ; closes IOCB dev
 ;======================================
 libIOClose      .proc
-                jsr close
+                jsr Close
                 jmp libIOChkErr
 
                 .endproc
@@ -272,7 +272,7 @@ libIOPrint      .proc
 ; outputs str to IOCB dev
 ;======================================
 libIOPrintD     .proc
-                jsr output
+                jsr Output
                 jmp libIOChkErr
 
                 .endproc
@@ -451,7 +451,7 @@ libIOPutDE      .proc
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
 libIOXIO        .proc
-                jsr xiostr
+                jsr XioStr
                 jmp libIOChkErr
 
                 .endproc
@@ -476,7 +476,7 @@ libIOPrintB     .proc
 ; outputs cardinal num to default IOCB
 ;======================================
 libIOPrintC     .proc
-                jsr printc
+                jsr PrintCard
                 jmp libIOChkErr
 
                 .endproc
@@ -528,10 +528,10 @@ libIOPrintCD    .proc
                 sty arg2
                 ldx arg2
 
-                jsr ctostr
+                jsr CardToStr
 
                 lda arg0
-                jsr printc.pnum+2
+                jsr PrintCard.pnum+2
                 jmp libIOChkErr
 
                 .endproc
@@ -657,7 +657,7 @@ libIOStrB       .proc
 libIOStrC       .proc
                 sty arg2
 
-                jsr ctostr
+                jsr CardToStr
 
                 iny
 _next1          lda numbuf,Y
@@ -693,7 +693,7 @@ libIOStrI       .proc
                 tax
                 tya
 
-                jsr ctostr
+                jsr CardToStr
 
                 inx
                 txa

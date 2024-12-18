@@ -14,16 +14,16 @@
 CommandMsg      .proc
                 sta arg0
 
-                jsr cmdcol
+                jsr CmdColumn
 
                 lda #0
                 sta arg3
 
                 lda arg0
                 ldy #$80
-                jsr putstr
+                jsr PutStr
 
-                jmp rstcol
+                jmp ResetColumn
 
                 .endproc
 
@@ -32,7 +32,7 @@ CommandMsg      .proc
 ;   CleanLine()
 ;======================================
 CleanLine       .proc
-                jsr chkcur
+                jsr ChkCursor
 
                 lda isDirty
                 beq _XIT
@@ -45,7 +45,7 @@ CleanLine       .proc
                 jsr DeleteCurrentLine
                 jsr InsertByte
 
-_XIT            jmp chkcur
+_XIT            jmp ChkCursor
 
                 .endproc
 
@@ -149,7 +149,7 @@ _next1          lda temps
 ;======================================
 TopLine         .proc
                 jsr CleanLine
-                jsr chkcur._ENTRY1
+                jsr ChkCursor._ENTRY1
 
                 .endproc
 
@@ -165,7 +165,7 @@ NewPage         .proc
 
 _ENTRY1         sta choff
 
-                jsr rstcsr              ; for command line
+                jsr RestoreCursorChar              ; for command line
 
                 lda LMARGN
                 sta COLCRS
@@ -184,7 +184,7 @@ Refresh         .proc
                 adc lnum
                 sta ROWCRS
 
-                jsr savecol
+                jsr SaveColumn
                 jsr SaveWindow
 
                 inc ROWCRS
@@ -208,7 +208,7 @@ _next1          ldy #0
 
                 jsr curstr
 
-_next2          jsr putstr
+_next2          jsr PutStr
 
                 lda arg9
                 bne _1
@@ -225,8 +225,8 @@ _1              inc ROWCRS
                 dec arg10
                 bne _next1
 
-_2              jsr rstcur
-                jsr rstcol
+_2              jsr ResetCursor
+                jsr ResetColumn
 
                 jmp RefreshBuf
 

@@ -46,7 +46,7 @@ _next2          ldy sp
                 lda #$FF
                 sta isDirty
 
-                jsr dspbuf
+                jsr DisplayBuffer
 
                 jmp ScrollRight
 
@@ -181,7 +181,7 @@ Return_         .proc
 
                 jsr Insert_._ENTRY1
                 jsr nextup
-                jsr ldbuf
+                jsr LoadBuffer
 
 _ENTRY1         jsr ScrollDown
 
@@ -224,7 +224,7 @@ _2              jsr DeleteCurrentLine
                 beq _3
 
                 jsr nextdwn
-_3              jsr chkcur
+_3              jsr ChkCursor
 
                 lda #0
 
@@ -295,7 +295,7 @@ DeleteNext      .proc
 ;   Undo()
 ;======================================
 Undo            .proc
-                jsr ldbuf
+                jsr LoadBuffer
 
                 jmp Front
 
@@ -335,9 +335,9 @@ _next1          iny
 ;   RefreshBuf()
 ;======================================
 RefreshBuf      .proc
-                jsr dspbuf
+                jsr DisplayBuffer
 
-                jmp rstcol._ENTRY1
+                jmp ResetColumn._ENTRY1
 
                 .endproc
 
@@ -390,7 +390,7 @@ csbs            .proc
                 cmp #2
                 bcs BackSpc._ENTRY1
 
-                jsr chkcur
+                jsr ChkCursor
                 beq CheckDown._XIT      ; no lines at all!
 
                 ldy #1
