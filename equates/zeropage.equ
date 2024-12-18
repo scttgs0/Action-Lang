@@ -42,7 +42,9 @@ OLDADR                  = ZPBASE+$5E    ; [word]
 
 ; Page Zero defs
 ;----------------
+
 ; Alloc/Free defs, also used by compiler
+
 zpAllocBase             = ZPBASE+$80
 zpAllocLast             = ZPBASE+$82
 zpAllocCurrent          = ZPBASE+$84
@@ -56,6 +58,7 @@ zpAllocPrevToken        = ZPBASE+$8B
 
 ; current window data / compiler vars
 ;----------------------------------
+
 sp                      = ZPBASE+$8C
 choff                   = ZPBASE+$8D
 lnum                    = ZPBASE+$8E
@@ -118,6 +121,7 @@ token                   = ZPBASE+$C2    ; token value
 ; following defs can be used during
 ; program execution (user program)
 ;-----------------------------------
+
 isDirty                 = ZPBASE+$C3
 spln                    = ZPBASE+$C4    ; error char
 curln                   = ZPBASE+$C5    ; error line
@@ -167,3 +171,4 @@ RND_RESULT              .word ?
 
 ;; $4d-$59 available
 ;; $60-$7f available
+;; $ca-$cd available

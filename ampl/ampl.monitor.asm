@@ -9,7 +9,7 @@
 
 
 ;======================================
-;   Monitor for ACTION!
+;   ACTION! Monitor
 ;======================================
 Monitor         .proc
                 jsr SaveWorld
@@ -224,7 +224,7 @@ MpSave          .proc
 ;======================================
 ;   Boot()
 ;======================================
-Boot            .proc
+ReBoot          .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr YesNo
@@ -506,31 +506,31 @@ _1              tay
 monitorCmd      .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
 
-                .addr Boot
-                .byte 'b'
+                .addr ReBoot
+                .text 'b'               ; BOOT
                 .addr Comp
-                .byte 'c'
+                .text 'c'               ; COMPILE
                 .addr dret
-                .byte 'd'
+                .text 'd'               ; DOS
                 .addr MonQuit
-                .byte 'e'
+                .text 'e'               ; EDITOR
 
 ;               .addr Format
-;               .byte 'f'
+;               .text 'f'
 
                 .addr options
-                .byte 'o'
+                .text 'o'               ; OPTIONS
                 .addr Proceed
-                .byte 'p'
+                .text 'p'               ; PROCEED (continue after Break)
                 .addr MRun
-                .byte 'r'
+                .text 'r'               ; MEMORY RUN
                 .addr MWrite
-                .byte 'w'
+                .text 'w'               ; MEMORY WRITE
                 .addr MWOut._ENTRY1
-                .byte 'x'
+                .text 'x'               ; EXECUTE
                 .addr MPrint
-                .byte '?'
+                .text '?'               ; PRINT
                 .addr MDump
-                .byte '*'
+                .text '*'               ; MEMORY DUMP
 
-monitorPrompt   .byte 1,'>'
+monitorPrompt   .ptext '>'

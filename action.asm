@@ -27,7 +27,7 @@
 
 ;--------------------------------------
 ;--------------------------------------
-                * = $7FE0
+                * = $7800
 ;--------------------------------------
 
 ;   Boot from RAM data block
@@ -36,7 +36,7 @@
                 .byte $F2,$56           ; signature
                 .byte $03               ; slot count
                 .byte $03               ; START slot
-                .addr BOOT_             ; execute address
+                .addr BOOT              ; execute address
                 .word $0306             ; version       ; TODO: assemble date of latest version!
                 .word $0000             ; kernel
                 .null 'Action!'         ; binary name
@@ -44,7 +44,7 @@
 
 ;--------------------------------------
 
-BOOT_           cld
+BOOT            cld
 
                 ldx #$FF                ; initialize the stack
                 txs
@@ -56,8 +56,19 @@ BOOT_           cld
 ;   Initialization code
 
 INIT            clc
+
+                jsr PrepBanks
                 jsr CSTART
                 jmp START
+
+
+;======================================
+; clone banks into upper memory
+;======================================
+PrepBanks       .proc
+                ; TODO:
+                .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -100,6 +111,8 @@ amplfin
 ;--------------------------------------
 ;    ACTION! - Symbol Table
 
+                ;.align $1000
+
                 .include "ampl/ampl.math.asm"
                 .include "ampl/ampl.symbol.asm"
                 .include "library/lib.key.asm"
@@ -116,6 +129,8 @@ cpyright        .null " ACTION! (c) 2024 GPL3           Foenix Adaptation       
 ;--------------------------------------
 ;    "ACTION! - Compiler
 
+                ;.align $1000
+
 main
                 .include "compiler.main.asm"
 
@@ -124,6 +139,8 @@ cright          .text "ACTION! (c) 2024 GPL3      Foenix Adaptation",$00,$00
 
 ;--------------------------------------
 ;    ACTION! 4.0 - Editor
+
+                ;.align $1000
 
                 .include "storage.mac.asm"
                 .include "editor/edit.memory.asm"

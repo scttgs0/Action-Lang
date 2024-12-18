@@ -11,7 +11,7 @@
 ZAPRAM          = 0                     ; to zap or not to zap, that is the question?
 
 
-; ACTION! vars ($480 - $57D)
+; ACTION! vars ($480 - $57F)
 ;--------------------------------------
 
 w1              = $0480                 ; window 1 data
@@ -80,7 +80,7 @@ findbuf         = $0528                 ; 40 bytes     ; rowSize
 numbuf          = $0550                 ; 24 bytes
 stkbase         = $0577
 
-opstack         = $0580
+opstack         = $0580                 ; floating-point buffer
 
 ; $580 TO ? is used for output of
 ; FASC routine.  Should not exceed
@@ -101,7 +101,7 @@ temps           = $05F0                 ; 16 bytes
 QCODE           = $0E                   ; ap. high mem.
 CSRCH           = $5D
 
-LBUFF           = $0580                 ; FP ASCII buf
+LBUFF           = $0580                 ; line buffer
 
 
 ; window record offsets

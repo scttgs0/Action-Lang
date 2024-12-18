@@ -11,7 +11,7 @@
 ;!!SRTIMR          = $022B                 ; key repeat delay [default:$30 -- reset with each keystroke]
 ;!!SDMCTL          = $022F
 ;!!SSKCTL          = $0232                 ; Serial port control register
-                                        ;   bit 0 =     Enable debouce
+                                        ;   bit 0 =     Enable debounce
                                         ;       1 =     Enable keyboard scanning
                                         ;       2 =     The pot counter completes a read within two scan lines
                                         ;       3 =     POKEY two-tone mode
@@ -51,6 +51,7 @@ EXTMEMLO        = $02EB                 ; pointer to the bottom of free extended
 
 
 ; --- IOCB ----------------------------
+
 ;!!CIOV            = $E456
 ;!!IOCB0           = $0340
 ;!!ICCOM       = $02
@@ -66,6 +67,7 @@ EXTMEMLO        = $02EB                 ; pointer to the bottom of free extended
 
 
 ; --- Floating-Point ------------------
+
 ;!!AFP             = $D800
 ;!!FASC            = $D8E6
 ;!!IFP             = $D9AA
