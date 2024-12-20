@@ -17,10 +17,10 @@ Front           .proc
                 sbc indent
                 sta choff
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
 
                 lda LMARGN
-                jmp ResetColumn+6
+                jmp ioResetColumn+6
 
                 .endproc
 
@@ -44,7 +44,7 @@ _ENTRY1         pha
 _1              sbc indent
                 sta choff
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
 
                 sec
                 pla
@@ -56,7 +56,7 @@ _1              sbc indent
                 clc
                 adc LMARGN
 
-                jmp ResetColumn+6
+                jmp ioResetColumn+6
 
                 .endproc
 
@@ -132,7 +132,7 @@ Paste           .proc
                 jsr DeleteTop
 
 _next1          jsr mscStrPtr
-                jsr LoadBuffer._ENTRY1
+                jsr ioLoadBuffer._ENTRY1
                 jsr InsertByte
 
                 lda allocerr
@@ -141,7 +141,7 @@ _next1          jsr mscStrPtr
                 jsr DeleteNext
                 bne _next1
 
-_1              jsr ResetCursor
+_1              jsr ioResetCursor
 
                 ldy currentWindow
                 lda w1+WCUR+1,Y
@@ -220,7 +220,7 @@ ScrollInit      .proc
 
                 ldy arg13
                 jsr mscNext
-                beq _1                ; EOF
+                beq _1                  ; EOF
 
                 lda COLCRS
                 sta x__
@@ -231,9 +231,9 @@ ScrollInit      .proc
                 lda #$00
                 sta choff
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
 
-                jmp LoadBuffer
+                jmp ioLoadBuffer
 
 _1              pla
                 pla
@@ -263,7 +263,7 @@ _1              inc lnum
 
                 lda nlines
                 jsr MoveDown
-                jsr ResetColumn
+                jsr ioResetColumn
 
                 jmp RefreshBuf
 
@@ -294,10 +294,10 @@ _1              jsr BottomLine
                 ldx ytop
                 jsr MoveUp
 
-                jsr ResetColumn
-                jsr DisplayBuffer
+                jsr ioResetColumn
+                jsr ioDisplayBuffer
 
-                jmp ResetColumn
+                jmp ioResetColumn
 
                 .endproc
 
@@ -353,7 +353,7 @@ ScrollLeft      .proc
 
                 dec choff
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
                 jsr screenCursorRight
 
 _XIT            jmp screenCursorLeft
@@ -374,7 +374,7 @@ ScrollRight     .proc
 
                 inc choff
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
                 jsr screenCursorLeft
 
 _XIT            jmp screenCursorRight
@@ -436,8 +436,8 @@ MoveContent     .proc
                 sta arg4
 
                 stx ROWCRS
-                jsr RestoreCursorChar
-                jsr GetDisplayAddr     ; get display address
+                jsr ioRestoreCursorChar
+                jsr ioGetDisplayAddr    ; get display address
 
                 ldx arg4
                 dex

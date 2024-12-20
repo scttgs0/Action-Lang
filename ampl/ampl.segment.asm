@@ -34,7 +34,7 @@ _func           clc
                 adc #tokFUNC_t-tokVAR_t
                 sta type
 
-                jsr GetNext
+                jsr LexGetNext
 
 _1              jsr makeentry
                 jsr jt_segend
@@ -89,9 +89,9 @@ _next1          sta (symTblLocal),Y
                 sta (zpAllocProps),Y    ; set Sys flag
                 sta param
 
-                jsr GetNext
+                jsr LexGetNext
 
-_2              jsr GetNext
+_2              jsr LexGetNext
 
                 cmp #tokLParen
                 bne _argerr
@@ -100,7 +100,7 @@ _2              jsr GetNext
 ; low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
 ; low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
 
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokRParen
                 beq _3
@@ -117,7 +117,7 @@ _next2          jsr declare
 
 _argerr         ldy #argERR
 
-                jmp bankSplErr
+                jmp bankSPLErr
 
 _3          lda param
                 pha
@@ -125,7 +125,7 @@ _3          lda param
                 lda #$00
                 sta param
 
-                jsr GetNext
+                jsr LexGetNext
                 jsr declare             ; locals
 
 ;   handle procedure setup here

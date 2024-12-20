@@ -12,7 +12,7 @@
 ;   GetString(prompt, str, invert)
 ;======================================
 GetString       .proc
-                jsr DisplayStr
+                jsr ioDisplayStr
 _next1          jsr bankGetKey
 
                 tax
@@ -109,7 +109,7 @@ FRead           .proc
                 jsr FOpen
 
 _next1          lda #$01
-                jsr ReadBuffer
+                jsr ioReadBuffer
                 bmi _1
 
                 jsr InsertByte
@@ -123,7 +123,7 @@ _next1          lda #$01
 _1              cpy #$88                ; EOF
                 beq _3
 
-_2              jsr SystemError
+_2              jsr ioSystemError
 _3              jsr FWrite._ENTRY1
 
                 jmp CenterLine
@@ -144,10 +144,10 @@ FWrite          .proc
                 ldy #$08
                 jsr FOpen
 
-                jsr ChkCursor._ENTRY1
+                jsr ioChkCursor._ENTRY1
                 beq _1
 
-_next1          jsr LoadBuffer
+_next1          jsr ioLoadBuffer
 
                 ; inc COLOR4            ; let user know we're here
 
@@ -156,7 +156,7 @@ _next1          jsr LoadBuffer
                 nop
 
                 lda #$01
-                jsr WriteBuffer
+                jsr ioWriteBuffer
                 bmi _1
 
                 jsr mscNextDown
@@ -166,12 +166,12 @@ _next1          jsr LoadBuffer
                 sta dirty
 
 _ENTRY1         lda #$01
-                jsr Close
-                jsr ResetCursor
+                jsr ioClose
+                jsr ioResetCursor
 
-                jmp DisplayOn
+                jmp ioDisplayOn
 
-_1              jsr SystemError
+_1              jsr ioSystemError
 
                 jmp _ENTRY1
 
@@ -192,7 +192,7 @@ FOpen           .proc
 
 ;               jsr ClnLn               ; in SaveWd
                 jsr SaveWindow
-                jsr RestoreCursorChar
+                jsr ioRestoreCursorChar
 
                 ldy #<inbuf
                 lda #>inbuf
@@ -203,7 +203,7 @@ FOpen           .proc
                 jsr CommandString
 
                 lda #$01
-                jsr Close
+                jsr ioClose
 
                 ldy inbuf
                 beq _5
@@ -239,14 +239,14 @@ _2              lda #'D'
                 sta inbuf+1
 
 _3              stx arg3
-                jsr DisplayOff
+                jsr ioDisplayOff
 
                 lda #$01
                 sta arg4                ; clear high bit for cassette
 
                 ldx #<inbuf
                 ldy #>inbuf
-                jsr Open
+                jsr ioOpen
                 bmi _4
 
                 lda arg3                ; see if directory
@@ -260,7 +260,7 @@ _XIT            rts
 _4              pla
                 pla                     ; pop return
 
-                jmp SystemError
+                jmp ioSystemError
 
 _5              pla
                 pla
@@ -274,7 +274,7 @@ _5              pla
 ;======================================
 InitKeys        .proc
                 lda #$07
-                jsr Close
+                jsr ioClose
 
                 lda #$04
                 sta arg3                ; read only
@@ -283,7 +283,7 @@ InitKeys        .proc
                 ldx #<keybd
                 ldy #>keybd
 
-                jmp Open
+                jmp ioOpen
 
 ;--------------------------------------
 

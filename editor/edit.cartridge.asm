@@ -16,7 +16,7 @@ emjmps          rts                     ; Seg catch all
                 .word 0
                 ;!!.byte ebank          ; curBank
                 .byte $df               ; stMask
-                jmp bankSplErr          ; Error
+                jmp bankSPLErr          ; Error
 
                 .byte 18                ; wSize
                 .byte 120               ; line input max
@@ -54,7 +54,7 @@ ltab            .addr mscLShift._lshift ; LSH
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
 
-                jmp GetNext._ENTRY5     ; STM catch all
+                jmp LexGetNext._ENTRY5  ; STM catch all
 
                 rts                     ; illegal Monitor cmd
 

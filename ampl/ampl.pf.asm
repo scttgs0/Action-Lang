@@ -47,7 +47,7 @@ pf              .proc
                 lda #$00                ; load arg types flag
                 jsr bankGetArgs
                 jsr pushst
-                jsr GetNext
+                jsr LexGetNext
 
                 ldx #args
                 stx argbytes
@@ -56,7 +56,7 @@ pf              .proc
                 cpx #tokRParen
                 bne _next1
 
-                jsr GetNext
+                jsr LexGetNext
 
                 bra _next2
 

@@ -26,7 +26,7 @@ libGrGraphics   .proc
                 ldx #<_e
                 ldy #>_e
 
-                jsr Open
+                jsr ioOpen
                 jsr libIOChkErr
 
                 lda #$06
@@ -43,7 +43,7 @@ libGrGraphics   .proc
                 ldx #<_devs
                 ldy #>_devs
 
-                jsr Open
+                jsr ioOpen
 
                 jmp libIOChkErr
 
@@ -152,7 +152,7 @@ libGrPlot       .proc
 ; same as BASIC
 ;======================================
 libGrSetColor   .proc
-                cmp #$05                  ; SetColor(reg, hue, lum)
+                cmp #$05                ; SetColor(reg, hue, lum)
                 bpl _XIT
 
                 sta arg0

@@ -82,9 +82,9 @@ init            rts
 ;======================================
 bankRun         .proc
 ;   reset Error routine
-                ldy #<bankSplErr
+                ldy #<bankSPLErr
                 sty jt_error+1
-                ldy #>bankSplErr
+                ldy #>bankSPLErr
                 sty jt_error+2
 
                 jsr bankLProceed
@@ -229,12 +229,12 @@ bankGetKey      .proc
 
 
 ;======================================
-;
+; Scanner/Parser/Lexeme error
 ;======================================
-bankSplErr      .proc
+bankSPLErr      .proc
                 ;!!sta bank+lbank
 
-                jmp lsplerr
+                jmp coreSPLErr
 
                 .endproc
 

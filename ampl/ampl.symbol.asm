@@ -55,7 +55,7 @@ _1              inc arg13               ; try next entry
 
                 iny
 
-_XIT2           jmp bankSplErr
+_XIT2           jmp bankSPLErr
 
 _XIT            jmp (jt_stmradr)
 
@@ -129,7 +129,7 @@ _next1          iny
                 adc arg15
                 sta arg15
 
-                jsr NextChar
+                jsr LexNextChar
 
                 ldy arg14
                 cmp #'_'

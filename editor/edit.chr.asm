@@ -46,7 +46,7 @@ _next2          ldy sp
                 lda #$FF
                 sta isDirty
 
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
 
                 jmp ScrollRight
 
@@ -181,7 +181,7 @@ Return_         .proc
 
                 jsr Insert_._ENTRY1
                 jsr mscNextUp
-                jsr LoadBuffer
+                jsr ioLoadBuffer
 
 _ENTRY1         jsr ScrollDown
 
@@ -224,7 +224,7 @@ _2              jsr DeleteCurrentLine
                 beq _3
 
                 jsr mscNextDown
-_3              jsr ChkCursor
+_3              jsr ioChkCursor
 
                 lda #$00
 
@@ -295,7 +295,7 @@ DeleteNext      .proc
 ;   Undo()
 ;======================================
 Undo            .proc
-                jsr LoadBuffer
+                jsr ioLoadBuffer
 
                 jmp Front
 
@@ -335,9 +335,9 @@ _next1          iny
 ;   RefreshBuf()
 ;======================================
 RefreshBuf      .proc
-                jsr DisplayBuffer
+                jsr ioDisplayBuffer
 
-                jmp ResetColumn._ENTRY1
+                jmp ioResetColumn._ENTRY1
 
                 .endproc
 
@@ -390,7 +390,7 @@ csbs            .proc
                 cmp #$02
                 bcs BackSpc._ENTRY1
 
-                jsr ChkCursor
+                jsr ioChkCursor
                 beq CheckDown._XIT      ; no lines at all!
 
                 ldy #$01

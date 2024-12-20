@@ -42,7 +42,7 @@ _next1          jsr InitKeys
                 jsr screenInit          ; get Graphics(0)
 
 _1              jsr jt_alarm
-                jsr RestoreCursorChar
+                jsr ioRestoreCursorChar
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
@@ -60,7 +60,7 @@ _1              jsr jt_alarm
                 ldy sp
                 iny                     ; make sure non-zero
                 jsr LexExpand._ENTRY1
-                jsr GetNext
+                jsr LexGetNext
 
                 lda tempbuf+1
                 ora #$20
@@ -159,36 +159,36 @@ _1              lda arg11
 MPrint          .proc
                 jsr MpSave
 
-_ENTRY1         jsr PrintCard
+_ENTRY1         jsr ioPrintCard
 
                 ldy #','
-                jsr PutChar
+                jsr ioPutChar
 
                 lda arg11
                 ldx arg12
                 jsr PrintH
-                jsr PutSpace
+                jsr ioPutSpace
 
                 ldy #'='
-                jsr PutChar
-                jsr PutSpace
+                jsr ioPutChar
+                jsr ioPutSpace
                 jsr MpLoad
 
                 tay
-                jsr PutChar
-                jsr PutSpace
+                jsr ioPutChar
+                jsr ioPutSpace
                 jsr MpLoad
                 jsr PrintH
-                jsr PutSpace
+                jsr ioPutSpace
                 jsr MpLoad
 
                 ldx #$00
-                jsr PrintCard
-                jsr PutSpace
+                jsr ioPrintCard
+                jsr ioPutSpace
                 jsr MpLoad
-                jsr PrintCard
+                jsr ioPrintCard
 
-                jmp PutEOL
+                jmp ioPutEOL
 
                 .endproc
 
@@ -283,7 +283,7 @@ MWrite          .proc                   ; write object file
                 sta Channel
 
                 lda #$08                ; output
-                jsr OpenChannel
+                jsr ioOpenChannel
 
 ;   write header
                 lda #$06
@@ -354,7 +354,7 @@ _next1          lda _mwinit,X
 
 ;   close file
                 lda #$01
-                jmp Close
+                jmp ioClose
 
 ;--------------------------------------
 
@@ -372,7 +372,7 @@ MWOut           .proc
                 lda #$01
                 ldx #arg9
                 ldy #$00
-                jsr Output
+                jsr ioOutput
 
                 bmi _mwerr
 
@@ -384,7 +384,7 @@ MWOut           .proc
 ;======================================
 _mxerr          ldy #endERR
 
-_mwerr          jmp bankSplErr
+_mwerr          jmp bankSPLErr
 
 _ENTRY1         lda #$00                ; execute command line
                 sta codeoff
@@ -395,7 +395,7 @@ _ENTRY1         lda #$00                ; execute command line
                 lda QCODE+1
                 pha
 
-                jsr GetNext
+                jsr LexGetNext
                 jsr bankCStmtList
 
                 cmp #tokEOF
@@ -419,10 +419,10 @@ _ENTRY1         lda #$00                ; execute command line
 ;======================================
 Comp            .proc
                 jsr SPLsetup
-                jsr DisplayOff
+                jsr ioDisplayOff
                 jsr bankCompile
 
-                jmp DisplayOn
+                jmp ioDisplayOn
 
                 .endproc
 
@@ -472,7 +472,7 @@ PrintH          .proc
                 sta arg2
 
                 ldy #'$'
-                jsr PutChar
+                jsr ioPutChar
 
 _next1          lda #$00
                 ldx #$04
@@ -491,7 +491,7 @@ _next2          asl arg0
                 adc #$06
 
 _1              tay
-                jsr PutChar
+                jsr ioPutChar
 
                 dec arg2
                 bne _next1

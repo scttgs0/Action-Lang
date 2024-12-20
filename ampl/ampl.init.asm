@@ -10,6 +10,8 @@
 
 ;======================================
 ;   SPLsetup()
+;--------------------------------------
+; SPL = Scanner/Parser/Lexeme
 ;======================================
 SPLsetup        .proc
                 lda #$00
@@ -93,7 +95,7 @@ _2              sta codebase
                 sta symtab+1
 
 _err            ldy #allocateERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
 _3              lda sparem
                 sta frame

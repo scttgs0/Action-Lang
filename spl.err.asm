@@ -9,9 +9,11 @@
 
 
 ;======================================
-;   SPLErr(,,error)
+; coreSPLErr(,,error)
+;--------------------------------------
+; Scanner/Parser/Lexeme error
 ;======================================
-lsplerr         .proc
+coreSPLErr      .proc
                 lda top+1
                 beq _1
 
@@ -25,21 +27,21 @@ lsplerr         .proc
                 lda curln+1
                 sta w1+WCUR+1,X
 
-_1              jsr SystemError
-                jsr PutEOL
-                jsr PrintBuffer
+_1              jsr ioSystemError
+                jsr ioPutEOL
+                jsr ioPrintBuffer
 
                 lda #$00
                 ldx #<msgSysErr
                 ldy #>msgSysErr
-                jsr Output
+                jsr ioOutput
 
                 lda #$00
                 sta INITAD+1
 
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr Print
+                jsr ioPrint
 
                 jmp bankEmLoop
 

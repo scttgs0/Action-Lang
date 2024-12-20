@@ -55,11 +55,14 @@ BOOT            cld
 ;--------------------------------------
 ;   Initialization code
 
-INIT            clc
+INIT            .proc
+                clc
 
                 jsr PrepBanks
                 jsr bankCartStart
                 jmp START
+
+                .endproc
 
 
 ;======================================
@@ -69,6 +72,12 @@ PrepBanks       .proc
                 ; TODO:
                 rts
                 .endproc
+
+
+;--------------------------------------
+;--------------------------------------
+
+                .include "platform_f256.asm"
 
 
 ;--------------------------------------
@@ -85,6 +94,7 @@ versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest
 propid          ldx arg0
 
                 .include "screen.mac.asm"
+                .include "compiler.lexicon.asm"
                 .include "main.msc.asm"
                 .include "main.bank.asm"
 
@@ -123,7 +133,7 @@ propid          ldx arg0
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .null " ACTION! (c) 2024 GPL3           Foenix Adaptation           v4.0 Dec 04, 2024 "
+ampl_copyright  .null " ACTION! (c) 2024 GPL3           Foenix Adaptation           v4.0 Dec 04, 2024 "
 
 
 ;--------------------------------------
@@ -134,7 +144,8 @@ cpyright        .null " ACTION! (c) 2024 GPL3           Foenix Adaptation       
 main
                 .include "compiler.main.asm"
 
-cright          .text "ACTION! (c) 2024 GPL3      Foenix Adaptation",$00,$00
+comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
+                .byte $00
 
 
 ;--------------------------------------
@@ -157,9 +168,8 @@ cright          .text "ACTION! (c) 2024 GPL3      Foenix Adaptation",$00,$00
                 .include "ampl/ampl.monitor.asm"
                 .include "ampl/ampl.init.asm"
 
-                .include "platform_f256.asm"
-
-                .text "ces",$00,$00
+edit_copyright  .null "ces"
+                .byte $00
 
 editend
                 .end

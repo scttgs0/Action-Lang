@@ -12,7 +12,7 @@ slop            = 7                     ; can't be less than 4
 
 
 ;======================================
-;   Allocate(size)
+; Allocate(size)
 ;======================================
 Allocate        .proc
                 sta zpAllocSize         ; save size
@@ -179,7 +179,7 @@ _8              ldy #$00
 
 
 ;======================================
-;   Free(block)
+; Free(block)
 ;======================================
 Free            .proc
                 sta zpAllocBest
@@ -253,7 +253,7 @@ _1              iny
                 clc
                 bcc _3
 
-;:AFL14         plp
+                ; plp
 
 _2              ldy #$00                ; block(0) = cur
                 lda zpAllocCurrent
@@ -298,7 +298,7 @@ _3              iny                     ; if block =
 
                 rts
 
-;:AFL17         plp
+                ; plp
 
 _4              ldy #$00                ; last(0) = block
                 lda zpAllocBest

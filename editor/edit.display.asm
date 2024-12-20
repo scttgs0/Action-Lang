@@ -14,16 +14,16 @@
 CommandMsg      .proc
                 sta arg0
 
-                jsr CmdColumn
+                jsr ioCmdColumn
 
                 lda #$00
                 sta arg3
 
                 lda arg0
                 ldy #$80
-                jsr PutStr
+                jsr ioPutStr
 
-                jmp ResetColumn
+                jmp ioResetColumn
 
                 .endproc
 
@@ -32,7 +32,7 @@ CommandMsg      .proc
 ;   CleanLine()
 ;======================================
 CleanLine       .proc
-                jsr ChkCursor
+                jsr ioChkCursor
 
                 lda isDirty
                 beq _XIT
@@ -45,7 +45,7 @@ CleanLine       .proc
                 jsr DeleteCurrentLine
                 jsr InsertByte
 
-_XIT            jmp ChkCursor
+_XIT            jmp ioChkCursor
 
                 .endproc
 
@@ -149,7 +149,7 @@ _next1          lda temps
 ;======================================
 TopLine         .proc
                 jsr CleanLine
-                jsr ChkCursor._ENTRY1
+                jsr ioChkCursor._ENTRY1
 
                 .endproc
 
@@ -165,7 +165,7 @@ NewPage         .proc
 
 _ENTRY1         sta choff
 
-                jsr RestoreCursorChar              ; for command line
+                jsr ioRestoreCursorChar ; for command line
 
                 lda LMARGN
                 sta COLCRS
@@ -184,7 +184,7 @@ Refresh         .proc
                 adc lnum
                 sta ROWCRS
 
-                jsr SaveColumn
+                jsr ioSaveColumn
                 jsr SaveWindow
 
                 inc ROWCRS
@@ -208,7 +208,7 @@ _next1          ldy #$00
 
                 jsr mscCurStr
 
-_next2          jsr PutStr
+_next2          jsr ioPutStr
 
                 lda arg9
                 bne _1
@@ -225,8 +225,8 @@ _1              inc ROWCRS
                 dec arg10
                 bne _next1
 
-_2              jsr ResetCursor
-                jsr ResetColumn
+_2              jsr ioResetCursor
+                jsr ioResetColumn
 
                 jmp RefreshBuf
 

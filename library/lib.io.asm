@@ -202,7 +202,7 @@ _1              sta (buf),Y
                 ldx buf
                 ldy buf+1
 
-                jsr Open
+                jsr ioOpen
                 jmp libIOChkErr
 
                 .endproc
@@ -231,7 +231,7 @@ libIOPrintE     .proc
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
 libIOPrintDE    .proc
-                jsr Print
+                jsr ioPrint
                 jmp libIOChkErr
 
                 .endproc
@@ -243,7 +243,7 @@ libIOPrintDE    .proc
 ; closes IOCB dev
 ;======================================
 libIOClose      .proc
-                jsr Close
+                jsr ioClose
                 jmp libIOChkErr
 
                 .endproc
@@ -272,7 +272,7 @@ libIOPrint      .proc
 ; outputs str to IOCB dev
 ;======================================
 libIOPrintD     .proc
-                jsr Output
+                jsr ioOutput
                 jmp libIOChkErr
 
                 .endproc
@@ -345,7 +345,7 @@ libIOInputMD    .proc
 ; string input
 ;======================================
 libIOInputD     .proc
-                jsr ReadBuffer.inputs
+                jsr ioReadBuffer.inputs
                 jmp libIOChkErr
 
                 .endproc
@@ -451,7 +451,7 @@ libIOPutDE      .proc
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
 libIOXIO        .proc
-                jsr XioStr
+                jsr ioXioStr
                 jmp libIOChkErr
 
                 .endproc
@@ -476,7 +476,7 @@ libIOPrintB     .proc
 ; outputs cardinal num to default IOCB
 ;======================================
 libIOPrintC     .proc
-                jsr PrintCard
+                jsr ioPrintCard
                 jmp libIOChkErr
 
                 .endproc
@@ -528,10 +528,10 @@ libIOPrintCD    .proc
                 sty arg2
                 ldx arg2
 
-                jsr CardToStr
+                jsr ioCardToStr
 
                 lda arg0
-                jsr PrintCard.pnum+2
+                jsr ioPrintCard.pnum+2
                 jmp libIOChkErr
 
                 .endproc
@@ -657,7 +657,7 @@ libIOStrB       .proc
 libIOStrC       .proc
                 sty arg2
 
-                jsr CardToStr
+                jsr ioCardToStr
 
                 iny
 _next1          lda numbuf,Y
@@ -693,7 +693,7 @@ libIOStrI       .proc
                 tax
                 tya
 
-                jsr CardToStr
+                jsr ioCardToStr
 
                 inx
                 txa

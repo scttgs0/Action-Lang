@@ -9,24 +9,24 @@
 
 
 ;======================================
-; Open(device, name, mode, opt)
+; ioOpen(device, name, mode, opt)
 ;--------------------------------------
 ; returns status
 ;======================================
-Open            .proc
+ioOpen          .proc
                 stx arg5
                 sty arg6
 
                 ldy #$03
-                bne XioStr              ; [unc]
+                bne ioXioStr            ; [unc]
 
                 .endproc
 
 
 ;======================================
-; Print(device, str)
+; ioPrint(device, str)
 ;======================================
-Print           .proc
+ioPrint         .proc
                 stx arg5
                 sty arg6
 
@@ -34,7 +34,7 @@ Print           .proc
                 stx arg3
 
                 ldy #$09
-                jsr XioStr
+                jsr ioXioStr
                 bne _XIT
 
                 lda #$0B
@@ -48,9 +48,9 @@ _XIT            rts
 
 
 ;======================================
-; Close(device)
+; ioClose(device)
 ;======================================
-Close           .proc
+ioClose         .proc
                 ldx #>$B000      ;; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
@@ -62,15 +62,15 @@ Close           .proc
             .endif
 
                 ldy #$0C
-                bne Input._ENTRY1       ; [unc]
+                bne ioInput._ENTRY1       ; [unc]
 
                 .endproc
 
 
 ;======================================
-; Input(device, str)
+; ioInput(device, str)
 ;======================================
-Input           .proc
+ioInput         .proc
                 sty arg6
 
                 ldy #$05
@@ -85,9 +85,9 @@ _ENTRY1         stx arg5
 
 
 ;======================================
-; XioStr(device,,cmd,aux1,aux2,str)
+; ioXioStr(device,,cmd,aux1,aux2,str)
 ;======================================
-XioStr          .proc
+ioXioStr        .proc
                 asl                     ; *16
                 asl
                 asl
@@ -111,7 +111,7 @@ _1              tay
                 lda (arg5),Y
                 sta IOCB0+ICBLL,X       ; size
 
-                beq Print._XIT          ; return
+                beq ioPrint._XIT        ; return
 
                 clc
                 lda arg5
@@ -127,21 +127,21 @@ _1              tay
 
 
 ;======================================
-; Output(device, str)
+; ioOutput(device, str)
 ;======================================
-Output          .proc
+ioOutput        .proc
                 sty arg6
 
                 ldy #$0B
-                bne Input._ENTRY1       ; [unc]
+                bne ioInput._ENTRY1     ; [unc]
 
                 .endproc
 
 
 ;======================================
-; DisplayStr(prompt, str, invert)
+; ioDisplayStr(prompt, str, invert)
 ;======================================
-DisplayStr      .proc
+ioDisplayStr    .proc
                 sty arg12
 
                 ldy arg3
@@ -151,7 +151,7 @@ DisplayStr      .proc
                 sty arg3
 
                 ldy arg4
-                jsr PutStr
+                jsr ioPutStr
 
                 lda arg6                ; PutStr size
                 clc
@@ -181,9 +181,9 @@ _XIT            rts
 
 
 ;======================================
-; ReadBuffer(device)
+; ioReadBuffer(device)
 ;======================================
-ReadBuffer      .proc
+ioReadBuffer    .proc
 ;               inc COLOR4
                 nop
                 nop
@@ -197,7 +197,7 @@ ReadBuffer      .proc
                 txa
                 ldx buf
                 ldy buf+1
-inputs          jsr Input
+inputs          jsr ioInput
 
                 sty arg0
 
@@ -216,41 +216,41 @@ _1              ldy #$00
 
 
 ;======================================
-; WriteBuffer(device)
+; ioWriteBuffer(device)
 ;======================================
-WriteBuffer     .proc
+ioWriteBuffer   .proc
                 ldx buf
                 ldy buf+1
-                jmp Print
+                jmp ioPrint
 
                 .endproc
 
 
 ;======================================
-; ResetCursor()
+; ioResetCursor()
 ;======================================
-ResetCursor     .proc
+ioResetCursor   .proc
                 ldy currentWindow
                 lda w1+WCUR,Y
                 sta cur
                 lda w1+WCUR+1,Y
                 sta cur+1
 
-                jmp LoadBuffer
+                jmp ioLoadBuffer
 
                 .endproc
 
 
 ;======================================
-; SystemError(,,errnum)
+; ioSystemError(,,errnum)
 ;======================================
-SystemError     .proc
-                jsr DisplayOn
+ioSystemError   .proc
+                jsr ioDisplayOn
 
                 tya
                 ldx #$00
-                jsr CardToStr
-                jsr CmdColumn
+                jsr ioCardToStr
+                jsr ioCmdColumn
 
                 lda #$80
                 sta arg4
@@ -260,9 +260,9 @@ SystemError     .proc
 
                 lda #<msgSysErr
                 ldx #>msgSysErr
-                jsr DisplayStr
-                jsr RestoreCursorChar
-                jsr ResetColumn
+                jsr ioDisplayStr
+                jsr ioRestoreCursorChar
+                jsr ioResetColumn
 
                 jmp screenBell
 
@@ -276,13 +276,15 @@ msgSysErr       .ptext "Error: "
 
 
 ;======================================
-; CardToStr(num) - Cardinal to string
+; ioCardToStr(num)
+;--------------------------------------
+; Cardinal to string
 ;======================================
-CardToStr       .proc
+ioCardToStr     .proc
                 sta FR0
                 stx FR0+1
 
-                ;!!jsr IFP                 ; Cardinal to real
+                ;!!jsr IFP              ; Cardinal to real
 
                 .endproc
 
@@ -290,9 +292,11 @@ CardToStr       .proc
 
 
 ;======================================
-; RealToStr() - real in FR0
+; ioRealToStr()
+;--------------------------------------
+; real in FR0
 ;======================================
-RealToStr       ;.proc
+ioRealToStr       ;.proc
                 ;!!jsr FASC
 
                 ldy #$FF
@@ -315,9 +319,9 @@ _next1          iny
 
 
 ;======================================
-; DisplayOff()
+; ioDisplayOff()
 ;======================================
-DisplayOff      .proc
+ioDisplayOff    .proc
                 lda jt_tvdisp
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
@@ -327,9 +331,9 @@ DisplayOff      .proc
 
 
 ;======================================
-; DisplayOn()
+; ioDisplayOn()
 ;======================================
-DisplayOn       .proc
+ioDisplayOn     .proc
                 lda #$22
                 ;!!sta SDMCTL
                 ;!!sta DMACTL
@@ -342,28 +346,28 @@ DisplayOn       .proc
 
 
 ;======================================
-; PrintCard(num)
+; ioPrintCard(num)
 ;======================================
-PrintCard       .proc
-                jsr CardToStr
+ioPrintCard     .proc
+                jsr ioCardToStr
 
 pnum            lda device
                 ldx #<numbuf
                 ldy #>numbuf
 
-                jmp Output
+                jmp ioOutput
 
                 .endproc
 
 
 ;======================================
-; OpenChannel(mode)
+; ioOpenChannel(mode)
 ;======================================
-OpenChannel     .proc
+ioOpenChannel   .proc
                 pha
 
                 lda Channel
-                jsr Close
+                jsr ioClose
 
                 pla
                 sta arg3
@@ -410,30 +414,30 @@ _next1          lda (nxtaddr),Y         ; move string up...
 _1              lda Channel
                 ldx nxtaddr
                 ldy nxtaddr+1
-                jsr Open
-                bpl PrintBuffer
+                jsr ioOpen
+                bpl ioPrintBuffer
 
-                jmp bankSplErr          ; oops, error in Open
+                jmp bankSPLErr          ; oops, error in Open
 
                 .endproc
 
 
 ;======================================
-; PrintBuffer()
+; ioPrintBuffer()
 ;======================================
-PrintBuffer     .proc
+ioPrintBuffer   .proc
                 lda list
-                bne RealToCard._XIT     ; return
+                bne ioRealToCard._XIT   ; return
 
-                jmp WriteBuffer
+                jmp ioWriteBuffer
 
                 .endproc
 
 
 ;======================================
-; HexToCard(buf,index)
+; ioHexToCard(buf,index)
 ;======================================
-HexToCard       .proc
+ioHexToCard     .proc
                 sty CIX
                 sta arg1
                 stx arg2
@@ -446,17 +450,17 @@ _next1          ldy CIX
                 lda (arg1),Y
                 sec
                 sbc #'0'
-                bmi RealToCard._ENTRY1
+                bmi ioRealToCard._ENTRY1
 
                 cmp #$0A
                 bmi _1
 
                 cmp #$11
-                bmi RealToCard._ENTRY1
+                bmi ioRealToCard._ENTRY1
 
                 sbc #$07
                 cmp #$10
-                bpl RealToCard._ENTRY1
+                bpl ioRealToCard._ENTRY1
 
 _1              sta arg5
 
@@ -477,9 +481,9 @@ _1              sta arg5
 
 
 ;======================================
-; RealToCard()
+; ioRealToCard()
 ;======================================
-RealToCard      .proc
+ioRealToCard    .proc
                 ;!!jsr FPI
                 bcs _err
 
@@ -490,15 +494,15 @@ _ENTRY1         lda FR0
 _XIT            rts
 
 _err            ldy #constERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
 
 ;======================================
-; StrToReal(str, index)
+; ioStrToReal(str, index)
 ;======================================
-StrToReal       .proc
+ioStrToReal     .proc
                 sty CIX
                 sta INBUFF
                 stx INBUFF+1
@@ -509,19 +513,19 @@ StrToReal       .proc
 
 
 ;======================================
-; PutSpace()
+; ioPutSpace()
 ;======================================
-PutSpace        .proc
-                ldy #$20
-                bne PutChar             ; [unc]
+ioPutSpace      .proc
+                ldy #' '
+                bne ioPutChar           ; [unc]
 
                 .endproc
 
 
 ;======================================
-; PutEOL()
+; ioPutEOL()
 ;======================================
-PutEOL          .proc
+ioPutEOL        .proc
                 ldy #EOL
 
                 .endproc
@@ -530,9 +534,9 @@ PutEOL          .proc
 
 
 ;======================================
-; PutChar(,,char)
+; ioPutChar(,,char)
 ;======================================
-PutChar         .proc
+ioPutChar       .proc
                 lda device
                 jmp screenCh._ENTRY1
 
@@ -540,9 +544,9 @@ PutChar         .proc
 
 
 ;======================================
-; PutStr(str, invert, offset)
+; ioPutStr(str, invert, offset)
 ;======================================
-PutStr          .proc
+ioPutStr        .proc
                 sta arg6
                 stx arg7
                 sty arg2
@@ -556,8 +560,8 @@ PutStr          .proc
 
 _1              stx arg5
 
-                jsr GetDisplayAddr
-                jsr ZapCursor
+                jsr ioGetDisplayAddr
+                jsr ioZapCursor
 
                 ldy #39
                 lda arg2
@@ -653,9 +657,9 @@ _6              lda arg3
 ;======================================
 ; Command column???
 ;======================================
-CmdColumn       .proc
-                jsr SaveColumn
-                jsr RestoreCursorChar
+ioCmdColumn     .proc
+                jsr ioSaveColumn
+                jsr ioRestoreCursorChar
 
                 ldy cmdln
                 sty ROWCRS
@@ -667,7 +671,7 @@ CmdColumn       .proc
 ;======================================
 ; Preserve column
 ;======================================
-SaveColumn      .proc
+ioSaveColumn    .proc
                 lda ROWCRS
                 sta y__
 
@@ -681,14 +685,14 @@ SaveColumn      .proc
 ;======================================
 ; Reset column
 ;======================================
-ResetColumn     .proc
+ioResetColumn   .proc
                 lda y__
                 sta ROWCRS
 
                 lda x__
                 sta COLCRS
 
-                jsr ZapCursor
+                jsr ioZapCursor
 _ENTRY1         jsr screenCursorLeft
 
                 jmp screenCursorRight
@@ -699,7 +703,7 @@ _ENTRY1         jsr screenCursorLeft
 ;======================================
 ; Check cursor bounds
 ;======================================
-ChkCursor       .proc
+ioChkCursor     .proc
                 lda cur+1
                 bne _XIT
 
@@ -715,8 +719,8 @@ _XIT            rts
 ;======================================
 ; Load buffer
 ;======================================
-LoadBuffer      .proc
-                jsr ChkCursor
+ioLoadBuffer    .proc
+                jsr ioChkCursor
                 bne _1
 
                 tay
@@ -744,7 +748,7 @@ _next1          lda (arg0),Y
 ;======================================
 ;   Display content from buffer
 ;======================================
-DisplayBuffer   .proc
+ioDisplayBuffer .proc
                 clc
                 lda indent
                 adc choff
@@ -754,7 +758,7 @@ DisplayBuffer   .proc
                 lda buf
                 ldx buf+1
 
-                jmp PutStr
+                jmp ioPutStr
 
                 .endproc
 
@@ -762,7 +766,7 @@ DisplayBuffer   .proc
 ;======================================
 ; Get address of the display
 ;======================================
-GetDisplayAddr  .proc
+ioGetDisplayAddr .proc
                 lda #<CS_TEXT_MEM_PTR
                 ldx #>CS_TEXT_MEM_PTR
                 ldy ROWCRS
@@ -787,7 +791,7 @@ _2              sta arg0
 ;======================================
 ; Get rid of the old cursor
 ;======================================
-ZapCursor       .proc
+ioZapCursor     .proc
                 lda #<CSRCH
                 sta OLDADR
                 lda #>CSRCH
@@ -800,7 +804,7 @@ ZapCursor       .proc
 ;======================================
 ; Restore char under cursor
 ;======================================
-RestoreCursorChar .proc
+ioRestoreCursorChar .proc
                 ldy #$00
                 lda OLDCHR
                 sta (OLDADR),Y

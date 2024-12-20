@@ -41,7 +41,7 @@ _XIT            rts
 ;======================================
 GeneralMemErr   .proc
                 ldy #$00
-                jsr SystemError
+                jsr ioSystemError
 
                 lda sparem
                 ldx sparem+1

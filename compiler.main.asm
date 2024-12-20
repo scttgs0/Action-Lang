@@ -30,11 +30,11 @@ spl             ;.proc
 _1              lda top1
                 sta top+1
 
-                jsr ChkCursor._ENTRY1
+                jsr ioChkCursor._ENTRY1
                 beq _XIT1               ; no program !
 
-                jsr GetNext
-_next1          jsr GetNext
+                jsr LexGetNext
+_next1          jsr LexGetNext
 
 
 ;--------------------------------------
@@ -164,12 +164,12 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
 
                 ldy #$00
                 jsr SaveCd
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokEQU
                 bne _errDeclaration
 
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokLBracket
                 bne _errDeclaration
@@ -182,7 +182,7 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
                 sbc codeoff+1
                 sta QCODE+1
 
-                jsr GetNext
+                jsr LexGetNext
 
 _next1          cmp #tokCHAR
                 bcc cderr
@@ -202,7 +202,7 @@ _next2          jsr makeentry
 
                 lda zpAllocCurrent
                 jsr mscCodeIncr
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokComma
                 beq _next2
@@ -223,7 +223,7 @@ _next2          jsr makeentry
                 lda #$00
                 tay
                 jsr LoadCd
-                jsr GetNext
+                jsr LexGetNext
 
 
 ;======================================
@@ -303,13 +303,13 @@ _4              lda nxttoken
                 iny
                 jsr storprops
 
-                jsr GetNext
+                jsr LexGetNext
                 bne _6
 
 _5              lda zpAllocCurrent
                 jsr mscCodeIncr
 
-_6              jsr GetNext
+_6              jsr LexGetNext
 
                 cmp #tokComma
 _next2          beq _next1
@@ -328,7 +328,7 @@ _define         jsr makeentry
                 lda #tokDef
                 sta (zpAllocProps),Y
 
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokEQU
                 bne errDefine
@@ -343,9 +343,9 @@ _define         jsr makeentry
                 adc #$02                ; real size + EOL
 
                 jsr mscSTIncr
-                jsr GetNext             ; string itself
-                jsr GetNext             ; dummy string
-                jsr GetNext
+                jsr LexGetNext          ; string itself
+                jsr LexGetNext          ; dummy string
+                jsr LexGetNext
 
                 cmp #tokComma
                 bne _next2
@@ -356,7 +356,7 @@ _define         jsr makeentry
 ;
 ;--------------------------------------
 errDefine       ldy #declERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
 
 ;--------------------------------------
@@ -368,7 +368,7 @@ arrDeclaration  clc
                 adc #$08
                 sta type
 
-                jsr GetNext
+                jsr LexGetNext
 _next1          jsr makeentry
 
                 lda #$02
@@ -393,7 +393,7 @@ _next1          jsr makeentry
 
                 jsr mscStoreVar
                 jsr getarsz
-                jsr GetNext
+                jsr LexGetNext
 
 ;   check for small byte array
 
@@ -406,7 +406,7 @@ _next1          jsr makeentry
                 sbc (QCODE),Y
                 bcs _6                  ; size <= 256
 
-_next2          jsr GetNext
+_next2          jsr LexGetNext
 
                 cmp #tokRParen
                 bne errDefine
@@ -439,7 +439,7 @@ _1              cmp #$04
 
 _next4          jsr mscCodeIncr
 
-_next5          jsr GetNext
+_next5          jsr LexGetNext
 
                 cmp #tokComma
                 beq _next1
@@ -466,7 +466,7 @@ _4              jsr ideq
 
 _5              ldy #$01
                 jsr storprops
-                jsr GetNext
+                jsr LexGetNext
 
                 lda numargs
                 jmp _next4
@@ -498,7 +498,7 @@ _ENTRY1         beq makeentry._err
                 pla
                 pla
 
-                jmp GetNext
+                jmp LexGetNext
 
                 .endproc
 
@@ -551,7 +551,7 @@ _3              lda #$00
                 jsr mscGetCodeOffset
                 jsr storprops
 
-                jmp GetNext
+                jmp LexGetNext
 
                 .endproc
 
@@ -560,7 +560,7 @@ _3              lda #$00
 ;   IdEq()
 ;======================================
 ideq            .proc
-                jsr GetNext
+                jsr LexGetNext
 
                 ldx param
                 bne params._err
@@ -622,7 +622,7 @@ storprops       .proc
 ;               cmp #undec
 ;               bne _ChkN
 ;               jsr GNlocal
-;:ChkN          jmp GetNext
+;:ChkN          jmp LexGetNext
 
 
 ;======================================
@@ -668,7 +668,7 @@ _err            jmp Segment._argerr
 ;               beq PErr
 
 _2              cmp #tokVAR_t+tokINT_t
-                bcc _4                 ; one-byte arg
+                bcc _4                  ; one-byte arg
 
 ;   two-byte arg
 _3              and #$1F
@@ -727,10 +727,10 @@ _next1          ldx nxttoken
                 bra _2
 
 _1              jsr Push1               ; single byte
-_2              jsr GetNext
+_2              jsr LexGetNext
                 bra _next1
 
-_3              jsr GetNext
+_3              jsr LexGetNext
 
                 jmp recret.nxtstmt
 
@@ -800,7 +800,7 @@ _ENTRY2         eor #tokEQU
                 bne errAssign
 
                 jsr pushop              ; push 0 on op stack
-                jsr GetNext
+                jsr LexGetNext
 
                 sta zpAllocOP
                 cmp #tokEQU
@@ -834,7 +834,7 @@ _1              and #$20
 
                 inc temps-args,X
 
-_2              jsr GetNext
+_2              jsr LexGetNext
 _3              jsr exp._ENTRY1
                 jsr cgassign
 
@@ -848,7 +848,7 @@ _3              jsr exp._ENTRY1
 ;--------------------------------------
 errAssign       .proc
                 ldy #assgnERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
@@ -866,7 +866,7 @@ _ENTRY1         ldy #$00
                 cmp #tokVAR_t
                 bcc errAssign           ; const
 
-_1              jsr GetNext
+_1              jsr LexGetNext
                 bra assign._ENTRY2
 
                 .endproc
@@ -957,7 +957,7 @@ _ifnoelse       jsr TrashY
 recret          .proc
                 jsr freeframe
 
-nxtstmt         jsr GetNext
+nxtstmt         jsr LexGetNext
                 jmp stmtlist
 
                 .endproc
@@ -991,7 +991,7 @@ thnerr          ldy #thenERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-sterr           jmp bankSplErr
+sterr           jmp bankSPLErr
 
 
 ;--------------------------------------
@@ -1108,7 +1108,7 @@ forstmt         .proc
                 jsr whadr
 
 ;   make sure simple var for index
-                jsr GetNext
+                jsr LexGetNext
 
                 cmp #tokVAR_t+tokCHAR_t
                 bcc forerror
@@ -1372,7 +1372,7 @@ forexp          .proc
 
 
 _1              lda arg1
-                cmp #tokVAR_t               ; see if const
+                cmp #tokVAR_t           ; see if const
                 bcs _2
 
 ;   constant
@@ -1458,7 +1458,7 @@ _5              ldy #$04
                 jsr _6
 
                 lda arg2
-                cmp #tokVAR_t+tokINT_t          ; see if byte
+                cmp #tokVAR_t+tokINT_t  ; see if byte
                 bcc _XIT1
 
                 ldy #$05
@@ -1559,7 +1559,7 @@ retstmt         .proc
                 cpx #tokLParen
                 bne _err
 
-                jsr GetNext
+                jsr LexGetNext
                 jsr getexp
 
                 cmp #tokRParen
@@ -1573,7 +1573,7 @@ _1              lda #$60
                 jmp recret.nxtstmt
 
 _err            ldy #retrnERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
@@ -1806,7 +1806,7 @@ getframe        .proc
                 jmp framecd._ENTRY2
 
 _err            ldy #nestERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
@@ -1924,7 +1924,7 @@ getexp          .proc
                 nop
             .endif
 
-                jsr GetNext
+                jsr LexGetNext
 
                 .endproc
 
@@ -2049,7 +2049,7 @@ _8              tax
 
                 lda token
 _9              jsr pushop
-_next4          jsr GetNext
+_next4          jsr LexGetNext
 
                 jmp exp._ENTRY1
 
@@ -2097,11 +2097,11 @@ _15             jsr Push2
 
                 dec choff
 
-                jsr GetNext
+                jsr LexGetNext
                 bra _next4
 
 _errParen       ldy #parenthERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
 
 ;   QCODE to handle function ref
@@ -2214,7 +2214,7 @@ experr          ldy #exprERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-experr2          jmp bankSplErr
+experr2          jmp bankSPLErr
 
 
 ;======================================
@@ -2285,8 +2285,8 @@ pushst          .proc
 ;======================================
 etypep          .proc
                 jsr pushst
-                jsr GetNext
-                jsr GetNext
+                jsr LexGetNext
+                jsr LexGetNext
 
                 ldy #$00
                 sta (stack),Y
@@ -2504,7 +2504,7 @@ pushop          .proc
 pushnext        .proc
                 jsr pushst
 
-                jmp GetNext
+                jmp LexGetNext
 
                 .endproc
 
@@ -3255,7 +3255,7 @@ _1              pla
 ;--------------------------------------
 conderr         .proc
                 ldy #condtERR
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 

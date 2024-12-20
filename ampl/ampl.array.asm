@@ -143,7 +143,7 @@ _7              jsr Op1H
                 jmp cgadd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
-                jmp bankSplErr
+                jmp bankSPLErr
 
 _XIT2           jmp codegen._ENTRY1
 

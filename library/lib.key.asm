@@ -61,10 +61,10 @@ _3              and #$3F
                 beq _8
 
                 ldx #$70
-                lda #$07                  ; GETCHR
+                lda #$07                ; GETCHR
                 sta BRKKEY              ; ignore BREAK key
 
-                jsr PutCh._ENTRY2
+                jsr screenPutCh._ENTRY2
 
 _4              ;!!ldx SRTIMR
                 cpx #$0A

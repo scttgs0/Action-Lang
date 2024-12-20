@@ -62,7 +62,7 @@ mscNextDown     .proc
 ; mscNext(,,dir)
 ;======================================
 mscNext         .proc
-                jsr ChkCursor
+                jsr ioChkCursor
                 beq _XIT
 
                 lda (cur),Y
@@ -154,12 +154,12 @@ _next3          clc
                 adc zpAllocSize+1
 _next4          sta zpAllocSize+1
 
-                jsr NextChar
+                jsr LexNextChar
 
                 cmp #'+'
                 bne _2
 
-                jsr GetNext
+                jsr LexGetNext
                 bra _next1
 
 _2              ldy #$00
@@ -210,7 +210,7 @@ _next5          lda nxttoken            ; body of table
                 iny                     ; no, word
 _7              tya
                 jsr mscCodeIncr
-_8              jsr GetNext
+_8              jsr LexGetNext
                 bra _next5
 
 _9              lda #$01
@@ -231,7 +231,7 @@ _9              lda #$01
                 jmp _next2
 
 _varerr         ldy #varERR
-_adrerr         jmp bankSplErr
+_adrerr         jmp bankSPLErr
 
 _XIT            pla                     ; end of table
                 tax
@@ -431,7 +431,7 @@ _1              lda stmax
 
                 ldy #61                 ; out of symbol table space
 
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
@@ -456,7 +456,7 @@ cderr           ;!!sta bank+ebank
                 jsr SPLsetup            ; reset compiler
 
                 ldy #qcodeERR           ; out of QCODE space
-                jmp bankSplErr
+                jmp bankSPLErr
 
                 .endproc
 
