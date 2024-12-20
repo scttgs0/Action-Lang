@@ -31,7 +31,7 @@ _ENTRY1         jsr screenInit
                 stx cmdln
                 stx device
 
-                jsr SPLsetup
+                jsr SetupSPL
 
 _ENTRY2
 _next1          jsr InitKeys
@@ -76,7 +76,7 @@ _1              jsr jt_alarm
 ;--------------------------------------
 ;
 ;--------------------------------------
-MonQuit         .proc
+monQuit         .proc
                 ldy #$00
                 sty isMonitorLive
                 sty subbuf
@@ -89,9 +89,9 @@ MonQuit         .proc
 
 
 ;======================================
-;   RSTwnd()
+; monResetWindow()
 ;======================================
-RSTwnd          .proc
+monResetWindow  .proc
                 lda #$17
                 sta cmdln
 
@@ -102,10 +102,10 @@ RSTwnd          .proc
                 sta cmdln
 
                 lda #w2-w1
-                jsr PaintW
+                jsr monPaintWindow
 
                 lda #$00
-_1              jsr PaintW
+_1              jsr monPaintWindow
                 jsr EditorInit._ENTRY3
 
                 jmp floop
@@ -114,23 +114,22 @@ _1              jsr PaintW
 
 
 ;======================================
-;   PaintW(window)
+; monPaintWindow(window)
 ;======================================
-PaintW          .proc
+monPaintWindow  .proc
                 sta currentWindow
 
                 jsr RestoreWindow
-
                 jmp Found
 
                 .endproc
 
 
 ;======================================
-;   MDump()
+; monMemDump()
 ;======================================
-MDump           .proc
-                jsr MPrint
+monMemDump      .proc
+                jsr monPrint
 
 _next1          inc arg11
                 bne _1
@@ -139,7 +138,7 @@ _next1          inc arg11
 
 _1              lda arg11
                 ldx arg12
-                jsr MPrint._ENTRY1
+                jsr monPrint._ENTRY1
                 jsr GotKey
                 beq _next1
 
@@ -154,10 +153,10 @@ _1              lda arg11
 
 
 ;======================================
-;   MPrint()
+; monPrint()
 ;======================================
-MPrint          .proc
-                jsr MpSave
+monPrint        .proc
+                jsr monSaveParams
 
 _ENTRY1         jsr ioPrintCard
 
@@ -166,37 +165,38 @@ _ENTRY1         jsr ioPrintCard
 
                 lda arg11
                 ldx arg12
-                jsr PrintH
+                jsr monPrintHex
                 jsr ioPutSpace
 
                 ldy #'='
                 jsr ioPutChar
                 jsr ioPutSpace
-                jsr MpLoad
+                jsr monLoadParams
 
                 tay
                 jsr ioPutChar
                 jsr ioPutSpace
-                jsr MpLoad
-                jsr PrintH
+                jsr monLoadParams
+
+                jsr monPrintHex
                 jsr ioPutSpace
-                jsr MpLoad
+                jsr monLoadParams
 
                 ldx #$00
                 jsr ioPrintCard
                 jsr ioPutSpace
-                jsr MpLoad
-                jsr ioPrintCard
+                jsr monLoadParams
 
+                jsr ioPrintCard
                 jmp ioPutEOL
 
                 .endproc
 
 
 ;======================================
-;   MpLoad()
+; monLoadParams()
 ;======================================
-MpLoad          .proc
+monLoadParams   .proc
                 ldy #$01
                 lda (arg11),Y
                 tax
@@ -209,9 +209,9 @@ MpLoad          .proc
 
 
 ;======================================
-;   MpSave()
+; monSaveParams()
 ;======================================
-MpSave          .proc
+monSaveParams   .proc
                 jsr mscMNum
 
                 sta arg11
@@ -222,13 +222,13 @@ MpSave          .proc
 
 
 ;======================================
-;   Boot()
+; monBoot()
 ;======================================
-ReBoot          .proc
+monBoot         .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr YesNo
-                bne MRun._XIT
+                bne monMemRun._XIT
 
                 jmp START.cold
 
@@ -240,9 +240,11 @@ _bmsg           .ptext "Boot? "
 
 
 ;======================================
-;   MRun()
+; monMemRun()
+;--------------------------------------
+; execute from memory
 ;======================================
-MRun            .proc
+monMemRun       .proc
                 lda nxttoken
                 cmp #tokEOF
                 beq _1
@@ -250,7 +252,7 @@ MRun            .proc
                 cmp #tokQuote           ; compile and go?
                 bne _2                  ;   no
 
-                jsr Comp
+                jsr monCompile
 
 _1              lda INITAD
                 ldx INITAD+1
@@ -269,15 +271,15 @@ _3              jsr bankRun
 
 
 ;======================================
-;   MWrite()
+; monMemWrite()
 ;======================================
-MWrite          .proc                   ; write object file
+monMemWrite        .proc                ; write object file
                 lda nxttoken
                 cmp #tokQuote
-                bne MRun._XIT           ; no output file!
+                bne monMemRun._XIT      ; no output file!
 
                 lda INITAD+1
-                beq MRun._XIT           ; no program!!
+                beq monMemRun._XIT      ; no program!!
 
                 lda #$01
                 sta Channel
@@ -317,7 +319,7 @@ _1              dec arg14
                 adc codesize+1
                 sta arg15
 
-                jsr MWOut
+                jsr monWOut
 
 ;   write the QCODE
                 ldx #$10
@@ -335,7 +337,7 @@ _1              dec arg14
                 sta IOCB0+ICBLH,X
 
                 jsr CIOV
-                bmi MWOut._mwerr
+                bmi monWOut._mwerr
 
 ;   save START address
                 ldx #$04
@@ -350,7 +352,7 @@ _next1          lda _mwinit,X
                 lda INITAD+1
                 sta arg15
 
-                jsr MWOut
+                jsr monWOut
 
 ;   close file
                 lda #$01
@@ -366,9 +368,9 @@ _mwinit         .byte 6
 
 
 ;======================================
-;   MWOut()
+; monWOut()
 ;======================================
-MWOut           .proc
+monWOut         .proc
                 lda #$01
                 ldx #arg9
                 ldy #$00
@@ -379,14 +381,21 @@ MWOut           .proc
                 rts
 
 
-;======================================
+;--------------------------------------
 ;
-;======================================
+;--------------------------------------
 _mxerr          ldy #endERR
 
 _mwerr          jmp bankSPLErr
 
-_ENTRY1         lda #$00                ; execute command line
+                .endproc
+
+
+;--------------------------------------
+;
+;--------------------------------------
+monExecute      .proc
+                lda #$00                ; execute command line
                 sta codeoff
                 sta codeoff+1
 
@@ -399,7 +408,7 @@ _ENTRY1         lda #$00                ; execute command line
                 jsr bankCStmtList
 
                 cmp #tokEOF
-                bne _mxerr
+                bne monWOut._mxerr
 
                 lda #$60                ; RTS
                 ldy #$00
@@ -415,10 +424,10 @@ _ENTRY1         lda #$00                ; execute command line
 
 
 ;======================================
-;   Comp()
+; monCompile()
 ;======================================
-Comp            .proc
-                jsr SPLsetup
+monCompile      .proc
+                jsr SetupSPL
                 jsr ioDisplayOff
                 jsr bankCompile
 
@@ -435,10 +444,10 @@ Comp            .proc
 
 
 ;======================================
-;   Proceed()
+;   monProceed()
 ;======================================
-Proceed         .proc
-                ldx procsp
+monProceed      .proc
+                ldx procSP
                 beq _XIT
 
 ;               lda #<_pmsg
@@ -449,22 +458,23 @@ Proceed         .proc
 ;               ldx procSP              ; break stack pointer
 
                 lda #$00
-                sta procsp
+                sta procSP
 
                 txs
 
                 jmp bankLProceed
 
 _XIT            rts
+
+;_pmsg          DEFMSG "Proceed? "
+
                 .endproc
 
-;:Pmsg DEFMSG "Proceed? "
-
 
 ;======================================
-;   PrintH(num)
+; monPrintHex(num)
 ;======================================
-PrintH          .proc
+monPrintHex     .proc
                 sta arg0
                 stx arg1
 
@@ -506,31 +516,37 @@ _1              tay
 monitorCmd      .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
 
-                .addr ReBoot
+                .addr monBoot
                 .text 'b'               ; BOOT
-                .addr Comp
-                .text 'c'               ; COMPILE
-                .addr bankDRet
-                .text 'd'               ; DOS
-                .addr MonQuit
-                .text 'e'               ; EDITOR
 
-;               .addr Format
-;               .text 'f'
+                .addr monCompile
+                .text 'c'               ; COMPILE
+
+                .addr bankDosRet
+                .text 'd'               ; DOS
+
+                .addr monQuit
+                .text 'e'               ; EDITOR
 
                 .addr bankOptions
                 .text 'o'               ; OPTIONS
-                .addr Proceed
-                .text 'p'               ; PROCEED (continue after Break)
-                .addr MRun
+
+                .addr monProceed
+                .text 'p'               ; PROCEED (continue after BRK)
+
+                .addr monMemRun
                 .text 'r'               ; MEMORY RUN
-                .addr MWrite
+
+                .addr monMemWrite
                 .text 'w'               ; MEMORY WRITE
-                .addr MWOut._ENTRY1
+
+                .addr monExecute
                 .text 'x'               ; EXECUTE
-                .addr MPrint
+
+                .addr monPrint
                 .text '?'               ; PRINT
-                .addr MDump
+
+                .addr monMemDump
                 .text '*'               ; MEMORY DUMP
 
 monitorPrompt   .ptext '>'

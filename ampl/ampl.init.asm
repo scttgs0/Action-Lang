@@ -9,11 +9,11 @@
 
 
 ;======================================
-;   SPLsetup()
+; SetupSPL()
 ;--------------------------------------
 ; SPL = Scanner/Parser/Lexeme
 ;======================================
-SPLsetup        .proc
+SetupSPL        .proc
                 lda #$00
                 tay
                 sta sp
@@ -27,7 +27,7 @@ SPLsetup        .proc
                 sta arrayptr+1
                 sta whaddr+1
                 sta curnxt+1
-                sta procsp
+                sta procSP
 
 ;   clear qglobal symbol table
                 ldx isBigSymTbl

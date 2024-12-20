@@ -329,7 +329,7 @@ _1              cpy arg4
 ;======================================
 libMscBreak     .proc
                 tsx
-                stx procsp
+                stx procSP
 
                 ldy #brkERR
                 tya

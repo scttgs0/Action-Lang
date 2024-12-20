@@ -60,7 +60,7 @@ GeneralMemErr   .proc
 ;--------------------------------------
 Punt            jsr SaveWindow          ; we're in big trouble
 
-                jmp RSTwnd
+                jmp monResetWindow
 
                 .endproc
 

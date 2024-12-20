@@ -226,7 +226,7 @@ _9              lda #$01
 
                 lda #$01
                 jsr mscGProp
-                jsr bankRestoreBank
+                jsr bankRestore
 
                 jmp _next2
 
@@ -453,7 +453,7 @@ _1              lda stbase
 
 cderr           ;!!sta bank+ebank
 
-                jsr SPLsetup            ; reset compiler
+                jsr SetupSPL            ; reset compiler
 
                 ldy #qcodeERR           ; out of QCODE space
                 jmp bankSPLErr

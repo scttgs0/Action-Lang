@@ -11,7 +11,10 @@
 en0             .ptext "Error"
                 .byte $C0
                 .addr jt_error
+
+; - - - - - - - - - - - - - - - - - - -
                 .byte 3,138,138,138
+; - - - - - - - - - - - - - - - - - - -
 
 en1             .ptext "EOF"
                 .byte $9A
@@ -20,6 +23,7 @@ en1             .ptext "EOF"
 en2             .ptext "color"
                 .byte $8A
                 ;!!.addr FILDAT
+                .word $0000     ; HACK:
 
 en3             .ptext "LIST"
                 .byte $8A
@@ -60,9 +64,9 @@ bankGetName     .proc
 
 
 ;======================================
-; bankRestoreBank()
+; bankRestore()
 ;======================================
-bankRestoreBank .proc
+bankRestore     .proc
                 php
                 pha
 
@@ -120,7 +124,7 @@ bankEditBank    .proc
                 ;!!ldy #ebank
                 sty jt_curbank
 
-                jmp bankRestoreBank.rbank1
+                jmp bankRestore.rbank1
 
                 .endproc
 
@@ -144,7 +148,7 @@ bankGetAlias    .proc
 
                 sta token
 
-                jmp bankRestoreBank
+                jmp bankRestore
 
 _XIT            jmp mscMNum._varerr
 
@@ -152,14 +156,14 @@ _XIT            jmp mscMNum._varerr
 
 
 ;======================================
-; bankGnLocal()
+; bankLocalName()
 ;======================================
-bankGnLocal     .proc
+bankLocalName   .proc
                 ;!!sta bank+lbank
 
                 jsr lGetName._ENTRY1
 
-                jmp bankRestoreBank
+                jmp bankRestore
 
                 .endproc
 
@@ -223,7 +227,7 @@ bankGetKey      .proc
 
                 jsr libKeyGet
 
-                jmp bankRestoreBank
+                jmp bankRestore
 
                 .endproc
 
@@ -286,7 +290,7 @@ _next1          iny
                 sta argtypes,X          ; args inverted
                 bne _next1
 
-_XIT            jmp bankRestoreBank
+_XIT            jmp bankRestore
 
                 .endproc
 
@@ -297,7 +301,7 @@ _XIT            jmp bankRestoreBank
 bankPrintH      .proc
                 ;!!sty bank+ebank
 
-                jsr PrintH
+                jsr monPrintHex
 
                 ;!!sty bank+lbank
 
@@ -310,7 +314,7 @@ bankPrintH      .proc
 ; go directly to DOS, do NOT pass GO,
 ; do NOT collect $200, but setup LIB
 ;======================================
-bankDRet        .proc
+bankDosRet      .proc
                 jsr bankLProceed
 
                 jmp (DOSVEC)

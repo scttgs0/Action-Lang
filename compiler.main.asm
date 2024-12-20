@@ -524,7 +524,7 @@ makeentry       .proc
 _1              lda qglobal
                 beq chkparam._ENTRY1
 
-                jsr bankGnLocal
+                jsr bankLocalName
 
                 cmp #tokUNDEC
                 beq _2
