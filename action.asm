@@ -32,6 +32,7 @@ date            .byte $01,$17,$84       ; assemble date of latest version!
 propid          ldx $A0
 
                 .include "screen.mac.asm"
+                .include "comp.lex.asm"
                 .include "main.msc.asm"
                 .include "main.bnk.asm"
 
