@@ -21,9 +21,9 @@ Monitor         .proc
                 lda top+1
                 sta top1
 
-_ENTRY1         jsr scrinit
+_ENTRY1         jsr screenInit
 
-                ldx #1
+                ldx #$01
                 stx ROWCRS
                 stx isMonitorLive
 
@@ -39,7 +39,7 @@ _next1          jsr InitKeys
                 lda DINDEX              ; display mode
                 beq _1
 
-                jsr scrinit             ; get Graphics(0)
+                jsr screenInit          ; get Graphics(0)
 
 _1              jsr jt_alarm
                 jsr RestoreCursorChar
@@ -51,7 +51,7 @@ _1              jsr jt_alarm
                 ldy tempbuf
                 beq _next1
 
-                lda #0
+                lda #$00
                 sta top+1
                 sta Channel
 
@@ -59,14 +59,14 @@ _1              jsr jt_alarm
                 ldx #>tempbuf
                 ldy sp
                 iny                     ; make sure non-zero
-                jsr lexexpand._ENTRY1
+                jsr LexExpand._ENTRY1
                 jsr GetNext
 
                 lda tempbuf+1
                 ora #$20
                 ldx #<monitorCmd
                 ldy #>monitorCmd
-                jsr lookup
+                jsr mscLookup
 
                 jmp _next1
 
@@ -77,7 +77,7 @@ _1              jsr jt_alarm
 ;
 ;--------------------------------------
 MonQuit         .proc
-                ldy #0
+                ldy #$00
                 sty isMonitorLive
                 sty subbuf
                 sty findbuf
@@ -92,7 +92,7 @@ MonQuit         .proc
 ;   RSTwnd()
 ;======================================
 RSTwnd          .proc
-                lda #23
+                lda #$17
                 sta cmdln
 
                 lda numwd
@@ -104,7 +104,7 @@ RSTwnd          .proc
                 lda #w2-w1
                 jsr PaintW
 
-                lda #0
+                lda #$00
 _1              jsr PaintW
                 jsr EditorInit._ENTRY3
 
@@ -182,7 +182,7 @@ _ENTRY1         jsr PrintCard
                 jsr PutSpace
                 jsr MpLoad
 
-                ldx #0
+                ldx #$00
                 jsr PrintCard
                 jsr PutSpace
                 jsr MpLoad
@@ -197,7 +197,7 @@ _ENTRY1         jsr PrintCard
 ;   MpLoad()
 ;======================================
 MpLoad          .proc
-                ldy #1
+                ldy #$01
                 lda (arg11),Y
                 tax
 
@@ -212,7 +212,7 @@ MpLoad          .proc
 ;   MpSave()
 ;======================================
 MpSave          .proc
-                jsr mnum
+                jsr mscMNum
 
                 sta arg11
                 stx arg12
@@ -258,10 +258,10 @@ _1              lda INITAD
 
 _XIT            rts
 
-_2              jsr mnum
-_3              jsr run
+_2              jsr mscMNum
+_3              jsr bankRun
 
-                lda #0
+                lda #$00
                 sta device
 
                 rts
@@ -279,14 +279,14 @@ MWrite          .proc                   ; write object file
                 lda INITAD+1
                 beq MRun._XIT           ; no program!!
 
-                lda #1
+                lda #$01
                 sta Channel
 
-                lda #8                  ; output
+                lda #$08                ; output
                 jsr OpenChannel
 
 ;   write header
-                lda #6
+                lda #$06
                 sta arg9
 
                 lda #$FF
@@ -322,23 +322,23 @@ _1              dec arg14
 ;   write the QCODE
                 ldx #$10
                 lda #$0B                ; output command
-                ;!!sta IOCB0+ICCOM,X
+                sta IOCB0+ICCOM,X
 
                 lda codebase
-                ;!!sta IOCB0+ICBAL,X       ; buffer address
+                sta IOCB0+ICBAL,X       ; buffer address
                 lda codebase+1
-                ;!!sta IOCB0+ICBAH,X
+                sta IOCB0+ICBAH,X
 
                 lda codesize
-                ;!!sta IOCB0+ICBLL,X       ; size
+                sta IOCB0+ICBLL,X       ; size
                 lda codesize+1
-                ;!!sta IOCB0+ICBLH,X
+                sta IOCB0+ICBLH,X
 
-                ;!!jsr CIOV
+                jsr CIOV
                 bmi MWOut._mwerr
 
 ;   save START address
-                ldx #4
+                ldx #$04
 _next1          lda _mwinit,X
                 sta arg9,X
 
@@ -353,7 +353,7 @@ _next1          lda _mwinit,X
                 jsr MWOut
 
 ;   close file
-                lda #1
+                lda #$01
                 jmp Close
 
 ;--------------------------------------
@@ -369,9 +369,9 @@ _mwinit         .byte 6
 ;   MWOut()
 ;======================================
 MWOut           .proc
-                lda #1
+                lda #$01
                 ldx #arg9
-                ldy #0
+                ldy #$00
                 jsr Output
 
                 bmi _mwerr
@@ -384,9 +384,9 @@ MWOut           .proc
 ;======================================
 _mxerr          ldy #endERR
 
-_mwerr          jmp splerr
+_mwerr          jmp bankSplErr
 
-_ENTRY1         lda #0                  ; execute command line
+_ENTRY1         lda #$00                ; execute command line
                 sta codeoff
                 sta codeoff+1
 
@@ -396,20 +396,20 @@ _ENTRY1         lda #0                  ; execute command line
                 pha
 
                 jsr GetNext
-                jsr cstmtlst
+                jsr bankCStmtList
 
                 cmp #tokEOF
                 bne _mxerr
 
                 lda #$60                ; RTS
-                ldy #0
+                ldy #$00
                 sta (QCODE),Y
 
                 pla
                 tax
                 pla
 
-                jmp run
+                jmp bankRun
 
                 .endproc
 
@@ -420,7 +420,7 @@ _ENTRY1         lda #0                  ; execute command line
 Comp            .proc
                 jsr SPLsetup
                 jsr DisplayOff
-                jsr compile
+                jsr bankCompile
 
                 jmp DisplayOn
 
@@ -448,12 +448,12 @@ Proceed         .proc
 
 ;               ldx procSP              ; break stack pointer
 
-                lda #0
+                lda #$00
                 sta procsp
 
                 txs
 
-                jmp lproceed
+                jmp bankLProceed
 
 _XIT            rts
                 .endproc
@@ -468,14 +468,14 @@ PrintH          .proc
                 sta arg0
                 stx arg1
 
-                lda #4
+                lda #$04
                 sta arg2
 
                 ldy #'$'
                 jsr PutChar
 
-_next1          lda #0
-                ldx #4
+_next1          lda #$00
+                ldx #$04
 _next2          asl arg0
                 rol arg1
                 rol a
@@ -488,7 +488,7 @@ _next2          asl arg0
                 cmp #':'
                 bmi _1
 
-                adc #6
+                adc #$06
 
 _1              tay
                 jsr PutChar
@@ -510,7 +510,7 @@ monitorCmd      .addr jt_disptb+9       ; unknown cmd
                 .text 'b'               ; BOOT
                 .addr Comp
                 .text 'c'               ; COMPILE
-                .addr dret
+                .addr bankDRet
                 .text 'd'               ; DOS
                 .addr MonQuit
                 .text 'e'               ; EDITOR
@@ -518,7 +518,7 @@ monitorCmd      .addr jt_disptb+9       ; unknown cmd
 ;               .addr Format
 ;               .text 'f'
 
-                .addr options
+                .addr bankOptions
                 .text 'o'               ; OPTIONS
                 .addr Proceed
                 .text 'p'               ; PROCEED (continue after Break)

@@ -35,9 +35,9 @@ en5             .ptext "TRACE"
 
 
 ;======================================
-;   CStrt()
+; bankCartStart()
 ;======================================
-CSTART          .proc
+bankCartStart   .proc
                 ;!!ldy #ebank
                 sty jt_curbank
                 ;!!sty bank+ebank
@@ -48,9 +48,9 @@ CSTART          .proc
 
 
 ;======================================
-;   GetName(char)
+; bankGetName(char)
 ;======================================
-GetName         .proc
+bankGetName     .proc
                 ;!!sta bank+lbank
                 jsr lGetName
 
@@ -60,9 +60,9 @@ GetName         .proc
 
 
 ;======================================
-;   RestoreBank()
+; bankRestoreBank()
 ;======================================
-RestoreBank     .proc
+bankRestoreBank .proc
                 php
                 pha
 
@@ -78,27 +78,27 @@ init            rts
 
 
 ;======================================
-;   Run(address)
+; bankRun(address)
 ;======================================
-run             .proc
+bankRun         .proc
 ;   reset Error routine
-                ldy #<splerr
+                ldy #<bankSplErr
                 sty jt_error+1
-                ldy #>splerr
+                ldy #>bankSplErr
                 sty jt_error+2
 
-                jsr lproceed
-                jsr jsrind
+                jsr bankLProceed
+                jsr mscJSRIndirect
 
-                jmp EditBank
+                jmp bankEditBank
 
                 .endproc
 
 
 ;======================================
-;   Compile()
+; bankCompile()
 ;======================================
-compile         .proc
+bankCompile     .proc
                 ;!!ldy #cbank
                 sty jt_curbank
                 ;!!sty bank+cbank
@@ -110,9 +110,9 @@ compile         .proc
 
 
 ;======================================
-;   EditBank()
+; bankEditBank()
 ;======================================
-EditBank        .proc
+bankEditBank    .proc
                 php
                 pha
 
@@ -120,61 +120,61 @@ EditBank        .proc
                 ;!!ldy #ebank
                 sty jt_curbank
 
-                jmp RestoreBank.rbank1
+                jmp bankRestoreBank.rbank1
 
                 .endproc
 
 
 ;======================================
-;   GetAlias()
+; bankGetAlias()
 ;======================================
-GetAlias        .proc
-                lda #1
-                jsr getprop
+bankGetAlias    .proc
+                lda #$01
+                jsr mscGetProp
 
-                cpx #0
+                cpx #$00
                 beq _XIT
 
                 sta addr
                 stx addr+1
                 ;!!sta bank+lbank
 
-                lda #0
-                jsr getprop
+                lda #$00
+                jsr mscGetProp
 
                 sta token
 
-                jmp RestoreBank
+                jmp bankRestoreBank
 
-_XIT            jmp mnum._varerr
+_XIT            jmp mscMNum._varerr
 
                 .endproc
 
 
 ;======================================
-;   GNlocal()
+; bankGnLocal()
 ;======================================
-gnlocal         .proc
+bankGnLocal     .proc
                 ;!!sta bank+lbank
 
                 jsr lGetName._ENTRY1
 
-                jmp RestoreBank
+                jmp bankRestoreBank
 
                 .endproc
 
 
 ;======================================
-;   CStmtList()
+; bankCStmtList()
 ;======================================
-cstmtlst        .proc
+bankCStmtList   .proc
                 ;!!ldy #cbank
                 sty jt_curbank
                 ;!!sta bank+cbank
 
                 jsr stmtlist
 
-                jmp EditBank
+                jmp bankEditBank
 
                 .endproc
 
@@ -182,8 +182,8 @@ cstmtlst        .proc
 ;======================================
 ;
 ;======================================
-mgett1          .proc
-                jsr EditBank
+bankMGetT1      .proc
+                jsr bankEditBank
                 jsr GetTemp._ENTRY1
 
                 .endproc
@@ -192,9 +192,9 @@ mgett1          .proc
 
 
 ;======================================
-;   LProceed()
+; bankLProceed()
 ;======================================
-lproceed        .proc
+bankLProceed    .proc
                 ;!!ldy #lbank
                 sty jt_curbank
                 ;!!sty bank+lbank
@@ -206,11 +206,11 @@ lproceed        .proc
 ;======================================
 ;
 ;======================================
-options         .proc
-                jsr lproceed
+bankOptions     .proc
+                jsr bankLProceed
                 jsr libOptSet
 
-                jmp EditBank
+                jmp bankEditBank
 
                 .endproc
 
@@ -218,12 +218,12 @@ options         .proc
 ;======================================
 ;
 ;======================================
-GetKey          .proc
+bankGetKey      .proc
                 ;!!sta bank+lbank
 
                 jsr libKeyGet
 
-                jmp RestoreBank
+                jmp bankRestoreBank
 
                 .endproc
 
@@ -231,7 +231,7 @@ GetKey          .proc
 ;======================================
 ;
 ;======================================
-splerr          .proc
+bankSplErr      .proc
                 ;!!sta bank+lbank
 
                 jmp lsplerr
@@ -242,8 +242,8 @@ splerr          .proc
 ;======================================
 ;
 ;======================================
-emloop          .proc
-                jsr EditBank
+bankEmLoop      .proc
+                jsr bankEditBank
 
                 jmp Monitor._ENTRY2
 
@@ -253,13 +253,13 @@ emloop          .proc
 ;======================================
 ;
 ;======================================
-GetArgs         .proc
+bankGetArgs     .proc
                 pha                     ; save arg type load flag
 
                 ;!!sty bank+lbank
 
-                lda #1
-                jsr getprop
+                lda #$01
+                jsr mscGetProp
 
                 sta addr
                 stx addr+1
@@ -271,13 +271,13 @@ GetArgs         .proc
                 sta abt+1               ; flag as temp args
                 sta abt+2               ; (default)
 
-                ldy #2
+                ldy #$02
                 lda (zpAllocProps),Y
                 sta numargs
                 beq _XIT
 
                 tax
-                cpx #9
+                cpx #$09
                 bcs _XIT
 
 _next1          iny
@@ -286,7 +286,7 @@ _next1          iny
                 sta argtypes,X          ; args inverted
                 bne _next1
 
-_XIT            jmp RestoreBank
+_XIT            jmp bankRestoreBank
 
                 .endproc
 
@@ -294,7 +294,7 @@ _XIT            jmp RestoreBank
 ;======================================
 ; call only from LBANK!
 ;======================================
-prth            .proc
+bankPrintH      .proc
                 ;!!sty bank+ebank
 
                 jsr PrintH
@@ -310,8 +310,8 @@ prth            .proc
 ; go directly to DOS, do NOT pass GO,
 ; do NOT collect $200, but setup LIB
 ;======================================
-dret            .proc                   ; Dret()
-                jsr lproceed
+bankDRet        .proc
+                jsr bankLProceed
 
                 jmp (DOSVEC)
 

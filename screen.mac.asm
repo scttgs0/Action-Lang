@@ -11,16 +11,17 @@
 ;======================================
 ;
 ;======================================
-scrinit         .proc
-                .frsGraphics mcTextOn,mcVideoMode240    ; 80x60 text mode
+screenInit      .proc
+;   80x60 text mode
+                .frsGraphics mcTextOn,mcVideoMode240
                 stz DINDEX              ; text mode
 
-                ; lda #0
-                ; jsr Close             ; close #0, sets X to 0
+                ; lda #$00
+                ; jsr Close             ; close #$00, sets X to 0
 
                 ; lda #$0C
                 ; sta arg3
-                ; lda #0
+                ; lda #$00
                 ; ldx #<_data
                 ; ldy #>_data
                 ; jmp Open
@@ -33,31 +34,31 @@ scrinit         .proc
 
 
 ;======================================
-;     ScrCh(char)
-;    ------------
-; outputs char to screen.
-; Char passed in A reg.
-; Control characters are ignored.
+; screenCh(char)
+;--------------------------------------
+; outputs char to screen
+; Char passed in A reg
+; Control characters are ignored
 ;======================================
-scrch           .proc
+screenCh        .proc
                 tay
-                lda #0
-_ENTRY1         ldx #1
-                bne putch._ENTRY1       ; [unc]
+                lda #$00
+_ENTRY1         ldx #$01
+                bne PutCh._ENTRY1       ; [unc]
 
                 .endproc
 
 
 ;======================================
-;    PutCh(char)
-;    -----------
+; PutCh(char)
+;--------------------------------------
 ; outputs char to screen.
 ; Char passed in A reg.
 ; Processes control characters.
 ;======================================
-putch           .proc
+PutCh           .proc
                 tay
-                lda #0
+                lda #$00
                 tax
 _ENTRY1         ;!!stx DSPFLG
 
@@ -68,64 +69,73 @@ _ENTRY1         ;!!stx DSPFLG
 
                 tax
                 lda #$0B                ; PUTCHR
-_ENTRY2         ;!!sta IOCB0+ICCOM,X
+_ENTRY2         sta IOCB0+ICCOM,X
 
-                lda #0
-                ;!!sta IOCB0+ICBLL,X
-                ;!!sta IOCB0+ICBLH,X
+                lda #$00
+                sta IOCB0+ICBLL,X
+                sta IOCB0+ICBLH,X
 
                 tya
-                ;!!jmp CIOV
-
+                jmp CIOV
                 .endproc
 
 
 ;======================================
-;   ScrUp() - Move cursor up one
+; screenCursorUp()
+;--------------------------------------
+; Move cursor up one
 ;======================================
-scrup           .proc
+screenCursorUp  .proc
                 lda #$1C
-                bra putch
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-;   ScrDwn() - Move cursor down one
+; screenCursorDown()
+;--------------------------------------
+; Move cursor down one
 ;======================================
-scrdwn          .proc
+screenCursorDown .proc
                 lda #$1D
-                bra putch
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-;   ScrBell() - Bell Char
+; screenBell()
+;--------------------------------------
+; Bell Char
 ;======================================
-scrbell         .proc
+screenBell      .proc
                 lda #$FD
-                bra putch
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-;   ScrLft() - Move cursor left one
+; screenCursorLeft()
+;--------------------------------------
+; Move cursor left one
 ;======================================
-scrlft          .proc
+screenCursorLeft .proc
                 lda #$1E
-                bra putch
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-;   ScrRt() - Move cursor right one
+; screenCursorRight()
+;--------------------------------------
+; Move cursor right one
 ;======================================
-scrrt           .proc
+screenCursorRight .proc
                 lda #$1F
-                bra putch
+                bra PutCh
 
                 .endproc
 
@@ -220,7 +230,7 @@ tokFUNC_t       = $C0
 tokCOND_t       = $48
 
 ;    types
-;    -----
+;--------------------------------------
 tokCHAR_t       = 1
 tokBYTE_t       = 2
 tokINT_t        = 3
@@ -231,15 +241,15 @@ tokREAL_t       = 6
 tokUNDEC        = $88
 
 
-;========================
+;--------------------------------------
 ;    Error codes
-;========================
+;--------------------------------------
 
-; 0 - out of system memory
+;   0 - out of system memory
 strERR          = 1                     ; missing " at end
 dfnERR          = 2                     ; nested defines
 symtblERR       = 3                     ; too many qglobal st
-; 4 - too many local st entries
+;   4 - too many local st entries
 setERR          = 5                     ; SET syntax error
 declERR         = 6                     ; declaration error
 argERR          = 7                     ; bad argument list
@@ -257,23 +267,23 @@ parenthERR      = 18                    ; unmatched ()s
 odERR           = 19                    ; missing OD
 allocateERR     = 20                    ; can't alloc mem.
 arrayERR        = 21                    ; bad array ref.
-; 22 - file too large on input
+;   22 - file too large on input
 condtERR        = 23                    ; illegal cond. exp.
 forERR          = 24                    ; illegal FOR stmt
 exitERR         = 25                    ; no loop for EXIT
 nestERR         = 26                    ; nesting level too deep
 typERR          = 27                    ; illegal type ref.
 retrnERR        = 28                    ; illegal RETURN stmt.
-;61 - out of st space
+;   61 - out of st space
 brkERR          = $80                   ; Break key depressed
 
 
-;======================================
+;--------------------------------------
 ;    Compiler lexicon - get tokens
-;======================================
+;--------------------------------------
 
 ;======================================
-;   GetNext()
+; GetNext()
 ;======================================
 GetNext         .proc
                 lda spnxt
@@ -293,7 +303,7 @@ GetNext         .proc
                 sty addr+1
                 sta token
 
-_ENTRY1         jsr nextchar
+_ENTRY1         jsr NextChar
 
 _ENTRY2         cmp #tokEOF
                 beq _ENTRY3
@@ -309,14 +319,14 @@ _ENTRY2         cmp #tokEOF
                 bcs _1
 
                 tay
-                lda lexchars-33,Y
+                lda tblLexChars-33,Y
                 beq _ENTRY1
                 bpl _ENTRY3
 
                 and #$7F
                 bra _3
 
-_1              jsr alpha
+_1              jsr mscAlpha
                 bne _2
 
                 cmp #'['
@@ -329,14 +339,14 @@ _1              jsr alpha
                 beq _ENTRY3
                 bra _ENTRY1
 
-_2              jsr GetName
+_2              jsr bankGetName
                 bmi _ENTRY3
 
 _3              sta nxttoken
 
-                ldx #<lexcmd
-                ldy #>lexcmd
-                jmp lookup
+                ldx #<tblLexCmd
+                ldy #>tblLexCmd
+                jmp mscLookup
 
 _ENTRY3         sta nxttoken
 
@@ -354,7 +364,7 @@ _ENTRY5         lda token
 
 
 ;======================================
-;   LexCom()
+; LexCom()
 ;======================================
 LexCom          .proc
                 jsr NextLine
@@ -364,17 +374,17 @@ LexCom          .proc
 
 
 ;======================================
-;   LexDig()
+; LexDig()
 ;======================================
 LexDig          .proc
                 lda #tokCONST_t+tokINT_t
                 sta nxttoken
 
-                jsr lexbuf              ; get buf ptr
+                jsr LexBuf              ; get buf ptr
                 jsr StrToReal
 
-_next1          jsr nextchar            ; cardinal?
-                jsr alphanum._num
+_next1          jsr NextChar            ; cardinal?
+                jsr mscAlphaNum._num
                 bne _next1
 
                 cmp #'.'
@@ -389,7 +399,7 @@ _next1          jsr nextchar            ; cardinal?
                 bcc _1
 
 _err            ldy #constERR
-                jmp splerr
+                jmp bankSplErr
 
 _ENTRY1         dey
                 sty choff
@@ -397,7 +407,7 @@ _ENTRY1         dey
 _1              sta nxtaddr
                 stx nxtaddr+1
 
-                cpx #0
+                cpx #$00
                 bne GetNext._ENTRY4
 
                 lda #tokCONST_t+tokBYTE_t
@@ -414,10 +424,10 @@ _2              lda #tokCONST_t+tokREAL_t
 
 
 ;======================================
-;   LexChr()
+; LexChr()
 ;======================================
 LexChr          .proc
-                jsr nextchar
+                jsr NextChar
 
                 sta nxtaddr
 
@@ -428,13 +438,13 @@ LexChr          .proc
 
 
 ;======================================
-;   LexNE()
+; LexNE()
 ;======================================
 LexNE           .proc
-                jsr nextchar
+                jsr NextChar
 
                 cmp #'>'
-                bne LexEq._ENTRY1
+                bne LexEQ._ENTRY1
 
                 lda #tokNOTEQU
                 bra GetNext._ENTRY3
@@ -443,13 +453,13 @@ LexNE           .proc
 
 
 ;======================================
-;   LexEq()
+; LexEQ()
 ;======================================
-LexEq           .proc
-                jsr nextchar
+LexEQ           .proc
+                jsr NextChar
 
 _ENTRY1         cmp #'='
-                bne putback
+                bne PutBack
 
                 inc nxttoken
                 bra GetNext._ENTRY4
@@ -458,7 +468,7 @@ _ENTRY1         cmp #'='
 
 
 ;======================================
-;   LexHex()
+; LexHex()
 ;======================================
 LexHex          .proc
                 lda #tokCONST_t+tokCARD_t
@@ -466,7 +476,7 @@ LexHex          .proc
 
                 inc choff
 
-                jsr lexbuf
+                jsr LexBuf
                 jsr HexToCard
                 bra LexDig._ENTRY1
 
@@ -474,9 +484,9 @@ LexHex          .proc
 
 
 ;======================================
-;   PutBack returns character to buf
+; PutBack returns character to buf
 ;======================================
-putback         .proc
+PutBack         .proc
                 dec choff
 
 _ENTRY1         jmp GetNext._ENTRY4
@@ -485,13 +495,13 @@ _ENTRY1         jmp GetNext._ENTRY4
 
 
 ;======================================
-;   LexPF()
+; LexPF()
 ;======================================
-lexpf           .proc
+LexPF           .proc
                 lda qglobal
-                beq putback._ENTRY1
+                beq PutBack._ENTRY1
 
-                lda #0
+                lda #$00
                 sta qglobal
 
                 lda gbase               ; restore qglobal base
@@ -499,23 +509,23 @@ lexpf           .proc
                 lda gbase+1
                 sta symtab+1
 
-                bra putback._ENTRY1
+                bra PutBack._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;   LexStr()
+; LexStr()
 ;======================================
-lexstr          .proc
+LexStr          .proc
                 lda token
                 cmp #tokQuote
-                beq putback._ENTRY1     ; zap local st
+                beq PutBack._ENTRY1     ; zap local st
 
-                lda #0
+                lda #$00
                 sta arg9
 
-_next1          jsr nextchar
+_next1          jsr NextChar
 
                 inc arg9
                 beq _1                  ; string too long
@@ -530,9 +540,9 @@ _next2          ldy arg9
                 bpl _next1              ; if not EOF
 
 _1              ldy #strERR
-                jmp splerr
+                jmp bankSplErr
 
-_2              jsr nextchar
+_2              jsr NextChar
 
                 cmp #'"'
                 beq _next2              ; " in string
@@ -544,7 +554,7 @@ _2              jsr nextchar
 
                 dey
                 tya
-                ldy #0
+                ldy #$00
                 sta (symtab),Y          ; save size
 
                 lda symtab
@@ -558,11 +568,11 @@ _2              jsr nextchar
 
 
 ;======================================
-;   NextChar()
+; NextChar()
 ;======================================
-nextchar        .proc
+NextChar        .proc
                 ldy defflg
-                bne lexdef
+                bne LexDef
 
 _ENTRY1         ldy choff
                 cpy sp
@@ -574,7 +584,7 @@ _ENTRY1         ldy choff
 
 
 ;======================================
-;   NextLine()
+; NextLine()
 ;======================================
 NextLine        .proc
                 lda Channel
@@ -587,7 +597,7 @@ NextLine        .proc
                 cpy #$88                ; EOF
                 beq _next1
 
-                jmp splerr
+                jmp bankSplErr
 
 _next1          dec Channel
                 bne NextLine
@@ -602,10 +612,10 @@ _1              ldy top+1
                 ldx cur+1
                 stx curnxt+1
 
-                jsr nextdwn
+                jsr mscNextDown
                 bne _2
 
-            ;    lda #0
+            ;    lda #$00
                 sta top+1
 
 _2              lda list
@@ -614,7 +624,7 @@ _2              lda list
                 lda device
                 jsr WriteBuffer
 
-_3              ldy #0
+_3              ldy #$00
                 sty choff
                 lda (buf),Y
 
@@ -625,7 +635,7 @@ _3              ldy #0
                 lda #EOL
                 sta (buf),Y
 
-                ldy #0
+                ldy #$00
 _ENTRY1         iny
                 lda (buf),Y
                 sty choff
@@ -641,8 +651,8 @@ _4              lda #tokEOF
 ;======================================
 ;
 ;======================================
-lexdef          .proc
-                ldy #0
+LexDef          .proc
+                ldy #$00
                 lda (delnxt),Y
 
                 inc choff
@@ -652,7 +662,7 @@ lexdef          .proc
                 lda defflg
                 sta choff
                 sty defflg
-                bra nextchar._ENTRY1
+                bra NextChar._ENTRY1
 
 _1              ldy choff
                 lda (delnxt),Y
@@ -662,17 +672,17 @@ _1              ldy choff
 
 
 ;======================================
-;   LexGet()
+; LexGet()
 ;======================================
-lexget          .proc
+LexGet          .proc
                 jsr GetNext._ENTRY1
 
-_ENTRY1         lda #0
+_ENTRY1         lda #$00
                 sta defflg
 
                 inc Channel
 
-                lda #4
+                lda #$04
                 jsr OpenChannel
                 jsr NextLine
 
@@ -682,9 +692,9 @@ _ENTRY1         lda #0
 
 
 ;======================================
-;   LexSet()
+; LexSet()
 ;======================================
-lexset          .proc
+LexSet          .proc
                 jsr _1
 
                 sta arg11
@@ -698,7 +708,7 @@ lexset          .proc
 
                 jsr _1
 
-                ldy #0
+                ldy #$00
                 sta (arg11),Y
 
                 txa
@@ -710,30 +720,30 @@ lexset          .proc
 _XIT1           jmp GetNext._ENTRY1
 
 _err            ldy #setERR
-                jmp splerr
+                jmp bankSplErr
 
 _1              jsr GetNext._ENTRY1
-                jmp mnum
+                jmp mscMNum
 
                 .endproc
 
 
 ;======================================
-;   LexExpand()
+; LexExpand()
 ;======================================
-lexexpand       .proc
+LexExpand       .proc
                 lda defflg
                 beq _1
 
                 ldy #dfnERR
-                jmp splerr
+                jmp bankSplErr
 
-_1              lda #3
-                jsr nxtprop
+_1              lda #$03
+                jsr mscNextProp
 
                 lda zpAllocProps
                 ldx zpAllocProps+1
-                jsr rstp
+                jsr mscResetProp
 
                 ldy choff
 _ENTRY1         sta delnxt
@@ -741,7 +751,7 @@ _ENTRY1         sta delnxt
                 stx delnxt+1
                 sty defflg
 
-                lda #0
+                lda #$00
                 sta choff
 
                 jmp GetNext._ENTRY1
@@ -750,9 +760,9 @@ _ENTRY1         sta delnxt
 
 
 ;======================================
-;   LexBuf()
+; LexBuf()
 ;======================================
-lexbuf          .proc
+LexBuf          .proc
                 ldy choff
                 lda defflg
                 beq _1
@@ -772,37 +782,36 @@ _1              lda buf
 ;--------------------------------------
 ;--------------------------------------
 
-lexcmd          .addr GetNext._ENTRY4
+tblLexCmd       .addr GetNext._ENTRY4
                 .byte 41
                 .addr LexDig
                 .byte tokDigit-$80
                 .addr LexHex
                 .byte tokHex
-                .addr LexEq
+                .addr LexEQ
                 .byte tokGRTR
                 .addr LexNE
                 .byte tokLESS
-                .addr lexexpand
+                .addr LexExpand
                 .byte tokDef
                 .addr LexCom
                 .byte tokSColon
                 .addr LexChr
                 .byte tokSQuote
-                .addr lexpf
+                .addr LexPF
                 .byte tokPROC
-                .addr lexpf
+                .addr LexPF
                 .byte tokFUNC
-                .addr lexpf
+                .addr LexPF
                 .byte tokMOD
-                .addr lexstr
+                .addr LexStr
                 .byte tokQuote
-                .addr lexget
+                .addr LexGet
                 .byte tokGET
-                .addr lexset
+                .addr LexSet
                 .byte tokSET
 
-lexchars
-                .byte tokXOR            ; !
+tblLexChars     .byte tokXOR            ; !
                 .byte tokQuote+$80      ; "
                 .byte tokNOTEQU         ; #
                 .byte tokHex+$80        ; $
@@ -829,7 +838,7 @@ lexchars
                 .byte tokAT             ; @
 
 ;PrintTok lda token
-;         ldx #0
+;         ldx #$00
 ;         jsr PrintC
 ;         jsr PutSp
 ;         lda addr
@@ -837,7 +846,7 @@ lexchars
 ;         jsr PrintH
 ;         jsr PutSp
 ;         lda nxtToken
-;         ldx #0
+;         ldx #$00
 ;         jsr PrintC
 ;         jsr PutSp
 ;         lda nxtAddr

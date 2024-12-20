@@ -16,20 +16,20 @@
 libGrGraphics   .proc
                 pha
 
-                lda #0
+                lda #$00
                 jsr libIOClose
 
                 lda #$0C
                 sta arg3
 
-                lda #0
+                lda #$00
                 ldx #<_e
                 ldy #>_e
 
                 jsr Open
                 jsr libIOChkErr
 
-                lda #6
+                lda #$06
                 jsr libIOClose
 
                 pla
@@ -39,7 +39,7 @@ libGrGraphics   .proc
                 eor #$1C
                 sta arg3
 
-                lda #6
+                lda #$06
                 ldx #<_devs
                 ldy #>_devs
 
@@ -88,11 +88,11 @@ graphicIO       .proc
                 lda #>libGrGraphics._devs
                 sta arg6
 
-                lda #0
+                lda #$00
                 sta arg3
                 sta arg4
 
-                lda #6
+                lda #$06
 
                 rts
                 .endproc
@@ -124,7 +124,7 @@ pos1            sta COLCRS
 libGrLocate     .proc
                 jsr libGrPosition       ; Locate(col, row)
 
-                lda #6
+                lda #$06
                 jmp libIOGetD
 
                 .endproc
@@ -138,7 +138,7 @@ libGrLocate     .proc
 libGrPlot       .proc
                 jsr libGrPosition.pos1  ; Plot(col, row)
 
-                lda #6
+                lda #$06
                 ldx libGrGraphics._color
 
                 jmp libIOPutD
@@ -152,7 +152,7 @@ libGrPlot       .proc
 ; same as BASIC
 ;======================================
 libGrSetColor   .proc
-                cmp #5                  ; SetColor(reg, hue, lum)
+                cmp #$05                  ; SetColor(reg, hue, lum)
                 bpl _XIT
 
                 sta arg0

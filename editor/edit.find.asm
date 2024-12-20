@@ -34,7 +34,7 @@ _ENTRY1         ldy #>findbuf
 _ENTRY2         lda findbuf
                 beq _3
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda (buf),Y
                 tay
                 iny
@@ -46,7 +46,7 @@ _next2          ldy sp
                 bcs _1
 
                 sty sp
-                ldx #0
+                ldx #$00
 
 _next3          lda (buf),Y
                 inx
@@ -60,12 +60,12 @@ _next3          lda (buf),Y
                 cpy arg0
                 bcc _next3
 
-_1              jsr nextdwn
+_1              jsr mscNextDown
                 beq _2
 
                 jsr LoadBuffer
 
-                lda #0
+                lda #$00
                 sta sp
                 beq _next1
 
@@ -78,7 +78,7 @@ _2              sta curch
                 ldx #>notfnd
                 jsr CommandMsg
 
-                lda #0
+                lda #$00
 _3              sta curch
 
                 rts

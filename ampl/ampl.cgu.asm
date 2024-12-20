@@ -18,7 +18,7 @@ LoadY           .proc
 
                 jsr Push0
 
-                cmp #1
+                cmp #$01
                 bne _1
 
                 lda #$88                ; DEY
@@ -26,7 +26,7 @@ _next1          jsr Insrt1
 
                 jmp _3
 
-_1              cmp #0
+_1              cmp #$00
                 bne _2
 
                 lda #$C8                ; INY
@@ -34,7 +34,7 @@ _1              cmp #0
 
 _2              lda #$A0
                 ldx arg12
-                jsr Insrt2              ; LDY #0 or #1
+                jsr Insrt2              ; LDY #$00 or #$01
 
 _3              lda arg12
                 sta cury
@@ -129,8 +129,8 @@ Load1L          lda #$A1                ; LDA op
 Op1L            pha
 
                 lda arg2
-                ldy #8
-oplow           ldx #0
+                ldy #$08
+oplow           ldx #$00
 ophigh          stx arg12
 
 ; NOTE:  the order of following
@@ -164,7 +164,7 @@ _4              pla
 
 ;   proc
 _5              inc arg12               ; skip JMP byte
-                and #8
+                and #$08
                 beq _opv
 
 _operr          jmp conderr             ; cond. exp.
@@ -179,7 +179,7 @@ _6              bit cnstmode
                 ; and #$F7
                 ; sta arg7 ; flag Y reg used
 
-                lda #0
+                lda #$00
                 sta arg12
 
                 lda #$10                ; (addr),Y
@@ -266,7 +266,7 @@ Op2L            .proc
                 pha
 
                 lda arg1
-                ldy #1
+                ldy #$01
                 jmp LoadX.oplow
 
                 .endproc
@@ -292,8 +292,8 @@ Op1H            .proc
 
                 pha
                 lda arg2
-                ldy #8
-_ENTRY1         ldx #1
+                ldy #$08
+_ENTRY1         ldx #$01
                 jmp LoadX.ophigh
 
                 .endproc
@@ -319,7 +319,7 @@ Op2H            .proc
 
                 pha
                 lda arg1
-                ldy #1
+                ldy #$01
                 bne Op1H._ENTRY1
 
 _ophz           ora #$08
@@ -348,7 +348,7 @@ outtype         .byte $82,3,$84,tokREAL_t
 ;======================================
 GetTemps        .proc
                 ldx #args+16
-                ldy #7
+                ldy #$07
 _next1          dex
                 dex
                 dey
@@ -402,7 +402,7 @@ LoadI           .proc
 ;   LdCdZ(,,stkoff)
 ;======================================
 LdCdZ           .proc
-                lda #0
+                lda #$00
 
                 .endproc
 
@@ -418,7 +418,7 @@ LoadCd          .proc
                 sta QCODE
 
                 iny
-                lda #0
+                lda #$00
                 adc (stack),Y
                 sta QCODE+1
 
@@ -468,7 +468,7 @@ ChkZero         .proc
                 cmp #tokVAR_t
                 bcs _XIT
 
-                ldy #1
+                ldy #$01
                 lda (stack),Y
 
 _XIT            rts
@@ -507,8 +507,8 @@ StkAddr         .proc
 StkP            .proc
                 jsr StkAddr
 
-                lda #1
-                jmp gprop
+                lda #$01
+                jmp mscGProp
 
                 .endproc
 
@@ -517,7 +517,7 @@ StkP            .proc
 ;   StkPZ(,,offset)
 ;======================================
 StkPZ           .proc
-                lda #0
+                lda #$00
 
                 .endproc
 
@@ -548,7 +548,7 @@ StkProp         .proc
                 iny
 
                 lda (zpAllocProps),Y
-                adc #0
+                adc #$00
                 tay
 
                 rts
@@ -586,7 +586,7 @@ Push0           .proc
                 ldy QCODE+1
                 sty arg15
 
-                ldy #0
+                ldy #$00
 
                 rts
                 .endproc
@@ -598,10 +598,10 @@ Push0           .proc
 PushTrue        .proc
                 jsr Push1
 
-                ldy #10
+                ldy #$0A
                 jsr SaveCd
 
-                lda #0                  ; no other true branches
+                lda #$00                ; no other true branches
                 sta arg9
 
                 .endproc
@@ -627,13 +627,13 @@ Push1           .proc
 ;   Insrt1(op)
 ;======================================
 Insrt1          .proc
-                ldy #1
+                ldy #$01
                 jsr AddCdSp
 
 _ENTRY1         iny
                 tya
 
-                jmp codeincr
+                jmp mscCodeIncr
 
                 .endproc
 
@@ -644,7 +644,7 @@ _ENTRY1         iny
 STempH          .proc
                 inc arg9
 
-                ldy #12
+                ldy #$0C
                 bra STempL._ENTRY1
 
                 .endproc
@@ -654,7 +654,7 @@ STempH          .proc
 ;   STempL()
 ;======================================
 STempL          .proc
-                ldy #10
+                ldy #$0A
 
 _ENTRY1         jsr savecd
 
@@ -688,7 +688,7 @@ Push2           .proc
 ;   Insrt2(op,data)
 ;======================================
 Insrt2          .proc
-                ldy #2
+                ldy #$02
                 jsr AddCdSp
 
 _ENTRY1         txa
@@ -721,7 +721,7 @@ Push3           .proc
 Insrt3          .proc
                 sty arg13
 
-                ldy #3
+                ldy #$03
 _ENTRY1         jsr AddCdSp
 
 _ENTRY2         txa
@@ -749,7 +749,7 @@ AddCdSp         .proc
                 adc arg14
                 sta arg10
 
-                lda #0
+                lda #$00
                 adc arg15
                 sta arg11
 

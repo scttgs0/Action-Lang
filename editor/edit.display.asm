@@ -16,7 +16,7 @@ CommandMsg      .proc
 
                 jsr CmdColumn
 
-                lda #0
+                lda #$00
                 sta arg3
 
                 lda arg0
@@ -39,7 +39,7 @@ CleanLine       .proc
 
                 sta dirty
 
-                lda #0
+                lda #$00
                 sta isDirty
 
                 jsr DeleteCurrentLine
@@ -57,7 +57,7 @@ SaveWindow      .proc
                 jsr CleanLine
 
 _ENTRY1         clc
-                lda #14
+                lda #$0E
                 tax
                 adc currentWindow
 
@@ -78,7 +78,7 @@ _next1          lda sp,X
 ;======================================
 RestoreWindow   .proc
                 clc
-                lda #14
+                lda #$0E
                 tax
                 adc currentWindow
 
@@ -114,18 +114,18 @@ EndLine         .proc
 ;   CenterLine() center line
 ;======================================
 CenterLine      .proc
-                lda #0
+                lda #$00
                 sta temps
 
                 jsr CleanLine
                 beq _1
 
-                jsr nextup
+                jsr mscNextUp
                 beq _1
 
                 inc temps
 
-                jsr nextup
+                jsr mscNextUp
                 beq _1
 
                 inc temps
@@ -160,7 +160,7 @@ TopLine         .proc
 ;   NewPage()
 ;======================================
 NewPage         .proc
-                lda #0
+                lda #$00
                 sta lnum
 
 _ENTRY1         sta choff
@@ -189,7 +189,7 @@ Refresh         .proc
 
                 inc ROWCRS
 
-                jsr nextdwn
+                jsr mscNextDown
 
                 sta arg9
 
@@ -199,14 +199,14 @@ Refresh         .proc
                 sta arg10
                 beq _2
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda indent
                 sta arg3
 
                 ldx arg9
                 beq _3
 
-                jsr curstr
+                jsr mscCurStr
 
 _next2          jsr PutStr
 
@@ -218,7 +218,7 @@ _next2          jsr PutStr
 
 _1              inc ROWCRS
 
-                jsr nextdwn
+                jsr mscNextDown
 
                 sta arg9
 

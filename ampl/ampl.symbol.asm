@@ -29,7 +29,7 @@ _next1          lda (arg2),Y
                 lda (arg4),Y
                 sta nxtaddr
 
-                ldy #0
+                ldy #$00
 _next2          lda (nxtaddr),Y
                 eor (symtab),Y
                 and jt_stmask
@@ -55,7 +55,7 @@ _1              inc arg13               ; try next entry
 
                 iny
 
-_XIT2           jmp splerr
+_XIT2           jmp bankSplErr
 
 _XIT            jmp (jt_stmradr)
 
@@ -70,7 +70,7 @@ _XIT            jmp (jt_stmradr)
 ;======================================
 iSTMres         .proc
                 ldy arg14
-                cpy #8
+                cpy #$08
                 lda #$FF                ; if name too long!
                 bcs _XIT1               ; not reserved name
 
@@ -80,7 +80,7 @@ iSTMres         .proc
                 ldx tblReserveWords-2,Y
 _next1          stx arg1
 
-                ldy #1
+                ldy #$01
 _next2          lda resw1,X
                 bmi _XIT1
 
@@ -109,10 +109,10 @@ _1              clc
 
 
 ;======================================
-;   GetName(char)
+;   bankGetName(char)
 ;======================================
 lGetName        .proc
-                ldy #0
+                ldy #$00
                 sta FirstChar           ; indicates a big symbol table is not needed (yet)
 
                 tax                     ; preserve A
@@ -129,17 +129,17 @@ _next1          iny
                 adc arg15
                 sta arg15
 
-                jsr nextchar
+                jsr NextChar
 
                 ldy arg14
                 cmp #'_'
                 beq _next1
 
-                jsr alphanum
+                jsr mscAlphaNum
                 bne _next1
 
                 tya
-                ldy #0
+                ldy #$00
                 sta (symtab),Y
 
                 dec choff               ; put character back
@@ -218,7 +218,7 @@ NewEntry        .proc
 
                 iny
                 tya
-                jsr stincr
+                jsr mscSTIncr
 
                 lda #tokUNDEC
 

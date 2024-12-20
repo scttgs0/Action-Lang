@@ -13,7 +13,7 @@
 ;======================================
 GetMemory       .proc
                 clc
-                adc #4
+                adc #$04
                 sta zpAllocSize
                 bcc _1
 
@@ -27,7 +27,7 @@ _ENTRY1         jsr Allocate._ENTRY
 
                 clc
                 lda zpAllocCurrent
-                adc #4
+                adc #$04
                 bcc _XIT
 
                 inx
@@ -40,7 +40,7 @@ _XIT            rts
 ; General Memory Error
 ;======================================
 GeneralMemErr   .proc
-                ldy #0
+                ldy #$00
                 jsr SystemError
 
                 lda sparem
@@ -70,7 +70,7 @@ Punt            jsr SaveWindow          ; we're in big trouble
 ;======================================
 FreeMemory      ;.proc
                 sec
-                sbc #4
+                sbc #$04
                 bcs _XIT
 
                 dex
@@ -102,7 +102,7 @@ InsertByte      .proc
 ;   InsertBuffer(,,up)
 ;======================================
 InsertBuffer    .proc
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 ldx buf
                 ldy buf+1
@@ -121,17 +121,17 @@ InsertLine      ;.proc
                 sty arg2
 
                 clc
-                adc #3
-                ldx #0
+                adc #$03
+                ldx #$00
 
                 jsr GetMemory
 
                 clc
-                adc #2
+                adc #$02
                 sta arg5
 
                 txa
-                adc #0
+                adc #$00
                 sta arg6
 
                 ldy arg0
@@ -152,7 +152,7 @@ _1              lda arg0
                 lda top                 ; down _= top
                 sta arg5
 
-                ldy #4                  ; AFcur(2) _= down
+                ldy #$04                ; AFcur(2) _= down
                 sta (zpAllocCurrent),Y
 
                 lda top+1
@@ -166,7 +166,7 @@ _1              lda arg0
                 lda zpAllocCurrent+1
                 sta top+1
 
-                ldy #0                  ; AFcur(0) _= 0
+                ldy #$00                ; AFcur(0) _= 0
                 tya
                 sta (zpAllocCurrent),Y
 
@@ -183,7 +183,7 @@ _next2          lda arg6
 
                 rts
 
-_2              ldy #1
+_2              ldy #$01
                 lda zpAllocCurrent+1    ; @down _= AFcur
                 sta (arg5),Y
 
@@ -195,7 +195,7 @@ _2              ldy #1
 
                 rts
 
-_3              ldy #4
+_3              ldy #$04
                 lda (arg3),Y
                 sta arg5                ; down _= Next(up)
                 sta (zpAllocCurrent),Y  ; AFcur(2) _= down
@@ -211,7 +211,7 @@ _3              ldy #4
                 lda zpAllocCurrent+1
                 sta (arg3),Y
 
-                ldy #0
+                ldy #$00
                 lda arg3
                 sta (zpAllocCurrent),Y
 
@@ -243,13 +243,13 @@ _XIT            rts
 ;   DeleteLine(lineptr)
 ;======================================
 DeleteLine      .proc
-                cpx #0
+                cpx #$00
                 beq DeleteCurrentLine._XIT
 
                 sta arg0
                 stx arg1
 
-                ldy #4
+                ldy #$04
                 lda (arg0),Y
                 sta arg4                ; down _= Next(ptr)
 
@@ -257,7 +257,7 @@ DeleteLine      .proc
                 lda (arg0),Y
                 sta arg5
 
-                ldy #0
+                ldy #$00
                 lda (arg0),Y
                 sta arg2                ; up _= Prev(ptr)
 
@@ -273,7 +273,7 @@ DeleteLine      .proc
 
                 jmp _2
 
-_1              ldy #4
+_1              ldy #$04
                 lda arg4
                 sta (arg2),Y            ; up(2) _= down
 
@@ -291,7 +291,7 @@ _2              lda arg5
 
                 jmp _4
 
-_3              ldy #0
+_3              ldy #$00
                 lda arg2
                 sta (arg4),Y            ; down(0) _= up
 

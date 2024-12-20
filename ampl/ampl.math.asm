@@ -43,7 +43,7 @@ MultI           .proc
 
                 dex
                 stx math._t2
-                ldx #8
+                ldx #$08
 _mc3            asl                     ; b*d, 16-bit result
                 rol math._rh
                 asl math._t1
@@ -79,10 +79,10 @@ _setsign        ldy math._sign
 _ss1            sta math._rl
                 stx math._rh
                 sec
-                lda #0
+                lda #$00
                 sbc math._rl
                 tay
-                lda #0
+                lda #$00
                 sbc math._rh
                 tax
                 tya
@@ -103,8 +103,8 @@ MulB            .proc
                 beq _mb3
 
                 stx math._t1
-                lda #0
-                ldx #8
+                lda #$00
+                ldx #$08
 _mb1            asl
                 asl math._t1
                 bcc _mb2
@@ -128,7 +128,7 @@ _mb3            lda math._rl
 ;======================================
 SMOps           .proc
                 stx math._sign
-                cpx #0                  ; check signs
+                cpx #$00                ; check signs
                 bpl _smo1
 
                 jsr MultI._ss1
@@ -146,7 +146,7 @@ _smo1           sta math._b
 
                 sta math._d
                 stx math._c
-_smo2           lda #0
+_smo2           lda #$00
                 sta math._rh
 
                 rts
@@ -163,7 +163,7 @@ DivC            .proc
                 lda math._c
                 beq _dsmall
 
-_dlarge         ldx #8
+_dlarge         ldx #$08
 _dl1            rol math._b
                 rol math._a
                 rol math._rh
@@ -182,13 +182,13 @@ _dl2            dex
 
                 lda math._b
                 rol a
-                ldx #0
+                ldx #$00
                 ldy math._a
                 sty math._rl            ; save low byte of REM
 
                 jmp MultI._setsign
 
-_dsmall         ldx #16
+_dsmall         ldx #$10
 _ds1            rol math._b
                 rol math._a
                 rol a
@@ -255,15 +255,15 @@ SArgs           .proc                   ; saves args for call
                 clc
                 pla
                 sta zpAllocCurrent
-                adc #3                  ; jump over data
+                adc #$03                ; jump over data
                 tay
                 pla
                 sta zpAllocCurrent+1
-                adc #0
+                adc #$00
                 pha
                 tya
                 pha
-                ldy #1
+                ldy #$01
                 lda (zpAllocCurrent),Y  ; local address
                 sta zpAllocLast
                 iny

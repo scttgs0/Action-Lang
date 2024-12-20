@@ -52,18 +52,18 @@ EXTMEMLO        = $02EB                 ; pointer to the bottom of free extended
 
 ; --- IOCB ----------------------------
 
-;!!CIOV            = $E456
-;!!IOCB0           = $0340
-;!!ICCOM       = $02
-;!!ICBAL       = $04
-;!!ICBAH       = $05
-;!!ICBLL       = $08
-;!!ICBLH       = $09
-;!!ICAX1       = $0A
-;!!ICAX2       = $0B
-;!!ICAX3       = $0C
-;!!ICAX4       = $0D
-;!!ICAX5       = $0E
+CIOV            = $E456
+IOCB0           = $0340
+ICCOM       = $02
+ICBAL       = $04
+ICBAH       = $05
+ICBLL       = $08
+ICBLH       = $09
+ICAX1       = $0A
+ICAX2       = $0B
+ICAX3       = $0C
+ICAX4       = $0D
+ICAX5       = $0E
 
 
 ; --- Floating-Point ------------------

@@ -65,14 +65,14 @@ _3              lda #$7D
                 php                     ; save status for test below
                 bcs _4
 
-                lda #1
+                lda #$01
                 sbc arg3                ; negate delta size
 
 _4              clc
                 adc buf
                 sta arg0
 
-                lda #0
+                lda #$00
                 tay
                 adc buf+1
                 sta arg1
@@ -105,7 +105,7 @@ _next2          iny
                 bcc _next2
 
 _6              ldy sp
-                ldx #0
+                ldx #$00
                 beq _7
 
 _next3          inx
@@ -117,7 +117,7 @@ _7              cpx subbuf
                 bne _next3
 
                 clc
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 adc arg3
                 sta (buf),Y

@@ -150,11 +150,11 @@ _tmp            .byte $00
 Bin2Bcd         .proc
                 ldx #00
                 ldy #00
-_next1          cmp #10
+_next1          cmp #$0A
                 bcc _done
 
                 sec
-                sbc #10
+                sbc #$0A
 
                 inx
                 bra _next1
@@ -197,7 +197,7 @@ InitSID         .proc
 ;   switch to system map
                 stz IOPAGE_CTRL
 
-                lda #0                  ; reset the SID registers
+                lda #$00                ; reset the SID registers
                 ldx #$1F
 _next1          sta SID1_BASE,X
                 sta SID2_BASE,X
@@ -253,7 +253,7 @@ InitPSG         .proc
 ;   switch to system map
                 stz IOPAGE_CTRL
 
-                lda #0                  ; reset the PSG registers
+                lda #$00                ; reset the PSG registers
                 ldx #$07
 _next1          sta PSG1_BASE,X
                 sta PSG2_BASE,X

@@ -14,7 +14,7 @@
 libKeyGet       .proc
                 clc                     ; blink cursor
                 lda JIFFYCLOCK
-                adc #14
+                adc #$0E
 
                 tax
 _waitForKey     lda KEYCHAR             ; key down?
@@ -24,14 +24,14 @@ _waitForKey     lda KEYCHAR             ; key down?
                 cpx JIFFYCLOCK
                 bpl _waitForKey
 
-                ldy #0
+                ldy #$00
                 lda (OLDADR),Y
                 eor #$80
                 sta (OLDADR),Y
 
                 jmp libKeyGet
 
-_1              ldy #0
+_1              ldy #$00
                 lda OLDCHR
                 eor #$80
                 sta (OLDADR),Y          ; restore cursor
@@ -40,10 +40,10 @@ _faster         ;!!ldx SRTIMR           ; faster repeat
                 cpx #$0C
                 bcs _6
 
-                cpx #4
+                cpx #$04
                 bcc _2
 
-                ldx #3
+                ldx #$03
 _next2          ;!!stx SRTIMR
 
 _2              lda KEYCHAR             ; last key pressed
@@ -61,23 +61,23 @@ _3              and #$3F
                 beq _8
 
                 ldx #$70
-                lda #7                  ; GETCHR
+                lda #$07                  ; GETCHR
                 sta BRKKEY              ; ignore BREAK key
 
-                jsr putch._ENTRY2
+                jsr PutCh._ENTRY2
 
 _4              ;!!ldx SRTIMR
-                cpx #10
+                cpx #$0A
                 bcs _5
 
-                ldx #3
+                ldx #$03
                 ;!!stx SRTIMR
 
 _5              sta curch
 
                 rts
 
-_6              ldx #20
+_6              ldx #$14
                 bne _next2
 
 _7              lda KEYCHAR             ; last key pressed

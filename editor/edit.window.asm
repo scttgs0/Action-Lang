@@ -15,7 +15,7 @@ Window1         .proc
                 lda currentWindow
                 beq SaveWorld._XIT
 
-                lda #0
+                lda #$00
                 pha
 
                 .endproc
@@ -144,7 +144,7 @@ DeleteWindow    .proc
                 lda dirty
                 bne SaveWorld._XIT
 
-                ldy #0
+                ldy #$00
                 sty numwd
 
                 cpy currentWindow
@@ -170,7 +170,7 @@ dirtymsg        .ptext "Not saved, Delete? "
 ;   GetTemp(msg)
 ;======================================
 GetTemp         .proc
-                ldy #0
+                ldy #$00
 _ENTRY1         sty tempbuf
 
                 ldy #>tempbuf

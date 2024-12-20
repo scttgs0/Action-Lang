@@ -14,14 +14,14 @@
 InsertChar      .proc
                 jsr SetSpacing
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 cmp jt_linemax
                 bcc _1                 ; test line too long
 
-                jsr scrbell
+                jsr screenBell
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
 _1              cmp sp
                 bcs _2
@@ -54,7 +54,7 @@ _2              ldx insert
                 beq _next2
 
 ;   move buf right one char
-                adc #0                  ; really 1, carry set
+                adc #$00                ; really 1, carry set
                 sta (buf),Y
 
                 tay
@@ -88,7 +88,7 @@ InsertSpace     .proc
                 pla
                 sta insert
 
-                jmp scrlft
+                jmp screenCursorLeft
 
                 .endproc
 
@@ -98,16 +98,16 @@ InsertSpace     .proc
 ;======================================
 Insert_         .proc
                 jsr CleanLine
-                jsr nextup
+                jsr mscNextUp
 
                 sta cur+1               ; tricky
 
                 jsr _ENTRY1
 
-                lda #0
+                lda #$00
                 jmp NewPage._ENTRY1
 
-_ENTRY1         lda #0
+_ENTRY1         lda #$00
                 tay
 _ENTRY2         sta (buf),Y
 
@@ -126,7 +126,7 @@ csret           .proc
                 jsr InsertSpace
                 jsr DeleteChar
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 pha
 
@@ -135,7 +135,7 @@ csret           .proc
                 sta isDirty             ; always non-zero
 
                 sec
-                sbc #1
+                sbc #$01
                 sta (buf),Y
 
                 jsr CleanLine
@@ -144,7 +144,7 @@ csret           .proc
                 sta arg1
 
                 inc arg1
-                lda #0
+                lda #$00
                 sta arg0
                 beq _1
 
@@ -158,10 +158,10 @@ _1              ldy sp
                 cpy arg1
                 bcc _next1
 
-                ldy #0
+                ldy #$00
                 lda arg0
                 jsr Insert_._ENTRY2
-                jsr nextup
+                jsr mscNextUp
                 jsr Refresh
 
                 jmp Return_._ENTRY1
@@ -180,7 +180,7 @@ Return_         .proc
                 bne _ENTRY1
 
                 jsr Insert_._ENTRY1
-                jsr nextup
+                jsr mscNextUp
                 jsr LoadBuffer
 
 _ENTRY1         jsr ScrollDown
@@ -223,10 +223,10 @@ _1              sta arg3
 _2              jsr DeleteCurrentLine
                 beq _3
 
-                jsr nextdwn
+                jsr mscNextDown
 _3              jsr ChkCursor
 
-                lda #0
+                lda #$00
 
                 jmp NewPage._ENTRY1
 
@@ -277,7 +277,7 @@ DeleteFree      .proc
 ;   DeleteNext()
 ;======================================
 DeleteNext      .proc
-                ldy #5
+                ldy #$05
                 lda (delnxt),Y
                 tax
 
@@ -309,12 +309,12 @@ DeleteChar      .proc
                 jsr CheckColumn
                 bcc CheckDown._XIT
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 sta isDirty
 
                 sec
-                sbc #1
+                sbc #$01
                 sta (buf),Y
 
                 ldy sp
@@ -349,7 +349,7 @@ CheckDown       .proc
                 jsr CleanLine
                 beq _XIT
 
-                ldy #5
+                ldy #$05
                 lda (cur),Y
 
 _XIT            rts
@@ -362,7 +362,7 @@ _XIT            rts
 BackSpc         .proc
                 jsr SetSpacing
 
-                cmp #2
+                cmp #$02
                 bcc CheckDown._XIT
 
 _ENTRY1         jsr ScrollLeft
@@ -387,27 +387,27 @@ _ENTRY1         jsr ScrollLeft
 csbs            .proc
                 jsr SetSpacing
 
-                cmp #2
+                cmp #$02
                 bcs BackSpc._ENTRY1
 
                 jsr ChkCursor
                 beq CheckDown._XIT      ; no lines at all!
 
-                ldy #1
+                ldy #$01
                 lda (cur),Y
                 beq CheckDown._XIT      ; no line to merge with
 
     ; merge
                 jsr ScrollUp
                 jsr Back
-                jsr nextdwn
+                jsr mscNextDown
 
                 sta isDirty
 
-                jsr curstr
+                jsr mscCurStr
 
                 clc
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 sta arg2
 

@@ -14,9 +14,9 @@
 emjmps          rts                     ; Seg catch all
 
                 .word 0
-                ;!!.byte ebank             ; curBank
+                ;!!.byte ebank          ; curBank
                 .byte $df               ; stMask
-                jmp splerr              ; Error
+                jmp bankSplErr          ; Error
 
                 .byte 18                ; wSize
                 .byte 120               ; line input max
@@ -35,10 +35,10 @@ zero            .word 0
                 rts                     ; SPLEnd
 
                 .word 0
-                jmp scrbell             ; Alarm
+                jmp screenBell          ; Alarm
 
                 .byte 0                 ; EOLch (default = space)
-ltab            .addr lsh1._lshift      ; LSH
+ltab            .addr mscLShift._lshift ; LSH
                 .addr RShift
                 .addr MultI
                 .addr DivC
@@ -83,7 +83,7 @@ _warm           lda isMonitorLive       ; see where we were
 
 _1              jmp GeneralMemErr.Punt  ; editor
 
-cold            lda #0
+cold            lda #$00
                 tay
 _next1          sta $0480,Y             ; zero RAM
 
@@ -117,15 +117,15 @@ _next2          lda emjmps-1,Y          ; init RAM
                 nop
             .endif
 
-                ldx #8                  ; 2K id space
+                ldx #$08                ; 2K id space
                 stx SymTblSizePages
 
-                lda #0
-                ldx #4
+                lda #$00
+                ldx #$04
                 ldy isBigSymTbl         ; big symbol table?
                 beq _2                  ;   no
 
-                ldx #6
+                ldx #$06
 _2              jsr GetMemory           ; get hash table
 
                 sta symTblGlobal        ; qglobal hash table

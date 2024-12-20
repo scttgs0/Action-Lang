@@ -11,7 +11,7 @@ frsMouse_off    .macro
 frsMouse_on     .macro
                 pha
 
-                lda #1
+                lda #$01
                 sta MOUSE_CTRL
 
                 pla

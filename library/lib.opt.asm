@@ -18,7 +18,7 @@ libOptSet       .proc
                 jsr _14
                 beq _1
 
-                lda #0
+                lda #$00
                 beq _2
 
 _1              lda #$22
@@ -56,7 +56,7 @@ _6              sta jt_stmask
                 jsr _14
                 beq _7
 
-                lda #0
+                lda #$00
                 beq _8
 
 _7              lda #$FF
@@ -68,7 +68,7 @@ _8              sta trace
                 jsr _14
                 beq _9
 
-                lda #0
+                lda #$00
                 beq _10
 
 _9              lda #$FF
@@ -81,14 +81,14 @@ _10             sta list
                 ldx #wmsg-optmsg
                 jsr _19
 
-                cmp #5
+                cmp #$05
                 bcs _11                 ; make sure at least 5
 
-                lda #5
-_11             cmp #19
+                lda #$05
+_11             cmp #$13
                 bcc _12                 ; make sure less than 19
 
-                lda #18
+                lda #$12
 _12             sta jt_wsize
 
                 ldx numwd
@@ -101,7 +101,7 @@ _12             sta jt_wsize
                 sty w2+WYTOP
 
                 sec
-                lda #23
+                lda #$17
                 sbc jt_wsize
                 sta w2+WNLINES
 
@@ -130,7 +130,7 @@ _13             lda jt_linemax
                 rol a
                 rol a
                 rol a
-                and #3
+                and #$03
 
                 tax
                 tya
@@ -161,7 +161,7 @@ _14             beq _15
 _15             ldy #'N'
 _16             sty tempbuf+1
 
-                ldy #1
+                ldy #$01
                 jsr libOptGetTmpBuf
 
                 lda tempbuf+1
@@ -182,7 +182,7 @@ _17             ora #$20
                 rts
 
 ; get string
-_18             ldx #0
+_18             ldx #$00
                 ldy #>tempbuf
                 sty arg3
 
@@ -237,7 +237,7 @@ libOptGetTmpBuf .proc
                 sty arg2
 
 ;   copy string to tempBuf+10
-                ldy #20
+                ldy #$14
 _next1          lda optmsg+20,X
                 sta tempbuf+10,Y
 
@@ -254,6 +254,6 @@ _next1          lda optmsg+20,X
                 ldx #>(tempbuf+10)
                 ldy arg2
 
-                jmp mgett1
+                jmp bankMGetT1
 
                 .endproc

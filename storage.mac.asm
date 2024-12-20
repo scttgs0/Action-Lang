@@ -27,7 +27,7 @@ _ENTRY          lda #$FF                ; set best size
                 lda #>zpAllocBase
                 sta zpAllocLast+1
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda (zpAllocLast),Y     ; cur = last(0)
                 sta zpAllocCurrent
                 bne _1                  ; while cur # 0
@@ -42,7 +42,7 @@ _1              iny
                 lda (zpAllocLast),Y
                 sta zpAllocCurrent+1
 
-_2              ldy #3
+_2              ldy #$03
                 lda (zpAllocCurrent),Y  ; get size
                 cmp zpAllocSize+1       ; high bytes
                 bcc _4                  ; size too small
@@ -56,7 +56,7 @@ _2              ldy #3
 
 ;   Check for best fit
 
-_3              ldy #2
+_3              ldy #$02
                 lda (zpAllocCurrent),Y
                 cmp zpAllocBSize
 
@@ -112,7 +112,7 @@ _6              lda zpAllocBSize+1
                 bcs _8                  ; split it
 
 ;   don't split
-_7              ldy #0
+_7              ldy #$00
                 lda (zpAllocBest),Y     ; cur =  best(0)
                 sta zpAllocCurrent
                 iny
@@ -128,7 +128,7 @@ _7              ldy #0
                 rts
 
 ;   found entry of right size
-_next2          ldy #0
+_next2          ldy #$00
                 lda (zpAllocCurrent),Y
                 sta (zpAllocLast),Y
                 iny
@@ -139,7 +139,7 @@ _XIT1           rts
 
 ;   split best block
 
-_8              ldy #0
+_8              ldy #$00
                 lda (zpAllocBest),Y     ; cur = best(0)
                 sta zpAllocCurrent
 
@@ -195,7 +195,7 @@ _next1          lda zpAllocCurrent      ; last = cur
                 lda zpAllocCurrent+1
                 sta zpAllocLast+1
 
-                ldy #0
+                ldy #$00
                 lda (zpAllocLast),Y     ; cur = last(0)
                 sta zpAllocCurrent
 
@@ -242,7 +242,7 @@ _1              iny
                 adc (zpAllocCurrent),Y
                 sta (zpAllocBest),Y
 
-                ldy #0                  ; block(0) = cur(0)
+                ldy #$00                ; block(0) = cur(0)
                 lda (zpAllocCurrent),Y
                 sta (zpAllocBest),Y
 
@@ -255,7 +255,7 @@ _1              iny
 
 ;:AFL14         plp
 
-_2              ldy #0                  ; block(0) = cur
+_2              ldy #$00                ; block(0) = cur
                 lda zpAllocCurrent
                 sta (zpAllocBest),Y
                 iny
@@ -288,7 +288,7 @@ _3              iny                     ; if block =
                 adc (zpAllocBest),Y
                 sta (zpAllocLast),Y
 
-                ldy #0                  ; last(0) = block(0)
+                ldy #$00                ; last(0) = block(0)
                 lda (zpAllocBest),Y
                 sta (zpAllocLast),Y
 
@@ -300,7 +300,7 @@ _3              iny                     ; if block =
 
 ;:AFL17         plp
 
-_4              ldy #0                  ; last(0) = block
+_4              ldy #$00                ; last(0) = block
                 lda zpAllocBest
                 sta (zpAllocLast),Y
 

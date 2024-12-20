@@ -46,11 +46,11 @@ _1              jsr makeentry
 
                 sta qglobal
 
-                lda #1
-                jsr stincr              ; space for num args
+                lda #$01
+                jsr mscSTIncr           ; space for num args
 
-                ldy #3
-                lda #0                  ; no args yet
+                ldy #$03
+                lda #$00                ; no args yet
                 sta (zpAllocProps),Y
                 sta argbytes
 
@@ -69,8 +69,8 @@ _next1          sta (symTblLocal),Y
 ;   up to 20 letters (24 bytes)
 ;   unused space will be reclaimed
 ;   see Params
-                lda #32
-                jsr stincr              ; arg list space
+                lda #$20
+                jsr mscSTIncr           ; arg list space
                 jsr TrashY
 
                 lda nxttoken
@@ -83,9 +83,9 @@ _next1          sta (symTblLocal),Y
                 iny
                 jsr storprops
 
-                ldy #0
+                ldy #$00
                 lda (zpAllocProps),Y
-                ora #8
+                ora #$08
                 sta (zpAllocProps),Y    ; set Sys flag
                 sta param
 
@@ -117,12 +117,12 @@ _next2          jsr declare
 
 _argerr         ldy #argERR
 
-                jmp splerr
+                jmp bankSplErr
 
 _3          lda param
                 pha
 
-                lda #0
+                lda #$00
                 sta param
 
                 jsr GetNext
@@ -134,21 +134,21 @@ _3          lda param
 
 ;   get beginning of arguments and
 ;   save actual procedure address
-                lda #1
-                jsr cprop
+                lda #$01
+                jsr mscCProp
 
                 sta arg0
                 stx arg1
 
-                jsr getcdoff
+                jsr mscGetCodeOffset
                 jsr storprops
 
 ;   get space for proc variable
                 lda #$4C                ; JMP
                 jsr Push1
-                jsr getcdoff            ; fill in address
+                jsr mscGetCodeOffset    ; fill in address
 
-                adc #2
+                adc #$02
                 bcc _4
 
                 inx
@@ -160,10 +160,10 @@ _4              jsr Push2
 _next3          lda argbytes
                 beq _8                  ; no arguments
 
-                cmp #3
+                cmp #$03
                 bcs _7
 
-                cmp #2
+                cmp #$02
                 lda #$8D                ; STA addr16
                 ldx arg0
                 ldy arg1
@@ -184,7 +184,7 @@ _5              jsr Push3
 
 _6              jmp _9
 
-_7              ldx #10
+_7              ldx #$0A
                 jsr JSRTable
 
                 lda arg0
@@ -204,7 +204,7 @@ _8              lda trace               ; check for trace
 
                 jsr Push3
 
-                ldy #0
+                ldy #$00
                 lda (curproc),Y
 
                 tay
@@ -218,14 +218,14 @@ _next4          lda (curproc),Y
                 inx
                 txa
 
-                jsr codeincr
+                jsr mscCodeIncr
 
                 lda arg0
                 ldx arg1
                 jsr Push2
 
-                lda #3
-                jsr cprop
+                lda #$03
+                jsr mscCProp
 
                 tay
                 tax
@@ -239,7 +239,7 @@ _next5          lda (zpAllocProps),Y
                 inx
                 txa
 
-                jsr codeincr
+                jsr mscCodeIncr
 
 _9              jsr stmtlist
 

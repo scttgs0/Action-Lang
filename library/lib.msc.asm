@@ -16,12 +16,12 @@
 ;======================================
 libMscRand      .proc
                 .frsRandomByteX
-                cmp #0
+                cmp #$00
                 beq _1
 
                 stx zpAllocCurrent
 
-                ldx #0
+                ldx #$00
                 stx zpAllocCurrent+1
 
                 jsr MultI
@@ -42,7 +42,7 @@ libMscSound     .proc
                 sty arg2
 
                 tay
-                cmp #7
+                cmp #$07
                 bmi _1
 
                 ldy #100
@@ -73,8 +73,8 @@ libMscSndRst    .proc
                 ;!!sta SSKCTL
                 ;!!sta SKCTL
 
-                lda #0
-                ldx #8
+                lda #$00
+                ldx #$08
 _next1          ;!!sta AUDF1,X          ; zero sound regs
 
                 dex
@@ -100,12 +100,12 @@ _next1          ;!!sta AUDF1,X          ; zero sound regs
 ; port is depressed.  Assumes port<8
 ;======================================
 libMscPTrig     .proc
-                ldx #0
-                cmp #4
+                ldx #$00
+                cmp #$04
                 bmi _1
 
                 inx
-                and #3
+                and #$03
 
 _1              tay
                 ;!!lda PORTA,X
@@ -127,12 +127,12 @@ _data1          .byte $04,$08,$40,$80
 ; controller port.  Assumes port<4
 ;======================================
 libMscStick     .proc
-                ldx #0
-                cmp #2
+                ldx #$00
+                cmp #$02
                 bmi _1
 
                 inx
-                and #1
+                and #$01
 
 _1              tay
                 ;!!lda PORTA,X
@@ -182,7 +182,7 @@ libMscPeekC     .proc
                 sta arg2
                 stx arg3
 
-                ldy #0
+                ldy #$00
                 lda (arg2),Y
                 sta args
 
@@ -204,7 +204,7 @@ libMscPoke      .proc
                 stx arg1
 
                 tya
-                ldy #0
+                ldy #$00
                 sta (arg0),Y
 
                 rts
@@ -237,7 +237,7 @@ libMscPokeC     .proc
 libMscZero      .proc
                 pha
 
-                lda #0
+                lda #$00
                 sta arg4
 
                 pla
@@ -258,7 +258,7 @@ libMscSetBlock  .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg4
                 ldx arg3
                 beq _1
@@ -295,7 +295,7 @@ libMscMoveBlock .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg5
                 beq _1
 
@@ -346,11 +346,11 @@ libMscCTrace    .proc
 ;   name passed following JSR
                 clc
                 pla
-                adc #1
+                adc #$01
                 sta arg10
 
                 pla
-                adc #0
+                adc #$00
                 sta arg11
 
 ;   address of name now in arg10-11
@@ -366,7 +366,7 @@ libMscCTrace    .proc
                 sec
                 lda arg10
 
-                ldy #0
+                ldy #$00
                 sty arg15
 
                 adc (arg10),Y
@@ -410,7 +410,7 @@ _next1          inc arg14
                 jsr libIOPrintI
                 jmp _4
 
-_2              ldx #0
+_2              ldx #$00
                 ldy arg15
 _3              lda (arg12),Y
                 jsr libIOPrintC
@@ -430,7 +430,7 @@ _5              clc
                 tax
 
                 lda arg11
-                adc #0
+                adc #$00
                 pha
 
                 txa

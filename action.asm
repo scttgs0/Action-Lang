@@ -58,7 +58,7 @@ BOOT            cld
 INIT            clc
 
                 jsr PrepBanks
-                jsr CSTART
+                jsr bankCartStart
                 jmp START
 
 
@@ -67,6 +67,7 @@ INIT            clc
 ;======================================
 PrepBanks       .proc
                 ; TODO:
+                rts
                 .endproc
 
 
@@ -75,8 +76,8 @@ PrepBanks       .proc
                 * = $8000
 ;--------------------------------------
 
-version         .byte $40
-date            .byte $12,$04,$24        ; TODO: assemble date of latest version!
+version         .byte $40               ; TODO: [M.m]    4.0
+versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -87,7 +88,6 @@ propid          ldx arg0
                 .include "main.msc.asm"
                 .include "main.bank.asm"
 
-amplfin
 
 ;--------------------------------------
 ;    ACTION! - Editor Routines

@@ -54,7 +54,7 @@ _2
 ; Break1(error)
 ;======================================
 libIOBreak1     .proc
-                ldx #1
+                ldx #$01
                 stx BRKKEY
 
                 pha
@@ -90,13 +90,13 @@ libIOPrintF     .proc
                 stx addr+1
                 sty temps
 
-                ldy #0
+                ldy #$00
                 lda (addr),Y
                 sta token
 
                 inc token
 
-                ldx #13
+                ldx #$0D
 _next1          lda args+2,X
                 sta temps,X
 
@@ -156,7 +156,7 @@ _2              cpy #'I'
 _3              cpy #'H'
                 bne _4
 
-                jsr prth
+                jsr bankPrintH
 
                 jmp _next2
 
@@ -179,7 +179,7 @@ libIOOpen       .proc
                 sty arg2
 
                 tay
-                lda #0
+                lda #$00
                 sta eof,Y
 
                 tay
@@ -324,7 +324,7 @@ libIOInputMD    .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg3
                 sta (arg1),Y
 
@@ -368,14 +368,14 @@ _ENTRY1         stx arg4
 
                 tax
                 lda arg4
-                ;!!sta IOCB0+ICCOM,X
+                sta IOCB0+ICCOM,X
 
-                lda #0
-                ;!!sta IOCB0+ICBLL,X
-                ;!!sta IOCB0+ICBLH,X
+                lda #$00
+                sta IOCB0+ICBLL,X
+                sta IOCB0+ICBLH,X
 
                 tya
-                ;!!jsr CIOV
+                jsr CIOV
                 sta args
 
                 jmp libIOChkErr
@@ -463,7 +463,7 @@ libIOXIO        .proc
 ; outputs byte num to default IOCB
 ;======================================
 libIOPrintB     .proc
-                ldx #0
+                ldx #$00
 
                 .endproc
 
@@ -487,7 +487,7 @@ libIOPrintC     .proc
 ; same as PrintB except EOL appended
 ;======================================
 libIOPrintBE    .proc
-                ldx #0
+                ldx #$00
 
                 .endproc
 
@@ -510,7 +510,7 @@ libIOPrintCE    .proc
 ; output byte num to IOCB dev
 ;======================================
 libIOPrintBD    .proc
-                ldy #0
+                ldy #$00
 
                 .endproc
 
@@ -542,7 +542,7 @@ libIOPrintCD    .proc
 ; output num to IOCB dev with EOL
 ;======================================
 libIOPrintBDE   .proc
-                ldy #0
+                ldy #$00
 
                 .endproc
 
@@ -583,7 +583,7 @@ libIOPrintI     .proc
 ; outputs integer num to IOCB dev
 ;======================================
 libIOPrintID    .proc
-                cpy #0
+                cpy #$00
                 bpl libIOPrintCD
 
                 pha
@@ -595,11 +595,11 @@ libIOPrintID    .proc
                 jsr libIOPutD._ENTRY1
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg1
 
                 tax
-                lda #0
+                lda #$00
                 sbc arg2
 
                 tay
@@ -642,7 +642,7 @@ libIOStrB       .proc
                 stx arg2
                 sty arg3
 
-                ldx #0
+                ldx #$00
                 ldy arg2
 
                 .endproc
@@ -675,7 +675,7 @@ _next1          lda numbuf,Y
 ; convert number to string
 ;======================================
 libIOStrI       .proc
-                cpx #0
+                cpx #$00
                 bpl libIOStrC
 
                 sta arg0
@@ -683,11 +683,11 @@ libIOStrI       .proc
                 sty arg2
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg0
 
                 tay
-                lda #0
+                lda #$00
                 sbc arg1
 
                 tax
@@ -738,7 +738,7 @@ libIOInputI     lda device
 ;======================================
 libIOInputBD
 libIOInputCD
-libIOInputID    ldx #19
+libIOInputID    ldx #$13
                 stx numbuf
 
                 ldx #<numbuf
@@ -762,7 +762,7 @@ libIOValI
 libIOValC       sta arg4
                 stx arg5
 
-                ldy #0
+                ldy #$00
                 sty arg0
                 sty arg1
                 sty arg2
@@ -772,7 +772,7 @@ libIOValC       sta arg4
 
                 inc arg3
 
-                lda #32
+                lda #$20
                 iny
 _next1          cmp (arg4),Y
                 bne _1
@@ -839,11 +839,11 @@ _4              lda arg2
                 beq _XIT
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg0
                 sta arg0
 
-                lda #0
+                lda #$00
                 sbc arg1
                 sta arg1
 
@@ -869,18 +869,18 @@ libIONote       .proc
 
                 tax
                 lda #$26                ; NOTE
-                ;!!sta IOCB0+ICCOM,X
+                sta IOCB0+ICCOM,X
 
-                ;!!jsr CIOV
+                jsr CIOV
                 jsr libIOChkErr
 
-                ldy #0
-                ;!!lda IOCB0+ICAX5,X       ; offset
+                ldy #$00
+                lda IOCB0+ICAX5,X       ; offset
                 sta (arg3),Y
 
-                ;!!lda IOCB0+ICAX3,X       ; low byte of sector
+                lda IOCB0+ICAX3,X       ; low byte of sector
                 sta (arg1),Y
-                ;!!lda IOCB0+ICAX4,X       ; high byte of sector
+                lda IOCB0+ICAX4,X       ; high byte of sector
                 iny
                 sta (arg1),Y
 
@@ -905,17 +905,17 @@ libIOPoint      .proc
 
                 tax
                 tya                     ; sector+1
-                ;!!sta IOCB0+ICAX4,X
+                sta IOCB0+ICAX4,X
                 lda arg1                ; sector
-                ;!!sta IOCB0+ICAX3,X
+                sta IOCB0+ICAX3,X
 
                 lda arg3                ; offset
-                ;!!sta IOCB0+ICAX5,X
+                sta IOCB0+ICAX5,X
 
                 lda #$25                ; POINT
-                ;!!sta IOCB0+ICCOM,X
+                sta IOCB0+ICCOM,X
 
-                ;!!jsr CIOV
+                jsr CIOV
                 jmp libIOChkErr
 
                 .endproc

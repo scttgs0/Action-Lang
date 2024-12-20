@@ -12,7 +12,7 @@
 ;   SPLsetup()
 ;======================================
 SPLsetup        .proc
-                lda #0
+                lda #$00
                 tay
                 sta sp
                 sta Channel
@@ -47,7 +47,7 @@ _next2          sta (symTblGlobal),Y
                 sta arg0
                 stx arg1
 
-_next3          ldy #1
+_next3          ldy #$01
                 lda (arg0),Y
                 beq _1
 
@@ -61,7 +61,7 @@ _next3          ldy #1
 
 _1              clc
                 lda arg0
-                adc #4
+                adc #$04
                 bcc _2
 
                 inc arg1
@@ -93,7 +93,7 @@ _2              sta codebase
                 sta symtab+1
 
 _err            ldy #allocateERR
-                jmp splerr
+                jmp bankSplErr
 
 _3              lda sparem
                 sta frame

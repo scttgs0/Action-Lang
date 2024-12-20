@@ -13,7 +13,7 @@
 ;======================================
 Front           .proc
                 sec
-                lda #0
+                lda #$00
                 sbc indent
                 sta choff
 
@@ -29,7 +29,7 @@ Front           .proc
 ;   Back()
 ;======================================
 Back            .proc
-                ldy #0
+                ldy #$00
                 lda (buf),Y
 _ENTRY1         pha
 
@@ -40,7 +40,7 @@ _ENTRY1         pha
                 sbc RMARGN
                 bcs _1
 
-                lda #1
+                lda #$01
 _1              sbc indent
                 sta choff
 
@@ -67,9 +67,9 @@ _1              sbc indent
 PageUp          .proc
                 sec
                 lda lnum
-                sbc #2
+                sbc #$02
 
-                ldy #1
+                ldy #$01
                 bra PageContent
 
                 .endproc
@@ -79,10 +79,10 @@ PageUp          .proc
 ;   PageDown()
 ;======================================
 PageDown        .proc
-                ldy #5
+                ldy #$05
 
                 sec
-                lda #2
+                lda #$02
                 sbc lnum
 
                 .endproc
@@ -104,7 +104,7 @@ PageContent     .proc
                 jsr CleanLine
 
 _next1          ldy arg13
-                jsr next
+                jsr mscNext
 
                 dec arg14
                 bne _next1
@@ -124,14 +124,14 @@ Paste           .proc
                 stx dirty
 
                 jsr CleanLine
-                jsr nextup
+                jsr mscNextUp
 
                 sta cur+1               ; tricky, fake out top
 
                 jsr SaveWindow._ENTRY1
                 jsr DeleteTop
 
-_next1          jsr strptr
+_next1          jsr mscStrPtr
                 jsr LoadBuffer._ENTRY1
                 jsr InsertByte
 
@@ -147,9 +147,9 @@ _1              jsr ResetCursor
                 lda w1+WCUR+1,Y
                 beq _2
 
-                jsr nextdwn
+                jsr mscNextDown
 
-_2              lda #0
+_2              lda #$00
                 jmp NewPage._ENTRY1
 
 _XIT            rts
@@ -219,7 +219,7 @@ ScrollInit      .proc
                 beq _XIT
 
                 ldy arg13
-                jsr next
+                jsr mscNext
                 beq _1                ; EOF
 
                 lda COLCRS
@@ -228,7 +228,7 @@ ScrollInit      .proc
                 ; lda choff
                 ; beq _SI1
 
-                lda #0
+                lda #$00
                 sta choff
 
                 jsr DisplayBuffer
@@ -246,13 +246,13 @@ _XIT            rts
 ;   ScrollUp()
 ;======================================
 ScrollUp        .proc
-                ldy #1
+                ldy #$01
                 jsr ScrollInit
 
                 dec lnum
                 bmi _1
 
-                jmp scrup
+                jmp screenCursorUp
 
 _1              inc lnum
 
@@ -274,7 +274,7 @@ _1              inc lnum
 ;   ScrollDown()
 ;======================================
 ScrollDown      .proc
-                ldy #5
+                ldy #$05
                 jsr ScrollInit
 
                 ldx lnum
@@ -284,7 +284,7 @@ ScrollDown      .proc
 
                 stx lnum
 
-                jmp scrdwn
+                jmp screenCursorDown
 
 _1              jsr BottomLine
 
@@ -323,7 +323,7 @@ _XIT            rts
 CheckColumn     .proc
                 jsr SetSpacing
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 cmp sp
                 bcs _XIT
@@ -354,9 +354,9 @@ ScrollLeft      .proc
                 dec choff
 
                 jsr DisplayBuffer
-                jsr scrrt
+                jsr screenCursorRight
 
-_XIT            jmp scrlft
+_XIT            jmp screenCursorLeft
 
                 .endproc
 
@@ -375,9 +375,9 @@ ScrollRight     .proc
                 inc choff
 
                 jsr DisplayBuffer
-                jsr scrlft
+                jsr screenCursorLeft
 
-_XIT            jmp scrrt
+_XIT            jmp screenCursorRight
 
                 .endproc
 
@@ -421,7 +421,7 @@ MoveUp          .proc
                 ldy #40                 ; rowSize
                 sty arg5
 
-                ldy #0
+                ldy #$00
 
                 .endproc
 

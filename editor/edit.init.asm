@@ -17,7 +17,7 @@ MemoryInit      .proc
                 lda MEMLO+1
                 sta zpAllocBase+1
 
-                lda #0
+                lda #$00
                 tay
                 sta (zpAllocBase),Y
 
@@ -37,8 +37,8 @@ MemoryInit      .proc
                 iny
                 sta (zpAllocBase),Y
 
-                lda #0                  ; allocate 2 pages of spare memory
-                ldx #2
+                lda #$00                ; allocate 2 pages of spare memory
+                ldx #$02
                 jsr Allocate
 
                 lda zpAllocCurrent
@@ -54,8 +54,8 @@ MemoryInit      .proc
 ; Initialize window
 ;======================================
 ZeroWindow      .proc
-                lda #0
-                ldx #15
+                lda #$00
+                ldx #$0F
 
 _next1          dex                     ; zero page0 window table
                 sta sp,X
@@ -94,7 +94,7 @@ Window2Init     .proc
                 sty ytop
 
                 sec
-                lda #23
+                lda #$17
                 sbc jt_wsize
                 sta nlines
 
@@ -119,8 +119,8 @@ EditorInit      .proc
 
                 jsr MemoryInit
 
-                lda #0
-                ldx #1
+                lda #$00
+                ldx #$01
                 jsr Allocate            ; get edit buffer
 
                 lda zpAllocCurrent
@@ -141,11 +141,11 @@ EditorInit      .proc
 ;   initialize window
                 jsr ZeroWindow
 
-_ENTRY1         lda #23                 ; rowcount
+_ENTRY1         lda #$17                ; rowcount
                 sta nlines
                 sta cmdln
 
-                lda #0
+                lda #$00
                 sta currentWindow
                 sta ytop
 

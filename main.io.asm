@@ -17,7 +17,7 @@ Open            .proc
                 stx arg5
                 sty arg6
 
-                ldy #3
+                ldy #$03
                 bne XioStr              ; [unc]
 
                 .endproc
@@ -30,7 +30,7 @@ Print           .proc
                 stx arg5
                 sty arg6
 
-                ldx #0
+                ldx #$00
                 stx arg3
 
                 ldy #$09
@@ -38,10 +38,10 @@ Print           .proc
                 bne _XIT
 
                 lda #$0B
-                ;!!sta IOCB0+ICCOM,X
+                sta IOCB0+ICCOM,X
 
                 lda #EOL
-                ;!!jmp CIOV
+                jmp CIOV
 
 _XIT            rts
                 .endproc
@@ -76,7 +76,7 @@ Input           .proc
                 ldy #$05
 _ENTRY1         stx arg5
 
-                ldx #0
+                ldx #$00
                 stx arg3
 
                 .endproc
@@ -95,35 +95,34 @@ XioStr          .proc
 
                 tax
                 tya
-                ;!!sta IOCB0+ICCOM,X       ; command
+                sta IOCB0+ICCOM,X       ; command
 
                 lda arg3
                 beq _1
 
-                ;!!sta IOCB0+ICAX1,X
+                sta IOCB0+ICAX1,X
 
                 lda arg4
-                ;!!sta IOCB0+ICAX2,X
+                sta IOCB0+ICAX2,X
 
-                lda #0
+                lda #$00
 _1              tay
-                ;!!sta IOCB0+ICBLH,X
+                sta IOCB0+ICBLH,X
                 lda (arg5),Y
-                ;!!sta IOCB0+ICBLL,X       ; size
+                sta IOCB0+ICBLL,X       ; size
 
                 beq Print._XIT          ; return
 
                 clc
                 lda arg5
-                adc #1
-                ;!!sta IOCB0+ICBAL,X       ; buffer address
+                adc #$01
+                sta IOCB0+ICBAL,X       ; buffer address
 
                 lda arg6
-                adc #0
-                ;!!sta IOCB0+ICBAH,X
+                adc #$00
+                sta IOCB0+ICBAH,X
 
-                ;!!jmp CIOV
-
+                jmp CIOV
                 .endproc
 
 
@@ -148,7 +147,7 @@ DisplayStr      .proc
                 ldy arg3
                 sty arg13
 
-                ldy #0
+                ldy #$00
                 sty arg3
 
                 ldy arg4
@@ -159,9 +158,9 @@ DisplayStr      .proc
                 adc LMARGN
                 sta COLCRS
 
-                jsr scrrt
+                jsr screenCursorRight
 
-                ldy #0
+                ldy #$00
                 lda (arg12),Y
                 beq _XIT
 
@@ -172,7 +171,7 @@ _next1          inc arg4
                 ldy arg4
                 lda (arg12),Y
                 eor arg2
-                jsr scrch
+                jsr screenCh
 
                 dec arg3
                 bne _next1
@@ -190,7 +189,7 @@ ReadBuffer      .proc
                 nop
                 nop
 
-                ldy #0
+                ldy #$00
                 tax
                 lda #240
                 sta (buf),Y
@@ -202,12 +201,12 @@ inputs          jsr Input
 
                 sty arg0
 
-                ;!!lda IOCB0+ICBLL,X    ; size
+                lda IOCB0+ICBLL,X       ; size
                 beq _1
 
                 sec
-                sbc #1
-_1              ldy #0
+                sbc #$01
+_1              ldy #$00
                 sta (arg5),Y
 
                 ldy arg0
@@ -249,7 +248,7 @@ SystemError     .proc
                 jsr DisplayOn
 
                 tya
-                ldx #0
+                ldx #$00
                 jsr CardToStr
                 jsr CmdColumn
 
@@ -265,7 +264,7 @@ SystemError     .proc
                 jsr RestoreCursorChar
                 jsr ResetColumn
 
-                jmp scrbell
+                jmp screenBell
 
                 .endproc
 
@@ -297,7 +296,7 @@ RealToStr       ;.proc
                 ;!!jsr FASC
 
                 ldy #$FF
-                ldx #0
+                ldx #$00
 _next1          iny
                 inx
 
@@ -336,7 +335,7 @@ DisplayOn       .proc
                 ;!!sta DMACTL
 
                 lda bckgrnd             ; background color
-                ;!!sta COLOR4              ; restore background
+                ;!!sta COLOR4           ; restore background
 
                 rts
                 .endproc
@@ -371,7 +370,7 @@ OpenChannel     .proc
 
 ;   check for default device
                 lda #':'
-                ldy #2
+                ldy #$02
                 cmp (nxtaddr),Y
                 beq _1
 
@@ -382,15 +381,15 @@ OpenChannel     .proc
 ;   stuff in D: for device
                 clc
                 lda nxtaddr
-                adc #2
+                adc #$02
                 sta FR0
                 lda nxtaddr+1
-                adc #0
+                adc #$00
                 sta FR0+1
 
-                ldy #0
+                ldy #$00
                 lda (nxtaddr),Y         ; add 2 to length of string
-                adc #2                  ;  so we can insert 'D:'
+                adc #$02                ;  so we can insert 'D:'
                 sta (nxtaddr),Y
 
                 tay
@@ -414,7 +413,7 @@ _1              lda Channel
                 jsr Open
                 bpl PrintBuffer
 
-                jmp splerr              ; oops, error in Open
+                jmp bankSplErr          ; oops, error in Open
 
                 .endproc
 
@@ -424,7 +423,7 @@ _1              lda Channel
 ;======================================
 PrintBuffer     .proc
                 lda list
-                bne RealToCard._XIT         ; return
+                bne RealToCard._XIT     ; return
 
                 jmp WriteBuffer
 
@@ -439,7 +438,7 @@ HexToCard       .proc
                 sta arg1
                 stx arg2
 
-                lda #0
+                lda #$00
                 sta FR0
                 sta FR0+1
 
@@ -449,22 +448,22 @@ _next1          ldy CIX
                 sbc #'0'
                 bmi RealToCard._ENTRY1
 
-                cmp #10
+                cmp #$0A
                 bmi _1
 
-                cmp #17
+                cmp #$11
                 bmi RealToCard._ENTRY1
 
-                sbc #7
-                cmp #16
+                sbc #$07
+                cmp #$10
                 bpl RealToCard._ENTRY1
 
 _1              sta arg5
 
                 lda FR0
                 ldx FR0+1
-                ldy #4
-                jsr lsh1
+                ldy #$04
+                jsr mscLShift
 
                 clc
                 adc arg5
@@ -491,7 +490,7 @@ _ENTRY1         lda FR0
 _XIT            rts
 
 _err            ldy #constERR
-                jmp splerr
+                jmp bankSplErr
 
                 .endproc
 
@@ -505,7 +504,7 @@ StrToReal       .proc
                 stx INBUFF+1
 
                 ;!!jmp AFP
-
+                rts     ;!! HACK:
                 .endproc
 
 
@@ -535,7 +534,7 @@ PutEOL          .proc
 ;======================================
 PutChar         .proc
                 lda device
-                jmp scrch._ENTRY1
+                jmp screenCh._ENTRY1
 
                 .endproc
 
@@ -585,7 +584,7 @@ _2              iny                     ; sets Y to 0
                 sta arg6
 
                 tay
-                lda #0
+                lda #$00
                 sta arg7
 
                 sec
@@ -593,7 +592,7 @@ _2              iny                     ; sets Y to 0
                 sbc LMARGN
                 cmp arg6
                 beq _3                  ; handle EOL char
-                bcs _next2                ; length ok
+                bcs _next2              ; length ok
 
                 sta arg6
 
@@ -635,7 +634,7 @@ _4              eor (arg0),Y
 _5              lda arg3
                 beq _XIT1
 
-_next4          ldy #0
+_next4          ldy #$00
                 lda (arg0),Y
                 eor #$80
                 sta (arg0),Y
@@ -690,9 +689,9 @@ ResetColumn     .proc
                 sta COLCRS
 
                 jsr ZapCursor
-_ENTRY1         jsr scrlft
+_ENTRY1         jsr screenCursorLeft
 
-                jmp scrrt
+                jmp screenCursorRight
 
                 .endproc
 
@@ -725,9 +724,9 @@ LoadBuffer      .proc
 
                 rts
 
-_1              jsr curstr
+_1              jsr mscCurStr
 
-_ENTRY1         ldy #0
+_ENTRY1         ldy #$00
                 lda (arg0),Y
                 sta (buf),Y
 
@@ -751,7 +750,7 @@ DisplayBuffer   .proc
                 adc choff
                 sta arg3
 
-                ldy #0
+                ldy #$00
                 lda buf
                 ldx buf+1
 
@@ -802,7 +801,7 @@ ZapCursor       .proc
 ; Restore char under cursor
 ;======================================
 RestoreCursorChar .proc
-                ldy #0
+                ldy #$00
                 lda OLDCHR
                 sta (OLDADR),Y
 

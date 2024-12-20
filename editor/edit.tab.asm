@@ -32,12 +32,12 @@ _next1          lda TABMAP,X            ; ignore if no tabstops within this byte
                 jmp Back._ENTRY1        ; do the tab
 
 _1              iny                     ; advance to next position within this byte
-                cpy #8
+                cpy #$08
                 bmi _next1
 
-_2              ldy #0                  ; advance to next byte, high-bit
+_2              ldy #$00                ; advance to next byte, high-bit
                 inx
-                cpx #15                 ; reached EOL?
+                cpx #$0F                ; reached EOL?
                 bmi _next1              ;   no
 
                 rts
@@ -97,7 +97,7 @@ CalcTableByteBit .proc
                 jsr SetSpacing          ; A=sp (sp=indent+choff+COLCRS-LMARGN)
 
                 sec
-                sbc #1                  ; 0-indexed adjustment
+                sbc #$01                ; 0-indexed adjustment
 
 _ENTRY1         tay                     ; preserve
 
@@ -109,14 +109,14 @@ _ENTRY1         tay                     ; preserve
 
 ;   calculate the bit offset
                 tya                     ; restore
-                and #7
+                and #$07
                 tay                     ; Y=bit offset
 
 ;   check bounds
-                cpx #15
+                cpx #$0F
                 bmi _XIT                ; good
 
-                ldy #8                  ; end of line, special value to prevent change (e.g. ignore)
+                ldy #$08                ; end of line, special value to prevent change (e.g. ignore)
 
 _XIT            rts
                 .endproc

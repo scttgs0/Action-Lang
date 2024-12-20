@@ -29,18 +29,18 @@ _1              jsr SystemError
                 jsr PutEOL
                 jsr PrintBuffer
 
-                lda #0
+                lda #$00
                 ldx #<msgSysErr
                 ldy #>msgSysErr
                 jsr Output
 
-                lda #0
+                lda #$00
                 sta INITAD+1
 
                 ldx #<numbuf
                 ldy #>numbuf
                 jsr Print
 
-                jmp emloop
+                jmp bankEmLoop
 
                 .endproc

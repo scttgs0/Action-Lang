@@ -24,10 +24,10 @@ SetTag          .proc
                 bne _1                  ; tag already exists
 
 ;   get a new tag
-                lda #8
+                lda #$08
                 jsr Allocate
 
-                ldy #1
+                ldy #$01
                 lda taglist+1
                 sta (zpAllocCurrent),Y
 
@@ -41,7 +41,7 @@ SetTag          .proc
                 ldx zpAllocCurrent+1
                 stx taglist+1
 
-_1              ldy #4
+_1              ldy #$04
                 lda tempbuf+1
                 sta (zpAllocCurrent),Y
 
@@ -59,7 +59,7 @@ _1              ldy #4
                 sta (zpAllocCurrent),Y
 
 ;   flag line as tagged
-                ldy #3
+                ldy #$03
                 lda (cur),Y
                 ora #$80
                 sta (cur),Y
@@ -115,7 +115,7 @@ LocateTag       .proc
                 jsr GetTag
                 beq notag
 
-                ldy #6
+                ldy #$06
                 lda (zpAllocCurrent),Y
 
                 tax
@@ -124,11 +124,11 @@ LocateTag       .proc
                 jsr FindLine
                 beq notag
 
-                ldy #3
+                ldy #$03
                 lda (arg2),Y
                 bpl notag
 
-                ldy #7
+                ldy #$07
                 lda (zpAllocCurrent),Y
                 sta sp
 
@@ -154,12 +154,12 @@ GetTag          .proc
 
 _XIT            rts
 
-_next1          ldy #4
+_next1          ldy #$04
                 lda (zpAllocCurrent),Y
                 cmp arg0
                 beq _2
 
-                ldy #1
+                ldy #$01
                 lda (zpAllocCurrent),Y
 
                 tax
@@ -188,7 +188,7 @@ FreeTags        .proc
 _next1          sta zpAllocBest
                 stx zpAllocBest+1
 
-                ldy #0
+                ldy #$00
                 lda (zpAllocBest),Y
                 sta arg0
 
@@ -221,7 +221,7 @@ FindLine        .proc
 
                 rts
 
-_next1          ldy #5
+_next1          ldy #$05
                 lda (arg2),Y
 
                 tax

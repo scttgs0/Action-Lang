@@ -20,7 +20,7 @@ libStrSCompare  .proc
                 stx arg5
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 sty args
                 sty args+1
 
@@ -30,7 +30,7 @@ libStrSCompare  .proc
 
                 jsr _3
 
-_1              cmp #0
+_1              cmp #$00
                 bne _2
 
                 rts
@@ -68,7 +68,7 @@ libStrSCopy     .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda (arg2),Y
 _ENTRY1         sta (arg0),Y
                 beq _XIT
@@ -94,7 +94,7 @@ libStrSCopyS    .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda (arg2),Y
                 cmp arg5
                 bcs _1
@@ -116,7 +116,7 @@ _2              sec
                 sbc arg4
                 bcs _XIT
 
-                lda #0
+                lda #$00
 
 _XIT            jmp libStrSCopy._ENTRY1
 
@@ -136,7 +136,7 @@ libStrSAssign   .proc
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda (arg2),Y
                 beq _XIT1
 

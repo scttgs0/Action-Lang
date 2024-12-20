@@ -28,7 +28,7 @@ arrconst        jsr procref._ENTRY1
 
 _XIT1           jmp pushst
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda (stack),Y
                 cmp #tokARRAY_t+8
                 bcs _1                  ; small array
@@ -36,11 +36,11 @@ _next1          ldy #0
                 iny
                 jsr StkP
 
-                cpx #0
+                cpx #$00
                 bne _1
 
 ;   page zero pointer
-                ldy #1
+                ldy #$01
                 sta (stack),Y
 
                 dey
@@ -66,7 +66,7 @@ _2              jsr pushnext
                 ldx zpAllocOP
                 bne arrerr
 
-_3              ldy #7
+_3              ldy #$07
                 lda (stack),Y
 arra0           pha
 
@@ -80,14 +80,14 @@ arra0           pha
                 cmp #tokARRAY_t+8
                 bcs arrerr._small
 
-                and #7
+                and #$07
                 tax
                 ora #$B0                ; temp array mode
                 sta arg7
 
                 ldy arg1
                 cpy #tokCONST_t+tokSTR_t
-                ldy #1                  ; clear Z flag if we branch
+                ldy #$01                ; clear Z flag if we branch
                 bcs _4
 
                 lda (stack),Y
@@ -99,7 +99,7 @@ _4              sta FR1
                 ldy vartype-1,X
                 beq arrerr._XIT2
 
-                ; cpy #3
+                ; cpy #$03
                 ; beq _ARReal
 
 ;   integer or cardinal
@@ -143,12 +143,12 @@ _7              jsr Op1H
                 jmp cgadd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
-                jmp splerr
+                jmp bankSplErr
 
 _XIT2           jmp codegen._ENTRY1
 
 ;   small arrary
-_small          ldy #7
+_small          ldy #$07
                 sta (stack),Y           ; restore correct type
 
                 lda arg1
@@ -157,13 +157,13 @@ _small          ldy #7
                 bit arrmode
                 bne arrerr              ; can't index with array
 
-                ldy #10
+                ldy #$0A
                 sta (stack),Y
 
-                ldy #2
+                ldy #$02
                 jsr LoadI
 
-                ldy #11
+                ldy #$0B
                 jsr SaveCd._saveStack
 
                 jmp popst

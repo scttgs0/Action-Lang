@@ -22,7 +22,7 @@ floop           .proc
 _1              lda curch
                 sta lastch
 
-                jsr GetKey
+                jsr bankGetKey
                 jsr EditorInit._ENTRY3
 
                 lda curch
@@ -48,7 +48,7 @@ _2              ldx #<fmcscmd
 _3              ldx #<fmcmd
                 ldy #>fmcmd
 
-_4              jsr lookup
+_4              jsr mscLookup
 
                 jmp floop
 

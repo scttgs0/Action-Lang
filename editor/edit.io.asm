@@ -13,7 +13,7 @@
 ;======================================
 GetString       .proc
                 jsr DisplayStr
-_next1          jsr GetKey
+_next1          jsr bankGetKey
 
                 tax
                 cpx #$7E
@@ -22,10 +22,10 @@ _next1          jsr GetKey
                 cpx #$7D
                 beq _3                  ; clear
 
-_next2          ldy #0
+_next2          ldy #$00
                 clc
                 lda (arg12),Y
-                adc #1
+                adc #$01
 
                 cpx #$1B                ; ESC
                 beq _1
@@ -49,11 +49,11 @@ _next2          ldy #0
                 sta (arg12),Y
 
                 eor arg2
-                jsr scrch
+                jsr screenCh
 
                 jmp _next1
 
-_1              lda #0
+_1              lda #$00
                 sta curch
                 sta (arg12),Y
 
@@ -68,21 +68,21 @@ _2              tay
 
 _3              stx arg3
 
-_next3          ldy #0
+_next3          ldy #$00
                 lda (arg12),Y
                 beq _4
 
                 sec
-                sbc #1
+                sbc #$01
                 sta (arg12),Y
 
-                jsr scrlft
+                jsr screenCursorLeft
 
                 lda #$20
                 eor arg2
 
-                jsr scrch
-                jsr scrlft
+                jsr screenCh
+                jsr screenCursorLeft
 
                 ldx arg3
                 cpx #$7E
@@ -100,15 +100,15 @@ _4              cpx #$7D
 ;   FRead()
 ;======================================
 FRead           .proc
-                lda #0
+                lda #$00
                 sta inbuf
 
                 lda #<rdmsg
                 ldx #>rdmsg
-                ldy #4
+                ldy #$04
                 jsr FOpen
 
-_next1          lda #1
+_next1          lda #$01
                 jsr ReadBuffer
                 bmi _1
 
@@ -117,7 +117,7 @@ _next1          lda #1
                 lda allocerr
                 beq _next1
 
-                ldy #22                 ; file too big
+                ldy #$16                ; file too big
                 bne _2
 
 _1              cpy #$88                ; EOF
@@ -141,7 +141,7 @@ rdmsg           .ptext "Read? "
 FWrite          .proc
                 lda #<wrtmsg
                 ldx #>wrtmsg
-                ldy #8
+                ldy #$08
                 jsr FOpen
 
                 jsr ChkCursor._ENTRY1
@@ -155,17 +155,17 @@ _next1          jsr LoadBuffer
                 nop
                 nop
 
-                lda #1
+                lda #$01
                 jsr WriteBuffer
                 bmi _1
 
-                jsr nextdwn
+                jsr mscNextDown
                 bne _next1
 
-                lda #0
+                lda #$00
                 sta dirty
 
-_ENTRY1         lda #1
+_ENTRY1         lda #$01
                 jsr Close
                 jsr ResetCursor
 
@@ -202,7 +202,7 @@ FOpen           .proc
                 ldx arg11
                 jsr CommandString
 
-                lda #1
+                lda #$01
                 jsr Close
 
                 ldy inbuf
@@ -234,14 +234,14 @@ _1              lda inbuf+1
                 cmp #'?'                ; read directory?
                 bne _3                  ;   no
 
-                ldx #6
+                ldx #$06
 _2              lda #'D'
                 sta inbuf+1
 
 _3              stx arg3
                 jsr DisplayOff
 
-                lda #1
+                lda #$01
                 sta arg4                ; clear high bit for cassette
 
                 ldx #<inbuf
@@ -250,7 +250,7 @@ _3              stx arg3
                 bmi _4
 
                 lda arg3                ; see if directory
-                eor #6
+                eor #$06
                 bne _XIT
 
                 sta inbuf               ; clear inbuf
@@ -273,13 +273,13 @@ _5              pla
 ;   InitKeys()
 ;======================================
 InitKeys        .proc
-                lda #7
+                lda #$07
                 jsr Close
 
-                lda #4
+                lda #$04
                 sta arg3                ; read only
 
-                lda #7
+                lda #$07
                 ldx #<keybd
                 ldy #>keybd
 

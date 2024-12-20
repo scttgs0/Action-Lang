@@ -12,14 +12,14 @@
 ;
 ;======================================
 ld1             .proc
-                ldy #0
+                ldy #$00
                 lda (stack),Y
                 cmp #tokARRAY_t
                 bcs pf._ENTRY1
 
                 inc abt-args,X
 
-                ldy #7
+                ldy #$07
                 lda (stack),Y
                 cmp #tokTEMP_t+tokBYTE_t
                 beq pf._ENTRY2
@@ -44,8 +44,8 @@ ld1             .proc
 ;   PF()
 ;======================================
 pf              .proc
-                lda #0                  ; load arg types flag
-                jsr GetArgs
+                lda #$00                ; load arg types flag
+                jsr bankGetArgs
                 jsr pushst
                 jsr GetNext
 
@@ -67,7 +67,7 @@ _next1          ldx numargs
                 ldx argbytes
                 stx abt+3
                 cmp #$7F
-                bcs _1                 ; one byte arg
+                bcs _1                  ; one byte arg
 
                 sta temps-args+1,X
 
@@ -109,7 +109,7 @@ _ENTRY2         lda token
 
 _next2          jsr TrashY
 
-                ldy #1
+                ldy #$01
                 jsr StkAddr
 
                 lda #$20                ; JSR
@@ -162,7 +162,7 @@ _5              stx arg0
                 pha
                 sty arg0
 
-                ldy #2
+                ldy #$02
                 jsr LoadI
 
                 ldy arg0
