@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.array.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
@@ -26,9 +26,9 @@ arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
                 cmp #tokARRAY_t+8
                 bcc arrconst._XIT1
 
-arrconst        jsr procref._ENTRY1
+arrconst        jsr compiler.ProcRef._ENTRY1
 
-_XIT1           jmp pushst
+_XIT1           jmp compiler.PushST
 
 _next1          ldy #$00
                 lda (stack),Y
@@ -52,15 +52,15 @@ _next1          ldy #$00
 
                 rts
 
-_1              jsr zerost
+_1              jsr compiler.ZeroST
                 bra _3
 
-_2              jsr pushnext
+_2              jsr compiler.PushNext
 
                 cmp #tokUpArrow
                 beq _next1
 
-                jsr getexp
+                jsr compiler.GetExp
 
                 cmp #tokRParen
                 bne arrerr
@@ -76,7 +76,7 @@ arra0           pha
                 sta (stack),Y
 
                 lda #tokPLUS
-                jsr genops
+                jsr compiler.GenOps
 
                 pla
                 cmp #tokARRAY_t+8
@@ -98,7 +98,7 @@ arra0           pha
 _4              sta FR1
                 beq _5                  ; pointer
 
-                ldy vartype-1,X
+                ldy compiler.vartype-1,X
                 beq arrerr._XIT2
 
                 ; cpy #$03
@@ -142,12 +142,12 @@ _6              jsr ampl.cgu.Op1L
 
                 lda #$61                ; ADC
 _7              jsr ampl.cgu.Op1H
-                jmp cgadd._ENTRY2
+                jmp compiler.CGAdd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
                 jmp bankSPLErr
 
-_XIT2           jmp codegen._ENTRY1
+_XIT2           jmp compiler.CodeGen._ENTRY1
 
 ;   small arrary
 _small          ldy #$07
@@ -168,7 +168,7 @@ _small          ldy #$07
                 ldy #$0B
                 jsr ampl.cgu.SaveCd._ToStack
 
-                jmp popst
+                jmp compiler.PopST
 
                 .endproc
 

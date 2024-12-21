@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.init.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 

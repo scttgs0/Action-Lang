@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.pf.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
@@ -31,7 +31,7 @@ Load1           .proc
                 cpx #args+2
                 bcc ProcFunc._ENTRY2
 
-                jsr genops._ENTRY1
+                jsr compiler.GenOps._ENTRY1
                 jsr ampl.cgu.Load2H
 
                 lda #$81                ; STA
@@ -48,8 +48,8 @@ Load1           .proc
 ProcFunc        .proc
                 lda #$00                ; load arg types flag
                 jsr bankGetArgs
-                jsr pushst
-                jsr LexGetNext
+                jsr compiler.PushST
+                jsr compiler.lexicon.GetNext
 
                 ldx #args
                 stx argbytes
@@ -58,7 +58,7 @@ ProcFunc        .proc
                 cpx #tokRParen
                 bne _next1
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 bra _next2
 
@@ -80,8 +80,8 @@ _1              sta temps-args,X
                 inc argbytes
 
                 txa
-                jsr storst
-                jsr getexp
+                jsr compiler.StoreST
+                jsr compiler.GetExp
 
                 dec numargs
                 bmi _err
@@ -90,7 +90,7 @@ _1              sta temps-args,X
                 cpx #args+3
                 bcc Load1
 
-_ENTRY1         jsr cgassign
+_ENTRY1         jsr compiler.CGAssign
 
 _ENTRY2         lda token
                 cmp #tokComma
@@ -143,7 +143,7 @@ _push           lda abt-args,X
                 jmp ampl.cgu.Push2
 
 _5              stx arg0
-                jsr genops._ENTRY1
+                jsr compiler.GenOps._ENTRY1
 
                 ldx arg0
                 lda _ops-args,X
@@ -174,7 +174,7 @@ _5              stx arg0
                 pla
                 jsr ampl.cgu.Push2      ; low byte of const
 
-                jmp cgassign._ENTRY5
+                jmp compiler.CGAssign._ENTRY5
 
 _6              pla
 _XIT1           jmp ampl.cgu.Push2      ; high byte
@@ -189,7 +189,7 @@ _8              bpl _9
 
 _9              jsr ampl.cgu.Op2L
 
-                jmp cgassign._ENTRY5
+                jmp compiler.CGAssign._ENTRY5
 
 ;--------------------------------------
 

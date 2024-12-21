@@ -154,12 +154,12 @@ _next3          clc
                 adc zpAllocSize+1
 _next4          sta zpAllocSize+1
 
-                jsr LexNextChar
+                jsr compiler.lexicon.NextChar
 
                 cmp #'+'
                 bne _2
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
                 bra _next1
 
 _2              ldy #$00
@@ -210,7 +210,7 @@ _next5          lda nxttoken            ; body of table
                 iny                     ; no, word
 _7              tya
                 jsr mscCodeIncr
-_8              jsr LexGetNext
+_8              jsr compiler.lexicon.GetNext
                 bra _next5
 
 _9              lda #$01

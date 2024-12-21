@@ -94,7 +94,12 @@ versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest
 propid          ldx arg0
 
                 .include "screen.mac.asm"
+
+                .include "compiler.inc"
+compiler    .namespace
                 .include "compiler.lexicon.asm"
+            .endnamespace
+
                 .include "main.msc.asm"
                 .include "main.bank.asm"
 
@@ -112,7 +117,7 @@ editor      .namespace
 ;--------------------------------------
 ;    "ACTION! - Compiler Routines
 
-ampl        .namespace   
+ampl        .namespace
                 .fill 3,$00
                 .include "ampl/ampl.segment.asm"
                 .include "ampl/ampl.pf.asm"
@@ -145,12 +150,12 @@ ampl_copyright  .null " ACTION! (c) 2024 GPL3           Foenix Adaptation       
 
                 ;.align $1000
 
-main
+            .namespace compiler
                 .include "compiler.main.asm"
 
 comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
                 .byte $00
-
+            .endnamespace
 
 ;--------------------------------------
 ;    ACTION! 4.0 - Editor

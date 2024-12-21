@@ -38,11 +38,11 @@ _func           clc
                 adc #tokFUNC_t-tokVAR_t
                 sta type
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
 ; - - - - - - - - - - - - - - - - - - -
 
-_1              jsr makeentry
+_1              jsr compiler.MakeEntry
                 jsr jt_segend
 
                 lda addr
@@ -84,10 +84,10 @@ _next1          sta (symTblLocal),Y
                 sta param               ; this is very tricky!!
                 bne _2
 
-                jsr ideq                ; param must = 0 here
+                jsr compiler.IDEqual    ; param must = 0 here
 
                 iny
-                jsr storprops
+                jsr compiler.StoreProps
 
                 ldy #$00
                 lda (zpAllocProps),Y
@@ -95,9 +95,9 @@ _next1          sta (symTblLocal),Y
                 sta (zpAllocProps),Y    ; set Sys flag
                 sta param
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
-_2              jsr LexGetNext
+_2              jsr compiler.lexicon.GetNext
 
                 cmp #tokLParen
                 bne _argerr
@@ -106,12 +106,12 @@ _2              jsr LexGetNext
 ;   low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
 ;   low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokRParen
                 beq _3
 
-_next2          jsr declare
+_next2          jsr compiler.Declare
 
                 ldx zpAllocPrevToken
                 inc zpAllocPrevToken    ; in case 2 ,'s
@@ -131,8 +131,8 @@ _3              lda param
                 lda #$00
                 sta param
 
-                jsr LexGetNext
-                jsr declare             ; locals
+                jsr compiler.lexicon.GetNext
+                jsr compiler.Declare    ; locals
 
 ;   handle procedure setup here
                 pla
@@ -146,7 +146,7 @@ _3              lda param
                 stx arg1
 
                 jsr mscGetCodeOffset
-                jsr storprops
+                jsr compiler.StoreProps
 
 ;   get space for proc variable
                 lda #$4C                ; JMP
@@ -245,7 +245,7 @@ _next5          lda (zpAllocProps),Y
 
                 jsr mscCodeIncr
 
-_9              jsr stmtlist
+_9              jsr compiler.StmtList
 
                 jmp Segment
 

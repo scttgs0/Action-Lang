@@ -106,7 +106,7 @@ bankCompile     .proc
                 ;!!ldy #cbank
                 sty jt_curbank
                 ;!!sty bank+cbank
-                jsr ccompile
+                jsr compiler.Compile
 
                 .endproc
 
@@ -176,7 +176,7 @@ bankCStmtList   .proc
                 sty jt_curbank
                 ;!!sta bank+cbank
 
-                jsr stmtlist
+                jsr compiler.StmtList
 
                 jmp bankEditBank
 

@@ -1,140 +1,14 @@
 
-;--------------------------------------
-;    Compiler tokens
-;--------------------------------------
+; SPDX-PackageSummary: Action! Programming Language
+; SPDX-PackageOriginator: Clinton W Parker
+; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
+; SPDX-License-Identifier: GPL-3.0-or-later
 
-tokPLUS         = 1
-tokMINUS        = 2
-tokMULT         = 3
-tokDIVD         = 4
-tokOR           = 5
-tokAND          = 6
-tokEQU          = 7
-tokNOTEQU       = 8
-tokGRTR         = 9
-tokGRTREQU      = 10
-tokLESS         = 11
-tokLESSEQU      = 12
-tokREM          = 13
-tokXOR          = 14
-tokLSH          = 15
-tokRSH          = 16
-tokUMINUS       = 17
-tokAT           = 18
-
-tokSColon       = 21
-tokSQuote       = 22
-tokPeriod       = 23
-tokRParen       = 24
-tokLParen       = 25
-tokComma        = 26
-tokDef          = 27
-tokDigit        = 28+$80
-tokHex          = 29
-tokQuote        = 30
-
-tokCHAR         = 32
-tokBYTE         = 33
-tokINT          = 34
-tokCARD         = 35
-tokSTRING       = 36
-tokREAL         = 37
-tokDEFINE       = 38
-tokRECORD       = 39
-
-tokARRAY        = 64
-tokFUNC         = 65
-tokPROC         = 66
-tokGET          = 67
-tokSET          = 68
-tokPOINTER      = 69
-tokTYPE         = 70
-
-tokIF           = 80
-tokWHILE        = 81
-tokRET          = 82
-tokEXIT         = 83
-tokFOR          = 84
-tokCASE         = 85
-tokCode         = 86
-tokMOD          = 87
-tokUNTIL        = 88
-
-tokLBracket     = 91
-tokRBracket     = 93
-tokUpArrow      = 94
-
-tokTHEN         = 96
-tokELSE         = 97
-tokDO           = 98
-tokFI           = 99
-tokOD           = 100
-tokTO           = 101
-tokSTEP         = 102
-tokOF           = 103
-tokESAC         = 104
-tokEDOC         = 105
-tokELSEIF       = 106
-tokDOWNTO       = 107
-
-tokTYPE_t       = $70                   ; 112
-
-tokEOF          = 127
-
-tokCONST_t      = $80
-tokVAR_t        = $88
-tokARRAY_t      = $90
-tokTEMP_t       = $A8
-tokFUNC_t       = $C0
-tokCOND_t       = $48
-
-;    types
-;--------------------------------------
-tokCHAR_t       = 1
-tokBYTE_t       = 2
-tokINT_t        = 3
-tokCARD_t       = 4
-tokSTR_t        = 5
-tokREAL_t       = 6
-
-tokUNDEC        = $88
+; SPDX-FileName: compiler.lexicon.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
-;--------------------------------------
-;    Error codes
-;--------------------------------------
-
-;   0 - out of system memory
-strERR          = 1                     ; missing " at end
-dfnERR          = 2                     ; nested defines
-symtblERR       = 3                     ; too many qglobal st
-;   4 - too many local st entries
-setERR          = 5                     ; SET syntax error
-declERR         = 6                     ; declaration error
-argERR          = 7                     ; bad argument list
-varERR          = 8                     ; var not declared
-constERR        = 9                     ; not int const
-assgnERR        = 10                    ; bad assignment
-endERR          = 11                    ; unknown error
-thenERR         = 12                    ; missing THEN
-fiERR           = 13                    ; missing FI
-qcodeERR        = 14                    ; out of QCODE space
-doERR           = 15                    ; missing DO
-toERR           = 16                    ; missing TO
-exprERR         = 17                    ; bad expression
-parenthERR      = 18                    ; unmatched ()s
-odERR           = 19                    ; missing OD
-allocateERR     = 20                    ; can't alloc mem.
-arrayERR        = 21                    ; bad array ref.
-;   22 - file too large on input
-condtERR        = 23                    ; illegal cond. exp.
-forERR          = 24                    ; illegal FOR stmt
-exitERR         = 25                    ; no loop for EXIT
-nestERR         = 26                    ; nesting level too deep
-typERR          = 27                    ; illegal type ref.
-retrnERR        = 28                    ; illegal RETURN stmt.
-;   61 - out of st space
-brkERR          = $80                   ; Break key depressed
+lexicon        .namespace
 
 
 ;--------------------------------------
@@ -142,9 +16,9 @@ brkERR          = $80                   ; Break key depressed
 ;--------------------------------------
 
 ;======================================
-; LexGetNext()
+; GetNext()
 ;======================================
-LexGetNext      .proc
+GetNext         .proc
                 lda spnxt
                 ldx curnxt
                 ldy curnxt+1
@@ -162,7 +36,7 @@ LexGetNext      .proc
                 sty addr+1
                 sta token
 
-_ENTRY1         jsr LexNextChar
+_ENTRY1         jsr NextChar
 
 _ENTRY2         cmp #tokEOF
                 beq _ENTRY3
@@ -223,26 +97,26 @@ _ENTRY5         lda token
 
 
 ;======================================
-; LexCom()
+; Com()
 ;======================================
-LexCom          .proc
-                jsr LexNextLine
-                bra LexGetNext._ENTRY2
+Com             .proc
+                jsr NextLine
+                bra GetNext._ENTRY2
 
                 .endproc
 
 
 ;======================================
-; LexDig()
+; Dig()
 ;======================================
-LexDig          .proc
+Dig             .proc
                 lda #tokCONST_t+tokINT_t
                 sta nxttoken
 
                 jsr LexBuf              ; get buf ptr
                 jsr ioStrToReal
 
-_next1          jsr LexNextChar            ; cardinal?
+_next1          jsr NextChar            ; cardinal?
                 jsr mscAlphaNum._num
                 bne _next1
 
@@ -267,10 +141,10 @@ _1              sta nxtaddr
                 stx nxtaddr+1
 
                 cpx #$00
-                bne LexGetNext._ENTRY4
+                bne GetNext._ENTRY4
 
                 lda #tokCONST_t+tokBYTE_t
-                bne LexGetNext._ENTRY3
+                bne GetNext._ENTRY3
 
 _2              lda #tokCONST_t+tokREAL_t
                 sta nxttoken
@@ -283,15 +157,15 @@ _2              lda #tokCONST_t+tokREAL_t
 
 
 ;======================================
-; LexChr()
+; Chr()
 ;======================================
-LexChr          .proc
-                jsr LexNextChar
+Chr             .proc
+                jsr NextChar
 
                 sta nxtaddr
 
                 lda #tokCONST_t+tokCHAR_t
-                bra LexGetNext._ENTRY3
+                bra GetNext._ENTRY3
 
                 .endproc
 
@@ -300,13 +174,13 @@ LexChr          .proc
 ; LexNE()
 ;======================================
 LexNE           .proc
-                jsr LexNextChar
+                jsr NextChar
 
                 cmp #'>'
                 bne LexEQ._ENTRY1
 
                 lda #tokNOTEQU
-                bra LexGetNext._ENTRY3
+                bra GetNext._ENTRY3
 
                 .endproc
 
@@ -315,21 +189,21 @@ LexNE           .proc
 ; LexEQ()
 ;======================================
 LexEQ           .proc
-                jsr LexNextChar
+                jsr NextChar
 
 _ENTRY1         cmp #'='
-                bne LexPutBack
+                bne PutBack
 
                 inc nxttoken
-                bra LexGetNext._ENTRY4
+                bra GetNext._ENTRY4
 
                 .endproc
 
 
 ;======================================
-; LexHex()
+; Hex()
 ;======================================
-LexHex          .proc
+Hex             .proc
                 lda #tokCONST_t+tokCARD_t
                 sta nxttoken
 
@@ -337,28 +211,28 @@ LexHex          .proc
 
                 jsr LexBuf
                 jsr ioHexToCard
-                bra LexDig._ENTRY1
+                bra Dig._ENTRY1
 
                 .endproc
 
 
 ;======================================
-; LexPutBack returns character to buf
+; PutBack returns character to buf
 ;======================================
-LexPutBack      .proc
+PutBack         .proc
                 dec choff
 
-_ENTRY1         jmp LexGetNext._ENTRY4
+_ENTRY1         jmp GetNext._ENTRY4
 
                 .endproc
 
 
 ;======================================
-; LexPF()
+; ProcFunc()
 ;======================================
-LexPF           .proc
+ProcFunc        .proc
                 lda qglobal
-                beq LexPutBack._ENTRY1
+                beq PutBack._ENTRY1
 
                 lda #$00
                 sta qglobal
@@ -368,23 +242,23 @@ LexPF           .proc
                 lda gbase+1
                 sta symtab+1
 
-                bra LexPutBack._ENTRY1
+                bra PutBack._ENTRY1
 
                 .endproc
 
 
 ;======================================
-; LexStr()
+; Str()
 ;======================================
-LexStr          .proc
+Str             .proc
                 lda token
                 cmp #tokQuote
-                beq LexPutBack._ENTRY1  ; zap local st
+                beq PutBack._ENTRY1  ; zap local st
 
                 lda #$00
                 sta arg9
 
-_next1          jsr LexNextChar
+_next1          jsr NextChar
 
                 inc arg9
                 beq _1                  ; string too long
@@ -401,7 +275,7 @@ _next2          ldy arg9
 _1              ldy #strERR
                 jmp bankSPLErr
 
-_2              jsr LexNextChar
+_2              jsr NextChar
 
                 cmp #'"'
                 beq _next2              ; " in string
@@ -421,21 +295,21 @@ _2              jsr LexNextChar
                 ldy choff
 
                 dey
-                jmp LexDig._ENTRY1
+                jmp Dig._ENTRY1
 
                 .endproc
 
 
 ;======================================
-; LexNextChar()
+; NextChar()
 ;======================================
-LexNextChar     .proc
+NextChar        .proc
                 ldy defflg
-                bne LexDef
+                bne Def
 
 _ENTRY1         ldy choff
                 cpy sp
-                bcc LexNextLine._ENTRY1
+                bcc NextLine._ENTRY1
 
                 .endproc
 
@@ -443,9 +317,9 @@ _ENTRY1         ldy choff
 
 
 ;======================================
-; LexNextLine()
+; NextLine()
 ;======================================
-LexNextLine     .proc
+NextLine        .proc
                 lda Channel
                 beq _1
                 bmi _4                  ; eof
@@ -459,7 +333,7 @@ LexNextLine     .proc
                 jmp bankSPLErr
 
 _next1          dec Channel
-                bne LexNextLine
+                bne NextLine
 
 _1              ldy top+1
                 beq _next1              ; set eof, tricky QCODE
@@ -510,7 +384,7 @@ _4              lda #tokEOF
 ;======================================
 ;
 ;======================================
-LexDef          .proc
+Def             .proc
                 ldy #$00
                 lda (delnxt),Y
 
@@ -521,7 +395,7 @@ LexDef          .proc
                 lda defflg
                 sta choff
                 sty defflg
-                bra LexNextChar._ENTRY1
+                bra NextChar._ENTRY1
 
 _1              ldy choff
                 lda (delnxt),Y
@@ -531,10 +405,10 @@ _1              ldy choff
 
 
 ;======================================
-; LexGet()
+; Get()
 ;======================================
-LexGet          .proc
-                jsr LexGetNext._ENTRY1
+Get             .proc
+                jsr GetNext._ENTRY1
 
 _ENTRY1         lda #$00
                 sta defflg
@@ -543,23 +417,23 @@ _ENTRY1         lda #$00
 
                 lda #$04
                 jsr ioOpenChannel
-                jsr LexNextLine
+                jsr NextLine
 
-                jmp LexGetNext._ENTRY2
+                jmp GetNext._ENTRY2
 
                 .endproc
 
 
 ;======================================
-; LexSet()
+; Set()
 ;======================================
-LexSet          .proc
+Set             .proc
                 jsr _1
 
                 sta arg11
                 stx arg12
 
-                jsr LexGetNext._ENTRY1
+                jsr GetNext._ENTRY1
 
                 lda nxttoken
                 cmp #tokEQU
@@ -576,21 +450,21 @@ LexSet          .proc
                 iny
                 sta (arg11),Y
 
-_XIT1           jmp LexGetNext._ENTRY1
+_XIT1           jmp GetNext._ENTRY1
 
 _err            ldy #setERR
                 jmp bankSPLErr
 
-_1              jsr LexGetNext._ENTRY1
+_1              jsr GetNext._ENTRY1
                 jmp mscMNum
 
                 .endproc
 
 
 ;======================================
-; LexExpand()
+; Expand()
 ;======================================
-LexExpand       .proc
+Expand          .proc
                 lda defflg
                 beq _1
 
@@ -613,7 +487,7 @@ _ENTRY1         sta delnxt
                 lda #$00
                 sta choff
 
-                jmp LexGetNext._ENTRY1
+                jmp GetNext._ENTRY1
 
                 .endproc
 
@@ -641,33 +515,33 @@ _1              lda buf
 ;--------------------------------------
 ;--------------------------------------
 
-tblLexCmd       .addr LexGetNext._ENTRY4
+tblLexCmd       .addr GetNext._ENTRY4
                 .byte 41
-                .addr LexDig
+                .addr Dig
                 .byte tokDigit-$80
-                .addr LexHex
+                .addr Hex
                 .byte tokHex
                 .addr LexEQ
                 .byte tokGRTR
                 .addr LexNE
                 .byte tokLESS
-                .addr LexExpand
+                .addr Expand
                 .byte tokDef
-                .addr LexCom
+                .addr Com
                 .byte tokSColon
-                .addr LexChr
+                .addr Chr
                 .byte tokSQuote
-                .addr LexPF
+                .addr ProcFunc
                 .byte tokPROC
-                .addr LexPF
+                .addr ProcFunc
                 .byte tokFUNC
-                .addr LexPF
+                .addr ProcFunc
                 .byte tokMOD
-                .addr LexStr
+                .addr Str
                 .byte tokQuote
-                .addr LexGet
+                .addr Get
                 .byte tokGET
-                .addr LexSet
+                .addr Set
                 .byte tokSET
 
 tblLexChars     .byte tokXOR            ; !
@@ -712,3 +586,5 @@ tblLexChars     .byte tokXOR            ; !
 ;         ldx nxtAddr+1
 ;         jsr ampl.monitor.PrintHex
 ;         jmp ioPutEOL
+
+                .endnamespace

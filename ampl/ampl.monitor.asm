@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.monitor.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
@@ -61,8 +61,8 @@ _1              jsr jt_alarm
                 ldx #>tempbuf
                 ldy sp
                 iny                     ; make sure non-zero
-                jsr LexExpand._ENTRY1
-                jsr LexGetNext
+                jsr compiler.lexicon.Expand._ENTRY1
+                jsr compiler.lexicon.GetNext
 
                 lda tempbuf+1
                 ora #$20
@@ -406,7 +406,7 @@ Execute         .proc
                 lda QCODE+1
                 pha
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
                 jsr bankCStmtList
 
                 cmp #tokEOF

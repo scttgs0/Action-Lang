@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.cgu.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
@@ -171,7 +171,7 @@ _5              inc arg12               ; skip JMP byte
                 and #$08
                 beq _opv
 
-_operr          jmp conderr             ; cond. exp.
+_operr          jmp compiler.ErrCond    ; cond. exp.
 
 ;   array
 _6              bit modeConst
@@ -378,7 +378,7 @@ _1              stx arg9
 
                 rts
 
-_err            jmp experr
+_err            jmp compiler.ErrorExpression
 
                 .endproc
 
@@ -482,7 +482,7 @@ _XIT            rts
 ;======================================
 OpCd1           .proc
                 ldx arg8
-                lda cgopscd+1,X
+                lda compiler.cgopscd+1,X
 
                 rts
                 .endproc

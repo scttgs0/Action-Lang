@@ -11,20 +11,19 @@
 ;======================================
 ;         Main compiler entry
 ;======================================
-ccompile
+Compile
 
 
 ;======================================
-;
 ;======================================
-spl             ;.proc
+ScanParseLex    ;.proc
                 jsr jt_splend
 
                 lda nxttoken
                 cmp #tokQuote
                 bne _1                  ; no name
 
-                jsr LexGet._ENTRY1
+                jsr compiler.lexicon.Get._ENTRY1
                 jmp _next1
 
 _1              lda top1
@@ -33,8 +32,8 @@ _1              lda top1
                 jsr ioChkCursor._ENTRY1
                 beq _XIT1               ; no program !
 
-                jsr LexGetNext
-_next1          jsr LexGetNext
+                jsr compiler.lexicon.GetNext
+_next1          jsr compiler.lexicon.GetNext
 
 
 ;--------------------------------------
@@ -42,7 +41,7 @@ _next1          jsr LexGetNext
 ;                 | (MODULE) <module>
 ; <module> _:= (<dcl list>) (<segment list>)
 ;--------------------------------------
-                jsr declare
+                jsr Declare
                 jsr ampl.Segment
 
                 cmp #tokMOD             ; another module ?
@@ -124,7 +123,7 @@ _2              jsr mscGetCodeOffset    ; no main PROC
 
                 sta INITAD
                 stx INITAD+1
-                jsr stmtlist
+                jsr StmtList
 
                 cmp #tokEOF
                 beq _next2
@@ -133,7 +132,7 @@ _2              jsr mscGetCodeOffset    ; no main PROC
 ;               sty $2E3                ; zap run address
 
 _err            ldy #endERR
-                jmp errFI
+                jmp ErrorFI
 
 _err2           jmp mscCodeIncr.cderr   ; out of QCODE space
 
@@ -141,21 +140,21 @@ _err2           jmp mscCodeIncr.cderr   ; out of QCODE space
 
 
 ;======================================
-;    Declaration processing
+; Declaration processing
 ;--------------------------------------
 ; <dcl list> _:= <dcl list> <dcl> | <dcl>
 ; <dcl> _:= <simple dcl> | <array dcl> | <def dcl>
 ;======================================
-cderr           lda #$00                ; reset QCODE before err
+DeclError       lda #$00                ; reset QCODE before err
                 tay
                 jsr ampl.cgu.LoadCd
 
-_errDeclaration jmp errDefine
+_errDecl        jmp DefineError
 
 _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
                 sta type
 
-                jsr makeentry
+                jsr MakeEntry
 
                 lda addr
                 ldx addr+1
@@ -164,15 +163,15 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
 
                 ldy #$00
                 jsr ampl.cgu.SaveCd
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokEQU
-                bne _errDeclaration
+                bne _errDecl
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokLBracket
-                bne _errDeclaration
+                bne _errDecl
 
                 sec
                 lda #$00
@@ -182,13 +181,13 @@ _type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
                 sbc codeoff+1
                 sta QCODE+1
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
 _next1          cmp #tokCHAR
-                bcc cderr
+                bcc DeclError
 
                 cmp #tokDEFINE
-                bcs cderr
+                bcs DeclError
 
                 tax
                 clc
@@ -198,11 +197,11 @@ _next1          cmp #tokCHAR
                 lda varsize-tokCHAR,X
                 sta zpAllocCurrent
 
-_next2          jsr makeentry
+_next2          jsr MakeEntry
 
                 lda zpAllocCurrent
                 jsr mscCodeIncr
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
                 beq _next2
@@ -214,22 +213,22 @@ _next2          jsr makeentry
                 jsr ampl.cgu.StkP
 
                 ldx QCODE+1
-                bne cderr
+                bne DeclError
 
                 lda QCODE
                 ldy #$00
-                jsr storprops
+                jsr StoreProps
 
                 lda #$00
                 tay
                 jsr ampl.cgu.LoadCd
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
 
 ;======================================
 ;
 ;======================================
-declare         jsr jt_dclend
+Declare         jsr jt_dclend
 
                 cmp #tokCHAR
                 bcs _1
@@ -237,12 +236,12 @@ declare         jsr jt_dclend
 _XIT1           rts
 
 _1              cmp #tokTYPE
-                beq cderr._type
+                beq DeclError._type
 
                 cmp #tokRECORD
                 bne _2
 
-;   record dcl.
+;   record decl.
                 lda #$00
                 jsr mscGetProp
 
@@ -268,14 +267,14 @@ _2              cmp #tokDEFINE
                 beq _XIT1
 
                 cpx #tokARRAY
-                beq arrDeclaration
+                beq ArrayDecl
 
 _3              cpx #tokPOINTER
-                bne _next1
+                bne _simple
 
                 ldy #$00
                 sty zpAllocCurrent
-                bra arrDeclaration
+                bra ArrayDecl
 
 
 ;--------------------------------------
@@ -283,12 +282,12 @@ _3              cpx #tokPOINTER
 ; <id eq list> _:= <id eq list> , <id eq> | <id eq>
 ; <id eq> _:= <id> (= <constant>)
 ;--------------------------------------
-_next1          jsr makeentry
+_simple         jsr MakeEntry
 
                 ldx param
                 beq _4
 
-                jsr params
+                jsr Params
 
                 ldx param
                 bpl _5
@@ -298,23 +297,23 @@ _4              lda nxttoken
                 cmp #tokEQU
                 bne _5
 
-                jsr ideq
+                jsr IDEqual
 
                 iny
-                jsr storprops
+                jsr StoreProps
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
                 bne _6
 
 _5              lda zpAllocCurrent
                 jsr mscCodeIncr
 
-_6              jsr LexGetNext
+_6              jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
-_next2          beq _next1
+_leapSimple     beq _simple
 
-                jmp declare
+                jmp Declare
 
 
 ;--------------------------------------
@@ -322,20 +321,20 @@ _next2          beq _next1
 ; <def list> _:= <def list> , <def> | <def>
 ; <def> _:= <id> = <str const>
 ;--------------------------------------
-_define         jsr makeentry
+_define         jsr MakeEntry
 
                 ldy #$00
                 lda #tokDef
                 sta (zpAllocProps),Y
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokEQU
-                bne errDefine
+                bne DefineError
 
                 lda nxttoken
                 cmp #tokQuote
-                bne errDefine
+                bne DefineError
 
                 ldy #$00
                 lda (symtab),Y
@@ -343,19 +342,19 @@ _define         jsr makeentry
                 adc #$02                ; real size + EOL
 
                 jsr mscSTIncr
-                jsr LexGetNext          ; string itself
-                jsr LexGetNext          ; dummy string
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext    ; string itself
+                jsr compiler.lexicon.GetNext    ; dummy string
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
-                bne _next2
+                bne _leapSimple
                 bra _define
 
 
 ;--------------------------------------
 ;
 ;--------------------------------------
-errDefine       ldy #declERR
+DefineError     ldy #declERR
                 jmp bankSPLErr
 
 
@@ -364,12 +363,12 @@ errDefine       ldy #declERR
 ; <array list> _:= <array list> , <array> | <array>
 ; <array> _:= <id> ((<constant>)) (= <constant>)
 ;--------------------------------------
-arrDeclaration  clc
+ArrayDecl       clc
                 adc #$08
                 sta type
 
-                jsr LexGetNext
-_next1          jsr makeentry
+                jsr compiler.lexicon.GetNext
+_next1          jsr MakeEntry
 
                 lda #$02
                 sta numargs             ; variable space
@@ -392,8 +391,8 @@ _next1          jsr makeentry
                 ldy #$00
 
                 jsr mscStoreVar
-                jsr getarsz
-                jsr LexGetNext
+                jsr GetArraySize
+                jsr compiler.lexicon.GetNext
 
 ;   check for small byte array
 
@@ -406,10 +405,10 @@ _next1          jsr makeentry
                 sbc (QCODE),Y
                 bcs _6                  ; size <= 256
 
-_next2          jsr LexGetNext
+_next2          jsr compiler.lexicon.GetNext
 
                 cmp #tokRParen
-                bne errDefine
+                bne DefineError
 
                 lda nxttoken
                 cmp #tokEQU
@@ -439,14 +438,14 @@ _1              cmp #$04
 
 _next4          jsr mscCodeIncr
 
-_next5          jsr LexGetNext
+_next5          jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
                 beq _next1
 
-                jmp declare
+                jmp Declare
 
-_2              jsr params
+_2              jsr Params
 
                 ldx param
                 bpl _next3
@@ -455,7 +454,7 @@ _2              jsr params
 _3              cmp #tokEQU
                 bne _next3
 
-_4              jsr ideq
+_4              jsr IDEqual
 
                 ldy numargs
                 beq _5
@@ -465,8 +464,8 @@ _4              jsr ideq
                 jsr mscGetCodeOffset
 
 _5              ldy #$01
-                jsr storprops
-                jsr LexGetNext
+                jsr StoreProps
+                jsr compiler.lexicon.GetNext
 
                 lda numargs
                 jmp _next4
@@ -483,30 +482,30 @@ _6              ldy #$00
 
                 iny
                 jsr mscGetCodeOffset
-                jsr storprops
+                jsr StoreProps
                 bra _next2
 
 
 ;--------------------------------------
 ;
 ;--------------------------------------
-chkparam        .proc
+CheckParam      .proc
                 ldx param
 
-_ENTRY1         beq makeentry._err
+_ENTRY1         beq MakeEntry._err
 
                 pla
                 pla
 
-                jmp LexGetNext
+                jmp compiler.lexicon.GetNext
 
                 .endproc
 
 
 ;======================================
-;   MakeEntry()
+; MakeEntry()
 ;======================================
-makeentry       .proc
+MakeEntry       .proc
                 lda nxttoken
                 cmp #tokUNDEC
                 beq _3
@@ -516,20 +515,20 @@ makeentry       .proc
                 beq _1
 
                 cmp #tokTYPE_t
-                bcc chkparam
+                bcc CheckParam
 
                 cmp #tokEOF
-                bcs chkparam
+                bcs CheckParam
 
 _1              lda qglobal
-                beq chkparam._ENTRY1
+                beq CheckParam._ENTRY1
 
                 jsr bankLocalName
 
                 cmp #tokUNDEC
                 beq _2
 
-_err            jmp errDefine
+_err            jmp DefineError
 
 _2              sta nxttoken
 
@@ -549,21 +548,21 @@ _3              lda #$00
                 iny
 
                 jsr mscGetCodeOffset
-                jsr storprops
+                jsr StoreProps
 
-                jmp LexGetNext
+                jmp compiler.lexicon.GetNext
 
                 .endproc
 
 
 ;======================================
-;   IdEq()
+; IDEqual()
 ;======================================
-ideq            .proc
-                jsr LexGetNext
+IDEqual         .proc
+                jsr compiler.lexicon.GetNext
 
                 ldx param
-                bne params._err
+                bne Params._err
 
                 jmp mscMNum
 
@@ -571,10 +570,10 @@ ideq            .proc
 
 
 ;======================================
-;   GetArSz()
+; GetArraySize()
 ;======================================
-getarsz         .proc
-                jsr ideq
+GetArraySize    .proc
+                jsr IDEqual
 
                 sty arg0                ; Y should = 0
                 sty arg1
@@ -602,9 +601,9 @@ _next1          clc
 
 
 ;======================================
-;   StorProps(low, high, index)
+; StoreProps(low, high, index)
 ;======================================
-storprops       .proc
+StoreProps      .proc
                 sta (zpAllocProps),Y
 
                 txa
@@ -620,15 +619,16 @@ storprops       .proc
 ;ChkNext PROC ; ChkNext()
 ;               lda nxtToken
 ;               cmp #undec
-;               bne _ChkN
+;               bne _XIT
+;
 ;               jsr GNlocal
-;:ChkN          jmp LexGetNext
+;_XIT           jmp compiler.lexicon.GetNext
 
 
 ;======================================
-;   Params()
+; Params()
 ;======================================
-params          .proc
+Params          .proc
                 ldy #$00
                 lda (zpAllocProps),Y    ; get var type
                 pha
@@ -689,7 +689,7 @@ varsize         .byte 1,1,2,2,2,6
 
 
 ;====================================
-;    Statement processing
+; Statement processing
 ;------------------------------------
 ; <stmt list> _:= <stmt list> <stmt> | <stmt>
 ; <stmt> _:= <assign> |
@@ -702,8 +702,8 @@ varsize         .byte 1,1,2,2,2,6
 ;            <return> |
 ;            EXIT
 ;====================================
-stmtlist        .proc
-                jsr clrtemps
+StmtList        .proc
+                jsr ClearTemps
 
                 sta zpAllocOP
                 jsr jt_smtend
@@ -727,26 +727,26 @@ _next1          ldx nxttoken
                 bra _2
 
 _1              jsr ampl.cgu.Push1      ; single byte
-_2              jsr LexGetNext
+_2              jsr compiler.lexicon.GetNext
                 bra _next1
 
-_3              jsr LexGetNext
+_3              jsr compiler.lexicon.GetNext
 
-                jmp recret.nxtstmt
+                jmp RecRet.nxtstmt
 
 _next2          ldx nxttoken
                 cmp #tokVAR_t+tokCHAR_t
                 bcc _4
 
                 cmp #tokFUNC_t
-                bcc assign
+                bcc Assign
 
 ;   routine reference
                 cpx #tokLParen
-                beq call
+                beq Call
 
-                jsr procref
-                bra assign._ENTRY1
+                jsr ProcRef
+                bra Assign._ENTRY1
 
 _4              cmp #tokUNDEC
                 bne _5
@@ -757,17 +757,17 @@ _4              cmp #tokUNDEC
 _5              cmp #tokTYPE_t
                 bne _6
 
-                jsr etype
-                jmp arassign._ENTRY1
+                jsr EType
+                jmp AssignArray._ENTRY1
 
 _6              cmp #tokTYPE_t+8
                 bne _7
 
-                jsr etypea
-                jmp arassign._ENTRY1
+                jsr ETypeA
+                jmp AssignArray._ENTRY1
 
-_7              ldx #<stmtlst
-                ldy #>stmtlst
+_7              ldx #<tblStmtList
+                ldy #>tblStmtList
                 jmp mscLookup
 
                 .endproc
@@ -778,11 +778,11 @@ _7              ldx #<stmtlst
 ; <proc var> _:= <id>
 ; <arglist> _:= <arglist> , <exp> | <exp>
 ;--------------------------------------
-call            .proc
+Call            .proc
                 jsr ampl.pf.ProcFunc
-                jsr popst
+                jsr PopST
 
-                jmp recret.nxtstmt
+                jmp RecRet.nxtstmt
 
                 .endproc
 
@@ -790,17 +790,17 @@ call            .proc
 ;--------------------------------------
 ; <assign> _:= <id> = <exp>
 ;--------------------------------------
-assign          .proc
+Assign          .proc
                 cmp #tokARRAY_t
-                bcs arassign
+                bcs AssignArray
 
-_ENTRY1         jsr pushnext
+_ENTRY1         jsr PushNext
 
 _ENTRY2         eor #tokEQU
-                bne errAssign
+                bne AssignError
 
-                jsr pushop              ; push 0 on op stack
-                jsr LexGetNext
+                jsr PushOp              ; push 0 on op stack
+                jsr compiler.lexicon.GetNext
 
                 sta zpAllocOP
                 cmp #tokEQU
@@ -809,7 +809,7 @@ _ENTRY2         eor #tokEQU
                 lda #$00
                 sta zpAllocOP
 
-                jsr copyst
+                jsr CopyST
 
 ;   check for temps
                 iny
@@ -834,11 +834,11 @@ _1              and #$20
 
                 inc temps-args,X
 
-_2              jsr LexGetNext
-_3              jsr exp._ENTRY1
-                jsr cgassign
+_2              jsr compiler.lexicon.GetNext
+_3              jsr Expression._ENTRY1
+                jsr CGAssign
 
-                jmp stmtlist
+                jmp StmtList
 
                 .endproc
 
@@ -846,7 +846,7 @@ _3              jsr exp._ENTRY1
 ;--------------------------------------
 ;
 ;--------------------------------------
-errAssign       .proc
+AssignError     .proc
                 ldy #assgnERR
                 jmp bankSPLErr
 
@@ -856,7 +856,7 @@ errAssign       .proc
 ;--------------------------------------
 ; <array assign> _:= <id> ( <exp> ) = <exp>
 ;--------------------------------------
-arassign        .proc
+AssignArray     .proc
                 jsr ampl.array.Ref
 
 _ENTRY1         ldy #$00
@@ -864,9 +864,9 @@ _ENTRY1         ldy #$00
                 bpl _1                  ; record element
 
                 cmp #tokVAR_t
-                bcc errAssign           ; const
+                bcc AssignError         ; const
 
-_1              jsr LexGetNext
+_1              jsr compiler.lexicon.GetNext
                 bra assign._ENTRY2
 
                 .endproc
@@ -876,25 +876,25 @@ _1              jsr LexGetNext
 ; <if> _:= IF <exp> THEN <stmt list
 ;          (ELSE <stmt list>) FI
 ;---------------------------------------
-ifstmt          .proc
+StmtIF          .proc
                 lda #$07
-                jsr getframe
+                jsr GetFrame
 
                 ldy #$05
                 lda #$00
                 sta (frame),Y
 
-_if             jsr condexp
+_if             jsr ExpressionCond
 
                 cmp #tokTHEN
-                bne thnerr
+                bne ThenError
 
 ;   save current Y
                 lda cury
                 ldy #$06
                 sta (frame),Y
 
-                jsr recret.nxtstmt
+                jsr RecRet.nxtstmt
 
 ;   restore Y
                 tax
@@ -907,66 +907,66 @@ _if             jsr condexp
                 bne _else
 
                 ldy #$04
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
 
                 ldy #$04
-                jsr framecd._ENTRY1
+                jsr FrameCd._ENTRY1
 
                 ldx arg4
                 ldy arg5
 
-                jsr pushjmp
-                jsr frameadr
-                jsr filljmp._ENTRY1
+                jsr PushJMP
+                jsr FrameAdr
+                jsr FillJmp._ENTRY1
 
                 jmp _if
 
 _else           cmp #tokELSE
                 bne _fi
 
-                jsr frameadr
-                jsr framecd
+                jsr FrameAdr
+                jsr FrameCd
 
                 ldy #$00                ; flag as end of list
-                jsr pushjmp
-                jsr filljmp._ENTRY1
-                jsr recret.nxtstmt
+                jsr PushJMP
+                jsr FillJmp._ENTRY1
+                jsr RecRet.nxtstmt
 
 _fi             ldy #fiERR
                 cmp #tokFI
-                bne errFI
+                bne ErrorFI
 
                 ldy #$04
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
                 beq _ifnoelse           ; if no ELSEIF
 
-                jsr filljmp._ENTRY1
+                jsr FillJmp._ENTRY1
 
 _ifnoelse       jsr ampl.cgu.TrashY
-                jsr frameadr
+                jsr FrameAdr
 
-                beq recret              ; in case of DO loop
-                jsr filljmp._ENTRY1
-
-                .endproc
-
-
-;--------------------------------------
-;    RecRet() pops stack and returns
-;--------------------------------------
-recret          .proc
-                jsr freeframe
-
-nxtstmt         jsr LexGetNext
-                jmp stmtlist
+                beq RecRet              ; in case of DO loop
+                jsr FillJmp._ENTRY1
 
                 .endproc
 
 
 ;--------------------------------------
-;    pops stack
+; RecRet() pops stack and returns
 ;--------------------------------------
-freeframe       .proc
+RecRet          .proc
+                jsr FreeFrame
+
+nxtstmt         jsr compiler.lexicon.GetNext
+                jmp StmtList
+
+                .endproc
+
+
+;--------------------------------------
+; pops stack
+;--------------------------------------
+FreeFrame       .proc
                 ldy #$00
                 lda (frame),Y
                 tax
@@ -983,7 +983,7 @@ freeframe       .proc
 ;--------------------------------------
 ;
 ;--------------------------------------
-thnerr          ldy #thenERR
+ThenError       ldy #thenERR
 
                 ;[fall-through]
 
@@ -991,19 +991,19 @@ thnerr          ldy #thenERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-sterr           jmp bankSPLErr
+StmtErr         jmp bankSPLErr
 
 
 ;--------------------------------------
 ; <do> _:= DO <stmt list> (UNTIL <exp>) OD
 ;--------------------------------------
-dostmt          .proc
+StmtDO          .proc
                 jsr doinit
 
                 lda #$00
                 ldy #$03
                 sta (frame),Y
-                bra whstmt._ENTRY1
+                bra StmtWHILE._ENTRY1
 
                 .endproc
 
@@ -1011,9 +1011,9 @@ dostmt          .proc
 ;--------------------------------------
 ;
 ;--------------------------------------
-errFI           .proc
+ErrorFI         .proc
                 cmp #tokUNDEC
-                bne sterr
+                bne StmtErr
 
                 jmp mscMNum._varerr
 
@@ -1023,49 +1023,49 @@ errFI           .proc
 ;--------------------------------------
 ; <while> _:= WHILE <exp> <do>
 ;--------------------------------------
-whstmt          .proc
+StmtWHILE       .proc
                 jsr doinit
-                jsr condexp
+                jsr ExpressionCond
 
                 ldy #doERR
                 cmp #tokDO
-                bne sterr
+                bne StmtErr
 
-_ENTRY1         jsr recret.nxtstmt
+_ENTRY1         jsr RecRet.nxtstmt
 
 _ENTRY2         cmp #tokUNTIL
                 bne _1
 
-                jsr condexp
+                jsr ExpressionCond
                 bra _2
 
 _1              ldy #$04
-                jsr frameadr._ENTRY1
-                jsr pushjmp
+                jsr FrameAdr._ENTRY1
+                jsr PushJMP
 
                 lda token
 _2              ldy #odERR
                 cmp #tokOD
-                bne errFI
+                bne ErrorFI
 
                 ldy #$06
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
 
                 stx whaddr
                 sty whaddr+1
 
-                jmp ifstmt._ifnoelse
+                jmp StmtIF._ifnoelse
 
                 .endproc
 
 
 ;======================================
-;   EXITstmt()
+; StmtEXIT()
 ;======================================
-exitstmt        .proc
+StmtEXIT        .proc
                 ldy #exitERR
                 ldx whaddr+1
-                beq sterr
+                beq StmtErr
 
                 ldy #$02                ; get pointer to EXIT list
                 lda (whaddr),Y
@@ -1084,9 +1084,9 @@ exitstmt        .proc
 
                 pla
                 tay
-                jsr pushjmp
+                jsr PushJMP
 
-                jmp recret.nxtstmt
+                jmp RecRet.nxtstmt
 
                 .endproc
 
@@ -1095,29 +1095,29 @@ exitstmt        .proc
 ; <for> _:= FOR <id> = <exp> TO <exp>
 ;             (STEP <exp>) <do>
 ;======================================
-forerror        ldy #forERR
-                bne errFI        ; [unc]
+ErrorFOR        ldy #forERR
+                bne ErrorFI             ; [unc]
 
 
 ;======================================
 ;
 ;======================================
-forstmt         .proc
+StmtFOR         .proc
                 lda #$17
-                jsr getframe
-                jsr whadr
+                jsr GetFrame
+                jsr AddressWHILE
 
 ;   make sure simple var for index
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 cmp #tokVAR_t+tokCHAR_t
-                bcc forerror
+                bcc ErrorFOR
 
                 cmp #tokARRAY_t
                 bcc _1
 
                 cmp #tokARRAY_t+tokREAL_t
-                bcs forerror
+                bcs ErrorFOR
 
                 lda #tokVAR_t+tokCARD_t
                 sta token
@@ -1130,19 +1130,19 @@ _1              ldy #$08
                 lda addr
                 ldx addr+1
 
-                jsr framecd._ENTRY2
-                jsr pushnext
+                jsr FrameCd._ENTRY2
+                jsr PushNext
 
                 cmp #tokEQU
-                bne forerror
+                bne ErrorFOR
 
-                jsr getexp
-                jsr cgassign
+                jsr GetExp
+                jsr CGAssign
 
 ;   set default STEP size
                 lda token
                 cmp #tokTO
-_next1          bne forerror
+_next1          bne ErrorFOR
 
                 lda #$00
                 ldx #$09
@@ -1162,11 +1162,11 @@ _next2          sta (frame),Y
 
                 ldx #$01
                 ldy #$0B
-                jsr framecd._ENTRY2
+                jsr FrameCd._ENTRY2
 
 ;   get ending value
                 lda #$10
-                jsr forexp
+                jsr ExpressionFOR
 
 ;   get step value
                 lda token
@@ -1174,7 +1174,7 @@ _next2          sta (frame),Y
                 bne _2
 
                 lda #$0B
-                jsr forexp
+                jsr ExpressionFOR
 
                 lda token
 _2              cmp #tokDO
@@ -1184,9 +1184,9 @@ _2              cmp #tokDO
                 jsr mscGetCodeOffset
 
                 ldy #$04
-                jsr framecd._ENTRY2
+                jsr FrameCd._ENTRY2
                 jsr ampl.cgu.TrashY
-                jsr genops._ENTRY1
+                jsr GenOps._ENTRY1
 
                 ldy #$10
                 lda (frame),Y
@@ -1220,7 +1220,7 @@ _3              ldy #$11
                 sty arg0
 
                 lda #$AD                ; LDA addr16
-                jsr forexp._ENTRY1
+                jsr ExpressionFOR._ENTRY1
 
                 lda #$C1                ; CMP
                 jsr ampl.cgu.Op2L
@@ -1235,7 +1235,7 @@ _3              ldy #$11
                 bcc _next3              ; only byte var
 
                 lda #$AD                ; LDA addr16
-                jsr forexp._ENTRY1
+                jsr ExpressionFOR._ENTRY1
 
 _4              lda #$E1                ; SBC
                 jsr ampl.cgu.Op2H
@@ -1251,14 +1251,14 @@ _5              lda arg3
 _6              jsr ampl.cgu.Push1
 
                 ldy #$15
-                jsr framecd._ENTRY1
+                jsr FrameCd._ENTRY1
                 jsr ampl.cgu.Push1
-                jsr popst
+                jsr PopST
 
-                jsr framecd
+                jsr FrameCd
 
                 ldy #$00
-                jsr pushjmp
+                jsr PushJMP
 
 ;   save space for vars
                 ldy #$10
@@ -1277,7 +1277,7 @@ _6              jsr ampl.cgu.Push1
                 ldx symtab+1
                 iny
 
-                jsr framecd._ENTRY2
+                jsr FrameCd._ENTRY2
 
                 lda #$00
                 tay
@@ -1288,33 +1288,33 @@ _6              jsr ampl.cgu.Push1
 
 ;   patch branch
 _7              ldy #$15
-                jsr frameadr._ENTRY1
-                jsr comprel
+                jsr FrameAdr._ENTRY1
+                jsr CompareRel
 
 ;   handle stmt list
-                jsr recret.nxtstmt
+                jsr RecRet.nxtstmt
 
 ;   handle incr
                 pha                     ; save token
 
                 ldy #$08
                 jsr fstk
-                jsr copyst
+                jsr CopyST
 
                 ldy #$0B
                 jsr fstk
 
                 lda #tokPLUS
-                jsr cgplus
+                jsr CGPlus
 
                 lda arg5
                 beq _8
 
-                jsr chasseq.chstkeq     ; see if INC
+                jsr ChAssEQ.ChStkEQ     ; see if INC
 
 _8              pha
 
-                jsr cgassign
+                jsr CGAssign
 
                 pla
                 beq _9                  ; not INC
@@ -1350,7 +1350,7 @@ _8              pha
 _9              pla
 _10             sta token
 
-                jmp whstmt._ENTRY2
+                jmp StmtWHILE._ENTRY2
 
                 .endproc
 
@@ -1358,17 +1358,17 @@ _10             sta token
 ;======================================
 ;
 ;======================================
-forexp          .proc
+ExpressionFOR   .proc
                 pha
-                jsr getexp
-                jsr genops._ENTRY1
+                jsr GetExp
+                jsr GenOps._ENTRY1
 
                 pla
                 sta arg0
 
                 jsr _1
 
-                jmp popst
+                jmp PopST
 
 
 _1              lda arg1
@@ -1387,7 +1387,7 @@ _1              lda arg1
                 ldy arg0
                 iny
 
-                jmp framecd._ENTRY2
+                jmp FrameCd._ENTRY2
 
 _2              ldy #$08
                 lda (frame),Y
@@ -1430,10 +1430,10 @@ _next1          lda #$8D                ; STA data16
 _ENTRY1         pha
 
                 ldy arg0
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
 
                 ldy arg0
-                jsr framecd._ENTRY1
+                jsr FrameCd._ENTRY1
 
                 iny
                 sty arg0
@@ -1475,7 +1475,7 @@ _6              jsr ampl.cgu.LoadCd
 ;======================================
 fmem            lda (frame),Y
                 cmp #tokVAR_t
-                bcc forexp._XIT1        ; const
+                bcc ExpressionFOR._XIT1 ; const
 
                 sty arg2
                 jsr mscGetCodeOffset    ; save address for step
@@ -1493,15 +1493,15 @@ fmem            lda (frame),Y
                 ldy arg2
                 lda (frame),Y
                 cmp #tokVAR_t+tokINT_t
-                bcc forexp._XIT1        ; byte only
+                bcc ExpressionFOR._XIT1 ; byte only
 
                 iny
                 iny
 
 _1              iny
 
-                jsr frameadr._ENTRY1
-                jsr filljmp._ENTRY1
+                jsr FrameAdr._ENTRY1
+                jsr FillJmp._ENTRY1
 
                 lda #$01
                 jmp mscCodeIncr
@@ -1514,12 +1514,12 @@ fstk            lda (frame),Y
                 sta token
 
                 iny
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
 
                 stx addr
                 sty addr+1
 
-                jmp pushst
+                jmp PushST
 
 
 ;======================================
@@ -1527,12 +1527,12 @@ fstk            lda (frame),Y
 ;======================================
 doinit          .proc
                 lda #$08
-                jsr getframe
-                jsr whadr
+                jsr GetFrame
+                jsr AddressWHILE
                 jsr mscGetCodeOffset
 
                 ldy #$04
-                jsr framecd._ENTRY2
+                jsr FrameCd._ENTRY2
 
                 jmp ampl.cgu.TrashY
 
@@ -1542,7 +1542,7 @@ doinit          .proc
 ;--------------------------------------
 ; <return> _:= RETURN ((<exp>))
 ;--------------------------------------
-retstmt         .proc
+StmtRETURN      .proc
                 lda #$00
                 jsr mscCProp
 
@@ -1553,24 +1553,24 @@ retstmt         .proc
                 tay
 
                 lda #args
-                jsr storst
+                jsr StoreST
 
                 ldx nxttoken
                 cpx #tokLParen
                 bne _err
 
-                jsr LexGetNext
-                jsr getexp
+                jsr compiler.lexicon.GetNext
+                jsr GetExp
 
                 cmp #tokRParen
                 bne _err
 
-                jsr cgassign
+                jsr CGAssign
 
 _1              lda #$60
                 jsr ampl.cgu.Push1
 
-                jmp recret.nxtstmt
+                jmp RecRet.nxtstmt
 
 _err            ldy #retrnERR
                 jmp bankSPLErr
@@ -1579,10 +1579,10 @@ _err            ldy #retrnERR
 
 
 ;======================================
-;   CondExp()
+; ExpressionCond()
 ;======================================
-condexp         .proc
-                jsr getexp
+ExpressionCond  .proc
+                jsr GetExp
 
                 pha
 
@@ -1592,10 +1592,10 @@ condexp         .proc
                 beq _1
 
 ;   not boolean
-                jsr zerost
+                jsr ZeroST
 
                 lda #tokNOTEQU
-                jsr codegen
+                jsr CodeGen
 
 _1              pla                     ; token value
                 pha
@@ -1609,23 +1609,23 @@ _1              pla                     ; token value
 
 ;   JMP to JMP to top of loop
 ;   yek!, should be improved
-                jsr filljmp             ; fill in jmps
+                jsr FillJmp             ; fill in jmps
 
 _2              ldy #$04
-                jsr frameadr._ENTRY1
+                jsr FrameAdr._ENTRY1
                 bra _4
 
-_3              jsr framecd
+_3              jsr FrameCd
 
                 ldy #$01
                 jsr ampl.cgu.StkAddr
 
-_4              jsr pushjmp
+_4              jsr PushJMP
 
 ;   fill in branch addresses
                 ldy #$04
-                jsr fillbr
-                jsr popst
+                jsr FillBr
+                jsr PopST
 
                 pla                     ; get token value
                 rts
@@ -1635,12 +1635,12 @@ _4              jsr pushjmp
 ;======================================
 ;
 ;======================================
-whadr           .proc
+AddressWHILE    .proc
                 lda whaddr
                 ldx whaddr+1
                 ldy #$06
 
-                jsr framecd._ENTRY2
+                jsr FrameCd._ENTRY2
 
                 lda frame
                 sta whaddr
@@ -1652,14 +1652,14 @@ whadr           .proc
 
 
 ;======================================
-;   FillBr(,,offset)
+; FillBr(,,offset)
 ;======================================
-fillbr          .proc
-                jsr setrel
+FillBr          .proc
+                jsr SetRel
 
-_next1          jsr savrel
-                jsr comprel
-                jsr loadn
+_next1          jsr SaveRel
+                jsr CompareRel
+                jsr LoadN
                 bne _next1
 
                 rts
@@ -1667,9 +1667,9 @@ _next1          jsr savrel
 
 
 ;======================================
-;   FrameAdr()
+; FrameAdr()
 ;======================================
-frameadr        .proc
+FrameAdr        .proc
                 ldy #$02
 
 _ENTRY1         lda (frame),Y
@@ -1687,9 +1687,9 @@ _ENTRY2         stx arg4
 
 
 ;======================================
-;   FrameCd()
+; FrameCd()
 ;======================================
-framecd         .proc
+FrameCd         .proc
                 ldy #$02
 
 _ENTRY1         lda QCODE
@@ -1706,15 +1706,15 @@ _ENTRY2         sta (frame),Y
 
 
 ;======================================
-;   FillJmp(,addr)
+; FillJmp(,addr)
 ;======================================
-filljmp         .proc
-                jsr frameadr._ENTRY2
+FillJmp         .proc
+                jsr FrameAdr._ENTRY2
 
-_ENTRY1         jsr saven
+_ENTRY1         jsr SaveN
                 jsr mscGetCodeOffset
-                jsr save4
-                jsr loadn
+                jsr Save4
+                jsr LoadN
                 bne _ENTRY1
 
                 rts
@@ -1722,9 +1722,9 @@ _ENTRY1         jsr saven
 
 
 ;======================================
-;   Save4(value)
+; Save4(value)
 ;======================================
-save4           .proc
+Save4           .proc
                 sta (arg4),Y
 
                 iny
@@ -1736,9 +1736,9 @@ save4           .proc
 
 
 ;======================================
-;   SaveN()
+; SaveN()
 ;======================================
-saven           .proc
+SaveN           .proc
                 ldy #$01
                 lda (arg4),Y
                 sta arg0
@@ -1753,9 +1753,9 @@ saven           .proc
 
 
 ;======================================
-;   LoadN()
+; LoadN()
 ;======================================
-loadn           .proc
+LoadN           .proc
                 lda arg0
                 ldx arg1
                 beq _XIT                ; is this needed anymore?
@@ -1768,9 +1768,9 @@ _XIT            rts
 
 
 ;======================================
-;   PushJMP(, addr)
+; PushJMP(, addr)
 ;======================================
-pushjmp         .proc
+PushJMP         .proc
                 lda #$4C                ; JMP addr16
                 jmp ampl.cgu.Push3
 
@@ -1778,9 +1778,9 @@ pushjmp         .proc
 
 
 ;======================================
-;   GetFrame(size)
+; GetFrame(size)
 ;======================================
-getframe        .proc
+GetFrame        .proc
                 sta arg0
 
                 ldy frame
@@ -1803,7 +1803,7 @@ getframe        .proc
                 tya
                 ldy #$00
 
-                jmp framecd._ENTRY2
+                jmp FrameCd._ENTRY2
 
 _err            ldy #nestERR
                 jmp bankSPLErr
@@ -1812,12 +1812,12 @@ _err            ldy #nestERR
 
 
 ;======================================
-;   SetRel(,,offset)
+; SetRel(,,offset)
 ;======================================
-setrel          .proc
+SetRel          .proc
                 jsr ampl.cgu.LoadI
 
-                jmp loadn._ENTRY1
+                jmp LoadN._ENTRY1
 
                 .endproc
 
@@ -1825,7 +1825,7 @@ setrel          .proc
 ;======================================
 ;
 ;======================================
-savrel          .proc
+SaveRel         .proc
                 ldy #$00
                 ldx #$00
                 lda (arg4),Y
@@ -1849,7 +1849,7 @@ _2              sta arg1
 ;======================================
 ;
 ;======================================
-comprel         .proc
+CompareRel      .proc
                 lda QCODE
                 clc                     ; extra -1 for offset byte
 _ENTRY1         sbc arg4
@@ -1864,7 +1864,7 @@ _ENTRY1         sbc arg4
 ;======================================
 ;
 ;======================================
-clrtemps        .proc
+ClearTemps      .proc
                 lda #$00
                 ldx #$10
 _next1          sta temps-1,X
@@ -1878,26 +1878,25 @@ _next1          sta temps-1,X
 ;--------------------------------------
 ;--------------------------------------
 
-stmtlst         .addr jt_smtend         ; not found
+tblStmtList     .addr jt_smtend         ; not found
                 .byte 20                ; #entries*3 - 1
-                .addr ifstmt
+                .addr StmtIF
                 .byte tokIF
-                .addr forstmt
+                .addr StmtFOR
                 .byte tokFOR
-                .addr whstmt
+                .addr StmtWHILE
                 .byte tokWHILE
-                .addr retstmt
+                .addr StmtRETURN
                 .byte tokRET
-                .addr dostmt
+                .addr StmtDO
                 .byte tokDO
-                .addr exitstmt
+                .addr StmtEXIT
                 .byte tokEXIT
 
 
-;=====================================
-;    Expression processing
-;=====================================
-
+;--------------------------------------
+; Expression processing
+;--------------------------------------
 ; <exp> _:= <exp> XOR <equiv> | <equiv>
 ; <equiv> _:= <equiv> OR <logical prod> | <logical prod>
 ; <logical prod> _:= <logical prod> AND <relation> | <relation>
@@ -1913,9 +1912,9 @@ stmtlst         .addr jt_smtend         ; not found
 ; <unary op> _:= @ | -
 
 ;======================================
-;   GetExp()
+; GetExp()
 ;======================================
-getexp          .proc
+GetExp          .proc
             .if ZAPRAM
                 inc cgopscd
             .else
@@ -1924,7 +1923,7 @@ getexp          .proc
                 nop
             .endif
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
 
                 .endproc
 
@@ -1934,10 +1933,9 @@ getexp          .proc
 ;======================================
 ;
 ;======================================
-
-exp             .proc
+Expression      .proc
                 lda #$00
-                jsr pushop
+                jsr PushOp
 
                 lda token               ; always non-zero
                 sta zpAllocOP
@@ -1953,7 +1951,7 @@ _ENTRY1         jsr jt_expend
                 ldx zpAllocOP
                 bne _err
 
-                jsr rollops
+                jsr RollOps
 
                 cmp #tokLParen
                 beq _next4
@@ -1968,7 +1966,7 @@ _1              cmp #tokLParen
                 ldx zpAllocOP
                 bne _9
 
-_err            jmp experr
+_err            jmp ErrorExpression
 
 _2              ldx zpAllocOP
                 beq _10
@@ -1983,17 +1981,17 @@ _next1          ldx nxttoken
                 beq _4                  ; record
 
                 cmp #tokTYPE_t
-                bcc exp._err
+                bcc Expression._err
                 bne _3
 
-_next2          jsr etype
+_next2          jsr EType
                 bra _next4
 
 _3              cmp #tokTYPE_t+8
                 bcc _4                  ; field
                 bne _5
 
-                jsr etypea
+                jsr ETypeA
 
                 jmp _next4
 
@@ -2005,7 +2003,7 @@ _4              cpx #tokPeriod
 ;   will generate error if falls through
 
 _5              cmp #tokCONST_t
-                bcc exp._err            ; missing operand?
+                bcc Expression._err     ; missing operand?
 
                 cmp #tokARRAY_t
                 bcs _6                  ; array or func
@@ -2014,10 +2012,10 @@ _5              cmp #tokCONST_t
                 beq _11
 
                 cmp #tokCONST_t+tokREAL_t
-                beq exp._err            ; real constant
+                beq Expression._err     ; real constant
 
-_next3          jsr pushnext
-                bra exp._ENTRY1
+_next3          jsr PushNext
+                bra Expression._ENTRY1
 
 _6              cmp #tokFUNC_t
                 bcs _12
@@ -2035,7 +2033,7 @@ _7              ldx zpAllocOP
                 beq _8
 
                 cmp #tokMINUS
-                bne exp._err
+                bne Expression._err
 
                 lda #tokUMINUS
                 sta token
@@ -2044,16 +2042,16 @@ _8              tax
                 lda prec-1,X
                 sta zpAllocOP
 
-                jsr rollops
-                jsr pushop
+                jsr RollOps
+                jsr PushOp
 
                 lda token
-_9              jsr pushop
-_next4          jsr LexGetNext
+_9              jsr PushOp
+_next4          jsr compiler.lexicon.GetNext
 
-                jmp exp._ENTRY1
+                jmp Expression._ENTRY1
 
-_10             jsr rollops
+_10             jsr RollOps
 
                 cmp #tokLParen
                 beq _errParen
@@ -2069,7 +2067,7 @@ _11             jsr bankGetAlias
 ;   proc
 _12             bne _16
 
-_next5          jsr procref
+_next5          jsr ProcRef
                 bra _next3
 
 ;   string
@@ -2093,11 +2091,11 @@ _15             jsr ampl.cgu.Push2
                 jsr mscCopyStr
 
                 ldy #tokCONST_t+tokSTR_t
-                jsr storst
+                jsr StoreST
 
                 dec choff
 
-                jsr LexGetNext
+                jsr compiler.lexicon.GetNext
                 bra _next4
 
 _errParen       ldy #parenthERR
@@ -2112,7 +2110,7 @@ _16             cmp #tokFUNC_t+8
                 bne _next5
 
                 lda #$11
-                jsr getframe
+                jsr GetFrame
 
                 ldy #$10
                 lda zpAllocOP
@@ -2142,10 +2140,10 @@ _17             dec arg1
                 bne _next6
 
                 lda temps
-                bne experr              ; nested functions
+                bne ErrorExpression     ; nested functions
 
-                jsr clrtemps
-                jsr ampl.pf.ProcFunc          ; call the function
+                jsr ClearTemps
+                jsr ampl.pf.ProcFunc    ; call the function
 
 ;   restore temps
                 ldy #$01
@@ -2176,7 +2174,7 @@ _18             inc arg1
                 lda (frame),Y
                 sta zpAllocOP
 
-                jsr freeframe
+                jsr FreeFrame
 
 ;   set result type
                 ldy #$00
@@ -2208,21 +2206,21 @@ _18             inc arg1
 ;--------------------------------------
 ;
 ;--------------------------------------
-experr          ldy #exprERR
+ErrorExpression ldy #exprERR
 
 
 ;--------------------------------------
 ;
 ;--------------------------------------
-experr2          jmp bankSPLErr
+ErrorExp2       jmp bankSPLErr
 
 
 ;======================================
-;   PopOp()
+; PopOp()
 ;======================================
-popop           .proc
+PopOp           .proc
                 dec stackptr
-                bmi experr              ; this should never happen
+                bmi ErrorExpression     ; this should never happen
 
                 ldy stackptr
                 lda opstack,Y
@@ -2234,7 +2232,7 @@ popop           .proc
 ;======================================
 ;
 ;======================================
-zerost          .proc
+ZeroST          .proc
                 lda #$00
                 tax
                 ldy #tokCONST_t+tokBYTE_t
@@ -2245,9 +2243,9 @@ zerost          .proc
 
 
 ;======================================
-;   StorST(addr16,token)
+; StoreST(addr16,token)
 ;======================================
-storst          .proc
+StoreST         .proc
                 sty token
                 sta addr
                 stx addr+1
@@ -2258,14 +2256,14 @@ storst          .proc
 
 
 ;======================================
-;   PushST()
+; PushST()
 ;======================================
-pushst          .proc
+PushST          .proc
                 sec
                 lda stack
                 sbc #$07
                 sta stack
-                bcc experr
+                bcc ErrorExpression
 
                 ldy #$00
                 lda token
@@ -2283,10 +2281,10 @@ pushst          .proc
 ;======================================
 ;
 ;======================================
-etypep          .proc
-                jsr pushst
-                jsr LexGetNext
-                jsr LexGetNext
+ETypeP          .proc
+                jsr PushST
+                jsr compiler.lexicon.GetNext
+                jsr compiler.lexicon.GetNext
 
                 ldy #$00
                 sta (stack),Y
@@ -2296,11 +2294,11 @@ etypep          .proc
 
                 ldy #typERR
                 cmp #tokTYPE_t
-                bne experr2
+                bne ErrorExp2
 
                 txa
                 and #$07
-                beq experr2
+                beq ErrorExp2
 
                 sta token
 
@@ -2314,7 +2312,7 @@ etypep          .proc
 ;======================================
 ;
 ;======================================
-etype           .proc
+EType           .proc
                 cpx #tokPeriod
                 beq _1
 
@@ -2322,7 +2320,7 @@ etype           .proc
 ;   A reg must be nonzero before call
                 jmp ampl.array.Ref.arrconst
 
-_1              jsr etypep              ; set type
+_1              jsr ETypeP              ; set type
 
 ;   get var address
                 ldy #$01
@@ -2343,13 +2341,13 @@ _1              jsr etypep              ; set type
 ;======================================
 ;
 ;======================================
-etypea          .proc
+ETypeA          .proc
                 cpx #tokPeriod
                 beq _1
 
                 jmp ampl.array.Ref.arrvar
 
-_1              jsr etypep              ; set type
+_1              jsr ETypeP              ; set type
 
                 tay
                 lda token
@@ -2358,7 +2356,7 @@ _1              jsr etypep              ; set type
                 tya
                 ldy #tokCONST_t+tokBYTE_t
 
-                jsr storst
+                jsr StoreST
 
                 lda #tokARRAY_t+tokBYTE_t
                 ldy #$07
@@ -2377,14 +2375,14 @@ _1              jsr etypep              ; set type
 ;======================================
 ;
 ;======================================
-procref         .proc
-                ldy #tokFUNC_t+tokCARD_t        ; make sure CARD
+ProcRef         .proc
+                ldy #tokFUNC_t+tokCARD_t    ; make sure CARD
                 cmp #tokFUNC_t+8
                 bcc _1
 
-_ENTRY1         jsr bankGetArgs                 ; A#0, no arg types
+_ENTRY1         jsr bankGetArgs             ; A#0, no arg types
 
-                ldy #tokCONST_t+tokCARD_t       ; sys proc
+                ldy #tokCONST_t+tokCARD_t   ; sys proc
 _1              sty token
 
                 rts
@@ -2392,14 +2390,14 @@ _1              sty token
 
 
 ;======================================
-;   CopyST()
+; CopyST()
 ;======================================
-copyst          .proc
+CopyST          .proc
                 lda stack
                 ldx stack+1
 
-                jsr loadn._ENTRY1
-                jsr pushst
+                jsr LoadN._ENTRY1
+                jsr PushST
 
                 ldy #$06
 _next1          lda (arg4),Y
@@ -2413,10 +2411,10 @@ _next1          lda (arg4),Y
 
 
 ;======================================
-;   RollOps()
+; RollOps()
 ;======================================
-rollops         .proc
-                jsr popop
+RollOps         .proc
+                jsr PopOp
                 beq _XIT
 
                 cmp #tokLParen
@@ -2443,7 +2441,7 @@ rollops         .proc
                 cpx #tokLSH
                 bne _4
 
-_1              jsr popop               ; see if last op
+_1              jsr PopOp               ; see if last op
                 bne _3
 
 ;   check for increament
@@ -2453,30 +2451,30 @@ _1              jsr popop               ; see if last op
                 cmp #tokPLUS
                 bne _2
 
-                jsr cgplus
+                jsr CGPlus
 
                 lda #$00
                 rts
 
-_2              jsr cgsh
+_2              jsr CGSh
 
                 lda #$00
                 rts
 
-_3              jsr pushop
+_3              jsr PushOp
 
                 txa
-_4              jsr codegen
-                jmp rollops
+_4              jsr CodeGen
+                jmp RollOps
 
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   PopST()
+; PopST()
 ;======================================
-popst           .proc
+PopST           .proc
                 clc
                 lda stack
                 adc #$07
@@ -2487,9 +2485,9 @@ popst           .proc
 
 
 ;======================================
-;   PushOp(op)
+; PushOp(op)
 ;======================================
-pushop          .proc
+PushOp          .proc
                 ldy stackptr
                 inc stackptr
                 sta opstack,Y
@@ -2499,14 +2497,15 @@ pushop          .proc
 
 
 ;======================================
-;   PushNext()
+; PushNext()
 ;======================================
-pushnext        .proc
-                jsr pushst
+PushNext        .proc
+                jsr PushST
 
-                jmp LexGetNext
+                jmp compiler.lexicon.GetNext
 
                 .endproc
+
 
 ;--------------------------------------
 ;--------------------------------------
@@ -2516,14 +2515,14 @@ prec            .byte 5,5,6,6,2,3
                 .byte 6,1,6,6,7,7
 
 
-;======================================
+;--------------------------------------
 ;    Code generation
-;======================================
+;--------------------------------------
 
 ;======================================
-;   GenOps(op)
+; GenOps(op)
 ;======================================
-genops          .proc
+GenOps          .proc
                 sta arg0
 
 _ENTRY1         ldy #$00
@@ -2569,15 +2568,15 @@ _ENTRY1         ldy #$00
 ;======================================
 ;
 ;======================================
-cgsh            .proc
-                jsr chasseq
-                beq codegen._ENTRY1
+CGSh            .proc
+                jsr ChAssEQ
+                beq CodeGen._ENTRY1
 
 _next1          lda stkbase-20
                 beq _XIT                ; no shift!
 
                 cmp #$05
-                bcs codegen._ENTRY1     ; too large a shift
+                bcs CodeGen._ENTRY1     ; too large a shift
 
 ;   whew!, we can now shift it
                 ldy arg0
@@ -2607,16 +2606,16 @@ _2              jsr ampl.cgu.Op1L
 _3              dec stkbase-20
                 bne _next1
 
-_XIT            jmp popst
+_XIT            jmp PopST
 
                 .endproc
 
 
 ;======================================
-;   CodeGen(op)
+; CodeGen(op)
 ;======================================
-codegen         .proc
-                jsr genops
+CodeGen         .proc
+                jsr GenOps
 _ENTRY1         jsr jt_cgend
 
                 lda arg0
@@ -2637,15 +2636,15 @@ _ENTRY1         jsr jt_cgend
 
 
 ;======================================
-;   CGPlus()
+; CGPlus()
 ;======================================
-cgplus          .proc
-                jsr chasseq
-                beq codegen._ENTRY1
+CGPlus          .proc
+                jsr ChAssEQ
+                beq CodeGen._ENTRY1
 
                 lda stkbase-20
                 cmp #$01                ; see if const = 1
-                bne codegen._ENTRY1     ;   no
+                bne CodeGen._ENTRY1     ;   no
 
 ;   whew!, we can now increment it
                 lda #$E6                ; INC
@@ -2667,9 +2666,9 @@ cgplus          .proc
                 jsr ampl.cgu.Op1H
 
                 ldy #$0D
-                jsr fillbr
+                jsr FillBr
 
-_XIT            jmp popst
+_XIT            jmp PopST
 
                 .endproc
 
@@ -2677,17 +2676,17 @@ _XIT            jmp popst
 ;--------------------------------------
 ;
 ;--------------------------------------
-cgexperr        jmp experr
+CGExpError      jmp ErrorExpression
 
 
 ;======================================
-;   CGAssign()
+; CGAssign()
 ;======================================
-cgassign        .proc
+CGAssign        .proc
                 lda #$00
-                jsr genops
+                jsr GenOps
                 jsr jt_cgend
-                jsr chasseq.chstkeq     ; see if INC
+                jsr ChAssEQ.ChStkEQ     ; see if INC
                 bne _ENTRY5             ;   yes, just return
 
                 lda arg1
@@ -2736,7 +2735,7 @@ _1              ldy #$01
                 bra _4
 
 _2              cmp #tokTYPE_t
-                bcc cgexperr            ; cond. exp.
+                bcc CGExpError          ; cond. exp.
 
 ;   rhs var
 _ENTRY1         ldx arg4                ; lhs type=byte?
@@ -2756,18 +2755,18 @@ _3              jsr ampl.cgu.Load2L
 
 _ENTRY4         lda #$81                ; STA
 _4              jsr ampl.cgu.Op1L
-_ENTRY5         jsr popst
+_ENTRY5         jsr PopST
 
-                jmp popst
+                jmp PopST
 
 _5              and #$10                ; rhs array?
-                bne cgassign._ENTRY1    ;   yes
+                bne CGAssign._ENTRY1    ;   yes
 
 ;   special case for arg0
                 ldy #$01
                 lda (stack),Y
                 cmp #args
-                beq cgassign._ENTRY1    ; function return value
+                beq CGAssign._ENTRY1    ; function return value
 
                 lda arg4                ; lhs byte?
                 beq _10                 ;   yes
@@ -2813,7 +2812,7 @@ _next1          ldy #$05
                 jmp _ENTRY5
 
 _7              and #$40                ; proc?
-                bne cgassign._ENTRY2    ;   yes, punt(not the best QCODE)
+                bne CGAssign._ENTRY2    ;   yes, punt(not the best QCODE)
 
                 jsr ampl.cgu.StkAddr    ; temp (proc argument)
 
@@ -2826,46 +2825,46 @@ _8              ldy #$01
 
 ;   temp array
 _9              lda arg3
-                beq cgassign._ENTRY2
+                beq CGAssign._ENTRY2
 
                 ldy #$05
                 jsr ampl.cgu.LdCdZ
-                bra cgassign._ENTRY3
+                bra CGAssign._ENTRY3
 
 _10             ldy #$03
                 jsr ampl.cgu.LoadCd
 
                 lda arg3                ; see if rhs BYTE or CHAR
-                beq cgassign._ENTRY4    ;   yes
+                beq CGAssign._ENTRY4    ;   yes
 
                 jsr ampl.cgu.TrashY     ; in case INT ARRAY in rhs
 
 ;   oh if I only had more QCODE space!
 ;   could handle Y, see _OpA in CGU
-                bra cgassign._ENTRY4
+                bra CGAssign._ENTRY4
 
                 .endproc
 
 
 ;======================================
-;   chasseq (mode)
+; ChAssEQ (mode)
 ;======================================
-chasseq         .proc
-                jsr genops
+ChAssEQ         .proc
+                jsr GenOps
 
                 lda arg1
                 cmp #tokVAR_t           ; see if const
-                bcs chstkeq._ENTRY1     ;   no
+                bcs ChStkEQ._ENTRY1     ;   no
 
                 lda stkbase-19          ; see if byte
-                bne chstkeq._ENTRY1     ;   no
+                bne ChStkEQ._ENTRY1     ;   no
                                         ; see if left and right-hand are =
 
 
 ;======================================
-;   JMP ChStkEq
+; JMP ChStkEq
 ;======================================
-chstkeq         ldx #$02
+ChStkEQ         ldx #$02
                 lda stkbase-7
                 and #$F8
                 cmp #$B0                ; large array?
@@ -2891,9 +2890,9 @@ _ENTRY1         lda #$00
 
 
 ;======================================
-;   CGAdd()
+; CGAdd()
 ;======================================
-cgadd           .proc
+CGAdd           .proc
                 lda arg1
                 bpl _3
 
@@ -2977,7 +2976,7 @@ _ENTRY4         ldy #$07
 
                 jsr ampl.cgu.SaveCd._ToStack
 
-_XIT            jmp popst
+_XIT            jmp PopST
 
                 .endproc
 
@@ -2985,17 +2984,17 @@ _XIT            jmp popst
 ;======================================
 ;
 ;======================================
-cgshift         .proc
+CGShift         .proc
                 lda arg5                ; byte ?
-                bne cgmd                ;   no
+                bne CGMd                ;   no
 
                 lda arg1
                 cmp #tokVAR_t           ; see if constant
-                bcs cgmd                ;   no
+                bcs CGMd                ;   no
 
                 ldy #$01
                 lda (stack),Y
-                beq cgadd._XIT          ; ignore shift
+                beq CGAdd._XIT          ; ignore shift
 
                 cmp #$08                ; shift high  7
                 bcc _1                  ;   no
@@ -3004,7 +3003,7 @@ cgshift         .proc
                 stx arg9
 
                 lda #tokCONST_t+tokBYTE_t
-                bra cgadd._ENTRY4
+                bra CGAdd._ENTRY4
 
 _1              sta arg1
 
@@ -3027,7 +3026,7 @@ _next1          lda arg3                ; shift Op
 
                 jsr ampl.cgu.STempL
 
-                jmp cgadd._ENTRY3
+                jmp CGAdd._ENTRY3
 
                 .endproc
 
@@ -3035,7 +3034,7 @@ _next1          lda arg3                ; shift Op
 ;======================================
 ;
 ;======================================
-cgmul           .proc
+CGMul           .proc
                 lda #tokTEMP_t+tokINT_t ; force output to INT
                 sta arg5
                 sta arg7
@@ -3055,7 +3054,7 @@ cgmul           .proc
 ;======================================
 ;
 ;======================================
-cgdiv           .proc
+CGDiv           .proc
                 jsr ampl.cgu.Load2H
 
                 lda #$85                ; STA AFcur+1
@@ -3071,7 +3070,7 @@ cgdiv           .proc
 ;--------------------------------------
 ;
 ;--------------------------------------
-cgmd            .proc
+CGMd            .proc
                 jsr ampl.cgu.GetTemps
                 jsr ampl.cgu.Load2L
 
@@ -3111,16 +3110,16 @@ _2              ldx arg8
 
                 jsr ampl.cgu.STempH
 
-_XIT            jmp cgadd._ENTRY3
+_XIT            jmp CGAdd._ENTRY3
 
                 .endproc
 
 
 ;======================================
-;   CGOr()
+; CGOr()
 ;======================================
-cgor            .proc
-                jsr chkcond
+CGOr            .proc
+                jsr CheckCond
 
                 ldy #$0C
                 jsr ampl.cgu.LdCdZ
@@ -3129,24 +3128,24 @@ cgor            .proc
                 jsr ampl.cgu.StkAddr
                 beq _1                  ; no JMPs
 
-                jsr filljmp
+                jsr FillJmp
 
 _1              ldy #$05
                 jsr ampl.cgu.LdCdZ
 
                 ldy #$0B                ; link T2 to T1
-                jsr setrel
+                jsr SetRel
 
-_next1          jsr savrel
-                jsr loadn
+_next1          jsr SaveRel
+                jsr LoadN
                 bne _next1              ; get end of T1
 
                 ldy #$03
                 lda (stack),Y
 
                 sec
-                jsr comprel._ENTRY1     ; patch in T2
-                bra cgand._ENTRY1
+                jsr CompareRel._ENTRY1  ; patch in T2
+                bra CGAnd._ENTRY1
 
                 .endproc
 
@@ -3154,14 +3153,14 @@ _next1          jsr savrel
 ;======================================
 ;   CGAnd()
 ;======================================
-cgand           .proc
-                jsr chkcond
+CGAnd           .proc
+                jsr CheckCond
 
                 lda stack
                 ldx stack+1
-                jsr loadn._ENTRY1
+                jsr LoadN._ENTRY1
 
-_next1          jsr saven               ; patch addresses
+_next1          jsr SaveN               ; patch addresses
 
                 clc
                 lda arg0
@@ -3173,14 +3172,14 @@ _next1          jsr saven               ; patch addresses
                 adc #$00
                 sta (arg4),Y
 
-                jsr loadn
+                jsr LoadN
                 bne _next1
 
                 ldy #$0D
                 jsr ampl.cgu.LoadI
 
                 ldy #$01
-                jsr save4               ; link F1 to F2
+                jsr Save4               ; link F1 to F2
 
                 ldy #$08
                 jsr ampl.cgu.StkAddr
@@ -3197,7 +3196,7 @@ _next1          jsr saven               ; patch addresses
                 sta QCODE
 
                 ldy #$0B
-                jsr fillbr              ; make T1 -> Cond2
+                jsr FillBr              ; make T1 -> Cond2
 
                 pla
                 sta QCODE
@@ -3224,7 +3223,7 @@ _ENTRY1         ldy #$02
                 jsr ampl.cgu.SaveCd
                 jsr ampl.cgu.TrashY     ; just in case array in cond.
 
-                jmp popst               ; done at last, whew!
+                jmp PopST               ; done at last, whew!
 
                 .endproc
 
@@ -3232,20 +3231,20 @@ _ENTRY1         ldy #$02
 ;======================================
 ;
 ;======================================
-chkcond         .proc
+CheckCond       .proc
                 lda #tokCOND_t
                 cmp arg1
                 bne _1
 
                 cmp arg2
-                bne conderr
+                bne ErrCond
 
                 rts
 
 _1              pla
                 pla
 
-                jmp cgadd._ENTRY1
+                jmp CGAdd._ENTRY1
 
                 .endproc
 
@@ -3253,7 +3252,7 @@ _1              pla
 ;--------------------------------------
 ;
 ;--------------------------------------
-conderr         .proc
+ErrCond         .proc
                 ldy #condtERR
                 jmp bankSPLErr
 
@@ -3261,9 +3260,9 @@ conderr         .proc
 
 
 ;======================================
-;   CGEq()
+; CGEqual()
 ;======================================
-cgeq            .proc
+CGEqual         .proc
 cgne            jsr ampl.cgu.Load1L
                 jsr ampl.cgu.ChkZero
                 beq _1
@@ -3292,7 +3291,7 @@ _2              lda #$01                ; ORA
                 jsr ampl.cgu.Op2H
 
                 ldy #$0B
-                jsr fillbr
+                jsr FillBr
 
 _ENTRY1         jsr ampl.cgu.OpCd1
                 jsr ampl.cgu.PushTrue   ; sets arg9 to zero
@@ -3303,15 +3302,15 @@ _ENTRY1         jsr ampl.cgu.OpCd1
                 ldy #$0C
                 jsr ampl.cgu.SaveCd
 
-                jmp cgadd._ENTRY3
+                jmp CGAdd._ENTRY3
 
                 .endproc
 
 
 ;======================================
-;   CGLS()
+; CGLess()
 ;======================================
-cgls            .proc
+CGLess          .proc
 cgge            jsr ampl.cgu.RelOp
                 jsr ampl.cgu.Load1L
 
@@ -3319,21 +3318,21 @@ cgge            jsr ampl.cgu.RelOp
                 jsr ampl.cgu.Op2L
 
                 lda arg5
-                beq cgeq.cgne._ENTRY1
+                beq CGEqual.cgne._ENTRY1
 
                 jsr ampl.cgu.Load1H
 
                 lda #$E1                ; SBC
                 jsr ampl.cgu.Op2H
-                bra cgeq.cgne._ENTRY1   ; see CodeIncr
+                bra CGEqual.cgne._ENTRY1   ; see CodeIncr
 
                 .endproc
 
 
 ;======================================
-;   CGGR()
+; CGGreater()
 ;======================================
-cggr            .proc
+CGGreater       .proc
 cgle            jsr ampl.cgu.RelOp
                 jsr ampl.cgu.Load2L
 
@@ -3341,21 +3340,21 @@ cgle            jsr ampl.cgu.RelOp
                 jsr ampl.cgu.Op1L
 
                 lda arg5
-                beq cgeq.cgne._ENTRY1
+                beq CGEqual.cgne._ENTRY1
 
                 jsr ampl.cgu.Load2H
 
                 lda #$E1                ; SBC
                 jsr ampl.cgu.Op1H
-                bra cgeq.cgne._ENTRY1   ; see CodeIncr
+                bra CGEqual.cgne._ENTRY1   ; see CodeIncr
 
                 .endproc
 
 
 ;======================================
-;   CGUM()
+; CGUnaryMinus()
 ;======================================
-cgum            .proc
+CGUnaryMinus    .proc
                 lda arg1
                 and #$78
                 bne _1                  ; not constant
@@ -3379,7 +3378,7 @@ cgum            .proc
 
                 rts
 
-_1              jsr copyst
+_1              jsr CopyST
 
                 ldy #$07
                 lda #tokCONST_t+tokINT_t
@@ -3392,15 +3391,15 @@ _1              jsr copyst
                 jsr ampl.cgu.SaveCd._ToStack
 
                 lda #tokMINUS
-                jmp codegen
+                jmp CodeGen
 
                 .endproc
 
 
 ;======================================
-;   CGAt()
+; CGAt()
 ;======================================
-cgat            .proc
+CGAt            .proc
                 lda arg1
                 cmp #tokVAR_t
                 bcc _1
@@ -3424,7 +3423,7 @@ _1              and #$F8
                 cmp #tokTYPE_t          ; check for record field
                 beq _next1
                                         ; constant or cond. exp. (error)
-_err            jmp experr
+_err            jmp ErrorExpression
 
                 .endproc
 
@@ -3442,55 +3441,55 @@ cgopscd         .byte $18,$61           ; CLC ADC
                 .byte $f0,$d0           ; BEQ BNE
 
 cgops           .byte 0
-                .addr cgadd
+                .addr CGAdd
 
                 .byte 2
-                .addr cgadd             ; minus
+                .addr CGAdd             ; minus
 
                 .byte 4
-                .addr cgmul             ; multiply
+                .addr CGMul             ; multiply
 
                 .byte 6
-                .addr cgdiv             ; divide
+                .addr CGDiv             ; divide
 
                 .byte 5
-                .addr cgor
+                .addr CGOr
 
                 .byte 4
-                .addr cgand
+                .addr CGAnd
 
                 .byte 10
-                .addr cgeq
+                .addr CGEqual
 
                 .byte 11
-                .addr cgeq.cgne
+                .addr CGEqual.cgne
 
                 .byte 6
-                .addr cggr
+                .addr CGGreater
 
                 .byte 8
-                .addr cgls.cgge
+                .addr CGLess.cgge
 
                 .byte 6
-                .addr cgls
+                .addr CGLess
 
                 .byte 8
-                .addr cggr.cgle
+                .addr CGGreater.cgle
 
                 .byte 8
-                .addr cgdiv             ; remainder
+                .addr CGDiv             ; remainder
 
                 .byte 3
-                .addr cgadd._ENTRY1     ; XOR
+                .addr CGAdd._ENTRY1     ; XOR
 
                 .byte 0
-                .addr cgshift           ; LSH
+                .addr CGShift           ; LSH
 
                 .byte 2
-                .addr cgshift           ; RSH
+                .addr CGShift           ; RSH
 
                 .byte 12
-                .addr cgum              ; unary minus
+                .addr CGUnaryMinus
 
                 .byte 0
-                .addr cgat
+                .addr CGAt
