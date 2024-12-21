@@ -12,11 +12,11 @@
 ;   ACTION! Monitor
 ;======================================
 Monitor         .proc
-                jsr SaveWorld
+                jsr editor.window.SaveWorld
 
                 lda delbuf              ; delete buffer bottom
                 ldx delbuf+1
-                jsr DeleteFree          ; get rid of delete buf
+                jsr editor.chr.DeleteFree   ; get rid of delete buf
 
                 lda top+1
                 sta top1
@@ -34,7 +34,7 @@ _ENTRY1         jsr screenInit
                 jsr initSetupSPL
 
 _ENTRY2
-_next1          jsr InitKeys
+_next1          jsr editor.io.InitKeys
 
                 lda DINDEX              ; display mode
                 beq _1
@@ -46,7 +46,7 @@ _1              jsr jt_alarm
 
                 lda #<monitorPrompt
                 ldx #>monitorPrompt
-                jsr GetTemp
+                jsr editor.window.GetTemp
 
                 ldy tempbuf
                 beq _next1
@@ -106,9 +106,9 @@ monResetWindow  .proc
 
                 lda #$00
 _1              jsr monPaintWindow
-                jsr EditorInit._ENTRY3
+                jsr editor.init.EditorInit._ENTRY3
 
-                jmp floop
+                jmp editor.main.Loop
 
                 .endproc
 
@@ -119,8 +119,8 @@ _1              jsr monPaintWindow
 monPaintWindow  .proc
                 sta currentWindow
 
-                jsr RestoreWindow
-                jmp Found
+                jsr editor.display.RestoreWindow
+                jmp editor.find.Found
 
                 .endproc
 
@@ -139,7 +139,7 @@ _next1          inc arg11
 _1              lda arg11
                 ldx arg12
                 jsr monPrint._ENTRY1
-                jsr GotKey
+                jsr editor.io.GotKey
                 beq _next1
 
                 ldx #$FF
@@ -227,10 +227,10 @@ monSaveParams   .proc
 monBoot         .proc
                 lda #<_bmsg
                 ldx #>_bmsg
-                jsr YesNo
+                jsr editor.window.YesNo
                 bne monMemRun._XIT
 
-                jmp START.cold
+                jmp editor.cartridge.START._cold
 
 ;--------------------------------------
 
@@ -452,7 +452,7 @@ monProceed      .proc
 
 ;               lda #<_pmsg
 ;               ldx #>_pmsg
-;               jsr YesNo
+;               jsr editor.window.YesNo
 ;               bne _XIT
 
 ;               ldx procSP              ; break stack pointer

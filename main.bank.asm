@@ -46,7 +46,7 @@ bankCartStart   .proc
                 sty jt_curbank
                 ;!!sty bank+ebank
 
-                jmp START
+                jmp editor.cartridge.START
 
                 .endproc
 
@@ -188,7 +188,7 @@ bankCStmtList   .proc
 ;======================================
 bankMGetT1      .proc
                 jsr bankEditBank
-                jsr GetTemp._ENTRY1
+                jsr editor.window.GetTemp._ENTRY1
 
                 .endproc
 

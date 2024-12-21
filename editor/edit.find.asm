@@ -8,12 +8,14 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+find            .namespace
+
 ;======================================
-;   Find()
+; Find()
 ;======================================
 Find            .proc
-                jsr SetSpacing
-                jsr SaveWindow
+                jsr editor.command.SetSpacing
+                jsr editor.display.SaveWindow
 
                 lda lastch
                 cmp #$F8
@@ -26,7 +28,7 @@ _ENTRY1         ldy #>findbuf
                 sty arg3
 
                 ldy #<findbuf
-                jsr CommandString
+                jsr editor.window.CommandString
 
                 lda #$F8
                 sta curch
@@ -76,7 +78,7 @@ _2              sta curch
 
                 lda #<notfnd
                 ldx #>notfnd
-                jsr CommandMsg
+                jsr editor.display.CommandMsg
 
                 lda #$00
 _3              sta curch
@@ -88,14 +90,13 @@ _3              sta curch
 ;======================================
 ;   Found()
 ;======================================
-
 Found           .proc
-                jsr CenterLine
+                jsr editor.display.CenterLine
 
                 ldy sp
                 dey
                 tya
-                jsr Back._ENTRY1
+                jsr editor.command.Back._ENTRY1
 
                 lda #$FE
 
@@ -109,3 +110,5 @@ Found           .proc
 notfnd          .ptext "not found"
 
 findmsg         .ptext "Find? "
+
+                .endnamespace

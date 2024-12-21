@@ -8,10 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+memory          .namespace
+
 ;======================================
-;   GetMemory(size)
+; Get(size)
 ;======================================
-GetMemory       .proc
+Get             .proc
                 clc
                 adc #$04
                 sta zpAllocSize
@@ -23,7 +25,7 @@ _1              stx zpAllocSize+1
 _ENTRY1         jsr Allocate._ENTRY
 
                 ldx zpAllocCurrent+1
-                beq GeneralMemErr       ; no memory allocated !
+                beq GeneralErr       ; no memory allocated !
 
                 clc
                 lda zpAllocCurrent
@@ -39,7 +41,7 @@ _XIT            rts
 ;======================================
 ; General Memory Error
 ;======================================
-GeneralMemErr   .proc
+GeneralErr      .proc
                 ldy #$00
                 jsr ioSystemError
 
@@ -52,13 +54,13 @@ GeneralMemErr   .proc
 
                 jsr Free
 
-                jmp GetMemory._ENTRY1   ; retry
+                jmp Get._ENTRY1         ; retry
 
 
 ;--------------------------------------
 ;
 ;--------------------------------------
-Punt            jsr SaveWindow          ; we're in big trouble
+Punt            jsr editor.display.SaveWindow   ; we're in big trouble
 
                 jmp monResetWindow
 
@@ -66,9 +68,9 @@ Punt            jsr SaveWindow          ; we're in big trouble
 
 
 ;======================================
-;   FreeMem(addr)
+; Free(addr)
 ;======================================
-FreeMemory      ;.proc
+Free            ;.proc
                 sec
                 sbc #$04
                 bcs _XIT
@@ -81,7 +83,7 @@ _XIT            jmp Free
 
 
 ;======================================
-;   InsertByte()
+; InsertByte()
 ;======================================
 InsertByte      .proc
                 lda cur
@@ -99,7 +101,7 @@ InsertByte      .proc
 
 
 ;======================================
-;   InsertBuffer(,,up)
+; InsertBuffer(,,up)
 ;======================================
 InsertBuffer    .proc
                 ldy #$00
@@ -113,7 +115,7 @@ InsertBuffer    .proc
 
 
 ;======================================
-;   InsertLine(sze,sloc,up)
+; InsertLine(sze,sloc,up)
 ;======================================
 InsertLine      ;.proc
                 sta arg0                ; save sze
@@ -124,7 +126,7 @@ InsertLine      ;.proc
                 adc #$03
                 ldx #$00
 
-                jsr GetMemory
+                jsr Get
 
                 clc
                 adc #$02
@@ -225,7 +227,7 @@ _3              ldy #$04
 
 
 ;======================================
-;   DeleteCurrentLine()
+; DeleteCurrentLine()
 ;======================================
 DeleteCurrentLine .proc
                 lda cur
@@ -240,7 +242,7 @@ _XIT            rts
 
 
 ;======================================
-;   DeleteLine(lineptr)
+; DeleteLine(lineptr)
 ;======================================
 DeleteLine      .proc
                 cpx #$00
@@ -308,3 +310,5 @@ _4              lda arg0
 
                 rts
                 .endproc
+
+                .endnamespace

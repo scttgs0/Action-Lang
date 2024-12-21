@@ -8,8 +8,10 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+command         .namespace
+
 ;======================================
-;   Front()
+; Front()
 ;======================================
 Front           .proc
                 sec
@@ -26,7 +28,7 @@ Front           .proc
 
 
 ;======================================
-;   Back()
+; Back()
 ;======================================
 Back            .proc
                 ldy #$00
@@ -62,7 +64,7 @@ _1              sbc indent
 
 
 ;======================================
-;   PageUp()
+; PageUp()
 ;======================================
 PageUp          .proc
                 sec
@@ -76,7 +78,7 @@ PageUp          .proc
 
 
 ;======================================
-;   PageDown()
+; PageDown()
 ;======================================
 PageDown        .proc
                 ldy #$05
@@ -101,7 +103,7 @@ PageContent     .proc
                 beq _XIT
 
                 sty arg13
-                jsr CleanLine
+                jsr editor.display.CleanLine
 
 _next1          ldy arg13
                 jsr mscNext
@@ -109,36 +111,36 @@ _next1          ldy arg13
                 dec arg14
                 bne _next1
 
-_XIT            jmp CenterLine
+_XIT            jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   Paste()
+; Paste()
 ;======================================
 Paste           .proc
-                jsr DeleteTop
+                jsr editor.chr.DeleteTop
                 beq _XIT
 
                 stx dirty
 
-                jsr CleanLine
+                jsr editor.display.CleanLine
                 jsr mscNextUp
 
                 sta cur+1               ; tricky, fake out top
 
-                jsr SaveWindow._ENTRY1
-                jsr DeleteTop
+                jsr editor.display.SaveWindow._ENTRY1
+                jsr editor.chr.DeleteTop
 
 _next1          jsr mscStrPtr
                 jsr ioLoadBuffer._ENTRY1
-                jsr InsertByte
+                jsr editor.memory.InsertByte
 
                 lda allocerr
                 bne _1                  ; check for out of memory
 
-                jsr DeleteNext
+                jsr editor.chr.DeleteNext
                 bne _next1
 
 _1              jsr ioResetCursor
@@ -150,14 +152,14 @@ _1              jsr ioResetCursor
                 jsr mscNextDown
 
 _2              lda #$00
-                jmp NewPage._ENTRY1
+                jmp editor.display.NewPage._ENTRY1
 
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   old IndentL()
+; old IndentL()
 ;======================================
 IndentLeft      .proc
                 lda indent
@@ -165,13 +167,13 @@ IndentLeft      .proc
 
                 dec indent
 
-                jmp CenterLine
+                jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   old IndentR()
+; old IndentR()
 ;======================================
 IndentRight     .proc
                 lda indent
@@ -179,13 +181,15 @@ IndentRight     .proc
 
                 inc indent
 
-                jmp CenterLine
+                jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   InsrtT() insert/replace toggle
+; InsertToggle()
+;--------------------------------------
+; insert/replace toggle
 ;======================================
 InsertToggle    .proc
                 lda #<_rmsg
@@ -199,7 +203,7 @@ InsertToggle    .proc
                 lda #<_imsg
                 ldx #>_imsg
 
-_XIT            jmp CommandMsg
+_XIT            jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
@@ -215,7 +219,7 @@ _rmsg           .ptext "REPLACE"
 ScrollInit      .proc
                 sty arg13
 
-                jsr CleanLine
+                jsr editor.display.CleanLine
                 beq _XIT
 
                 ldy arg13
@@ -243,7 +247,7 @@ _XIT            rts
 
 
 ;======================================
-;   ScrollUp()
+; ScrollUp()
 ;======================================
 ScrollUp        .proc
                 ldy #$01
@@ -265,13 +269,13 @@ _1              inc lnum
                 jsr MoveDown
                 jsr ioResetColumn
 
-                jmp RefreshBuf
+                jmp editor.chr.RefreshBuf
 
                 .endproc
 
 
 ;======================================
-;   ScrollDown()
+; ScrollDown()
 ;======================================
 ScrollDown      .proc
                 ldy #$05
@@ -303,7 +307,7 @@ _1              jsr BottomLine
 
 
 ;======================================
-;   BottomLine()
+; BottomLine()
 ;======================================
 BottomLine      .proc
                 clc
@@ -318,7 +322,7 @@ _XIT            rts
 
 
 ;======================================
-;   CheckColumn()
+; CheckColumn()
 ;======================================
 CheckColumn     .proc
                 jsr SetSpacing
@@ -337,7 +341,7 @@ _XIT            rts
 
 
 ;======================================
-;   ScrollLeft()
+; ScrollLeft()
 ;======================================
 ScrollLeft      .proc
                 jsr CheckColumn
@@ -362,7 +366,7 @@ _XIT            jmp screenCursorLeft
 
 
 ;======================================
-;   ScrlRt()
+; ScrollRight()
 ;======================================
 ScrollRight     .proc
                 jsr CheckColumn
@@ -383,7 +387,7 @@ _XIT            jmp screenCursorRight
 
 
 ;======================================
-;   SetSpacing()
+; SetSpacing()
 ;======================================
 SetSpacing      .proc
                 sec
@@ -402,7 +406,7 @@ SetSpacing      .proc
 
 
 ;======================================
-;   MoveDown(cnt, row)
+; MoveDown(cnt, row)
 ;======================================
 MoveDown        .proc
                 ldy #+0-40              ; rowSize
@@ -415,7 +419,7 @@ MoveDown        .proc
 
 
 ;======================================
-;   MoveUp(cnt, row)
+; MoveUp(cnt, row)
 ;======================================
 MoveUp          .proc
                 ldy #40                 ; rowSize
@@ -467,3 +471,5 @@ _next2          lda (arg0),Y
 
                 rts
                 .endproc
+
+                .endnamespace

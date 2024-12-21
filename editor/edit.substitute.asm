@@ -9,11 +9,11 @@
 
 
 ;======================================
-;   Substitute()
+; Substitute()
 ;======================================
 Substitute      .proc
-                jsr SetSpacing
-                jsr SaveWindow
+                jsr editor.command.SetSpacing
+                jsr editor.display.SaveWindow
 
                 lda lastch
                 cmp #$7D
@@ -21,14 +21,14 @@ Substitute      .proc
 
                 pha
 
-                lda #<submsg
-                ldx #>submsg
+                lda #<msgSubtitute
+                ldx #>msgSubtitute
 
                 ldy #>subbuf
                 sty arg3
                 ldy #<subbuf
 
-                jsr CommandString
+                jsr editor.window.CommandString
 
                 pla
 
@@ -43,14 +43,14 @@ Substitute      .proc
 _1              cmp #$F8
                 beq _3                  ; string already found
 
-                lda #<formsg
-                ldx #>formsg
-                jsr Find._ENTRY1
+                lda #<msgFor
+                ldx #>msgFor
+                jsr editor.find.Find._ENTRY1
                 bne _3
 
 _XIT1           rts
 
-_2              jsr Find._ENTRY2
+_2              jsr editor.find.Find._ENTRY2
                 beq _XIT1
 
 _3              lda #$7D
@@ -122,11 +122,11 @@ _7              cpx subbuf
                 adc arg3
                 sta (buf),Y
 
-                jmp RefreshBuf
+                jmp editor.chr.RefreshBuf
 
                 .endproc
 
 ;--------------------------------------
 
-submsg          .ptext "Substitute? "
-formsg          .ptext "for? "
+msgSubtitute    .ptext "Substitute? "
+msgFor          .ptext "for? "

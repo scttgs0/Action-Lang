@@ -8,8 +8,10 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+display         .namespace
+
 ;======================================
-;   CommandMsg(message)
+; CommandMsg(message)
 ;======================================
 CommandMsg      .proc
                 sta arg0
@@ -29,7 +31,7 @@ CommandMsg      .proc
 
 
 ;======================================
-;   CleanLine()
+; CleanLine()
 ;======================================
 CleanLine       .proc
                 jsr ioChkCursor
@@ -42,8 +44,8 @@ CleanLine       .proc
                 lda #$00
                 sta isDirty
 
-                jsr DeleteCurrentLine
-                jsr InsertByte
+                jsr editor.memory.DeleteCurrentLine
+                jsr editor.memory.InsertByte
 
 _XIT            jmp ioChkCursor
 
@@ -51,7 +53,7 @@ _XIT            jmp ioChkCursor
 
 
 ;======================================
-;   SaveWindow()
+; SaveWindow()
 ;======================================
 SaveWindow      .proc
                 jsr CleanLine
@@ -74,7 +76,9 @@ _next1          lda sp,X
 
 
 ;======================================
-;   RestoreWindow() restore window
+; RestoreWindow()
+;--------------------------------------
+; restore window
 ;======================================
 RestoreWindow   .proc
                 clc
@@ -95,7 +99,7 @@ _XIT            rts
 
 
 ;======================================
-;   EndLine()
+; EndLine()
 ;======================================
 EndLine         .proc
                 jsr CleanLine
@@ -111,7 +115,9 @@ EndLine         .proc
 
 
 ;======================================
-;   CenterLine() center line
+; CenterLine()
+;--------------------------------------
+; center line
 ;======================================
 CenterLine      .proc
                 lda #$00
@@ -135,7 +141,7 @@ _1              jsr NewPage
 _next1          lda temps
                 beq RestoreWindow._XIT
 
-                jsr ScrollDown
+                jsr editor.command.ScrollDown
 
                 dec temps
 
@@ -145,7 +151,7 @@ _next1          lda temps
 
 
 ;======================================
-;   TopLine()
+; TopLine()
 ;======================================
 TopLine         .proc
                 jsr CleanLine
@@ -157,7 +163,7 @@ TopLine         .proc
 
 
 ;======================================
-;   NewPage()
+; NewPage()
 ;======================================
 NewPage         .proc
                 lda #$00
@@ -176,7 +182,7 @@ _ENTRY1         sta choff
 
 
 ;======================================
-;   Refresh()
+; Refresh()
 ;======================================
 Refresh         .proc
                 clc
@@ -228,11 +234,13 @@ _1              inc ROWCRS
 _2              jsr ioResetCursor
                 jsr ioResetColumn
 
-                jmp RefreshBuf
+                jmp editor.chr.RefreshBuf
 
-_3              lda #<zero
-                ldx #>zero
+_3              lda #<editor.cartridge.zero
+                ldx #>editor.cartridge.zero
 
                 bra _next2
 
                 .endproc
+
+                .endnamespace

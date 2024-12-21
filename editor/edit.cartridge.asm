@@ -8,9 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
-;======================================
-;
-;======================================
+cartridge      .namespace
+
+;--------------------------------------
+;--------------------------------------
+;   Editor/Monitor jump table
+
 emjmps          rts                     ; Seg catch all
 
                 .word 0
@@ -39,6 +42,7 @@ zero            .word 0
                 jmp screenBell          ; Alarm
 
                 .byte 0                 ; EOLch (default = space)
+
 ltab            .addr mscLShift._lshift ; LSH
                 .addr mathRShift
                 .addr mathMultI
@@ -48,7 +52,7 @@ ltab            .addr mscLShift._lshift ; LSH
                 .byte $60               ; jt_chrConvert3
                 .byte $22               ; tvDisp
 
-                jmp InsertChar          ; normal char
+                jmp editor.chr.InsertChar   ; normal char
 
                 rts                     ; ctrl-shift char
 
@@ -60,31 +64,35 @@ serial          .word $0A00             ; serial number of ROM
                 rts                     ; illegal Monitor cmd
 
                 .byte $86
-                .byte $9d
+                .byte $9D
                 .addr symSTMres         ; STMrAdr in EDIT.DEF
 
 
 ;======================================
-;   Init RTS
+; Init RTS
 ;======================================
 START           .proc
-                jsr InitKeys            ; get keyboard
+                jsr editor.io.InitKeys  ; get keyboard
 
                 lda WARMST
-                beq cold
+                beq _cold
 
                 lda jt_chrConvert3
                 cmp #$60                ; make sure RAM initialized
-                bne cold
+                bne _cold
+
+; - - - - - - - - - - - - - - - - - - -
 
 _warm           lda isMonitorLive       ; see where we were
-                beq _1
+                beq _XIT1
 
                 jmp Monitor._ENTRY1
 
-_1              jmp GeneralMemErr.Punt  ; editor
+_XIT1           jmp editor.memory.GeneralErr.Punt  ; editor
 
-cold            lda #$00
+; - - - - - - - - - - - - - - - - - - -
+
+_cold           lda #$00
                 tay
 _next1          sta $0480,Y             ; zero RAM
 
@@ -106,7 +114,7 @@ _next2          lda emjmps-1,Y          ; init RAM
 
                 ; sty chrConvert1       ; Y=0
 
-                jsr EditorInit          ; init editor
+                jsr editor.init.EditorInit  ; init editor
 
 ;SPLInit PROC ; init compiler RAM
 
@@ -127,7 +135,7 @@ _next2          lda emjmps-1,Y          ; init RAM
                 beq _2                  ;   no
 
                 ldx #$06
-_2              jsr GetMemory           ; get hash table
+_2              jsr editor.memory.Get   ; get hash table
 
                 sta symTblGlobal        ; qglobal hash table
                 stx symTblGlobal+1
@@ -146,3 +154,5 @@ _3              inx
                 stx symTblLocal+1
 
                 .endproc
+
+                .endnamespace

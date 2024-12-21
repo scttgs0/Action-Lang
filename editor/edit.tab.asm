@@ -8,11 +8,13 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+tab            .namespace
+
 ;======================================
 ;   Tab()
 ;======================================
-Tab_            .proc
-                jsr SetSpacing
+Tab            .proc
+                jsr editor.command.SetSpacing
                 jsr CalcTableByteBit._ENTRY1    ; X=byte, Y=bit
 
 _next1          lda TABMAP,X            ; ignore if no tabstops within this byte
@@ -29,7 +31,7 @@ _next1          lda TABMAP,X            ; ignore if no tabstops within this byte
                 asl
                 ora arg0                ; add bit offset
 
-                jmp Back._ENTRY1        ; do the tab
+                jmp editor.command.Back._ENTRY1 ; do the tab
 
 _1              iny                     ; advance to next position within this byte
                 cpy #$08
@@ -58,11 +60,11 @@ _offbit         .byte $7F,$BF,$DF,$EF
 ;======================================
 ; set tabstop at the cursor position
 ;======================================
-SetTab          .proc
+Set             .proc
                 jsr CalcTableByteBit    ; X=byte, Y=bit
 
                 lda TABMAP,X
-                ora Tab_._onbit,Y       ; set tabstop
+                ora Tab._onbit,Y        ; set tabstop
                 sta TABMAP,X
 
                 rts
@@ -72,11 +74,11 @@ SetTab          .proc
 ;======================================
 ; clear tabstop at the cursor position
 ;======================================
-ClearTab        .proc
+Clear           .proc
                 jsr CalcTableByteBit    ; X=byte, Y=bit
 
                 lda TABMAP,X
-                and Tab_._offbit,Y      ; clear tabstop
+                and Tab._offbit,Y       ; clear tabstop
                 sta TABMAP,X
 
                 rts
@@ -94,7 +96,7 @@ ClearTab        .proc
 ;               =8 when at EOL
 ;======================================
 CalcTableByteBit .proc
-                jsr SetSpacing          ; A=sp (sp=indent+choff+COLCRS-LMARGN)
+                jsr editor.command.SetSpacing   ; A=sp (sp=indent+choff+COLCRS-LMARGN)
 
                 sec
                 sbc #$01                ; 0-indexed adjustment
@@ -120,3 +122,5 @@ _ENTRY1         tay                     ; preserve
 
 _XIT            rts
                 .endproc
+
+                .endnamespace

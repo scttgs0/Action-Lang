@@ -8,11 +8,13 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+chr            .namespace
+
 ;======================================
-;   InsertChar() char in curCh
+; InsertChar() char in curCh
 ;======================================
 InsertChar      .proc
-                jsr SetSpacing
+                jsr editor.command.SetSpacing
 
                 ldy #$00
                 lda (buf),Y
@@ -48,7 +50,7 @@ _next2          ldy sp
 
                 jsr ioDisplayBuffer
 
-                jmp ScrollRight
+                jmp editor.command.ScrollRight
 
 _2              ldx insert
                 beq _next2
@@ -73,7 +75,7 @@ _next3          dey
 
 
 ;======================================
-;   InsrtSp()
+; InsertSpace()
 ;======================================
 InsertSpace     .proc
                 lda insert
@@ -94,10 +96,10 @@ InsertSpace     .proc
 
 
 ;======================================
-;   Insert_()
+; Insert()
 ;======================================
-Insert_         .proc
-                jsr CleanLine
+Insert          .proc
+                jsr editor.display.CleanLine
                 jsr mscNextUp
 
                 sta cur+1               ; tricky
@@ -105,7 +107,7 @@ Insert_         .proc
                 jsr _ENTRY1
 
                 lda #$00
-                jmp NewPage._ENTRY1
+                jmp editor.display.NewPage._ENTRY1
 
 _ENTRY1         lda #$00
                 tay
@@ -114,7 +116,7 @@ _ENTRY2         sta (buf),Y
                 iny
                 sty dirty
 
-                jmp InsertByte
+                jmp editor.memory.InsertByte
 
                 .endproc
 
@@ -122,7 +124,7 @@ _ENTRY2         sta (buf),Y
 ;======================================
 ; handle pad if any
 ;======================================
-csret           .proc
+CSRet           .proc
                 jsr InsertSpace
                 jsr DeleteChar
 
@@ -130,7 +132,7 @@ csret           .proc
                 lda (buf),Y
                 pha
 
-                jsr SetSpacing
+                jsr editor.command.SetSpacing
 
                 sta isDirty             ; always non-zero
 
@@ -138,7 +140,7 @@ csret           .proc
                 sbc #$01
                 sta (buf),Y
 
-                jsr CleanLine
+                jsr editor.display.CleanLine
 
                 pla
                 sta arg1
@@ -160,41 +162,41 @@ _1              ldy sp
 
                 ldy #$00
                 lda arg0
-                jsr Insert_._ENTRY2
+                jsr Insert._ENTRY2
                 jsr mscNextUp
-                jsr Refresh
+                jsr editor.display.Refresh
 
-                jmp Return_._ENTRY1
+                jmp Return._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;   Return_()
+; Return()
 ;======================================
-Return_         .proc
+Return          .proc
                 ldx insert
-                bne csret
+                bne CSRet
 
                 jsr CheckDown
                 bne _ENTRY1
 
-                jsr Insert_._ENTRY1
+                jsr Insert._ENTRY1
                 jsr mscNextUp
                 jsr ioLoadBuffer
 
-_ENTRY1         jsr ScrollDown
+_ENTRY1         jsr editor.command.ScrollDown
 
-_XIT            jmp Front
+_XIT            jmp editor.command.Front
 
                 .endproc
 
 
 ;======================================
-;   Delete_()
+; Delete()
 ;======================================
-Delete_         .proc
-                jsr CleanLine
+Delete          .proc
+                jsr editor.display.CleanLine
 
                 lda delbuf
                 ldx delbuf+1
@@ -209,7 +211,7 @@ Delete_         .proc
 _1              sta arg3
                 stx arg4
 
-                jsr InsertBuffer
+                jsr editor.memory.InsertBuffer
                 jsr CheckDown           ; last line ?
                 bne _2                  ;   no, delete it
 
@@ -218,9 +220,9 @@ _1              sta arg3
 
                 iny
                 sty isDirty
-                bra Return_._XIT
+                bra Return._XIT
 
-_2              jsr DeleteCurrentLine
+_2              jsr editor.memory.DeleteCurrentLine
                 beq _3
 
                 jsr mscNextDown
@@ -228,13 +230,13 @@ _3              jsr ioChkCursor
 
                 lda #$00
 
-                jmp NewPage._ENTRY1
+                jmp editor.display.NewPage._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;   DeleteTop()
+; DeleteTop()
 ;======================================
 DeleteTop       .proc
                 lda delbuf+4
@@ -248,7 +250,7 @@ DeleteTop       .proc
 
 
 ;======================================
-;   DeleteEnd(ptr)
+; DeleteEnd(ptr)
 ;======================================
 DeleteEnd       .proc
                 cmp #<delbuf
@@ -261,20 +263,20 @@ _XIT            rts
 
 
 ;======================================
-;   DeleteFree(bot)
+; DeleteFree(bot)
 ;======================================
 DeleteFree      .proc
                 jsr DeleteEnd
                 beq DeleteEnd._XIT
 
-                jsr DeleteLine
+                jsr editor.memory.DeleteLine
                 bne DeleteFree
 
                 .endproc
 
 
 ;======================================
-;   DeleteNext()
+; DeleteNext()
 ;======================================
 DeleteNext      .proc
                 ldy #$05
@@ -292,21 +294,21 @@ DeleteNext      .proc
 
 
 ;======================================
-;   Undo()
+; Undo()
 ;======================================
 Undo            .proc
                 jsr ioLoadBuffer
 
-                jmp Front
+                jmp editor.command.Front
 
                 .endproc
 
 
 ;======================================
-;   DeleteChar()
+; DeleteChar()
 ;======================================
 DeleteChar      .proc
-                jsr CheckColumn
+                jsr editor.command.CheckColumn
                 bcc CheckDown._XIT
 
                 ldy #$00
@@ -332,21 +334,20 @@ _next1          iny
 
 
 ;======================================
-;   RefreshBuf()
+; RefreshBuf()
 ;======================================
 RefreshBuf      .proc
                 jsr ioDisplayBuffer
-
                 jmp ioResetColumn._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;   CheckDown()
+; CheckDown()
 ;======================================
 CheckDown       .proc
-                jsr CleanLine
+                jsr editor.display.CleanLine
                 beq _XIT
 
                 ldy #$05
@@ -357,16 +358,16 @@ _XIT            rts
 
 
 ;======================================
-;   BackSpc()
+; BackSpc()
 ;======================================
 BackSpc         .proc
-                jsr SetSpacing
+                jsr editor.command.SetSpacing
 
                 cmp #$02
                 bcc CheckDown._XIT
 
-_ENTRY1         jsr ScrollLeft
-                jsr SetSpacing
+_ENTRY1         jsr editor.command.ScrollLeft
+                jsr editor.command.SetSpacing
 
                 tay
                 lda #$20
@@ -384,8 +385,8 @@ _ENTRY1         jsr ScrollLeft
 ;======================================
 ;
 ;======================================
-csbs            .proc
-                jsr SetSpacing
+CSBS            .proc
+                jsr editor.command.SetSpacing
 
                 cmp #$02
                 bcs BackSpc._ENTRY1
@@ -397,9 +398,9 @@ csbs            .proc
                 lda (cur),Y
                 beq CheckDown._XIT      ; no line to merge with
 
-    ; merge
-                jsr ScrollUp
-                jsr Back
+;   merge
+                jsr editor.command.ScrollUp
+                jsr editor.command.Back
                 jsr mscNextDown
 
                 sta isDirty
@@ -431,8 +432,10 @@ _next1          iny
                 cpy arg3
                 bne _next1
 
-_next2          jsr DeleteCurrentLine
+_next2          jsr editor.memory.DeleteCurrentLine
 
-                jmp Refresh
+                jmp editor.display.Refresh
 
                 .endproc
+
+                .endnamespace

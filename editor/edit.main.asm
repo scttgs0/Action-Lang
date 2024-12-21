@@ -8,22 +8,24 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+main           .namespace
+
 ;======================================
 ; Main program for EDIT/FLASH
 ;======================================
-floop           .proc
+Loop           .proc
                 lda allocerr
                 beq _1
 
                 lda #<outmem
                 ldx #>outmem
-                jsr CommandMsg
+                jsr editor.display.CommandMsg
 
 _1              lda curch
                 sta lastch
 
                 jsr bankGetKey
-                jsr EditorInit._ENTRY3
+                jsr editor.init.EditorInit._ENTRY3
 
                 lda curch
                 ldy KEYCHARm1           ; prior key pressed
@@ -35,11 +37,11 @@ _1              lda curch
                 bne _3
 
                 cmp #EOL
-                beq floop
+                beq Loop
 
-                jsr InsertChar
+                jsr editor.chr.InsertChar
 
-                jmp floop
+                jmp Loop
 
 _2              ldx #<fmcscmd
                 ldy #>fmcscmd
@@ -50,7 +52,7 @@ _3              ldx #<fmcmd
 
 _4              jsr mscLookup
 
-                jmp floop
+                jmp Loop
 
                 .endproc
 
@@ -60,86 +62,86 @@ _4              jsr mscLookup
 
 fmcmd           .addr jt_disptb         ; default routine
                 .byte 50                ; table size
-                .addr ScrollUp
+                .addr editor.command.ScrollUp
                 .byte $1c
-                .addr ScrollDown
+                .addr editor.command.ScrollDown
                 .byte $1d
-                .addr ScrollRight
+                .addr editor.command.ScrollRight
                 .byte $1f
-                .addr ScrollLeft
+                .addr editor.command.ScrollLeft
 zap2            .byte $1e
-                .addr DeleteChar
+                .addr editor.chr.DeleteChar
 zap3            .byte $fe
-                .addr BackSpc
+                .addr editor.chr.BackSpc
 zap4            .byte $7e
-                .addr InsertChar
+                .addr editor.chr.InsertChar
                 .byte $60
-                .addr InsertSpace
+                .addr editor.chr.InsertSpace
                 .byte $ff
-                .addr Return_
+                .addr editor.chr.Return
                 .byte EOL
-                .addr Tab_
+                .addr editor.tab.Tab
                 .byte $7f
-                .addr Delete_
+                .addr editor.chr.Delete
                 .byte $9c
-                .addr BottomLine._XIT
+                .addr editor.command.BottomLine._XIT
                 .byte $1b
-                .addr Clear_
+                .addr editor.window.Clear
                 .byte $7d
-                .addr Insert_
+                .addr editor.chr.Insert
                 .byte $9d
-                .addr SetTab
+                .addr editor.tab.Set
                 .byte $9f
-                .addr ClearTab
+                .addr editor.tab.Clear
                 .byte $9e
 
 fmcscmd         .addr jt_disptb+3       ; default
                 .byte 71                ; table size
-                .addr Front
+                .addr editor.command.Front
                 .byte $f6
-                .addr Back
+                .addr editor.command.Back
                 .byte $f7
-                .addr PageUp
+                .addr editor.command.PageUp
                 .byte $ce
-                .addr PageDown
+                .addr editor.command.PageDown
                 .byte $cf
-                .addr IndentLeft
+                .addr editor.command.IndentLeft
                 .byte $e0
-                .addr IndentRight
+                .addr editor.command.IndentRight
                 .byte $e2
-                .addr FRead
+                .addr editor.io.FRead
                 .byte $e8
-                .addr FWrite
+                .addr editor.io.FWrite
                 .byte $ee
-                .addr Paste
+                .addr editor.command.Paste
                 .byte $ca
-                .addr InsertToggle
+                .addr editor.command.InsertToggle
                 .byte $cd
                 .addr Monitor
                 .byte $e5
-                .addr Find
+                .addr editor.find.Find
                 .byte $f8
-                .addr Substitute
+                .addr editor.Substitute
                 .byte $fe
-                .addr Window1
+                .addr editor.window.Window1
                 .byte $df
-                .addr Window2
+                .addr editor.window.Window2
                 .byte $de
-                .addr DeleteWindow
+                .addr editor.window.Delete
                 .byte $fa
-                .addr csbs
+                .addr editor.chr.CSBS
                 .byte $f4
-                .addr csret
+                .addr editor.chr.CSRet
                 .byte $cc
-                .addr Undo
+                .addr editor.chr.Undo
                 .byte $cb
-                .addr TopLine
+                .addr editor.display.TopLine
                 .byte $f9
-                .addr EndLine
+                .addr editor.display.EndLine
                 .byte $ea
-                .addr SetTag
+                .addr editor.tag.Set
                 .byte $ed
-                .addr LocateTag
+                .addr editor.tag.Locate
                 .byte $fd
 
 outmem          .text 14," "
@@ -156,3 +158,5 @@ outmem          .text 14," "
             .enc "atari-screen-inverse"
                 .text "Memory"
             .enc "none"
+
+            .endnamespace

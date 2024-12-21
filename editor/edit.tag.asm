@@ -8,19 +8,21 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+tag            .namespace
+
 ;======================================
-;   SetTag()
+; Set()
 ;======================================
-SetTag          .proc
-                jsr tagid
+Set             .proc
+                jsr ID
 
                 lda tempbuf
-                beq notag
+                beq NoTag
 
-                jsr CleanLine
+                jsr editor.display.CleanLine
 
                 lda tempbuf+1
-                jsr GetTag
+                jsr Get
                 bne _1                  ; tag already exists
 
 ;   get a new tag
@@ -54,7 +56,7 @@ _1              ldy #$04
                 sta (zpAllocCurrent),Y
 
                 iny
-                jsr SetSpacing
+                jsr editor.command.SetSpacing
 
                 sta (zpAllocCurrent),Y
 
@@ -69,51 +71,51 @@ _1              ldy #$04
 
 
 ;======================================
-;   NoTag()
+; NoTag()
 ;======================================
-notag           .proc
-                lda #<_ntmsg
-                ldx #>_ntmsg
+NoTag           .proc
+                lda #<_msgNoTag
+                ldx #>_msgNoTag
 
-                jmp CommandMsg
+                jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-_ntmsg          .ptext "tag not set"
+_msgNoTag       .ptext "tag not set"
 
                 .endproc
 
 
 ;======================================
-;   TagId()
+; ID()
 ;======================================
-tagid           .proc
-                lda #<_stmsg
-                ldx #>_stmsg
+ID              .proc
+                lda #<_msgTagID
+                ldx #>_msgTagID
 
-                jmp GetTemp
+                jmp editor.window.GetTemp
 
 ;--------------------------------------
 
-_stmsg          .ptext "tag id: "
+_msgTagID       .ptext "tag id: "
 
                 .endproc
 
 
 ;======================================
-;   LocateTag()
+; Locate()
 ;======================================
-LocateTag       .proc
-                jsr tagid
+Locate          .proc
+                jsr ID
 
                 lda tempbuf
-                beq GetTag._XIT
+                beq Get._XIT
 
-                jsr CleanLine
+                jsr editor.display.CleanLine
 
                 lda tempbuf+1
-                jsr GetTag
-                beq notag
+                jsr Get
+                beq NoTag
 
                 ldy #$06
                 lda (zpAllocCurrent),Y
@@ -122,11 +124,11 @@ LocateTag       .proc
                 dey
                 lda (zpAllocCurrent),Y
                 jsr FindLine
-                beq notag
+                beq NoTag
 
                 ldy #$03
                 lda (arg2),Y
-                bpl notag
+                bpl NoTag
 
                 ldy #$07
                 lda (zpAllocCurrent),Y
@@ -137,15 +139,15 @@ LocateTag       .proc
                 ldx arg3
                 stx cur+1
 
-                jmp Found
+                jmp editor.find.Found
 
                 .endproc
 
 
 ;======================================
-;   GetTag(tag)
+; Get(tag)
 ;======================================
-GetTag          .proc
+Get             .proc
                 sta arg0
 
                 lda taglist
@@ -178,7 +180,7 @@ _2              ldx zpAllocCurrent+1
 
 
 ;======================================
-;   FreeTags()
+; FreeTags()
 ;======================================
 FreeTags        .proc
                 lda taglist
@@ -209,7 +211,7 @@ _XIT            rts
 
 
 ;======================================
-;   FindLine(line)
+; FindLine(line)
 ;======================================
 FindLine        .proc
                 sta arg0
@@ -244,3 +246,5 @@ _3              ldx arg3
 
                 rts
                 .endproc
+
+                .endnamespace

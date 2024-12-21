@@ -60,7 +60,7 @@ INIT            .proc
 
                 jsr PrepBanks
                 jsr bankCartStart
-                jmp START
+                jmp editor.cartridge.START
 
                 .endproc
 
@@ -102,11 +102,12 @@ propid          ldx arg0
 ;--------------------------------------
 ;    ACTION! - Editor Routines
 
+editor      .namespace
                 .fill 4,$00
                 .include "editor/edit.find.asm"
                 .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"
-
+            .endnamespace
 
 ;--------------------------------------
 ;    "ACTION! - Compiler Routines
@@ -154,6 +155,8 @@ comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
                 ;.align $1000
 
                 .include "storage.mac.asm"
+
+            .namespace editor
                 .include "editor/edit.memory.asm"
                 .include "editor/edit.cartridge.asm"
                 .include "editor/edit.main.asm"
@@ -164,6 +167,7 @@ comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
                 .include "editor/edit.display.asm"
                 .include "editor/edit.command.asm"
                 .include "editor/edit.tag.asm"
+            .endnamespace
 
                 .include "ampl/ampl.monitor.asm"
                 .include "ampl/ampl.init.asm"

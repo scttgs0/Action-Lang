@@ -8,8 +8,10 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+window          .namespace
+
 ;======================================
-;   Wind1()
+; Window1()
 ;======================================
 Window1         .proc
                 lda currentWindow
@@ -24,7 +26,7 @@ Window1         .proc
 
 
 ;======================================
-;   SwapWd()
+; SwapWindows()
 ;======================================
 SwapWindows     .proc
                 jsr SaveWorld
@@ -36,7 +38,7 @@ SwapWindows     .proc
 
 
 ;======================================
-;   Wind2()
+; Window2()
 ;======================================
 Window2         .proc
                 lda currentWindow
@@ -45,7 +47,7 @@ Window2         .proc
                 lda numwd
                 bne _1
 
-                jmp Window2Init
+                jmp editor.init.Window2
 
 _1              lda #w2-w1
                 pha
@@ -56,49 +58,49 @@ _1              lda #w2-w1
 
 
 ;======================================
-;   SaveWorld()
+; SaveWorld()
 ;======================================
 SaveWorld       .proc
-                jsr CleanLine
+                jsr editor.display.CleanLine
                 jsr ioSaveColumn
                 jsr ioRestoreCursorChar
-                jsr SetSpacing
+                jsr editor.command.SetSpacing
 
-                jmp SaveWindow
+                jmp editor.display.SaveWindow
 
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   Clear()
+; Clear()
 ;======================================
-Clear_           .proc
+Clear           .proc
                 jsr jt_alarm
 
-                lda #<DeleteWindow.clearmsg
-                ldx #>DeleteWindow.clearmsg
+                lda #<Delete.msgClear
+                ldx #>Delete.msgClear
                 jsr YesNo
                 bne SaveWorld._XIT
 
-_ENTRY1         jsr CleanLine
+_ENTRY1         jsr editor.display.CleanLine
 
                 lda dirty
                 beq _1
 
 ;               jsr Alarm
 
-                lda #<DeleteWindow.dirtymsg
-                ldx #>DeleteWindow.dirtymsg
+                lda #<Delete.msgDirty
+                ldx #>Delete.msgDirty
                 jsr YesNo
                 bne SaveWorld._XIT
 
-_1              jsr FreeTags            ; get rid of tags
+_1              jsr editor.tag.FreeTags            ; get rid of tags
 
                 lda bot
                 ldx bot+1
 
-_next1          jsr DeleteLine
+_next1          jsr editor.memory.DeleteLine
                 bne _next1
 
                 stx cur+1
@@ -106,18 +108,18 @@ _next1          jsr DeleteLine
                 stx isDirty
                 stx inbuf
 
-                jmp NewPage
+                jmp editor.display.NewPage
 
                 .endproc
 
 
 ;======================================
-;   RestoreWorld(window)
+; RestoreWorld(window)
 ;======================================
 RestoreWorld    .proc
                 sta currentWindow
 
-                jsr RestoreWindow
+                jsr editor.display.RestoreWindow
                 jsr ioLoadBuffer
 
                 jmp ioResetColumn
@@ -126,20 +128,20 @@ RestoreWorld    .proc
 
 
 ;======================================
-;   DeleteWindow()
+; Delete()
 ;======================================
-DeleteWindow    .proc
+Delete          .proc
                 lda numwd
                 beq SaveWorld._XIT
 
                 jsr jt_alarm
 
-                lda #<delmsg
-                ldx #>delmsg
+                lda #<msgDelete
+                ldx #>msgDelete
                 jsr YesNo
                 bne SaveWorld._XIT
 
-                jsr Clear_._ENTRY1
+                jsr Clear._ENTRY1
 
                 lda dirty
                 bne SaveWorld._XIT
@@ -153,21 +155,23 @@ DeleteWindow    .proc
                 ldy #w2-w1
 _1              sty currentWindow
 
-                jsr RestoreWindow
+                jsr editor.display.RestoreWindow
 
-                jmp EditorInit._ENTRY1
+                jmp editor.init.EditorInit._ENTRY1
+
 
 ;--------------------------------------
+;--------------------------------------
 
-clearmsg        .ptext "CLEAR? "
-delmsg          .ptext "Delete window? "
-dirtymsg        .ptext "Not saved, Delete? "
+msgClear        .ptext "CLEAR? "
+msgDelete       .ptext "Delete window? "
+msgDirty        .ptext "Not saved, Delete? "
 
                 .endproc
 
 
 ;======================================
-;   GetTemp(msg)
+; GetTemp(msg)
 ;======================================
 GetTemp         .proc
                 ldy #$00
@@ -183,7 +187,7 @@ _ENTRY1         sty tempbuf
 
 
 ;======================================
-;   CmdStr(msg, buf)
+; CommandString(msg, buf)
 ;======================================
 CommandString   .proc
                 sta arg0
@@ -197,7 +201,7 @@ CommandString   .proc
                 lda arg0
                 ldy arg2
 
-                jsr GetString
+                jsr editor.io.GetString
                 jsr ioRestoreCursorChar
 
                 jmp ioResetColumn
@@ -206,7 +210,7 @@ CommandString   .proc
 
 
 ;======================================
-;   YesNo(msg)
+; YesNo(msg)
 ;======================================
 YesNo           .proc
                 jsr GetTemp
@@ -224,3 +228,5 @@ _1              lda tempbuf+1
 
                 rts
                 .endproc
+
+                .endnamespace

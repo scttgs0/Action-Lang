@@ -8,8 +8,10 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+io              .namespace
+
 ;======================================
-;   GetString(prompt, str, invert)
+; GetString(prompt, str, invert)
 ;======================================
 GetString       .proc
                 jsr ioDisplayStr
@@ -97,7 +99,7 @@ _4              cpx #$7D
 
 
 ;======================================
-;   FRead()
+; FRead()
 ;======================================
 FRead           .proc
                 lda #$00
@@ -112,7 +114,7 @@ _next1          lda #$01
                 jsr ioReadBuffer
                 bmi _1
 
-                jsr InsertByte
+                jsr editor.memory.InsertByte
 
                 lda allocerr
                 beq _next1
@@ -126,7 +128,7 @@ _1              cpy #$88                ; EOF
 _2              jsr ioSystemError
 _3              jsr FWrite._ENTRY1
 
-                jmp CenterLine
+                jmp editor.display.CenterLine
 
 ;--------------------------------------
 
@@ -136,7 +138,7 @@ rdmsg           .ptext "Read? "
 
 
 ;======================================
-;   FWrite()
+; FWrite()
 ;======================================
 FWrite          .proc
                 lda #<wrtmsg
@@ -183,7 +185,7 @@ wrtmsg          .ptext "Write? "
 
 
 ;======================================
-;   FOpen(prompt, mode)
+; FOpen(prompt, mode)
 ;======================================
 FOpen           .proc
                 sta arg10
@@ -191,7 +193,7 @@ FOpen           .proc
                 sty opmode
 
 ;               jsr ClnLn               ; in SaveWd
-                jsr SaveWindow
+                jsr editor.display.SaveWindow
                 jsr ioRestoreCursorChar
 
                 ldy #<inbuf
@@ -200,7 +202,7 @@ FOpen           .proc
 
                 lda arg10
                 ldx arg11
-                jsr CommandString
+                jsr editor.window.CommandString
 
                 lda #$01
                 jsr ioClose
@@ -270,7 +272,7 @@ _5              pla
 
 
 ;======================================
-;   InitKeys()
+; InitKeys()
 ;======================================
 InitKeys        .proc
                 lda #$07
@@ -301,3 +303,5 @@ GotKey          .proc
 
                 rts
                 .endproc
+
+                .endnamespace

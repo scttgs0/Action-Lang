@@ -8,10 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+init            .namespace
+
 ;======================================
 ; Initialize memory
 ;======================================
-MemoryInit      .proc
+Memory          .proc
                 lda MEMLO
                 sta zpAllocBase
                 lda MEMLO+1
@@ -74,14 +76,14 @@ _next1          dex                     ; zero page0 window table
 ;======================================
 ; Initialize secondary window
 ;======================================
-Window2Init     .proc
-                jsr CenterLine
+Window2         .proc
+                jsr editor.display.CenterLine
 
                 lda jt_wsize
                 sta nlines
                 sta cmdln
 
-                jsr SaveWorld
+                jsr editor.window.SaveWorld
 
                 lda #w2-w1
                 sta numwd
@@ -117,7 +119,7 @@ EditorInit      .proc
                 lda #>$0600
                 sta MEMLO+1
 
-                jsr MemoryInit
+                jsr Memory
 
                 lda #$00
                 ldx #$01
@@ -149,14 +151,16 @@ _ENTRY1         lda #$17                ; rowcount
                 sta currentWindow
                 sta ytop
 
-_ENTRY2         jsr CenterLine
+_ENTRY2         jsr editor.display.CenterLine
 
 _ENTRY3         lda #<editCmdMsg
                 ldx #>editCmdMsg
 
-                jmp CommandMsg
+                jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
 editCmdMsg      .ptext "ACTION! (c) 2023 GPL3"
                 .endproc
+
+                .endnamespace
