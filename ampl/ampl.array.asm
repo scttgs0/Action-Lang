@@ -4,14 +4,16 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.array.asm
+; SPDX-FileName: asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+array           .namespace
+
 ;======================================
-; ArrRef()
+; Ref()
 ;======================================
-ArrRef          .proc
+Ref             .proc
                 ldx nxttoken
                 cpx #tokLParen
                 beq arrconst._2
@@ -34,7 +36,7 @@ _next1          ldy #$00
                 bcs _1                  ; small array
 
                 iny
-                jsr cguStkP
+                jsr ampl.cgu.StkP
 
                 cpx #$00
                 bne _1
@@ -104,18 +106,18 @@ _4              sta FR1
 
 ;   integer or cardinal
 
-_5              jsr cguGetTemps
+_5              jsr ampl.cgu.GetTemps
 
                 lda #$A1                ; LDA
                 ldx FR1
                 beq _6
 
-                jsr cguLoad2L
+                jsr ampl.cgu.Load2L
 
                 lda #$0A                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
-                jsr cguPush3
+                jsr ampl.cgu.Push3
 
                 lda #$61                ; ADC
             .if ZAPRAM
@@ -125,21 +127,21 @@ _5              jsr cguGetTemps
                 nop
             .endif
 
-_6              jsr cguOp1L
-                jsr cguSTempL
+_6              jsr ampl.cgu.Op1L
+                jsr ampl.cgu.STempL
 
                 lda #$A1                ; LDA
                 ldx FR1
                 beq _7
 
-                jsr cguLoad2H
+                jsr ampl.cgu.Load2H
 
                 lda #$2A                ; ROL A
                 ldx #$28                ; PLP, restore carry
-                jsr cguPush2
+                jsr ampl.cgu.Push2
 
                 lda #$61                ; ADC
-_7              jsr cguOp1H
+_7              jsr ampl.cgu.Op1H
                 jmp cgadd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
@@ -154,18 +156,20 @@ _small          ldy #$07
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
-                bit modeArr
+                bit ampl.cgu.modeArr
                 bne arrerr              ; can't index with array
 
                 ldy #$0A
                 sta (stack),Y
 
                 ldy #$02
-                jsr cguLoadI
+                jsr ampl.cgu.LoadI
 
                 ldy #$0B
-                jsr cguSaveCd._ToStack
+                jsr ampl.cgu.SaveCd._ToStack
 
                 jmp popst
 
                 .endproc
+
+                .endnamespace

@@ -702,7 +702,7 @@ tblLexChars     .byte tokXOR            ; !
 ;         jsr PutSp
 ;         lda addr
 ;         ldx addr+1
-;         jsr monPrintHex
+;         jsr ampl.monitor.PrintHex
 ;         jsr PutSp
 ;         lda nxtToken
 ;         ldx #$00
@@ -710,5 +710,5 @@ tblLexChars     .byte tokXOR            ; !
 ;         jsr PutSp
 ;         lda nxtAddr
 ;         ldx nxtAddr+1
-;         jsr monPrintHex
+;         jsr ampl.monitor.PrintHex
 ;         jmp ioPutEOL

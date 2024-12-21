@@ -56,7 +56,7 @@ bankCartStart   .proc
 ;======================================
 bankGetName     .proc
                 ;!!sta bank+lbank
-                jsr symGetName
+                jsr ampl.symbol.GetName
 
                 .endproc
 
@@ -161,7 +161,7 @@ _XIT            jmp mscMNum._varerr
 bankLocalName   .proc
                 ;!!sta bank+lbank
 
-                jsr symGetName._ENTRY1
+                jsr ampl.symbol.GetName._ENTRY1
 
                 jmp bankRestore
 
@@ -249,7 +249,7 @@ bankSPLErr      .proc
 bankEmLoop      .proc
                 jsr bankEditBank
 
-                jmp Monitor._ENTRY2
+                jmp ampl.monitor.Monitor._ENTRY2
 
                 .endproc
 
@@ -301,7 +301,7 @@ _XIT            jmp bankRestore
 bankPrintH      .proc
                 ;!!sty bank+ebank
 
-                jsr monPrintHex
+                jsr ampl.monitor.PrintHex
 
                 ;!!sty bank+lbank
 

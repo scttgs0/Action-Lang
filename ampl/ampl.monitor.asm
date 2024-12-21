@@ -4,9 +4,11 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.monitor.asm
+; SPDX-FileName: asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
+
+monitor         .namespace
 
 ;======================================
 ;   ACTION! Monitor
@@ -31,7 +33,7 @@ _ENTRY1         jsr screenInit
                 stx cmdln
                 stx device
 
-                jsr initSetupSPL
+                jsr ampl.init.SetupSPL
 
 _ENTRY2
 _next1          jsr editor.io.InitKeys
@@ -44,8 +46,8 @@ _next1          jsr editor.io.InitKeys
 _1              jsr jt_alarm
                 jsr ioRestoreCursorChar
 
-                lda #<monitorPrompt
-                ldx #>monitorPrompt
+                lda #<prompt
+                ldx #>prompt
                 jsr editor.window.GetTemp
 
                 ldy tempbuf
@@ -64,8 +66,8 @@ _1              jsr jt_alarm
 
                 lda tempbuf+1
                 ora #$20
-                ldx #<monitorCmd
-                ldy #>monitorCmd
+                ldx #<tblCmds
+                ldy #>tblCmds
                 jsr mscLookup
 
                 jmp _next1
@@ -76,7 +78,7 @@ _1              jsr jt_alarm
 ;--------------------------------------
 ;
 ;--------------------------------------
-monQuit         .proc
+Quit            .proc
                 ldy #$00
                 sty isMonitorLive
                 sty subbuf
@@ -89,9 +91,9 @@ monQuit         .proc
 
 
 ;======================================
-; monResetWindow()
+; ResetWindow()
 ;======================================
-monResetWindow  .proc
+ResetWindow     .proc
                 lda #$17
                 sta cmdln
 
@@ -102,10 +104,10 @@ monResetWindow  .proc
                 sta cmdln
 
                 lda #w2-w1
-                jsr monPaintWindow
+                jsr PaintWindow
 
                 lda #$00
-_1              jsr monPaintWindow
+_1              jsr PaintWindow
                 jsr editor.init.EditorInit._ENTRY3
 
                 jmp editor.main.Loop
@@ -114,9 +116,9 @@ _1              jsr monPaintWindow
 
 
 ;======================================
-; monPaintWindow(window)
+; PaintWindow(window)
 ;======================================
-monPaintWindow  .proc
+PaintWindow     .proc
                 sta currentWindow
 
                 jsr editor.display.RestoreWindow
@@ -126,10 +128,10 @@ monPaintWindow  .proc
 
 
 ;======================================
-; monMemDump()
+; MemDump()
 ;======================================
-monMemDump      .proc
-                jsr monPrint
+MemDump         .proc
+                jsr Print
 
 _next1          inc arg11
                 bne _1
@@ -138,7 +140,7 @@ _next1          inc arg11
 
 _1              lda arg11
                 ldx arg12
-                jsr monPrint._ENTRY1
+                jsr Print._ENTRY1
                 jsr editor.io.GotKey
                 beq _next1
 
@@ -153,10 +155,10 @@ _1              lda arg11
 
 
 ;======================================
-; monPrint()
+; Print()
 ;======================================
-monPrint        .proc
-                jsr monSaveParams
+Print           .proc
+                jsr SaveParams
 
 _ENTRY1         jsr ioPrintCard
 
@@ -165,27 +167,27 @@ _ENTRY1         jsr ioPrintCard
 
                 lda arg11
                 ldx arg12
-                jsr monPrintHex
+                jsr PrintHex
                 jsr ioPutSpace
 
                 ldy #'='
                 jsr ioPutChar
                 jsr ioPutSpace
-                jsr monLoadParams
+                jsr LoadParams
 
                 tay
                 jsr ioPutChar
                 jsr ioPutSpace
-                jsr monLoadParams
+                jsr LoadParams
 
-                jsr monPrintHex
+                jsr PrintHex
                 jsr ioPutSpace
-                jsr monLoadParams
+                jsr LoadParams
 
                 ldx #$00
                 jsr ioPrintCard
                 jsr ioPutSpace
-                jsr monLoadParams
+                jsr LoadParams
 
                 jsr ioPrintCard
                 jmp ioPutEOL
@@ -194,9 +196,9 @@ _ENTRY1         jsr ioPrintCard
 
 
 ;======================================
-; monLoadParams()
+; LoadParams()
 ;======================================
-monLoadParams   .proc
+LoadParams      .proc
                 ldy #$01
                 lda (arg11),Y
                 tax
@@ -209,9 +211,9 @@ monLoadParams   .proc
 
 
 ;======================================
-; monSaveParams()
+; SaveParams()
 ;======================================
-monSaveParams   .proc
+SaveParams      .proc
                 jsr mscMNum
 
                 sta arg11
@@ -222,13 +224,13 @@ monSaveParams   .proc
 
 
 ;======================================
-; monBoot()
+; Boot()
 ;======================================
-monBoot         .proc
+Boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr editor.window.YesNo
-                bne monMemRun._XIT
+                bne MemRun._XIT
 
                 jmp editor.cartridge.START._cold
 
@@ -240,11 +242,11 @@ _bmsg           .ptext "Boot? "
 
 
 ;======================================
-; monMemRun()
+; MemRun()
 ;--------------------------------------
 ; execute from memory
 ;======================================
-monMemRun       .proc
+MemRun          .proc
                 lda nxttoken
                 cmp #tokEOF
                 beq _1
@@ -252,7 +254,7 @@ monMemRun       .proc
                 cmp #tokQuote           ; compile and go?
                 bne _2                  ;   no
 
-                jsr monCompile
+                jsr Compile
 
 _1              lda INITAD
                 ldx INITAD+1
@@ -271,15 +273,15 @@ _3              jsr bankRun
 
 
 ;======================================
-; monMemWrite()
+; MemWrite()
 ;======================================
-monMemWrite        .proc                ; write object file
+MemWrite        .proc                   ; write object file
                 lda nxttoken
                 cmp #tokQuote
-                bne monMemRun._XIT      ; no output file!
+                bne MemRun._XIT         ; no output file!
 
                 lda INITAD+1
-                beq monMemRun._XIT      ; no program!!
+                beq MemRun._XIT         ; no program!!
 
                 lda #$01
                 sta Channel
@@ -319,7 +321,7 @@ _1              dec arg14
                 adc codesize+1
                 sta arg15
 
-                jsr monWOut
+                jsr WOut
 
 ;   write the QCODE
                 ldx #$10
@@ -337,7 +339,7 @@ _1              dec arg14
                 sta IOCB0+ICBLH,X
 
                 jsr CIOV
-                bmi monWOut._mwerr
+                bmi WOut._mwerr
 
 ;   save START address
                 ldx #$04
@@ -352,7 +354,7 @@ _next1          lda _mwinit,X
                 lda INITAD+1
                 sta arg15
 
-                jsr monWOut
+                jsr WOut
 
 ;   close file
                 lda #$01
@@ -368,9 +370,9 @@ _mwinit         .byte 6
 
 
 ;======================================
-; monWOut()
+; WOut()
 ;======================================
-monWOut         .proc
+WOut            .proc
                 lda #$01
                 ldx #arg9
                 ldy #$00
@@ -394,7 +396,7 @@ _mwerr          jmp bankSPLErr
 ;--------------------------------------
 ;
 ;--------------------------------------
-monExecute      .proc
+Execute         .proc
                 lda #$00                ; execute command line
                 sta codeoff
                 sta codeoff+1
@@ -408,7 +410,7 @@ monExecute      .proc
                 jsr bankCStmtList
 
                 cmp #tokEOF
-                bne monWOut._mxerr
+                bne WOut._mxerr
 
                 lda #$60                ; RTS
                 ldy #$00
@@ -424,10 +426,10 @@ monExecute      .proc
 
 
 ;======================================
-; monCompile()
+; Compile()
 ;======================================
-monCompile      .proc
-                jsr initSetupSPL
+Compile         .proc
+                jsr ampl.init.SetupSPL
                 jsr ioDisplayOff
                 jsr bankCompile
 
@@ -444,9 +446,9 @@ monCompile      .proc
 
 
 ;======================================
-;   monProceed()
+;   Proceed()
 ;======================================
-monProceed      .proc
+Proceed         .proc
                 ldx procSP
                 beq _XIT
 
@@ -472,9 +474,9 @@ _XIT            rts
 
 
 ;======================================
-; monPrintHex(num)
+; PrintHex(num)
 ;======================================
-monPrintHex     .proc
+PrintHex        .proc
                 sta arg0
                 stx arg1
 
@@ -513,40 +515,42 @@ _1              tay
 ;--------------------------------------
 ;--------------------------------------
 
-monitorCmd      .addr jt_disptb+9       ; unknown cmd
+tblCmds         .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
 
-                .addr monBoot
+                .addr Boot
                 .text 'b'               ; BOOT
 
-                .addr monCompile
+                .addr Compile
                 .text 'c'               ; COMPILE
 
                 .addr bankDosRet
                 .text 'd'               ; DOS
 
-                .addr monQuit
+                .addr Quit
                 .text 'e'               ; EDITOR
 
                 .addr bankOptions
                 .text 'o'               ; OPTIONS
 
-                .addr monProceed
+                .addr Proceed
                 .text 'p'               ; PROCEED (continue after BRK)
 
-                .addr monMemRun
+                .addr MemRun
                 .text 'r'               ; MEMORY RUN
 
-                .addr monMemWrite
+                .addr MemWrite
                 .text 'w'               ; MEMORY WRITE
 
-                .addr monExecute
+                .addr Execute
                 .text 'x'               ; EXECUTE
 
-                .addr monPrint
+                .addr Print
                 .text '?'               ; PRINT
 
-                .addr monMemDump
+                .addr MemDump
                 .text '*'               ; MEMORY DUMP
 
-monitorPrompt   .ptext '>'
+prompt          .ptext '>'
+
+                .endnamespace

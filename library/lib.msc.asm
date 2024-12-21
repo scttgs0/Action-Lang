@@ -25,7 +25,7 @@ libmscRand      .proc
                 ldx #$00
                 stx zpAllocCurrent+1
 
-                jsr mathMultI
+                jsr ampl.math.MultI
 
 _1              stx args
 

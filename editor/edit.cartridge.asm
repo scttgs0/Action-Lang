@@ -33,7 +33,7 @@ emjmps          rts                     ; Seg catch all
                 rts                     ; CodeGen catch all
 
                 .word 0
-                rts                     ; ArrRef Catch all
+                rts                     ; ampl.array.Ref Catch all
 
 zero            .word 0
                 rts                     ; SPLEnd
@@ -44,11 +44,11 @@ zero            .word 0
                 .byte 0                 ; EOLch (default = space)
 
 ltab            .addr mscLShift._lshift ; LSH
-                .addr mathRShift
-                .addr mathMultI
-                .addr mathDivC
-                .addr mathRemL
-                .addr mathSArgs
+                .addr ampl.math.RShift
+                .addr ampl.math.MultI
+                .addr ampl.math.DivC
+                .addr ampl.math.RemL
+                .addr ampl.math.SArgs
                 .byte $60               ; jt_chrConvert3
                 .byte $22               ; tvDisp
 
@@ -65,7 +65,7 @@ serial          .word $0A00             ; serial number of ROM
 
                 .byte $86
                 .byte $9D
-                .addr symSTMres         ; STMrAdr in EDIT.DEF
+                .addr ampl.symbol.STMres         ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -86,7 +86,7 @@ START           .proc
 _warm           lda isMonitorLive       ; see where we were
                 beq _XIT1
 
-                jmp Monitor._ENTRY1
+                jmp ampl.monitor.Monitor._ENTRY1
 
 _XIT1           jmp editor.memory.GeneralErr.Punt  ; editor
 
@@ -105,11 +105,11 @@ _next2          lda emjmps-1,Y          ; init RAM
                 sta jt_jmps,Y
                 bne _next2
 
-                lda #<symSTMres
+                lda #<ampl.symbol.STMres
                 sta jt_stmradr
-                lda #>symSTMres
+                lda #>ampl.symbol.STMres
                 sta jt_stmradr+1
-                lda #`symSTMres
+                lda #`ampl.symbol.STMres
                 sta jt_stmradr+2
 
                 ; sty chrConvert1       ; Y=0

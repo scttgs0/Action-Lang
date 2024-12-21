@@ -117,7 +117,7 @@ fmcscmd         .addr jt_disptb+3       ; default
                 .byte $ca
                 .addr editor.command.InsertToggle
                 .byte $cd
-                .addr Monitor
+                .addr ampl.monitor.Monitor
                 .byte $e5
                 .addr editor.find.Find
                 .byte $f8

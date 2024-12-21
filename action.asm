@@ -112,20 +112,23 @@ editor      .namespace
 ;--------------------------------------
 ;    "ACTION! - Compiler Routines
 
+ampl        .namespace   
                 .fill 3,$00
                 .include "ampl/ampl.segment.asm"
                 .include "ampl/ampl.pf.asm"
                 .include "ampl/ampl.array.asm"
                 .include "ampl/ampl.cgu.asm"
-
+            .endnamespace
 
 ;--------------------------------------
 ;    ACTION! - Symbol Table
 
                 ;.align $1000
-
+            .namespace ampl
                 .include "ampl/ampl.math.asm"
                 .include "ampl/ampl.symbol.asm"
+            .endnamespace
+
                 .include "library/lib.key.asm"
                 .include "spl.err.asm"
                 .include "library/lib.io.asm"
@@ -169,8 +172,10 @@ comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
                 .include "editor/edit.tag.asm"
             .endnamespace
 
+            .namespace ampl
                 .include "ampl/ampl.monitor.asm"
                 .include "ampl/ampl.init.asm"
+            .endnamespace
 
 edit_copyright  .null "ces"
                 .byte $00

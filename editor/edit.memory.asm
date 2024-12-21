@@ -25,7 +25,7 @@ _1              stx zpAllocSize+1
 _ENTRY1         jsr Allocate._ENTRY
 
                 ldx zpAllocCurrent+1
-                beq GeneralErr       ; no memory allocated !
+                beq GeneralErr          ; no memory allocated !
 
                 clc
                 lda zpAllocCurrent
@@ -62,7 +62,7 @@ GeneralErr      .proc
 ;--------------------------------------
 Punt            jsr editor.display.SaveWindow   ; we're in big trouble
 
-                jmp monResetWindow
+                jmp ampl.monitor.ResetWindow
 
                 .endproc
 

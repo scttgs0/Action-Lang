@@ -4,14 +4,16 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.symbol.asm
+; SPDX-FileName: asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+symbol         .namespace
+
 ;======================================
-; symSTM(table)
+; STM(table)
 ;======================================
-symSTM          .proc
+STM             .proc
                 sta arg2
                 stx arg3
                 sta arg4
@@ -66,9 +68,9 @@ _XIT            jmp (jt_stmradr)
 
 
 ;======================================
-; symSTMres() lookup reserved names
+; STMres() lookup reserved names
 ;======================================
-symSTMres       .proc
+STMres          .proc
                 ldy arg14
                 cpy #$08
                 lda #$FF                ; if name too long!
@@ -109,9 +111,9 @@ _1              clc
 
 
 ;======================================
-; symGetName(char)
+; GetName(char)
 ;======================================
-symGetName      .proc
+GetName         .proc
                 ldy #$00
                 sta FirstChar           ; indicates a big symbol table is not needed (yet)
 
@@ -144,16 +146,16 @@ _next1          iny
 
                 dec choff               ; put character back
 
-                jsr symSTM._XIT         ; check for res. name
-                bpl symSTMres._XIT1     ; return
+                jsr STM._XIT            ; check for res. name
+                bpl STMres._XIT1        ; return
 
                 lda qglobal
                 beq _1
 
                 lda symTblLocal
                 ldx symTblLocal+1
-                jsr symSTM
-                bne symSTMres._XIT1     ; return
+                jsr STM
+                bne STMres._XIT1        ; return
 
 _1              lda symTblGlobal
                 ldx symTblGlobal+1
@@ -164,19 +166,19 @@ _1              lda symTblGlobal
 
                 lda bigSymTblGlobal
                 ldx bigSymTblGlobal+1
-_2              jsr symSTM
-                bne symSTMres._XIT1     ; return
+_2              jsr STM
+                bne STMres._XIT1        ; return
 
                 lda qglobal
-                beq symNewEntry
+                beq NewEntry
 
 _ENTRY1         lda symTblLocal
                 ldx symTblLocal+1
-                jsr symSTM
-                bne symSTMres._XIT1
+                jsr STM
+                bne STMres._XIT1
 
             .if ZAPRAM
-                inc symSTM,X
+                inc STM,X
             .else
                 nop
                 nop
@@ -188,7 +190,7 @@ _ENTRY1         lda symTblLocal
 ;======================================
 ; Make new entry in symbol table
 ;======================================
-symNewEntry     .proc
+NewEntry        .proc
                 lda symtab+1
                 sta (arg2),Y
                 lda symtab
@@ -196,7 +198,7 @@ symNewEntry     .proc
 
                 lda #<libst
                 ldx #>libst
-                jsr symSTM              ; lookup shadow name
+                jsr STM                 ; lookup shadow name
 
                 lda #tokUNDEC
                 ldy arg14
@@ -291,3 +293,5 @@ resw6           .text "DEFINE",tokDEFINE
 resw7           .text "INCLUDE",tokGET
                 .text "POINTER",tokPOINTER
                 .byte $FF
+
+                .endnamespace

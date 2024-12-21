@@ -8,7 +8,9 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
-math            .block
+math            .namespace
+
+params         .block
 _a             = zpAllocLast+1
 _b             = zpAllocLast
 _c             = zpAllocCurrent+1
@@ -25,65 +27,65 @@ _sign          = token
 
 
 ;======================================
-; mathMultI(op1, op2)
+; MultI(op1, op2)
 ;--------------------------------------
 ; op2 is in c & d
 ;  r = ab * cd
 ;  r = (a*d + c*b)*2^8 + b*d
 ;======================================
-mathMultI       .proc
-                jsr mathSMOps
+MultI           .proc
+                jsr SMOps
 
-                ldx math._b
+                ldx params._b
                 beq _mc5
 
-                stx math._t1
-                ldx math._d
+                stx params._t1
+                ldx params._d
                 beq _mc5
 
                 dex
-                stx math._t2
+                stx params._t2
                 ldx #$08
 _mc3            asl                     ; b*d, 16-bit result
-                rol math._rh
-                asl math._t1
+                rol params._rh
+                asl params._t1
                 bcc _mc4
 
-                adc math._t2
+                adc params._t2
                 bcc _mc4
 
-                inc math._rh
+                inc params._rh
 _mc4            dex
                 bne _mc3
-_mc5            sta math._rl
-                lda math._b
-                ldx math._c
-                jsr mathMulB                ; b*c, 8-bit result
+_mc5            sta params._rl
+                lda params._b
+                ldx params._c
+                jsr MulB                ; b*c, 8-bit result
 
-                lda math._a
-                ldx math._d
-                jsr mathMulB                ; a*d, 8-bit result
+                lda params._a
+                ldx params._d
+                jsr MulB                ; a*d, 8-bit result
 
 
-_setsign        ldy math._sign
+_setsign        ldy params._sign
                 bpl _ss2
 
             .if ZAPRAM
-                sta mathMulB,X
+                sta MulB,X
             .else
                 nop
                 nop
                 nop
             .endif
 
-_ss1            sta math._rl
-                stx math._rh
+_ss1            sta params._rl
+                stx params._rh
                 sec
                 lda #$00
-                sbc math._rl
+                sbc params._rl
                 tay
                 lda #$00
-                sbc math._rh
+                sbc params._rh
                 tax
                 tya
 
@@ -92,32 +94,32 @@ _ss2            rts
 
 
 ;======================================
-; mathMulB()
+; MulB()
 ;======================================
-mathMulB        .proc
+MulB            .proc
                 beq _mb3
 
                 dex
-                stx math._t2
+                stx params._t2
                 tax
                 beq _mb3
 
-                stx math._t1
+                stx params._t1
                 lda #$00
                 ldx #$08
 _mb1            asl
-                asl math._t1
+                asl params._t1
                 bcc _mb2
 
-                adc math._t2
+                adc params._t2
 _mb2            dex
                 bne _mb1
 
                 clc
-                adc math._rh
-                sta math._rh
-_mb3            lda math._rl
-                ldx math._rh
+                adc params._rh
+                sta params._rh
+_mb3            lda params._rl
+                ldx params._rh
 
                 rts
                 .endproc
@@ -126,89 +128,89 @@ _mb3            lda math._rl
 ;======================================
 ;
 ;======================================
-mathSMOps       .proc
-                stx math._sign
+SMOps           .proc
+                stx params._sign
                 cpx #$00                ; check signs
                 bpl _smo1
 
-                jsr mathMultI._ss1
+                jsr MultI._ss1
 
-_smo1           sta math._b
-                stx math._a
-                lda math._c
+_smo1           sta params._b
+                stx params._a
+                lda params._c
                 bpl _smo2
 
                 tax
-                eor math._sign
-                sta math._sign
-                lda math._d
-                jsr mathMultI._ss1
+                eor params._sign
+                sta params._sign
+                lda params._d
+                jsr MultI._ss1
 
-                sta math._d
-                stx math._c
+                sta params._d
+                stx params._c
 _smo2           lda #$00
-                sta math._rh
+                sta params._rh
 
                 rts
                 .endproc
 
 
 ;======================================
-; mathDivC(op1, op2)
+; DivC(op1, op2)
 ;======================================
-mathDivC        .proc
-                jsr mathSMOps
+DivC            .proc
+                jsr SMOps
 
 ;   see MultC above
-                lda math._c
+                lda params._c
                 beq _dsmall
 
 _dlarge         ldx #$08
-_dl1            rol math._b
-                rol math._a
-                rol math._rh
+_dl1            rol params._b
+                rol params._a
+                rol params._rh
                 sec
-                lda math._a
-                sbc math._d
+                lda params._a
+                sbc params._d
                 tay
-                lda math._rh
-                sbc math._c
+                lda params._rh
+                sbc params._c
                 bcc _dl2                ; overflow, don't subtract
 
-                sta math._rh
-                sty math._a
+                sta params._rh
+                sty params._a
 _dl2            dex
                 bne _dl1
 
-                lda math._b
+                lda params._b
                 rol a
                 ldx #$00
-                ldy math._a
-                sty math._rl            ; save low byte of REM
+                ldy params._a
+                sty params._rl          ; save low byte of REM
 
-                jmp mathMultI._setsign
+                jmp MultI._setsign
 
 _dsmall         ldx #$10
-_ds1            rol math._b
-                rol math._a
+_ds1            rol params._b
+                rol params._a
                 rol a
                 bcs _ds1a               ; keep track of shift output
 
-                cmp math._d
+                cmp params._d
                 bcc _ds2                ; overflow, don't subtract
 
-_ds1a           sbc math._d
+_ds1a           sbc params._d
                 sec                     ; for carry out in ROL A above
 _ds2            dex
                 bne _ds1
 
-                rol math._b
-                rol math._a
-                sta math._rl
-                lda math._b
-                ldx math._a
+                rol params._b
+                rol params._a
+                sta params._rl
+                lda params._b
+                ldx params._a
 
-                jmp mathMultI._setsign
+                jmp MultI._setsign
 
                 .endproc
 
@@ -216,39 +218,39 @@ _ds2            dex
 ;======================================
 ;
 ;======================================
-mathRemL        .proc
-                jsr mathDivC
+RemL            .proc
+                jsr DivC
 
-                lda math._rl
-                ldx math._rh
+                lda params._rl
+                ldx params._rh
 
 _rem1           rts
                 .endproc
 
 
 ;======================================
-; mathRShift(val, cnt)
+; RShift(val, cnt)
 ;======================================
-mathRShift      .proc
-                ldy math._d
+RShift          .proc
+                ldy params._d
                 beq _rshret
 
-                stx math._c
-_rsh1           lsr math._c
+                stx params._c
+_rsh1           lsr params._c
                 ror a
                 dey
                 bne _rsh1
 
-                ldx math._c
+                ldx params._c
 
 _rshret         rts
                 .endproc
 
 
 ;======================================
-; mathSArgs()
+; SArgs()
 ;======================================
-mathSArgs       .proc                   ; saves args for call
+SArgs           .proc                   ; saves args for call
                 sta arg0
                 stx arg1
                 sty arg2
@@ -310,3 +312,5 @@ _sa2            rts
 ;       lda FR0
 ;       lda FR0+1
 ;       jmp _SetSign
+
+                .endnamespace

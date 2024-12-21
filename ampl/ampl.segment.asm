@@ -77,7 +77,7 @@ _next1          sta (symTblLocal),Y
 ;   see Params
                 lda #$20
                 jsr mscSTIncr           ; arg list space
-                jsr cguTrashY
+                jsr ampl.cgu.TrashY
 
                 lda nxttoken
                 eor #tokEQU
@@ -150,7 +150,7 @@ _3              lda param
 
 ;   get space for proc variable
                 lda #$4C                ; JMP
-                jsr cguPush1
+                jsr ampl.cgu.Push1
                 jsr mscGetCodeOffset    ; fill in address
 
                 adc #$02
@@ -158,7 +158,7 @@ _3              lda param
 
                 inx
 
-_4              jsr cguPush2
+_4              jsr ampl.cgu.Push2
 
 ;   QCODE to transfer arguments to local frame
 _next3          lda argbytes
@@ -180,7 +180,7 @@ _next3          lda argbytes
 
                 iny
 
-_5              jsr cguPush3
+_5              jsr ampl.cgu.Push3
 
                 dec argbytes
 
@@ -189,7 +189,7 @@ _5              jsr cguPush3
 _6              jmp _9
 
 _7              ldx #$0A
-                jsr cguJSRTable
+                jsr ampl.cgu.JSRTable
 
                 lda arg0
                 ldx arg1
@@ -197,7 +197,7 @@ _7              ldx #$0A
                 ldy argbytes
                 dey
 
-                jsr cguPush3
+                jsr ampl.cgu.Push3
 
 _8              lda trace               ; check for trace
                 beq _9                  ; no trace
@@ -206,7 +206,7 @@ _8              lda trace               ; check for trace
                 ldx #<libmscCTrace
                 ldy #>libmscCTrace
 
-                jsr cguPush3
+                jsr ampl.cgu.Push3
 
                 ldy #$00
                 lda (curproc),Y
@@ -226,7 +226,7 @@ _next4          lda (curproc),Y
 
                 lda arg0
                 ldx arg1
-                jsr cguPush2
+                jsr ampl.cgu.Push2
 
                 lda #$03
                 jsr mscCProp

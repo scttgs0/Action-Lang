@@ -4,38 +4,40 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.pf.asm
+; SPDX-FileName: asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
+
+pf              .namespace
 
 ;======================================
 ;
 ;======================================
-pfLoad1         .proc
+Load1           .proc
                 ldy #$00
                 lda (stack),Y
                 cmp #tokARRAY_t
-                bcs pfProcFunc._ENTRY1
+                bcs ProcFunc._ENTRY1
 
                 inc abt-args,X
 
                 ldy #$07
                 lda (stack),Y
                 cmp #tokTEMP_t+tokBYTE_t
-                beq pfProcFunc._ENTRY2
+                beq ProcFunc._ENTRY2
 
                 dec abt+1-args,X
 
                 cpx #args+2
-                bcc pfProcFunc._ENTRY2
+                bcc ProcFunc._ENTRY2
 
                 jsr genops._ENTRY1
-                jsr cguLoad2H
+                jsr ampl.cgu.Load2H
 
                 lda #$81                ; STA
-                jsr cguOp1H
+                jsr ampl.cgu.Op1H
 
-                jmp pfProcFunc._ENTRY2
+                jmp ProcFunc._ENTRY2
 
                 .endproc
 
@@ -43,7 +45,7 @@ pfLoad1         .proc
 ;======================================
 ; PF()
 ;======================================
-pfProcFunc      .proc
+ProcFunc        .proc
                 lda #$00                ; load arg types flag
                 jsr bankGetArgs
                 jsr pushst
@@ -86,7 +88,7 @@ _1              sta temps-args,X
 
                 ldx abt+3
                 cpx #args+3
-                bcc pfLoad1
+                bcc Load1
 
 _ENTRY1         jsr cgassign
 
@@ -107,13 +109,13 @@ _ENTRY2         lda token
                 cmp #args+1
                 bcs _4
 
-_next2          jsr cguTrashY
+_next2          jsr ampl.cgu.TrashY
 
                 ldy #$01
-                jsr cguStkAddr
+                jsr ampl.cgu.StkAddr
 
                 lda #$20                ; JSR
-                jmp cguPush3
+                jmp ampl.cgu.Push3
 
 _2              ldx #args+2
                 jsr _push
@@ -126,7 +128,7 @@ _4              ldx #args
 
                 jmp _next2
 
-_err            jmp Segment._argerr
+_err            jmp ampl.Segment._argerr
 
 
 ; = = = = = = = = = = = = = = = = = = =
@@ -138,7 +140,7 @@ _push           lda abt-args,X
                 lda _ops-args,X
                 ora #$04
 
-                jmp cguPush2
+                jmp ampl.cgu.Push2
 
 _5              stx arg0
                 jsr genops._ENTRY1
@@ -163,19 +165,19 @@ _5              stx arg0
                 sty arg0
 
                 ldy #$02
-                jsr cguLoadI
+                jsr ampl.cgu.LoadI
 
                 ldy arg0
                 bmi _6
 
                 tax
                 pla
-                jsr cguPush2            ; low byte of const
+                jsr ampl.cgu.Push2      ; low byte of const
 
                 jmp cgassign._ENTRY5
 
 _6              pla
-_XIT1           jmp cguPush2            ; high byte
+_XIT1           jmp ampl.cgu.Push2      ; high byte
 
 _7              ldy abt-args,X
 _8              bpl _9
@@ -183,9 +185,9 @@ _8              bpl _9
                 ldx arg3
                 beq _XIT1
 
-                jmp cguOp2H
+                jmp ampl.cgu.Op2H
 
-_9              jsr cguOp2L
+_9              jsr ampl.cgu.Op2L
 
                 jmp cgassign._ENTRY5
 
@@ -194,3 +196,5 @@ _9              jsr cguOp2L
 _ops            .byte $a1,$a2,$a0       ; LDA, LDX, LDY
 
                 .endproc
+
+                .endnamespace

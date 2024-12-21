@@ -4,16 +4,18 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.init.asm
+; SPDX-FileName: asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+init            .namespace
+
 ;======================================
-; initSetupSPL()
+; SetupSPL()
 ;--------------------------------------
 ; SPL = Scanner/Parser/Lexeme
 ;======================================
-initSetupSPL    .proc
+SetupSPL        .proc
                 lda #$00
                 tay
                 sta sp
@@ -114,3 +116,5 @@ _3              lda sparem
 
                 rts
                 .endproc
+
+                .endnamespace
