@@ -11,39 +11,39 @@
 ;======================================
 ;
 ;======================================
-ld1             .proc
+pfLoad1         .proc
                 ldy #$00
                 lda (stack),Y
                 cmp #tokARRAY_t
-                bcs pf._ENTRY1
+                bcs pfProcFunc._ENTRY1
 
                 inc abt-args,X
 
                 ldy #$07
                 lda (stack),Y
                 cmp #tokTEMP_t+tokBYTE_t
-                beq pf._ENTRY2
+                beq pfProcFunc._ENTRY2
 
                 dec abt+1-args,X
 
                 cpx #args+2
-                bcc pf._ENTRY2
+                bcc pfProcFunc._ENTRY2
 
                 jsr genops._ENTRY1
-                jsr Load2H
+                jsr cguLoad2H
 
                 lda #$81                ; STA
-                jsr Op1H
+                jsr cguOp1H
 
-                jmp pf._ENTRY2
+                jmp pfProcFunc._ENTRY2
 
                 .endproc
 
 
 ;======================================
-;   PF()
+; PF()
 ;======================================
-pf              .proc
+pfProcFunc      .proc
                 lda #$00                ; load arg types flag
                 jsr bankGetArgs
                 jsr pushst
@@ -86,7 +86,7 @@ _1              sta temps-args,X
 
                 ldx abt+3
                 cpx #args+3
-                bcc ld1
+                bcc pfLoad1
 
 _ENTRY1         jsr cgassign
 
@@ -107,13 +107,13 @@ _ENTRY2         lda token
                 cmp #args+1
                 bcs _4
 
-_next2          jsr TrashY
+_next2          jsr cguTrashY
 
                 ldy #$01
-                jsr StkAddr
+                jsr cguStkAddr
 
                 lda #$20                ; JSR
-                jmp Push3
+                jmp cguPush3
 
 _2              ldx #args+2
                 jsr _push
@@ -129,16 +129,16 @@ _4              ldx #args
 _err            jmp Segment._argerr
 
 
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 ;
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 _push           lda abt-args,X
                 bne _5
 
                 lda _ops-args,X
                 ora #$04
 
-                jmp Push2
+                jmp cguPush2
 
 _5              stx arg0
                 jsr genops._ENTRY1
@@ -163,19 +163,19 @@ _5              stx arg0
                 sty arg0
 
                 ldy #$02
-                jsr LoadI
+                jsr cguLoadI
 
                 ldy arg0
                 bmi _6
 
                 tax
                 pla
-                jsr Push2               ; low byte of const
+                jsr cguPush2            ; low byte of const
 
                 jmp cgassign._ENTRY5
 
 _6              pla
-_XIT1           jmp Push2               ; high byte
+_XIT1           jmp cguPush2            ; high byte
 
 _7              ldy abt-args,X
 _8              bpl _9
@@ -183,9 +183,9 @@ _8              bpl _9
                 ldx arg3
                 beq _XIT1
 
-                jmp Op2H
+                jmp cguOp2H
 
-_9              jsr Op2L
+_9              jsr cguOp2L
 
                 jmp cgassign._ENTRY5
 

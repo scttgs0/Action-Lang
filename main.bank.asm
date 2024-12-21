@@ -56,7 +56,7 @@ bankCartStart   .proc
 ;======================================
 bankGetName     .proc
                 ;!!sta bank+lbank
-                jsr lGetName
+                jsr symGetName
 
                 .endproc
 
@@ -161,7 +161,7 @@ _XIT            jmp mscMNum._varerr
 bankLocalName   .proc
                 ;!!sta bank+lbank
 
-                jsr lGetName._ENTRY1
+                jsr symGetName._ENTRY1
 
                 jmp bankRestore
 

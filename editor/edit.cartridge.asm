@@ -31,6 +31,7 @@ emjmps          rts                     ; Seg catch all
 
                 .word 0
                 rts                     ; ArrRef Catch all
+
 zero            .word 0
                 rts                     ; SPLEnd
 
@@ -39,11 +40,11 @@ zero            .word 0
 
                 .byte 0                 ; EOLch (default = space)
 ltab            .addr mscLShift._lshift ; LSH
-                .addr RShift
-                .addr MultI
-                .addr DivC
-                .addr remi
-                .addr SArgs
+                .addr mathRShift
+                .addr mathMultI
+                .addr mathDivC
+                .addr mathRemL
+                .addr mathSArgs
                 .byte $60               ; jt_chrConvert3
                 .byte $22               ; tvDisp
 
@@ -60,7 +61,7 @@ serial          .word $0A00             ; serial number of ROM
 
                 .byte $86
                 .byte $9d
-                .addr iSTMres           ; STMrAdr in EDIT.DEF
+                .addr symSTMres         ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -96,11 +97,11 @@ _next2          lda emjmps-1,Y          ; init RAM
                 sta jt_jmps,Y
                 bne _next2
 
-                lda #<iSTMres
+                lda #<symSTMres
                 sta jt_stmradr
-                lda #>iSTMres
+                lda #>symSTMres
                 sta jt_stmradr+1
-                lda #`iSTMres
+                lda #`symSTMres
                 sta jt_stmradr+2
 
                 ; sty chrConvert1       ; Y=0

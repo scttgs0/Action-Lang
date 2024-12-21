@@ -453,7 +453,7 @@ _1              lda stbase
 
 cderr           ;!!sta bank+ebank
 
-                jsr SetupSPL            ; reset compiler
+                jsr initSetupSPL        ; reset compiler
 
                 ldy #qcodeERR           ; out of QCODE space
                 jmp bankSPLErr

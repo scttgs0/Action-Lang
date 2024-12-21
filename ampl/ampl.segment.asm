@@ -26,15 +26,21 @@ Segment         .proc
 
                 rts                     ; end of segment list
 
+; - - - - - - - - - - - - - - - - - - -
+
 _proc           lda #tokFUNC_t-tokVAR_t+tokCHAR-1
                 sta type
                 bra _1
+
+; - - - - - - - - - - - - - - - - - - -
 
 _func           clc
                 adc #tokFUNC_t-tokVAR_t
                 sta type
 
                 jsr LexGetNext
+
+; - - - - - - - - - - - - - - - - - - -
 
 _1              jsr makeentry
                 jsr jt_segend
@@ -71,7 +77,7 @@ _next1          sta (symTblLocal),Y
 ;   see Params
                 lda #$20
                 jsr mscSTIncr           ; arg list space
-                jsr TrashY
+                jsr cguTrashY
 
                 lda nxttoken
                 eor #tokEQU
@@ -97,8 +103,8 @@ _2              jsr LexGetNext
                 bne _argerr
 
 
-; low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
-; low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
+;   low heading> _:= low id> (= low constant>) ( (<arg dcl list>) )
+;   low arg dcl list> _:= low arg dcl list> , low dcl list> | low dcl list>
 
                 jsr LexGetNext
 
@@ -119,7 +125,7 @@ _argerr         ldy #argERR
 
                 jmp bankSPLErr
 
-_3          lda param
+_3              lda param
                 pha
 
                 lda #$00
@@ -132,8 +138,7 @@ _3          lda param
                 pla
                 bmi _6                  ; system proc
 
-;   get beginning of arguments and
-;   save actual procedure address
+;   get beginning of arguments and save actual procedure address
                 lda #$01
                 jsr mscCProp
 
@@ -145,7 +150,7 @@ _3          lda param
 
 ;   get space for proc variable
                 lda #$4C                ; JMP
-                jsr Push1
+                jsr cguPush1
                 jsr mscGetCodeOffset    ; fill in address
 
                 adc #$02
@@ -153,10 +158,9 @@ _3          lda param
 
                 inx
 
-_4              jsr Push2
+_4              jsr cguPush2
 
-;   QCODE to transfer arguments to
-;   local frame
+;   QCODE to transfer arguments to local frame
 _next3          lda argbytes
                 beq _8                  ; no arguments
 
@@ -176,7 +180,7 @@ _next3          lda argbytes
 
                 iny
 
-_5              jsr Push3
+_5              jsr cguPush3
 
                 dec argbytes
 
@@ -185,7 +189,7 @@ _5              jsr Push3
 _6              jmp _9
 
 _7              ldx #$0A
-                jsr JSRTable
+                jsr cguJSRTable
 
                 lda arg0
                 ldx arg1
@@ -193,7 +197,7 @@ _7              ldx #$0A
                 ldy argbytes
                 dey
 
-                jsr Push3
+                jsr cguPush3
 
 _8              lda trace               ; check for trace
                 beq _9                  ; no trace
@@ -202,7 +206,7 @@ _8              lda trace               ; check for trace
                 ldx #<libMscCTrace
                 ldy #>libMscCTrace
 
-                jsr Push3
+                jsr cguPush3
 
                 ldy #$00
                 lda (curproc),Y
@@ -222,7 +226,7 @@ _next4          lda (curproc),Y
 
                 lda arg0
                 ldx arg1
-                jsr Push2
+                jsr cguPush2
 
                 lda #$03
                 jsr mscCProp

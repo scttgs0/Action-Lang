@@ -9,7 +9,7 @@
 
 
 ;======================================
-;   ArrRef()
+; ArrRef()
 ;======================================
 ArrRef          .proc
                 ldx nxttoken
@@ -34,7 +34,7 @@ _next1          ldy #$00
                 bcs _1                  ; small array
 
                 iny
-                jsr StkP
+                jsr cguStkP
 
                 cpx #$00
                 bne _1
@@ -104,18 +104,18 @@ _4              sta FR1
 
 ;   integer or cardinal
 
-_5              jsr GetTemps
+_5              jsr cguGetTemps
 
                 lda #$A1                ; LDA
                 ldx FR1
                 beq _6
 
-                jsr Load2L
+                jsr cguLoad2L
 
                 lda #$0A                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
-                jsr Push3
+                jsr cguPush3
 
                 lda #$61                ; ADC
             .if ZAPRAM
@@ -125,21 +125,21 @@ _5              jsr GetTemps
                 nop
             .endif
 
-_6              jsr LoadX.Op1L
-                jsr STempL
+_6              jsr cguOp1L
+                jsr cguSTempL
 
                 lda #$A1                ; LDA
                 ldx FR1
                 beq _7
 
-                jsr Load2H
+                jsr cguLoad2H
 
                 lda #$2A                ; ROL A
                 ldx #$28                ; PLP, restore carry
-                jsr Push2
+                jsr cguPush2
 
                 lda #$61                ; ADC
-_7              jsr Op1H
+_7              jsr cguOp1H
                 jmp cgadd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
@@ -154,17 +154,17 @@ _small          ldy #$07
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
-                bit arrmode
+                bit modeArr
                 bne arrerr              ; can't index with array
 
                 ldy #$0A
                 sta (stack),Y
 
                 ldy #$02
-                jsr LoadI
+                jsr cguLoadI
 
                 ldy #$0B
-                jsr SaveCd._saveStack
+                jsr cguSaveCd._ToStack
 
                 jmp popst
 

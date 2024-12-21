@@ -9,20 +9,20 @@
 
 
 ;======================================
-;   LoadY() value in arg12
+; cguLoadY() value in arg12
 ;======================================
-LoadY           .proc
+cguLoadY        .proc
                 lda cury
                 cmp arg12
                 beq _XIT
 
-                jsr Push0
+                jsr cguPush0
 
                 cmp #$01
                 bne _1
 
                 lda #$88                ; DEY
-_next1          jsr Insrt1
+_next1          jsr cguInsrt1
 
                 jmp _3
 
@@ -34,7 +34,7 @@ _1              cmp #$00
 
 _2              lda #$A0
                 ldx arg12
-                jsr Insrt2              ; LDY #$00 or #$01
+                jsr cguInsrt2           ; LDY #$00 or #$01
 
 _3              lda arg12
                 sta cury
@@ -45,9 +45,9 @@ _XIT            rts
 
 
 ;======================================
-;   TrashY()
+; cguTrashY()
 ;======================================
-TrashY          .proc
+cguTrashY       .proc
                 lda #$FF
                 sta cury
 
@@ -56,35 +56,34 @@ TrashY          .proc
 
 
 ;======================================
-;   LoadX(,,offset)
+; cguLoadX(,,offset)
 ;--------------------------------------
-;   NOTE:  this proc can only be called
-;   from Op below, see _LXC
+; NOTE:  this proc can only be called
+;        from Op below, see _LXC
 ;======================================
-LoadX           .proc
-
+cguLoadX        .proc
                 lda (stack),Y
                 iny
-                bit tempmode
+                bit modeTemp
                 bne _1
 
-                bit cnstmode
+                bit modeConst
                 beq _3
 
 ;   var to load
-                jsr StkProp
+                jsr cguStkProp
 
                 beq _2
 
                 lda #$AE                ; LDX addr16
-                jmp Push3
+                jmp cguPush3
 
 _1              lda (stack),Y
                 tax
                 dec temps-args,X
 
 _2              lda #$A6                ; LDX addr
-_XIT1           jmp Push2
+_XIT1           jmp cguPush2
 
 _3              lda (stack),Y
 
@@ -98,35 +97,38 @@ _3              lda (stack),Y
                 pla
                 pla
                 tay
-                bra ophigh._opv
+                bra cguOp1L.ophigh._opv
 
 _optype         and #$20
-                beq ophigh._operr       ; con. exp.
+                beq cguOp1L.ophigh._operr   ; con. exp.
 
-                jsr StkAddr
+                jsr cguStkAddr
 
                 lda arg12
-                beq ophigh._4
+                beq cguOp1L.ophigh._4
 
                 inx
-                bne ophigh._4
+                bne cguOp1L.ophigh._4
 
                 iny
-                jmp ophigh._4
+                jmp cguOp1L.ophigh._4
+
+                .endproc
 
 
 ;======================================
-;   Load1L
+; cguLoad1L()
 ;======================================
-Load1L          lda #$A1                ; LDA op
+cguLoad1L       lda #$A1                ; LDA op
 
                 ;[fall-through]
 
 
 ;======================================
-;   Op1L(op)
+; cguOp1L(op)
 ;======================================
-Op1L            pha
+cguOp1L         .proc
+                pha
 
                 lda arg2
                 ldy #$08
@@ -137,22 +139,22 @@ ophigh          stx arg12
 ; comparisons is important!
 
                 tax
-                bpl LoadX._optype
+                bpl cguLoadX._optype
 
-                bit procmode
+                bit modeProc
                 bne _5
 
-                bit arrmode
+                bit modeArr
                 bne _6                  ; array
 
-                bit tempmode
+                bit modeTemp
                 bne _13                 ; temp
 
-                bit cnstmode
+                bit modeConst
                 beq _9                  ; constant
 
 ;   var if we get here
-_opv            jsr StkProp
+_opv            jsr cguStkProp
 
                 beq _14                 ; page zero var
 
@@ -160,7 +162,7 @@ _opv            jsr StkProp
 _4              pla
                 ora #$0C                ; addr16
 
-                jmp Push3
+                jmp cguPush3
 
 ;   proc
 _5              inc arg12               ; skip JMP byte
@@ -170,10 +172,10 @@ _5              inc arg12               ; skip JMP byte
 _operr          jmp conderr             ; cond. exp.
 
 ;   array
-_6              bit cnstmode
+_6              bit modeConst
                 bne _7
 
-                jsr LoadY
+                jsr cguLoadY
 
                 ; lda arg7
                 ; and #$F7
@@ -204,22 +206,22 @@ _7              tya                     ; small array
                 iny
                 iny
 
-                jsr LoadX
+                jsr cguLoadX
 
                 pla
                 tay
-                jsr StkProp
+                jsr cguStkProp
                 beq _8                  ; page zero
 
                 pla
                 ora #$1C                ; addr16,X
 
-                jmp Push3
+                jmp cguPush3
 
 _8              pla
                 ora #$14                ; addr,X
 
-                jmp Push2
+                jmp cguPush2
 
 ;   constant
 _9              lda #$08                ; data
@@ -234,7 +236,7 @@ _10             lda (stack),Y
 _11             tax
 _12             pla
                 ora arg10               ; op mode
-                jmp Push2
+                jmp cguPush2
 
 ;   temp
 _13             lda #$04                ; addr
@@ -243,39 +245,36 @@ _13             lda #$04                ; addr
 ;   zero-page variable
 _14             pla
                 ora #$04                ; addr
-                jmp Push2
+                jmp cguPush2
 
                 .endproc
 
 
 ;======================================
-;   Load2L()
+; cguLoad2L()
 ;======================================
-Load2L          .proc
-                lda #$A1                ; LDA op
-
-                .endproc
+cguLoad2L       lda #$A1                ; LDA op
 
                 ;[fall-through]
 
 
 ;======================================
-;   Op2L(op)
+; cguOp2L(op)
 ;======================================
-Op2L            .proc
+cguOp2L         .proc
                 pha
 
                 lda arg1
                 ldy #$01
-                jmp LoadX.oplow
+                jmp cguOp1L.oplow
 
                 .endproc
 
 
 ;======================================
-;   Load1H()
+; cguLoad1H()
 ;======================================
-Load1H          .proc
+cguLoad1H       .proc
                 lda #$A1                ; LDA op
 
                 .endproc
@@ -284,25 +283,26 @@ Load1H          .proc
 
 
 ;======================================
-;   Op1H(op)
+; cguOp1H(op)
 ;======================================
-Op1H            .proc
+cguOp1H         .proc
                 ldx arg4
-                beq Op2H._ophz
+                beq cguOp2H._ophz
 
                 pha
+
                 lda arg2
                 ldy #$08
 _ENTRY1         ldx #$01
-                jmp LoadX.ophigh
+                jmp cguOp1L.ophigh
 
                 .endproc
 
 
 ;======================================
-;   Load2H()
+; cguLoad2H()
 ;======================================
-Load2H          .proc
+cguLoad2H       .proc
                 lda #$A1                ; LDA op
 
                 .endproc
@@ -311,19 +311,19 @@ Load2H          .proc
 
 
 ;======================================
-;   Op2H(op)
+; cguOp2H(op)
 ;======================================
-Op2H            .proc
+cguOp2H         .proc
                 ldx arg3
                 beq _ophz
 
                 pha
                 lda arg1
                 ldy #$01
-                bne Op1H._ENTRY1
+                bne cguOp1H._ENTRY1
 
 _ophz           ora #$08
-                jmp Push2
+                jmp cguPush2
 
                 .endproc
 
@@ -331,22 +331,22 @@ _ophz           ora #$08
 ;--------------------------------------
 ;--------------------------------------
 
-arrmode         .byte $10
-cnstmode        .byte $08
-tempmode        .byte $20
-procmode        .byte $40
+modeArr         .byte $10
+modeConst       .byte $08
+modeTemp        .byte $20
+modeProc        .byte $40
 
 ; see CG
-outtype         .byte $82,3,$84,tokREAL_t
+outType         .byte $82,3,$84,tokREAL_t
                 .byte 3,3,$84,tokREAL_t
                 .byte $84,$84,$84,tokREAL_t
                 .byte tokREAL_t,tokREAL_t,tokREAL_t,tokREAL_t
 
 
 ;======================================
-;   GetTemps()
+; cguGetTemps()
 ;======================================
-GetTemps        .proc
+cguGetTemps     .proc
                 ldx #args+16
                 ldy #$07
 _next1          dex
@@ -365,7 +365,7 @@ _next1          dex
                 inc temps-args+1,X
 
             .if ZAPRAM
-                inc SArgs,X
+                inc mathSArgs,X
             .else
                 nop
                 nop
@@ -382,9 +382,9 @@ _err            jmp experr
 
 
 ;======================================
-;   LoadI(,,offset)
+; cguLoadI(,,offset)
 ;======================================
-LoadI           .proc
+cguLoadI        .proc
                 lda (stack),Y
                 sta arg15
 
@@ -399,9 +399,9 @@ LoadI           .proc
 
 
 ;======================================
-;   LdCdZ(,,stkoff)
+; cguLdCdZ(,,stkoff)
 ;======================================
-LdCdZ           .proc
+cguLdCdZ        .proc
                 lda #$00
 
                 .endproc
@@ -410,9 +410,9 @@ LdCdZ           .proc
 
 
 ;======================================
-;   LoadCd(cdoff,,stkoff)
+; cguLoadCd(cdoff,,stkoff)
 ;======================================
-LoadCd          .proc
+cguLoadCd       .proc
                 clc
                 adc (stack),Y
                 sta QCODE
@@ -427,12 +427,12 @@ LoadCd          .proc
 
 
 ;======================================
-;   SaveCd(,,offset)
+; cguSaveCd(,,offset)
 ;======================================
-SaveCd          .proc
+cguSaveCd       .proc
                 lda QCODE
                 ldx QCODE+1
-_saveStack      sta (stack),Y
+_ToStack        sta (stack),Y
 
                 txa
                 iny
@@ -443,9 +443,9 @@ _saveStack      sta (stack),Y
 
 
 ;======================================
-;   RelOp()
+; cguRelOp()
 ;======================================
-RelOp           .proc
+cguRelOp        .proc
                 lda arg6
                 bpl _XIT
 
@@ -456,9 +456,9 @@ _XIT            rts
 
 
 ;======================================
-;   ChkZero()
+; cguChkZero()
 ;======================================
-ChkZero         .proc
+cguChkZero      .proc
                 lda arg3
                 bne _XIT
 
@@ -476,9 +476,9 @@ _XIT            rts
 
 
 ;======================================
-;   OpCd1()
+; cguOpCd1()
 ;======================================
-OpCd1           .proc
+cguOpCd1        .proc
                 ldx arg8
                 lda cgopscd+1,X
 
@@ -487,9 +487,9 @@ OpCd1           .proc
 
 
 ;======================================
-;   StkAddr(,,offset)
+; cguStkAddr(,,offset)
 ;======================================
-StkAddr         .proc
+cguStkAddr      .proc
                 lda (stack),Y
                 tax
 
@@ -502,10 +502,10 @@ StkAddr         .proc
 
 
 ;======================================
-;   StkP(,,offset)
+; cguStkP(,,offset)
 ;======================================
-StkP            .proc
-                jsr StkAddr
+cguStkP         .proc
+                jsr cguStkAddr
 
                 lda #$01
                 jmp mscGProp
@@ -514,9 +514,9 @@ StkP            .proc
 
 
 ;======================================
-;   StkPZ(,,offset)
+; cguStkPZ(,,offset)
 ;======================================
-StkPZ           .proc
+cguStkPZ        .proc
                 lda #$00
 
                 .endproc
@@ -525,9 +525,9 @@ StkPZ           .proc
 
 
 ;======================================
-;    StkPS(,,offset)
+; cguStkPS(,,offset)
 ;======================================
-StkPS           .proc
+cguStkPS        .proc
                 sta arg12
 
                 .endproc
@@ -536,10 +536,10 @@ StkPS           .proc
 
 
 ;======================================
-;    StkProp(,,offset)
+; cguStkProp(,,offset)
 ;======================================
-StkProp         .proc
-                jsr StkP
+cguStkProp      .proc
+                jsr cguStkP
 
                 clc
                 adc arg12
@@ -556,9 +556,9 @@ StkProp         .proc
 
 
 ;======================================
-;   JSRTable(,index)
+; cguJSRTable(,index)
 ;======================================
-JSRTable        .proc
+cguJSRTable     .proc
 ;           .if RAMzap
 ;               ldy LTab+1,X
 ;               lda LTab,X
@@ -570,15 +570,15 @@ JSRTable        .proc
                 tax
                 lda #$20                ; JSR opcode
 
-                jmp Push3
+                jmp cguPush3
 
                 .endproc
 
 
 ;======================================
-;   Push0()
+; cguPush0()
 ;======================================
-Push0           .proc
+cguPush0        .proc
                 sty arg13
 
                 ldy QCODE
@@ -593,13 +593,13 @@ Push0           .proc
 
 
 ;======================================
-;   PushTrue(op)
+; cguPushTrue(op)
 ;======================================
-PushTrue        .proc
-                jsr Push1
+cguPushTrue     .proc
+                jsr cguPush1
 
                 ldy #$0A
-                jsr SaveCd
+                jsr cguSaveCd
 
                 lda #$00                ; no other true branches
                 sta arg9
@@ -610,13 +610,13 @@ PushTrue        .proc
 
 
 ;======================================
-;   Push1(op)
+; cguPush1(op)
 ;======================================
-Push1           .proc
-                jsr Push0
+cguPush1        .proc
+                jsr cguPush0
 
                 sta (arg14),Y
-                beq Insrt1._ENTRY1
+                beq cguInsrt1._ENTRY1
 
                 .endproc
 
@@ -624,11 +624,11 @@ Push1           .proc
 
 
 ;======================================
-;   Insrt1(op)
+; cguInsrt1(op)
 ;======================================
-Insrt1          .proc
+cguInsrt1       .proc
                 ldy #$01
-                jsr AddCdSp
+                jsr cguAddCdSp
 
 _ENTRY1         iny
                 tya
@@ -639,24 +639,24 @@ _ENTRY1         iny
 
 
 ;======================================
-;   STempH()
+; cguSTempH()
 ;======================================
-STempH          .proc
+cguSTempH       .proc
                 inc arg9
 
                 ldy #$0C
-                bra STempL._ENTRY1
+                bra cguSTempL._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;   STempL()
+; cguSTempL()
 ;======================================
-STempL          .proc
+cguSTempL       .proc
                 ldy #$0A
 
-_ENTRY1         jsr savecd
+_ENTRY1         jsr cguSaveCd
 
                 lda arg9
                 tax
@@ -671,13 +671,13 @@ _ENTRY1         jsr savecd
 
 
 ;======================================
-;   Push2(op,,data)
+; cguPush2(op,,data)
 ;======================================
-Push2           .proc
-                jsr Push0
+cguPush2        .proc
+                jsr cguPush0
 
                 sta (arg14),Y
-                beq Insrt2._ENTRY1
+                beq cguInsrt2._ENTRY1
 
                 .endproc
 
@@ -685,16 +685,16 @@ Push2           .proc
 
 
 ;======================================
-;   Insrt2(op,data)
+; cguInsrt2(op,data)
 ;======================================
-Insrt2          .proc
+cguInsrt2       .proc
                 ldy #$02
-                jsr AddCdSp
+                jsr cguAddCdSp
 
 _ENTRY1         txa
                 iny
                 sta (arg14),Y
-                bne Insrt1._ENTRY1
+                bne cguInsrt1._ENTRY1
 
                 .endproc
 
@@ -702,13 +702,13 @@ _ENTRY1         txa
 
 
 ;======================================
-;   Push3(op,data16)
+; cguPush3(op,data16)
 ;======================================
-Push3           .proc
-                jsr Push0
+cguPush3        .proc
+                jsr cguPush0
 
                 sta (arg14),Y
-                beq Insrt3._ENTRY2
+                beq cguInsrt3._ENTRY2
 
                 .endproc
 
@@ -716,19 +716,19 @@ Push3           .proc
 
 
 ;======================================
-;   Insrt3(op,data16)
+; cguInsrt3(op,data16)
 ;======================================
-Insrt3          .proc
+cguInsrt3       .proc
                 sty arg13
 
                 ldy #$03
-_ENTRY1         jsr AddCdSp
+_ENTRY1         jsr cguAddCdSp
 
 _ENTRY2         txa
                 ldx arg13
                 iny
                 sta (arg14),Y
-                bne Insrt2._ENTRY1
+                bne cguInsrt2._ENTRY1
 
                 .endproc
 
@@ -736,12 +736,12 @@ _ENTRY2         txa
 
 
 ;======================================
-;   AddCdSp()
+; cguAddCdSp()
 ;--------------------------------------
-; AddCdSp(,,size) add QCODE space
+; cguAddCdSp(,,size) add QCODE space
 ; does NOT change QCODE or codeOff
 ;======================================
-AddCdSp         .proc
+cguAddCdSp      .proc
                 pha
 
                 clc

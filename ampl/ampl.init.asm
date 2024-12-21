@@ -9,11 +9,11 @@
 
 
 ;======================================
-; SetupSPL()
+; initSetupSPL()
 ;--------------------------------------
 ; SPL = Scanner/Parser/Lexeme
 ;======================================
-SetupSPL        .proc
+initSetupSPL    .proc
                 lda #$00
                 tay
                 sta sp

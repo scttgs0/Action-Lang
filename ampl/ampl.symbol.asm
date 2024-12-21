@@ -9,9 +9,9 @@
 
 
 ;======================================
-;   STM(table)
+; symSTM(table)
 ;======================================
-STM             .proc
+symSTM          .proc
                 sta arg2
                 stx arg3
                 sta arg4
@@ -62,13 +62,13 @@ _XIT            jmp (jt_stmradr)
                 .endproc
 
 
-;   this normially goes to ISTMres below
+;   this normally goes to ISTMres below
 
 
 ;======================================
-;   STMres() lookup reserved names
+; symSTMres() lookup reserved names
 ;======================================
-iSTMres         .proc
+symSTMres       .proc
                 ldy arg14
                 cpy #$08
                 lda #$FF                ; if name too long!
@@ -109,9 +109,9 @@ _1              clc
 
 
 ;======================================
-;   bankGetName(char)
+; symGetName(char)
 ;======================================
-lGetName        .proc
+symGetName      .proc
                 ldy #$00
                 sta FirstChar           ; indicates a big symbol table is not needed (yet)
 
@@ -144,16 +144,16 @@ _next1          iny
 
                 dec choff               ; put character back
 
-                jsr STM._XIT            ; check for res. name
-                bpl iSTMres._XIT1       ; return
+                jsr symSTM._XIT         ; check for res. name
+                bpl symSTMres._XIT1     ; return
 
                 lda qglobal
                 beq _1
 
                 lda symTblLocal
                 ldx symTblLocal+1
-                jsr STM
-                bne iSTMres._XIT1       ; return
+                jsr symSTM
+                bne symSTMres._XIT1     ; return
 
 _1              lda symTblGlobal
                 ldx symTblGlobal+1
@@ -164,19 +164,19 @@ _1              lda symTblGlobal
 
                 lda bigSymTblGlobal
                 ldx bigSymTblGlobal+1
-_2              jsr STM
-                bne iSTMres._XIT1       ; return
+_2              jsr symSTM
+                bne symSTMres._XIT1     ; return
 
                 lda qglobal
-                beq NewEntry
+                beq symNewEntry
 
 _ENTRY1         lda symTblLocal
                 ldx symTblLocal+1
-                jsr STM
-                bne iSTMres._XIT1
+                jsr symSTM
+                bne symSTMres._XIT1
 
             .if ZAPRAM
-                inc STM,X
+                inc symSTM,X
             .else
                 nop
                 nop
@@ -186,9 +186,9 @@ _ENTRY1         lda symTblLocal
 
 
 ;======================================
-;   Make new entry in symbol table
+; Make new entry in symbol table
 ;======================================
-NewEntry        .proc
+symNewEntry     .proc
                 lda symtab+1
                 sta (arg2),Y
                 lda symtab
@@ -196,7 +196,7 @@ NewEntry        .proc
 
                 lda #<libst
                 ldx #>libst
-                jsr STM                 ; lookup shadow name
+                jsr symSTM              ; lookup shadow name
 
                 lda #tokUNDEC
                 ldy arg14
@@ -241,21 +241,21 @@ resw1           .byte $FF
 
 resw2           .text "DO",tokDO
                 .text "FI",tokFI
-    ; .byte "FO",tokESAC
+                ; .text "FO",tokESAC
                 .text "IF",tokIF
                 .text "OD",tokOD
-    ; .byte "OF",of
+                ; .text "OF",of
                 .text "OR",tokOR
                 .text "TO",tokTO
                 .byte $FF
 
 resw3           .text "AND",tokAND
                 .text "FOR",tokFOR
-    ; .byte "GET",get
+                ; .text "GET",get
                 .text "INT",tokINT
                 .text "LSH",tokLSH
                 .text "MOD",tokREM
-    ; .byte "NOT",notId
+                ; .text "NOT",notId
                 .text "RSH",tokRSH
                 .text "SET",tokSET
                 .text "XOR",tokXOR
@@ -263,14 +263,14 @@ resw3           .text "AND",tokAND
 
 resw4           .text "BYTE",tokBYTE
                 .text "CARD",tokCARD
-    ; .byte "CASE",caseId
+                ; .text "CASE",caseId
                 .text "CHAR",tokCHAR
                 .text "ELSE",tokELSE
-    ; .byte "ESAC",tokESAC
+                ; .text "ESAC",tokESAC
                 .text "EXIT",tokEXIT
                 .text "FUNC",tokFUNC
                 .text "PROC",tokPROC
-    ; .byte "REAL",tokREAL
+                ; .text "REAL",tokREAL
                 .text "STEP",tokSTEP
                 .text "THEN",tokTHEN
                 .text "TYPE",tokTYPE
@@ -282,7 +282,7 @@ resw5           .text "ARRAY",tokARRAY
                 .byte $FF
 
 resw6           .text "DEFINE",tokDEFINE
-    ; .byte "DOWNTO",tokDOWNTO
+                ; .text "DOWNTO",tokDOWNTO
                 .text "ELSEIF",tokELSEIF
                 .text "MODULE",tokMOD
                 .text "RETURN",tokRET

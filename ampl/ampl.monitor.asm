@@ -31,7 +31,7 @@ _ENTRY1         jsr screenInit
                 stx cmdln
                 stx device
 
-                jsr SetupSPL
+                jsr initSetupSPL
 
 _ENTRY2
 _next1          jsr InitKeys
@@ -427,7 +427,7 @@ monExecute      .proc
 ; monCompile()
 ;======================================
 monCompile      .proc
-                jsr SetupSPL
+                jsr initSetupSPL
                 jsr ioDisplayOff
                 jsr bankCompile
 
