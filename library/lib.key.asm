@@ -9,9 +9,9 @@
 
 
 ;======================================
-;   Get next key in buffer
+; get next key in buffer
 ;======================================
-libKeyGet       .proc
+libkeyGet       .proc
                 clc                     ; blink cursor
                 lda JIFFYCLOCK
                 adc #$0E
@@ -29,7 +29,7 @@ _waitForKey     lda KEYCHAR             ; key down?
                 eor #$80
                 sta (OLDADR),Y
 
-                jmp libKeyGet
+                jmp libkeyGet
 
 _1              ldy #$00
                 lda OLDCHR
@@ -50,7 +50,7 @@ _2              lda KEYCHAR             ; last key pressed
                 cmp #$C0                ; Ctrl-Shft?
                 bcc _3                  ;   no
 
-                jsr libKeyClick
+                jsr libkeyClick
                 bra _4
 
 _3              and #$3F
@@ -84,8 +84,8 @@ _7              lda KEYCHAR             ; last key pressed
                 and #$C0                ; isolate control (128) and uppercase (64)
                 ;!!sta SHFLOK
 
-_next3          jsr libKeyClick
-                bmi libKeyGet
+_next3          jsr libkeyClick
+                bmi libkeyGet
 
 _8              ;!!lda INVFLG
                 eor #$80
@@ -97,9 +97,11 @@ _8              ;!!lda INVFLG
 
 
 ;======================================
-;   Click() click the keyboard
+; Click()
+;--------------------------------------
+; click the keyboard
 ;======================================
-libKeyClick     .proc
+libkeyClick     .proc
                 ldx #$7F
 _next1          stx CONSOL
                 ;!!stx WSYNC

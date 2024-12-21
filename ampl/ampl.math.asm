@@ -282,7 +282,7 @@ _sa1            lda args,Y
                 bne _sa2
 
                 inc BRKKEY
-                jmp libMscBreak
+                jmp libmscBreak
 
 _sa2            rts
                 .endproc

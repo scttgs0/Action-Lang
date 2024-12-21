@@ -203,8 +203,8 @@ _8              lda trace               ; check for trace
                 beq _9                  ; no trace
 
                 lda #$20                ; JSR CTrace
-                ldx #<libMscCTrace
-                ldy #>libMscCTrace
+                ldx #<libmscCTrace
+                ldy #>libmscCTrace
 
                 jsr cguPush3
 

@@ -13,11 +13,11 @@
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrGraphics   .proc
+libgrGraphics   .proc
                 pha
 
                 lda #$00
-                jsr libIOClose
+                jsr libioClose
 
                 lda #$0C
                 sta arg3
@@ -27,10 +27,10 @@ libGrGraphics   .proc
                 ldy #>_e
 
                 jsr ioOpen
-                jsr libIOChkErr
+                jsr libioChkErr
 
                 lda #$06
-                jsr libIOClose
+                jsr libioClose
 
                 pla
                 sta arg4
@@ -45,7 +45,7 @@ libGrGraphics   .proc
 
                 jsr ioOpen
 
-                jmp libIOChkErr
+                jmp libioChkErr
 
 ;--------------------------------------
 
@@ -65,27 +65,27 @@ _atachr         = $02FB
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrDrawTo     .proc
+libgrDrawTo     .proc
                 jsr graphicIO           ; DrawTo(col, row)
 
                 ldy #$11
-                jmp libIOXIO
+                jmp libioXIO
 
                 .endproc
 
 
-;==================
+; = = = = = = = = = = = = = = = = = = =
 ;
-;==================
+; = = = = = = = = = = = = = = = = = = =
 graphicIO       .proc
-                jsr libGrPosition.pos1
+                jsr libgrPosition.pos1
 
-                lda libGrGraphics._color
-                sta libGrGraphics._atachr
+                lda libgrGraphics._color
+                sta libgrGraphics._atachr
 
-                lda #<libGrGraphics._devs
+                lda #<libgrGraphics._devs
                 sta arg5
-                lda #>libGrGraphics._devs
+                lda #>libgrGraphics._devs
                 sta arg6
 
                 lda #$00
@@ -103,7 +103,7 @@ graphicIO       .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrPosition   .proc
+libgrPosition   .proc
                 sta OLDCOL              ; Position(col, row)
                 stx OLDCOL+1
                 sty OLDROW
@@ -121,11 +121,11 @@ pos1            sta COLCRS
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrLocate     .proc
-                jsr libGrPosition       ; Locate(col, row)
+libgrLocate     .proc
+                jsr libgrPosition       ; Locate(col, row)
 
                 lda #$06
-                jmp libIOGetD
+                jmp libioGetD
 
                 .endproc
 
@@ -135,13 +135,13 @@ libGrLocate     .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrPlot       .proc
-                jsr libGrPosition.pos1  ; Plot(col, row)
+libgrPlot       .proc
+                jsr libgrPosition.pos1  ; Plot(col, row)
 
                 lda #$06
-                ldx libGrGraphics._color
+                ldx libgrGraphics._color
 
-                jmp libIOPutD
+                jmp libioPutD
 
                 .endproc
 
@@ -151,7 +151,7 @@ libGrPlot       .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libGrSetColor   .proc
+libgrSetColor   .proc
                 cmp #$05                ; SetColor(reg, hue, lum)
                 bpl _XIT
 
@@ -185,10 +185,10 @@ _XIT            rts
 ;   XIO 18,#6,0,0,"S:"
 ; in BASIC
 ;======================================
-libGrFill       .proc
+libgrFill       .proc
                 jsr graphicIO
 
                 ldy #$12
-                jmp libIOXIO
+                jmp libioXIO
 
                 .endproc

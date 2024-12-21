@@ -212,7 +212,7 @@ bankLProceed    .proc
 ;======================================
 bankOptions     .proc
                 jsr bankLProceed
-                jsr libOptSet
+                jsr liboptSet
 
                 jmp bankEditBank
 
@@ -225,7 +225,7 @@ bankOptions     .proc
 bankGetKey      .proc
                 ;!!sta bank+lbank
 
-                jsr libKeyGet
+                jsr libkeyGet
 
                 jmp bankRestore
 
@@ -305,7 +305,7 @@ bankPrintH      .proc
 
                 ;!!sty bank+lbank
 
-                jmp libIOChkErr
+                jmp libioChkErr
 
                 .endproc
 
