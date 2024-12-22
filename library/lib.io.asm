@@ -5,17 +5,18 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.io.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;PROC ChkErr=*(BYTE result, block, errCode)
+; PROC ChkErr=*(BYTE result, block, errCode)
+;--------------------------------------
 ; checks for error return from CIO
 ; Sets EOF(block) to true on error
 ; does not call Error if EOF error ($88)
 ; see Hardware manual for CIO details
 ;======================================
-chkerr          .proc
+libioChkErr     .proc
                 bpl _2
 
                 cpy #$88                ; EOF
@@ -23,9 +24,9 @@ chkerr          .proc
 
                 tya
                 cpy #$80                ; break key
-                beq break1
+                beq libioBreak1
 
-                jmp error
+                jmp jt_error
 
 _1              txa
                 lsr
@@ -37,45 +38,38 @@ _1              txa
                 tya
                 sta eof,X
 _2
-        .if ramzap
-                dec chkerr-$10,X
-        .else
+            .if ZAPRAM
+                dec libioChkErr-$10,X
+            .else
                 nop
                 nop
                 nop
-        .endif
+            .endif
 
                 rts
                 .endproc
 
 
 ;======================================
-;   Break1(error)
+; Break1(error)
 ;======================================
-break1          .proc
-                ldx #1
-                stx brkkey
+libioBreak1     .proc
+                ldx #$01
+                stx BRKKEY
 
                 pha
 
-                jsr break
+                jsr libmscBreak
 
                 pla
                 tay
 
+_XIT            rts
                 .endproc
-
-                ;[fall-through]
-
-
-;--------------------------------------
-;
-;--------------------------------------
-pfe             rts
 
 
 ;======================================
-;PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
+; PROC PrintF(STRING f, CARD a1, a2, a3, a4, a5)
 ;--------------------------------------
 ; outputs a1-a5 to default device
 ; using format f.  Any non '%' char
@@ -91,37 +85,37 @@ pfe             rts
 ; any other char after % is treated
 ; the same as %U.
 ;======================================
-prtf            .proc
+libioPrintF     .proc
                 sta addr
                 stx addr+1
                 sty temps
 
-                ldy #0
+                ldy #$00
                 lda (addr),Y
                 sta token
 
                 inc token
 
-                ldx #13
+                ldx #$0D
 _next1          lda args+2,X
                 sta temps,X
 
                 dex
                 bne _next1
 
-                stx lsttoken
-                stx op
+                stx zpAllocPrevToken
+                stx zpAllocOP
 
-_next2          inc op
-                ldy op
+_next2          inc zpAllocOP
+                ldy zpAllocOP
                 cpy token
-                bcs pfe
+                bcs libioBreak1._XIT
 
                 lda (addr),Y
                 cmp #'%'
                 bne _next3
 
-                inc op
+                inc zpAllocOP
 
                 iny
                 lda (addr),Y
@@ -131,14 +125,13 @@ _next2          inc op
                 cmp #'E'
                 bne _1
 
-                lda #eol
-_next3          jsr put
-
+                lda #EOL
+_next3          jsr libioPut
                 jmp _next2
 
-_1              ldy lsttoken
-                inc lsttoken
-                inc lsttoken
+_1              ldy zpAllocPrevToken
+                inc zpAllocPrevToken
+                inc zpAllocPrevToken
                 sta args
 
                 lda temps,Y
@@ -150,23 +143,23 @@ _1              ldy lsttoken
                 cpy #'S'
                 bne _2
 
-                jsr prt
+                jsr libioPrint
                 jmp _next2
 
 _2              cpy #'I'
                 bne _3
 
-                jsr prti
+                jsr libioPrintI
                 jmp _next2
 
 _3              cpy #'H'
                 bne _4
 
-                jsr prth
+                jsr bankPrintH
 
                 jmp _next2
 
-_4              jsr prtc
+_4              jsr libioPrintC
 
                 jmp _next2
 
@@ -174,17 +167,18 @@ _4              jsr prtc
 
 
 ;======================================
-;PROC Open(BYTE dev, STRING fileSpec, BYTE mode, aux2)
+; PROC Open(BYTE dev, STRING fileSpec, BYTE mode, aux2)
+;--------------------------------------
 ; opens fileSpec and assigns it to IOCB dev
 ;======================================
-opn             .proc
+libioOpen       .proc
                 pha
 
                 stx arg1
                 sty arg2
 
                 tay
-                lda #0
+                lda #$00
                 sta eof,Y
 
                 tay
@@ -194,7 +188,7 @@ opn             .proc
                 tay
                 iny
 
-                lda #eol
+                lda #EOL
                 bne _1                ; [unc]
 
 _next1          lda (arg1),Y
@@ -207,17 +201,18 @@ _1              sta (buf),Y
                 ldx buf
                 ldy buf+1
 
-                jsr open
-                jmp chkerr
+                jsr ioOpen
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC PrintE(STRING str)
+; PROC PrintE(STRING str)
+;--------------------------------------
 ; outputs str to default IOCB with EOL
 ;======================================
-prte            .proc
+libioPrintE     .proc
                 stx arg1
 
                 tax
@@ -230,32 +225,35 @@ prte            .proc
 
 
 ;======================================
-;PROC PrintDE(BYTE dev, STRING str)
+; PROC PrintDE(BYTE dev, STRING str)
+;--------------------------------------
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
-prtde           .proc
-                jsr print
-                jmp chkerr
+libioPrintDE    .proc
+                jsr ioPrint
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC Close(BYTE dev)
+; PROC Close(BYTE dev)
+;--------------------------------------
 ; closes IOCB dev
 ;======================================
-clos            .proc
-                jsr close
-                jmp chkerr
+libioClose      .proc
+                jsr ioClose
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC Print(STRING str)
+; PROC Print(STRING str)
+;--------------------------------------
 ; outputs str to default IOCB
 ;======================================
-prt             .proc
+libioPrint      .proc
                 stx arg1
 
                 tax
@@ -268,21 +266,23 @@ prt             .proc
 
 
 ;======================================
-;PROC PrintD(BYTE dev, STRING str)
+; PROC PrintD(BYTE dev, STRING str)
+;--------------------------------------
 ; outputs str to IOCB dev
 ;======================================
-prtd            .proc
-                jsr output
-                jmp chkerr
+libioPrintD     .proc
+                jsr ioOutput
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC InputS(STRING str)
+; PROC InputS(STRING str)
+;--------------------------------------
 ; same as InputSD, but uses default IOCB
 ;======================================
-ins             .proc
+libioInputS     .proc
                 stx arg2
 
                 tax
@@ -295,10 +295,11 @@ ins             .proc
 
 
 ;======================================
-;PROC InputSD(BYTE dev, STRING str)
+; PROC InputSD(BYTE dev, STRING str)
+;--------------------------------------
 ; see Input, size set to 255
 ;======================================
-insd            .proc
+libioInputSD    .proc
                 pha
 
                 lda #255
@@ -312,16 +313,17 @@ insd            .proc
 
 
 ;======================================
-;PROC InputMD(BYTE dev, STRING str, BYTE max)
+; PROC InputMD(BYTE dev, STRING str, BYTE max)
+;--------------------------------------
 ; see Input, size set to max
 ;======================================
-inmd            .proc
+libioInputMD    .proc
                 pha
 
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg3
                 sta (arg1),Y
 
@@ -334,32 +336,29 @@ inmd            .proc
 
 
 ;======================================
-;PROC InputD(BYTE dev, STRING str)
+; PROC InputD(BYTE dev, STRING str)
+;--------------------------------------
 ; inputs str from IOCB dev
 ; first byte must be set to maximum size
-; on return, first byte set to size of string input
+; on return, first byte set to size of
+; string input
 ;======================================
-ind             .proc
-                jsr rdbuf.inputs
-                jmp chkerr
+libioInputD     .proc
+                jsr ioReadBuffer.inputs
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;BYTE FUNC GetD(BYTE dev)
+; BYTE FUNC GetD(BYTE dev)
+;--------------------------------------
 ; inputs character from IOCB dev
 ;======================================
-getd            ldx #$07
+libioGetD       .proc
+                ldx #$07
 
-                ;[fall-through]
-
-
-;--------------------------------------
-;
-;--------------------------------------
-ccio            .proc
-                stx arg4
+_ENTRY1         stx arg4
 
                 asl
                 asl
@@ -370,26 +369,26 @@ ccio            .proc
                 lda arg4
                 sta IOCB0+ICCOM,X
 
-                lda #0
+                lda #$00
                 sta IOCB0+ICBLL,X
                 sta IOCB0+ICBLH,X
 
                 tya
                 jsr CIOV
-
                 sta args
 
-                jmp chkerr
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC PutE()
+; PROC PutE()
+;--------------------------------------
 ; output EOL do default IOCB
 ;======================================
-pute            .proc
-                lda #eol
+libioPutE       .proc
+                lda #EOL
 
                 .endproc
 
@@ -397,10 +396,11 @@ pute            .proc
 
 
 ;======================================
-;PROC Put(CHAR ch)
+; PROC Put(CHAR ch)
+;--------------------------------------
 ; outputs ch to default IOCB
 ;======================================
-put             .proc
+libioPut        .proc
                 tax
                 lda device
 
@@ -410,33 +410,35 @@ put             .proc
 
 
 ;======================================
-;PROC PutD(BYTE dev, CHAR ch)
+; PROC PutD(BYTE dev, CHAR ch)
+;--------------------------------------
 ; outputs ch to IOCB dev
 ;======================================
-putd            .proc
+libioPutD       .proc
                 stx arg1
 
                 ldy arg1
 _ENTRY1         ldx #$0B
 
-                jmp ccio
+                jmp libioGetD._ENTRY1
 
                 .endproc
 
 
 ;======================================
-;PROC PutDE(BYTE dev)
+; PROC PutDE(BYTE dev)
+;--------------------------------------
 ; outputs EOL to IOCD dev
 ;======================================
-putde           .proc
-                ldy #eol
-                bne putd._ENTRY1        ; [unc]
+libioPutDE      .proc
+                ldy #EOL
+                bne libioPutD._ENTRY1   ; [unc]
 
                 .endproc
 
 
 ;======================================
-;PROC XIOstr(BYTE dev, fill, cmd, aux1, aux2, STRING str)
+; PROC XIOstr(BYTE dev, fill, cmd, aux1, aux2, STRING str)
 ;--------------------------------------
 ; see Hardware manual for CIO details
 ; performs system CIO call where:
@@ -448,19 +450,20 @@ putde           .proc
 ; CIO is not called if str(0)=0
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
-xio             .proc
-                jsr xiostr
-                jmp chkerr
+libioXIO        .proc
+                jsr ioXioStr
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC PrintB(BYTE num)
+; PROC PrintB(BYTE num)
+;--------------------------------------
 ; outputs byte num to default IOCB
 ;======================================
-prtb            .proc
-                ldx #0
+libioPrintB     .proc
+                ldx #$00
 
                 .endproc
 
@@ -468,22 +471,24 @@ prtb            .proc
 
 
 ;======================================
-;PROC PrintC(CARD num)
+; PROC PrintC(CARD num)
+;--------------------------------------
 ; outputs cardinal num to default IOCB
 ;======================================
-prtc            .proc
-                jsr printc
-                jmp chkerr
+libioPrintC     .proc
+                jsr ioPrintCard
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC PrintBE(BYTE num)
+; PROC PrintBE(BYTE num)
+;--------------------------------------
 ; same as PrintB except EOL appended
 ;======================================
-prtbe           .proc
-                ldx #0
+libioPrintBE    .proc
+                ldx #$00
 
                 .endproc
 
@@ -491,22 +496,24 @@ prtbe           .proc
 
 
 ;======================================
-;PROC PrintCE(CARD num)
+; PROC PrintCE(CARD num)
+;--------------------------------------
 ; same as PrintC except EOL appended
 ;======================================
-prtce           .proc
-                jsr prtc
-                jmp pute
+libioPrintCE    .proc
+                jsr libioPrintC
+                jmp libioPutE
 
                 .endproc
 
 
 ;======================================
-;PROC PrintBD(BYTE dev, BYTE num)
+; PROC PrintBD(BYTE dev, BYTE num)
+;--------------------------------------
 ; output byte num to IOCB dev
 ;======================================
-prtbd           .proc
-                ldy #0
+libioPrintBD    .proc
+                ldy #$00
 
                 .endproc
 
@@ -514,31 +521,33 @@ prtbd           .proc
 
 
 ;======================================
-;PROC PrintCD(BYTE dev, CARD num)
+; PROC PrintCD(BYTE dev, CARD num)
+;--------------------------------------
 ; output cardinal num to IOCB dev
 ;======================================
-prtcd           .proc
+libioPrintCD    .proc
                 sta arg0
 
                 txa
                 sty arg2
                 ldx arg2
 
-                jsr ctostr
+                jsr ioCardToStr
 
                 lda arg0
-                jsr printc.pnum+2
-                jmp chkerr
+                jsr ioPrintCard.pnum+2
+                jmp libioChkErr
 
                 .endproc
 
 
 ;======================================
-;PROC PrintBDE(BYTE dev, BYTE num)
+; PROC PrintBDE(BYTE dev, BYTE num)
+;--------------------------------------
 ; output num to IOCB dev with EOL
 ;======================================
-prtbde          .proc
-                ldy #0
+libioPrintBDE   .proc
+                ldy #$00
 
                 .endproc
 
@@ -546,23 +555,25 @@ prtbde          .proc
 
 
 ;======================================
-;PROC PrintCDE(BYTE dev, CARD num)
+; PROC PrintCDE(BYTE dev, CARD num)
+;--------------------------------------
 ; output num to IOCB dev with EOL
 ;======================================
-prtcde          .proc
-                jsr prtcd
+libioPrintCDE   .proc
+                jsr libioPrintCD
 
                 lda arg0
-                jmp putde
+                jmp libioPutDE
 
                 .endproc
 
 
 ;======================================
-;PROC PrintI(INT num)
+; PROC PrintI(INT num)
+;--------------------------------------
 ; outputs integer num to default IOCB
 ;======================================
-prti            .proc
+libioPrintI     .proc
                 stx arg2
 
                 tax
@@ -575,12 +586,13 @@ prti            .proc
 
 
 ;======================================
-;PROC PrintID(BYTE dev, INT num)
+; PROC PrintID(BYTE dev, INT num)
+;--------------------------------------
 ; outputs integer num to IOCB dev
 ;======================================
-prtid           .proc
-                cpy #0
-                bpl prtcd
+libioPrintID    .proc
+                cpy #$00
+                bpl libioPrintCD
 
                 pha
 
@@ -588,57 +600,60 @@ prtid           .proc
                 sty arg2
 
                 ldy #'-'
-                jsr putd._ENTRY1
+                jsr libioPutD._ENTRY1
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg1
 
                 tax
-                lda #0
+                lda #$00
                 sbc arg2
 
                 tay
                 pla
 
-                jmp prtcd
+                jmp libioPrintCD
 
                 .endproc
 
 
 ;======================================
-;PROC PrintIE(INT num)
+; PROC PrintIE(INT num)
+;--------------------------------------
 ; same as PrintI with EOL
 ;======================================
-prtie           .proc
-                jsr prti
-                jmp pute
+libioPrintIE    .proc
+                jsr libioPrintI
+                jmp libioPutE
 
                 .endproc
 
 
 ;======================================
-;PROC PrintIDE(BYTE dev, INT num)
+; PROC PrintIDE(BYTE dev, INT num)
+;--------------------------------------
 ; same as PrintID with EOL
 ;======================================
-prtide          .proc
-                jsr prtid
+libioPrintIDE   .proc
+                jsr libioPrintID
 
                 lda arg0
-                jmp putde
+                jmp libioPutDE
 
                 .endproc
 
 
 ;======================================
-;PROC StrB(BYTE n, STRING s)
+; PROC StrB(BYTE n, STRING s)
+;--------------------------------------
 ; convert number to string
 ;======================================
-strb            .proc
+libioStrB       .proc
                 stx arg2
                 sty arg3
 
-                ldx #0
+                ldx #$00
                 ldy arg2
 
                 .endproc
@@ -647,13 +662,14 @@ strb            .proc
 
 
 ;======================================
-;PROC StrC(CARD n, STRING s)
+; PROC StrC(CARD n, STRING s)
+;--------------------------------------
 ; convert number to string
 ;======================================
-strc            .proc
+libioStrC       .proc
                 sty arg2
 
-                jsr ctostr
+                jsr ioCardToStr
 
                 iny
 _next1          lda numbuf,Y
@@ -667,29 +683,30 @@ _next1          lda numbuf,Y
 
 
 ;======================================
-;PROC StrI(INT n, STRING s)
+; PROC StrI(INT n, STRING s)
+;--------------------------------------
 ; convert number to string
 ;======================================
-stri            .proc
-                cpx #0
-                bpl strc
+libioStrI       .proc
+                cpx #$00
+                bpl libioStrC
 
                 sta arg0
                 stx arg1
                 sty arg2
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg0
 
                 tay
-                lda #0
+                lda #$00
                 sbc arg1
 
                 tax
                 tya
 
-                jsr ctostr
+                jsr ioCardToStr
 
                 inx
                 txa
@@ -713,33 +730,35 @@ _next1          lda numbuf-1,Y
 
 
 ;======================================
-;BYTE FUNC InputB()
-;CARD FUNC InputC()
-;INT FUNC InputI()
+; BYTE FUNC InputB()
+; CARD FUNC InputC()
+; INT FUNC InputI()
+;--------------------------------------
 ; input number from default IOCB
 ; number must be terminated with EOL
 ;======================================
-input_b
-input_c
-input_i         lda device
+libioInputB
+libioInputC
+libioInputI     lda device
 
                 ;[fall-through]
 
 
 ;======================================
-;BYTE FUNC InputBD()
-;CARD FUNC InputCD()
-;INT FUNC InputID(BYTE dev)
+; BYTE FUNC InputBD()
+; CARD FUNC InputCD()
+; INT FUNC InputID(BYTE dev)
+;--------------------------------------
 ; same as InputI, but from IOCB dev
 ;======================================
-inbd
-incd
-inid            ldx #19
+libioInputBD
+libioInputCD
+libioInputID    ldx #$13
                 stx numbuf
 
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr ind
+                jsr libioInputD
 
                 lda #<numbuf
                 ldx #>numbuf
@@ -751,14 +770,15 @@ inid            ldx #19
 ; BYTE FUNC ValB(STRING s)
 ; INT FUNC ValI(STRING s)
 ; CARD FUNC ValC(STRING s)
+;--------------------------------------
 ; returns numeric value of s
 ;======================================
-valb
-vali
-valc            sta arg4
+libioValB
+libioValI
+libioValC       sta arg4
                 stx arg5
 
-                ldy #0
+                ldy #$00
                 sty arg0
                 sty arg1
                 sty arg2
@@ -768,7 +788,7 @@ valc            sta arg4
 
                 inc arg3
 
-                lda #32
+                lda #$20
                 iny
 _next1          cmp (arg4),Y
                 bne _1
@@ -835,11 +855,11 @@ _4              lda arg2
                 beq _XIT
 
                 sec
-                lda #0
+                lda #$00
                 sbc arg0
                 sta arg0
 
-                lda #0
+                lda #$00
                 sbc arg1
                 sta arg1
 
@@ -847,14 +867,15 @@ _XIT            rts
 
 
 ;======================================
-;PROC Note(BYTE dev, CARD POINTER sector, BYTE POINTER offset)
+; PROC Note(BYTE dev, CARD POINTER sector, BYTE POINTER offset)
+;--------------------------------------
 ; returns disk sector and offset in that
 ; sector of next byte to be read or
 ; written to IOCB dev
 ; example:  Note(1, @sect, @pos)
 ; see Hardware manual
 ;======================================
-note            .proc
+libioNote       .proc
                 stx arg1
                 sty arg2
 
@@ -868,9 +889,9 @@ note            .proc
                 sta IOCB0+ICCOM,X
 
                 jsr CIOV
-                jsr chkerr
+                jsr libioChkErr
 
-                ldy #0
+                ldy #$00
                 lda IOCB0+ICAX5,X       ; offset
                 sta (arg3),Y
 
@@ -885,13 +906,14 @@ note            .proc
 
 
 ;======================================
-;PROC Point(BYTE dev, CARD sector, BYTE offset)
+; PROC Point(BYTE dev, CARD sector, BYTE offset)
+;--------------------------------------
 ; Sets next byte to be read or written
 ; to be byte offset of sector.    File
 ; must be open for update (mode=12)
 ; see Hardware manual
 ;======================================
-point           .proc
+libioPoint      .proc
                 stx arg1
 
                 asl
@@ -912,6 +934,6 @@ point           .proc
                 sta IOCB0+ICCOM,X
 
                 jsr CIOV
-                jmp chkerr
+                jmp libioChkErr
 
                 .endproc

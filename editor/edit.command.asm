@@ -4,47 +4,49 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.cmd.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.command.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+command         .namespace
+
 ;======================================
-;   Front()
+; Front()
 ;======================================
-front           .proc
+Front           .proc
                 sec
-                lda #0
+                lda #$00
                 sbc indent
                 sta choff
 
-                jsr dspbuf
+                jsr ioDisplayBuffer
 
-                lda lmargin
-                jmp rstcol+6
+                lda LMARGN
+                jmp ioResetColumn+6
 
                 .endproc
 
 
 ;======================================
-;   Back()
+; Back()
 ;======================================
-back            .proc
-                ldy #0
+Back            .proc
+                ldy #$00
                 lda (buf),Y
 _ENTRY1         pha
 
                 clc
-                adc lmargin
+                adc LMARGN
 
                 sec
-                sbc rmargin
+                sbc RMARGN
                 bcs _1
 
-                lda #1
+                lda #$01
 _1              sbc indent
                 sta choff
 
-                jsr dspbuf
+                jsr ioDisplayBuffer
 
                 sec
                 pla
@@ -54,46 +56,45 @@ _1              sbc indent
                 sbc choff
 
                 clc
-                adc lmargin
+                adc LMARGN
 
-                jmp rstcol+6
+                jmp ioResetColumn+6
 
                 .endproc
 
 
 ;======================================
-;   PgUp()
+; PageUp()
 ;======================================
-pgup            .proc
+PageUp          .proc
                 sec
                 lda lnum
-                sbc #2
+                sbc #$02
 
-                ldy #1
-                bne page                ; [unc]
+                ldy #$01
+                bne PageContent         ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   PgDwn()
+; PageDown()
 ;======================================
-pgdwn           .proc
-                ldy #5
+PageDown        .proc
+                ldy #$05
 
                 sec
-                lda #2
+                lda #$02
                 sbc lnum
 
                 .endproc
 
                 ;[fall-through]
 
-
-;======================================
+;--------------------------------------
 ;
-;======================================
-page            .proc
+;--------------------------------------
+PageContent     .proc
                 clc
                 adc nlines
                 sta arg14
@@ -102,93 +103,95 @@ page            .proc
                 beq _XIT
 
                 sty arg13
-                jsr clnln
+                jsr editor.display.CleanLine
 
 _next1          ldy arg13
-                jsr next
+                jsr mscNext
 
                 dec arg14
                 bne _next1
 
-_XIT            jmp ctrln
+_XIT            jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   Paste()
+; Paste()
 ;======================================
-paste           .proc
-                jsr deltop
+Paste           .proc
+                jsr editor.chr.DeleteTop
                 beq _XIT
 
                 stx dirty
 
-                jsr clnln
-                jsr nextup
+                jsr editor.display.CleanLine
+                jsr mscNextUp
 
                 sta cur+1               ; tricky, fake out top
 
-                jsr savewd._ENTRY1
-                jsr deltop
+                jsr editor.display.SaveWindow._ENTRY1
+                jsr editor.chr.DeleteTop
 
-_next1          jsr strptr
-                jsr ldbuf._ENTRY1
-                jsr instb
+_next1          jsr mscStrPtr
+                jsr ioLoadBuffer._ENTRY1
+                jsr editor.memory.InsertByte
 
                 lda allocerr
                 bne _1                  ; check for out of memory
 
-                jsr delnext
+                jsr editor.chr.DeleteNext
                 bne _next1
 
-_1              jsr rstcur
+_1              jsr ioResetCursor
 
-                ldy curwdw
-                lda w1+wcur+1,Y
+                ldy currentWindow
+                lda w1+WCUR+1,Y
                 beq _2
 
-                jsr nextdwn
+                jsr mscNextDown
 
-_2              lda #0
-                jmp newpage._ENTRY1
+_2              lda #$00
+                jmp editor.display.NewPage._ENTRY1
 
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   old IndentL()
+; old IndentL()
 ;======================================
-indntl          .proc
+IndentLeft      .proc
                 lda indent
-                beq scrlinit._XIT
+                beq ScrollInit._XIT
 
                 dec indent
 
-                jmp ctrln
+                jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   old IndentR()
+; old IndentR()
 ;======================================
-indntr          .proc
+IndentRight     .proc
                 lda indent
-                bmi scrlinit._XIT
+                bmi ScrollInit._XIT
 
                 inc indent
 
-                jmp ctrln
+                jmp editor.display.CenterLine
 
                 .endproc
 
 
 ;======================================
-;   InsrtT() insert/replace toggle
+; InsertToggle()
+;--------------------------------------
+; insert/replace toggle
 ;======================================
-insrtt          .proc            ; was InsertT
+InsertToggle    .proc
                 lda #<_rmsg
                 ldx #>_rmsg
                 inc insert
@@ -200,41 +203,40 @@ insrtt          .proc            ; was InsertT
                 lda #<_imsg
                 ldx #>_imsg
 
-_XIT            jmp cmdmsg
+_XIT            jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-_imsg           .text 6,"INSERT"
-_rmsg           .text 7,"REPLACE"
+_imsg           .ptext "INSERT"
+_rmsg           .ptext "REPLACE"
 
                 .endproc
 
 
 ;======================================
-;
+; Initialize Scrolling
 ;======================================
-scrlinit        .proc
+ScrollInit      .proc
                 sty arg13
 
-                jsr clnln
+                jsr editor.display.CleanLine
                 beq _1
 
                 ldy arg13
-                jsr next
+                jsr mscNext
                 beq _1                  ; EOF
 
-                lda colcrs
-                sta x
+                lda COLCRS
+                sta x__
 
                 ; lda choff
                 ; beq _SI1
 
-                lda #0
+                lda #$00
                 sta choff
 
-                jsr dspbuf
-
-                jmp ldbuf
+                jsr ioDisplayBuffer
+                jmp ioLoadBuffer
 
 _1              pla
                 pla
@@ -244,39 +246,37 @@ _XIT            rts
 
 
 ;======================================
-;   ScrlUp()
+; ScrollUp()
 ;======================================
-scrlup          .proc
-                ldy #1
-                jsr scrlinit
+ScrollUp        .proc
+                ldy #$01
+                jsr ScrollInit
 
                 dec lnum
                 bmi _1
-
-                jmp scrup
+                jmp screenCursorUp
 
 _1              inc lnum
 
                 lda ytop
-                sta y
+                sta y__
 
-                jsr botln
+                jsr BottomLine
 
                 lda nlines
-                jsr movedwn
-                jsr rstcol
-
-                jmp rfrshbuf
+                jsr MoveDown
+                jsr ioResetColumn
+                jmp editor.chr.RefreshBuf
 
                 .endproc
 
 
 ;======================================
-;   ScrlDwn()
+; ScrollDown()
 ;======================================
-scrldwn         .proc
-                ldy #5
-                jsr scrlinit
+ScrollDown      .proc
+                ldy #$05
+                jsr ScrollInit
 
                 ldx lnum
                 inx
@@ -285,28 +285,26 @@ scrldwn         .proc
 
                 stx lnum
 
-                jmp scrdwn
+                jmp screenCursorDown
 
-_1              jsr botln
-
-                stx y
+_1              jsr BottomLine
+                stx y__
 
                 lda nlines
                 ldx ytop
-                jsr moveup
+                jsr MoveUp
 
-                jsr rstcol
-                jsr dspbuf
-
-                jmp rstcol
+                jsr ioResetColumn
+                jsr ioDisplayBuffer
+                jmp ioResetColumn
 
                 .endproc
 
 
 ;======================================
-;   BotLn()
+; BottomLine()
 ;======================================
-botln           .proc
+BottomLine      .proc
                 clc
                 lda ytop
                 adc nlines
@@ -319,18 +317,18 @@ _XIT            rts
 
 
 ;======================================
-;   ChkCol()
+; CheckColumn()
 ;======================================
-chkcol          .proc
-                jsr setsp
+CheckColumn     .proc
+                jsr SetSpacing
 
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 cmp sp
                 bcs _XIT
 
-                jsr back
-                jsr setsp
+                jsr Back
+                jsr SetSpacing
 
                 clc
 _XIT            rts
@@ -338,64 +336,64 @@ _XIT            rts
 
 
 ;======================================
-;   ScrlLft()
+; ScrollLeft()
 ;======================================
-scrllft         .proc
-                jsr chkcol
+ScrollLeft      .proc
+                jsr CheckColumn
 
-                lda lmargin
-                cmp colcrs
+                lda LMARGN
+                cmp COLCRS
                 bcc _XIT
 
                 clc
                 lda choff
                 adc indent
-                beq chkcol._XIT
+                beq CheckColumn._XIT
 
                 dec choff
 
-                jsr dspbuf
-                jsr scrrt
+                jsr ioDisplayBuffer
+                jsr screenCursorRight
 
-_XIT            jmp scrlft
+_XIT            jmp screenCursorLeft
 
                 .endproc
 
 
 ;======================================
-;   ScrlRt()
+; ScrollRight()
 ;======================================
-scrlrt          .proc
-                jsr chkcol
-                bcc chkcol._XIT
+ScrollRight     .proc
+                jsr CheckColumn
+                bcc CheckColumn._XIT
 
-                lda colcrs
-                cmp rmargin
+                lda COLCRS
+                cmp RMARGN
                 bcc _XIT
 
                 inc choff
 
-                jsr dspbuf
-                jsr scrlft
+                jsr ioDisplayBuffer
+                jsr screenCursorLeft
 
-_XIT            jmp scrrt
+_XIT            jmp screenCursorRight
 
                 .endproc
 
 
 ;======================================
-;   SetSp()
+; SetSpacing()
 ;======================================
-setsp           .proc
+SetSpacing      .proc
                 sec
                 lda indent
                 adc choff
 
                 clc
-                adc colcrs
+                adc COLCRS
 
                 sec
-                sbc lmargin
+                sbc LMARGN
                 sta sp
 
                 rts
@@ -403,26 +401,26 @@ setsp           .proc
 
 
 ;======================================
-;   MoveDwn(cnt, row)
+; MoveDown(cnt, row)
 ;======================================
-movedwn         .proc
+MoveDown        .proc
                 ldy #+0-40              ; rowSize
                 sty arg5
 
                 ldy #$FF
-                bne move                ; [unc]
+                bne MoveContent         ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   MoveUp(cnt, row)
+; MoveUp(cnt, row)
 ;======================================
-moveup          .proc
+MoveUp          .proc
                 ldy #40                 ; rowSize
                 sty arg5
 
-                ldy #0
+                ldy #$00
 
                 .endproc
 
@@ -432,13 +430,13 @@ moveup          .proc
 ;======================================
 ;
 ;======================================
-move            .proc
+MoveContent     .proc
                 sty arg6                ; save registers
                 sta arg4
+                stx ROWCRS
 
-                stx rowcrs
-                jsr rstcsr
-                jsr dsploc              ; get display address
+                jsr ioRestoreCursorChar
+                jsr ioGetDisplayAddr    ; get display address
 
                 ldx arg4
                 dex
@@ -468,3 +466,5 @@ _next2          lda (arg0),Y
 
                 rts
                 .endproc
+
+                .endnamespace

@@ -4,30 +4,32 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.mem.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.memory.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+memory          .namespace
+
 ;======================================
-;   GetMem(size)
+; Get(size)
 ;======================================
-getmem          .proc
+Get             .proc
                 clc
-                adc #4
-                sta afsize
+                adc #$04
+                sta zpAllocSize
                 bcc _1
 
                 inx
-_1              stx afsize+1
+_1              stx zpAllocSize+1
 
-_ENTRY1         jsr allocate._ENTRY
+_ENTRY1         jsr Allocate._ENTRY
 
-                ldx afcur+1
-                beq gmerr               ; no memory allocated !
+                ldx zpAllocCurrent+1
+                beq GeneralErr          ; no memory allocated !
 
                 clc
-                lda afcur
-                adc #4
+                lda zpAllocCurrent
+                adc #$04
                 bcc _XIT
 
                 inx
@@ -39,57 +41,56 @@ _XIT            rts
 ;======================================
 ; General Memory Error
 ;======================================
-gmerr           .proc
-                ldy #0
-                jsr syserr
+GeneralErr      .proc
+                ldy #$00
+                jsr ioSystemError
 
                 lda sparem
                 ldx sparem+1
                 ldy allocerr
-                bne punt                ; really out of memory
+                bne Punt                ; really out of memory
 
                 inc allocerr
 
-                jsr free
+                jsr Free
 
-                jmp getmem._ENTRY1      ; retry
+                jmp Get._ENTRY1         ; retry
 
 
 ;--------------------------------------
 ;
 ;--------------------------------------
-punt            jsr savewd              ; we're in big trouble
-
-                jmp rstwnd
+Punt            jsr editor.display.SaveWindow   ; we're in big trouble
+                jmp ampl.monitor.ResetWindow
 
                 .endproc
 
 
 ;======================================
-;   FreeMem(addr)
+; FreeMem(addr) - unused
 ;======================================
-freemem         ;.proc
+FreeMem         ;.proc
                 sec
-                sbc #4
+                sbc #$04
                 bcs _XIT
 
                 dex
 
-_XIT            jmp free
+_XIT            jmp Free
 
                 ;.endproc
 
 
 ;======================================
-;   InstB()
+; InsertByte()
 ;======================================
-instb           .proc
+InsertByte      .proc
                 lda cur
                 sta arg3
                 lda cur+1
                 sta arg4
 
-                jsr instbuf
+                jsr InsertBuffer
 
                 sta cur
                 stx cur+1
@@ -99,10 +100,10 @@ instb           .proc
 
 
 ;======================================
-;   InstBuf(,,up)
+; InsertBuffer(,,up)
 ;======================================
-instbuf         .proc
-                ldy #0
+InsertBuffer    .proc
+                ldy #$00
                 lda (buf),Y
                 ldx buf
                 ldy buf+1
@@ -113,25 +114,25 @@ instbuf         .proc
 
 
 ;======================================
-;   InstLn(sze,sloc,up)
+; InsertLine(sze,sloc,up)
 ;======================================
-instln          ;.proc
+InsertLine      ;.proc
                 sta arg0                ; save sze
                 stx arg1                ; save sloc
                 sty arg2
 
                 clc
-                adc #3
-                ldx #0
+                adc #$03
+                ldx #$00
 
-                jsr getmem
+                jsr Get
 
                 clc
-                adc #2
+                adc #$02
                 sta arg5
 
                 txa
-                adc #0
+                adc #$00
                 sta arg6
 
                 ldy arg0
@@ -152,72 +153,72 @@ _1              lda arg0
                 lda top                 ; down _= top
                 sta arg5
 
-                ldy #4                  ; AFcur(2) _= down
-                sta (afcur),Y
+                ldy #$04                ; AFcur(2) _= down
+                sta (zpAllocCurrent),Y
 
                 lda top+1
                 sta arg6
 
                 iny
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur               ; top _= AFcur
+                lda zpAllocCurrent      ; top _= AFcur
                 sta top
-                lda afcur+1
+                lda zpAllocCurrent+1
                 sta top+1
 
-                ldy #0                  ; AFcur(0) _= 0
+                ldy #$00                ; AFcur(0) _= 0
                 tya
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
 _next2          lda arg6
                 bne _2                  ; down # 0
 
-                lda afcur               ; bot _= AFcur
+                lda zpAllocCurrent      ; bot _= AFcur
                 sta bot
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx bot+1
 
                 rts
 
-_2              ldy #1
-                lda afcur+1             ; @down _= AFcur
+_2              ldy #$01
+                lda zpAllocCurrent+1    ; @down _= AFcur
                 sta (arg5),Y
 
                 dey
-                lda afcur
+                lda zpAllocCurrent
                 sta (arg5),Y
 
-                ldx afcur+1
+                ldx zpAllocCurrent+1
 
                 rts
 
-_3              ldy #4
+_3              ldy #$04
                 lda (arg3),Y
                 sta arg5                ; down _= Next(up)
-                sta (afcur),Y           ; AFcur(2) _= down
+                sta (zpAllocCurrent),Y  ; AFcur(2) _= down
 
-                lda afcur
+                lda zpAllocCurrent
                 sta (arg3),Y            ; up(2) _= AFcur
 
                 iny
                 lda (arg3),Y
                 sta arg6
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur+1
+                lda zpAllocCurrent+1
                 sta (arg3),Y
 
-                ldy #0
+                ldy #$00
                 lda arg3
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda arg4
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 jmp _next2
 
@@ -225,12 +226,12 @@ _3              ldy #4
 
 
 ;======================================
-;   DelCur()
+; DeleteCurrentLine()
 ;======================================
-delcur          .proc
+DeleteCurrentLine .proc
                 lda cur
                 ldx cur+1
-                jsr delln
+                jsr DeleteLine
 
                 sta cur
                 stx cur+1
@@ -240,16 +241,16 @@ _XIT            rts
 
 
 ;======================================
-;   DelLn(lineptr)
+; DeleteLine(lineptr)
 ;======================================
-delln           .proc
-                cpx #0
-                beq delcur._XIT
+DeleteLine      .proc
+                cpx #$00
+                beq DeleteCurrentLine._XIT
 
                 sta arg0
                 stx arg1
 
-                ldy #4
+                ldy #$04
                 lda (arg0),Y
                 sta arg4                ; down _= Next(ptr)
 
@@ -257,7 +258,7 @@ delln           .proc
                 lda (arg0),Y
                 sta arg5
 
-                ldy #0
+                ldy #$00
                 lda (arg0),Y
                 sta arg2                ; up _= Prev(ptr)
 
@@ -273,7 +274,7 @@ delln           .proc
 
                 jmp _2
 
-_1              ldy #4
+_1              ldy #$04
                 lda arg4
                 sta (arg2),Y            ; up(2) _= down
 
@@ -291,7 +292,7 @@ _2              lda arg5
 
                 jmp _4
 
-_3              ldy #0
+_3              ldy #$00
                 lda arg2
                 sta (arg4),Y            ; down(0) _= up
 
@@ -301,10 +302,12 @@ _3              ldy #0
 
 _4              lda arg0
                 ldx arg1
-                jsr free
+                jsr Free
 
                 lda arg2
                 ldx arg3
 
                 rts
                 .endproc
+
+                .endnamespace

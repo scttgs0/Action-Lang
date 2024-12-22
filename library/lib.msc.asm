@@ -5,26 +5,27 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.msc.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;BYTE FUNC Rand(BYTE range)
+; BYTE FUNC Rand(BYTE range)
+;--------------------------------------
 ; returns random number between 0 and
 ; range-1.  If range=0, then a random
 ; number between 0 and 255 is returned
 ;======================================
-rand            .proc
+libmscRand      .proc
                 ldx RANDOM
-                cmp #0
+                cmp #$00
                 beq _1
 
-                stx afcur
+                stx zpAllocCurrent
 
-                ldx #0
-                stx afcur+1
+                ldx #$00
+                stx zpAllocCurrent+1
 
-                jsr multi
+                jsr ampl.math.MultI
 
 _1              stx args
 
@@ -33,20 +34,21 @@ _1              stx args
 
 
 ;======================================
-;PROC Sound(BYTE v, p, d, vol)
+; PROC Sound(BYTE v, p, d, vol)
+;--------------------------------------
 ; set voice to specified pitch, distortion,
 ; and volume.  Assumes volume low  16.
 ;======================================
-sound           .proc
+libmscSound     .proc
                 asl
                 sty arg2
 
                 tay
-                cmp #7
+                cmp #$07
                 bmi _1
 
                 ldy #100
-                jsr error
+                jsr jt_error
 
 _1              txa
                 sta AUDF1,Y
@@ -64,17 +66,18 @@ _1              txa
 
 
 ;======================================
-;PROC SndRst()
+; PROC SndRst()
+;--------------------------------------
 ; reset sound channels
 ;======================================
-sndrst          .proc
+libmscSndRst    .proc
                 lda SSKCTL
                 and #$EF                ; turn off two tone bit
                 sta SSKCTL
                 sta SKCTL
 
-                lda #0
-                ldx #8
+                lda #$00
+                ldx #$08
 _next1          sta AUDF1,X             ; zero sound regs
 
                 dex
@@ -85,27 +88,31 @@ _next1          sta AUDF1,X             ; zero sound regs
 
 
 ;======================================
-;BYTE FUNC Paddle(BYTE port)
+; BYTE FUNC Paddle(BYTE port)
+;--------------------------------------
 ; returns paddle value of port
-; Assumes port low  8.
+; Assumes port low 8.
 ; see LIB.ST
-;Paddle          tax
+;======================================
+; libmscPaddle   tax
 ;                lda POT0,X
 ;                sta args
 ;                rts
 
 
-;BYTE FUNC PTrig(BYTE port)
+;======================================
+; BYTE FUNC PTrig(BYTE port)
+;--------------------------------------
 ; returns zero if trigger of paddle
 ; port is depressed.  Assumes port<8
 ;======================================
-ptrig           .proc
-                ldx #0
-                cmp #4
+libmscPTrig     .proc
+                ldx #$00
+                cmp #$04
                 bmi _1
 
                 inx
-                and #3
+                and #$03
 
 _1              tay
                 lda PORTA,X
@@ -122,17 +129,18 @@ _data1          .byte $04,$08,$40,$80
 
 
 ;======================================
-;BYTE FUNC Stick(BYTE port)
+; BYTE FUNC Stick(BYTE port)
+;--------------------------------------
 ; returns current value of joystick
 ; controller port.  Assumes port<4
 ;======================================
-stick           .proc
-                ldx #0
-                cmp #2
+libmscStick     .proc
+                ldx #$00
+                cmp #$02
                 bmi _1
 
                 inx
-                and #1
+                and #$01
 
 _1              tay
                 lda PORTA,X
@@ -153,36 +161,38 @@ _2              and #$0F
 
 
 ;======================================
-;BYTE FUNC STrig(BYTE port)
+; BYTE FUNC STrig(BYTE port)
+;--------------------------------------
 ; returns zero if trigger of joystick
 ; port is depressed.  Assumes port<4
 ;
 ; see LIB.ST
 ;======================================
-;STrig           tax
+;libmscSTrig     tax
 ;                ;!!lda TRIG0,X
 ;                sta args
 ;                rts
 
 
-
 ;======================================
-;BYTE FUNC Peek(CARD address)
+; BYTE FUNC Peek(CARD address)
+;--------------------------------------
 ; returns value stored at address
 ;======================================
-peek
+libmscPeek
                 ;[fall-through]
 
 
 ;======================================
-;CARD FUNC PeekC(CARD address)
+; CARD FUNC PeekC(CARD address)
+;--------------------------------------
 ; returns value stored at address
 ;======================================
-peekc           .proc
+libmscPeekC     .proc
                 sta arg2
                 stx arg3
 
-                ldy #0
+                ldy #$00
                 lda (arg2),Y
                 sta args
 
@@ -195,16 +205,17 @@ peekc           .proc
 
 
 ;======================================
-;PROC Poke(CARD address, BYTE value)
+; PROC Poke(CARD address, BYTE value)
+;--------------------------------------
 ; store byte or char value at address
 ; (single byte store)
 ;======================================
-poke            .proc
+libmscPoke      .proc
                 sta arg0
                 stx arg1
 
                 tya
-                ldy #0
+                ldy #$00
                 sta (arg0),Y
 
                 rts
@@ -212,12 +223,13 @@ poke            .proc
 
 
 ;======================================
-;PROC PokeC(CARD address, value)
+; PROC PokeC(CARD address, value)
+;--------------------------------------
 ; store cardinal or integer value at
 ; address (2 byte store)
 ;======================================
-pokec           .proc
-                jsr poke
+libmscPokeC     .proc
+                jsr libmscPoke
 
                 iny
                 lda arg3
@@ -228,16 +240,17 @@ pokec           .proc
 
 
 ;======================================
-;PROC Zero(BYTE POINTER address, CARD size)
+; PROC Zero(BYTE POINTER address, CARD size)
+;--------------------------------------
 ; set memory bytes starting at address
 ; up to (but not including) address+size
 ; to zero.  Note this modifies size
 ; bytes of memory.
 ;======================================
-mzero           .proc
+libmscZero      .proc
                 pha
 
-                lda #0
+                lda #$00
                 sta arg4
 
                 pla
@@ -247,18 +260,19 @@ mzero           .proc
 
 
 ;======================================
-;PROC SetBlock(BYTE POINTER address, CARD size, BYTE value)
+; PROC SetBlock(BYTE POINTER address, CARD size, BYTE value)
+;--------------------------------------
 ; set memory bytes starting at address
 ; up to (but not including) address+size
 ; to value.  Note this modifies size
 ; bytes of memory.
 ;======================================
-setblock        .proc
+libmscSetBlock  .proc
                 sta arg0
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg4
                 ldx arg3
                 beq _1
@@ -284,18 +298,19 @@ _1              cpy arg2
 
 
 ;======================================
-;PROC MoveBlock(BYTE POINTER dest, src, CARD size)
+; PROC MoveBlock(BYTE POINTER dest, src, CARD size)
+;--------------------------------------
 ; moves size bytes from src through
 ; src+size-1 to dest through dest+size-1.
 ; If dest>src and dest<=src+size-1 then
 ; transfer will not work properly!
 ;======================================
-moveblock       .proc
+libmscMoveBlock .proc
                 sta arg0
                 stx arg1
                 sty arg2
 
-                ldy #0
+                ldy #$00
                 lda arg5
                 beq _1
 
@@ -323,50 +338,51 @@ _1              cpy arg4
 
 
 ;======================================
-;PROC Break()
+; PROC Break()
+;--------------------------------------
 ; returns to Monitor after saving
 ; stack pointer in procSP
 ;======================================
-break           .proc
+libmscBreak     .proc
                 tsx
-                stx procsp
+                stx procSP
 
-                ldy #brker
+                ldy #brkERR
                 tya
 
-                jmp error
+                jmp jt_error
 
                 .endproc
 
 
 ;======================================
-;   Call Trace handler
+; Call Trace handler
 ;======================================
-ctrace          .proc
+libmscCTrace    .proc
 ;   name passed following JSR
                 clc
                 pla
-                adc #1
+                adc #$01
                 sta arg10
 
                 pla
-                adc #0
+                adc #$00
                 sta arg11
 
 ;   address of name now in arg10-11
 ;   ok, let's print the name
                 lda arg10
                 ldx arg11
-                jsr prt
+                jsr libioPrint
 
                 lda #'('
-                jsr put
+                jsr libioPut
 
 ;   now get addr of args
                 sec
                 lda arg10
 
-                ldy #0
+                ldy #$00
                 sty arg15
 
                 adc (arg10),Y
@@ -395,7 +411,7 @@ _next1          inc arg14
                 lda (arg10),Y
                 bmi _2                  ; byte
 
-                cmp #cardt
+                cmp #tokCARD_t
 
                 inc arg15
                 ldy arg15
@@ -407,20 +423,20 @@ _next1          inc arg14
 
 ;   integer
                 lda (arg12),Y
-                jsr prti
+                jsr libioPrintI
                 jmp _4
 
-_2              ldx #0
+_2              ldx #$00
                 ldy arg15
 _3              lda (arg12),Y
-                jsr prtc
+                jsr libioPrintC
 
 _4              inc arg15
                 dec arg9
                 beq _5                  ; all done
 
                 lda #','
-                jsr put
+                jsr libioPut
                 jmp _next1
 
 ;   setup return
@@ -430,14 +446,14 @@ _5              clc
                 tax
 
                 lda arg11
-                adc #0
+                adc #$00
                 pha
 
                 txa
                 pha
 
                 lda #')'
-                jsr put
-                jmp pute
+                jsr libioPut
+                jmp libioPutE
 
                 .endproc

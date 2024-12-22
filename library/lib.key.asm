@@ -5,52 +5,52 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.key.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;   Get next key in buffer
+; get next key in buffer
 ;======================================
-lgetkey         .proc
+libkeyGet       .proc
                 clc                     ; blink cursor
                 lda rtclok+2
-                adc #14
+                adc #$0E
 
                 tax
-_next1          lda CH_                 ; key down?
+_waitForKey     lda CH_                 ; key down?
                 eor #$FF
                 bne _1
 
                 cpx rtclok+2
-                bpl _next1
+                bpl _waitForKey
 
-                ldy #0
-                lda (oldadr),Y
+                ldy #$00
+                lda (OLDADR),Y
                 eor #$80
-                sta (oldadr),Y
+                sta (OLDADR),Y
 
-                jmp lgetkey
+                jmp libkeyGet
 
-_1              ldy #0
-                lda oldchr
+_1              ldy #$00
+                lda OLDCHR
                 eor #$80
-                sta (oldadr),Y          ; restore cursor
+                sta (OLDADR),Y          ; restore cursor
 
-                ldx SRTIMR              ; faster repeat
+_faster         ldx SRTIMR              ; faster repeat
                 cpx #$0C
                 bcs _6
 
-                cpx #4
+                cpx #$04
                 bcc _2
 
-                ldx #3
+                ldx #$03
 _next2          stx SRTIMR
 
 _2              lda CH_
                 cmp #$C0
                 bcc _3                  ; not Ctrl-Shft
 
-                jsr click
+                jsr libkeyClick
                 bmi _4                  ; [unc]
 
 _3              and #$3F
@@ -61,31 +61,31 @@ _3              and #$3F
                 beq _8
 
                 ldx #$70
-                lda #7                  ; GETCHR
-                sta brkkey              ; ignore BREAK key
+                lda #$07                ; GETCHR
+                sta BRKKEY              ; ignore BREAK key
 
-                jsr putch._ENTRY2
+                jsr screenPutCh._ENTRY2
 
 _4              ldx SRTIMR
-                cpx #10
+                cpx #$0A
                 bcs _5
 
-                ldx #3
+                ldx #$03
                 stx SRTIMR
 
 _5              sta curch
 
                 rts
 
-_6              ldx #20
+_6              ldx #$14
                 bne _next2
 
 _7              lda CH_
                 and #$C0                ; isolate control (128) and uppercase (64)
                 sta SHFLOC
 
-_next3          jsr click
-                bmi lgetkey
+_next3          jsr libkeyClick
+                bmi libkeyGet
 
 _8              lda INVFLG
                 eor #$80
@@ -97,9 +97,11 @@ _8              lda INVFLG
 
 
 ;======================================
-;   Click() click the keyboard
+; Click()
+;--------------------------------------
+; click the keyboard
 ;======================================
-click           .proc
+libkeyClick     .proc
                 ldx #$7F
 _next1          stx CONSOL
                 stx WSYNC

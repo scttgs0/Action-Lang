@@ -4,46 +4,48 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.ini.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.init.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+init            .namespace
+
 ;======================================
-;
+; Initialize memory
 ;======================================
-minit           .proc                   ; initialize memory
+Memory          .proc
                 lda MEMLO
-                sta afbase
+                sta zpAllocBase
                 lda MEMLO+1
-                sta afbase+1
+                sta zpAllocBase+1
 
-                lda #0
+                lda #$00
                 tay
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 sec
                 lda MEMTOP
-                sbc afbase
+                sbc zpAllocBase
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
                 lda MEMTOP+1
-                sbc afbase+1
+                sbc zpAllocBase+1
 
                 iny
-                sta (afbase),Y
+                sta (zpAllocBase),Y
 
-                lda #0                  ; allocate 2 pages of
-                ldx #2                  ; spare memory
-                jsr allocate
+                lda #$00                ; allocate 2 pages of spare memory
+                ldx #$02
+                jsr Allocate
 
-                lda afcur
+                lda zpAllocCurrent
                 sta sparem
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx sparem+1
 
                 rts
@@ -53,15 +55,15 @@ minit           .proc                   ; initialize memory
 ;======================================
 ; Initialize window
 ;======================================
-zerow           .proc
-                lda #0
-                ldx #15
+ZeroWindow      .proc
+                lda #$00
+                ldx #$0F
 
 _next1          dex                     ; zero page0 window table
                 sta sp,X
                 bne _next1
 
-                sta dirtyf
+                sta isDirty
                 sta inbuf
 
                 tay
@@ -74,31 +76,31 @@ _next1          dex                     ; zero page0 window table
 ;======================================
 ; Initialize secondary window
 ;======================================
-w2init          .proc
-                jsr ctrln
+Window2         .proc
+                jsr editor.display.CenterLine
 
-                lda wsize
+                lda jt_wsize
                 sta nlines
                 sta cmdln
 
-                jsr savworld
+                jsr editor.window.SaveWorld
 
                 lda #w2-w1
                 sta numwd
-                sta curwdw
+                sta currentWindow
 
-                jsr zerow
+                jsr ZeroWindow
 
-                ldy wsize
+                ldy jt_wsize
                 iny
                 sty ytop
 
                 sec
-                lda #23
-                sbc wsize
+                lda #$17
+                sbc jt_wsize
                 sta nlines
 
-                bne einit._ENTRY2       ; [unc]
+                bne EditorInit._ENTRY2  ; [unc]
 
                 .endproc
 
@@ -106,20 +108,20 @@ w2init          .proc
 ;======================================
 ; Initialize the Editor
 ;======================================
-einit           .proc
-                jsr minit
+EditorInit      .proc
+                jsr Memory
 
-                lda #0
-                ldx #1
-                jsr allocate            ; get edit buffer
+                lda #$00
+                ldx #$01
+                jsr Allocate            ; get edit buffer
 
-                lda afcur
+                lda zpAllocCurrent
                 sta buf
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx buf+1
 
                 lda #$40
-                sta chcvt
+                sta chrConvert
 
                 lda #<delbuf
                 sta delbuf
@@ -129,24 +131,26 @@ einit           .proc
                 sta delbuf+5
 
 ;   initialize window
-                jsr zerow
+                jsr ZeroWindow
 
-_ENTRY1         lda #23                 ; rowcount
+_ENTRY1         lda #$17                ; rowcount
                 sta nlines
                 sta cmdln
 
-                lda #0
-                sta curwdw
+                lda #$00
+                sta currentWindow
                 sta ytop
 
-_ENTRY2         jsr ctrln
+_ENTRY2         jsr editor.display.CenterLine
 
-_ENTRY3         lda #<editc
-                ldx #>editc
+_ENTRY3         lda #<editCmdMsg
+                ldx #>editCmdMsg
 
-                jmp cmdmsg
+                jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-editc           .text 19,"ACTION! (c)1983 ACS"
+editCmdMsg      .ptext "ACTION! (c)1983 ACS"
                 .endproc
+
+                .endnamespace

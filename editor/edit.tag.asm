@@ -5,61 +5,63 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: edit.tag.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+tag            .namespace
+
 ;======================================
-;   SetTag()
+; Set()
 ;======================================
-settag          .proc
-                jsr tagid
+Set             .proc
+                jsr ID
 
                 lda tempbuf
-                beq notag
+                beq NoTag
 
-                jsr clnln
+                jsr editor.display.CleanLine
 
                 lda tempbuf+1
-                jsr gettag
+                jsr Get
                 bne _1                  ; tag already exists
 
 ;   get a new tag
-                lda #8
-                jsr allocate
+                lda #$08
+                jsr Allocate
 
-                ldy #1
+                ldy #$01
                 lda taglist+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 dey
                 lda taglist
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
-                lda afcur
+                lda zpAllocCurrent
                 sta taglist
 
-                ldx afcur+1
+                ldx zpAllocCurrent+1
                 stx taglist+1
 
-_1              ldy #4
+_1              ldy #$04
                 lda tempbuf+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda cur
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
                 lda cur+1
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
                 iny
-                jsr setsp
+                jsr editor.command.SetSpacing
 
-                sta (afcur),Y
+                sta (zpAllocCurrent),Y
 
 ;   flag line as tagged
-                ldy #3
+                ldy #$03
                 lda (cur),Y
                 ora #$80
                 sta (cur),Y
@@ -69,67 +71,67 @@ _1              ldy #4
 
 
 ;======================================
-;   NoTag()
+; NoTag()
 ;======================================
-notag           .proc
-                lda #<_ntmsg
-                ldx #>_ntmsg
+NoTag           .proc
+                lda #<_msgNoTag
+                ldx #>_msgNoTag
 
-                jmp cmdmsg
+                jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-_ntmsg          .text 11,"tag not set"
+_msgNoTag       .ptext "tag not set"
 
                 .endproc
 
 
 ;======================================
-;   TagId()
+; ID()
 ;======================================
-tagid           .proc
-                lda #<_stmsg
-                ldx #>_stmsg
+ID              .proc
+                lda #<_msgTagID
+                ldx #>_msgTagID
 
-                jmp gettemp
+                jmp editor.window.GetTemp
 
 ;--------------------------------------
 
-_stmsg          .text 8,"tag id: "
+_msgTagID       .ptext "tag id: "
 
                 .endproc
 
 
 ;======================================
-;   LocTag()
+; Locate()
 ;======================================
-loctag          .proc
-                jsr tagid
+Locate          .proc
+                jsr ID
 
                 lda tempbuf
-                beq gettag._XIT
+                beq Get._XIT
 
-                jsr clnln
+                jsr editor.display.CleanLine
 
                 lda tempbuf+1
-                jsr gettag
-                beq notag
+                jsr Get
+                beq NoTag
 
-                ldy #6
-                lda (afcur),Y
+                ldy #$06
+                lda (zpAllocCurrent),Y
 
                 tax
                 dey
-                lda (afcur),Y
-                jsr findln
-                beq notag
+                lda (zpAllocCurrent),Y
+                jsr FindLine
+                beq NoTag
 
-                ldy #3
+                ldy #$03
                 lda (arg2),Y
-                bpl notag
+                bpl NoTag
 
-                ldy #7
-                lda (afcur),Y
+                ldy #$07
+                lda (zpAllocCurrent),Y
                 sta sp
 
                 lda arg2
@@ -137,15 +139,15 @@ loctag          .proc
                 ldx arg3
                 stx cur+1
 
-                jmp found
+                jmp editor.find.Found
 
                 .endproc
 
 
 ;======================================
-;   GetTag PROC ; GetTag(tag)
+; Get(tag)
 ;======================================
-gettag          .proc
+Get             .proc
                 sta arg0
 
                 lda taglist
@@ -154,49 +156,49 @@ gettag          .proc
 
 _XIT            rts
 
-_next1          ldy #4
-                lda (afcur),Y
+_next1          ldy #$04
+                lda (zpAllocCurrent),Y
                 cmp arg0
                 beq _2
 
-                ldy #1
-                lda (afcur),Y
+                ldy #$01
+                lda (zpAllocCurrent),Y
 
                 tax
                 dey
-                lda (afcur),Y
-_1              sta afcur
-                stx afcur+1
+                lda (zpAllocCurrent),Y
+_1              sta zpAllocCurrent
+                stx zpAllocCurrent+1
 
                 txa
                 bne _next1
 
-_2              ldx afcur+1
+_2              ldx zpAllocCurrent+1
 
                 rts
                 .endproc
 
 
 ;======================================
-;   FreeTags()
+; FreeTags()
 ;======================================
-freetags        .proc
+FreeTags        .proc
                 lda taglist
                 ldx taglist+1
                 beq _XIT
 
-_next1          sta afbest
-                stx afbest+1
+_next1          sta zpAllocBest
+                stx zpAllocBest+1
 
-                ldy #0
-                lda (afbest),Y
+                ldy #$00
+                lda (zpAllocBest),Y
                 sta arg0
 
                 iny
-                lda (afbest),Y
+                lda (zpAllocBest),Y
                 sta arg1
 
-                jsr free._ENTRY1
+                jsr Free._ENTRY1
 
                 lda arg0
                 ldx arg1
@@ -209,9 +211,9 @@ _XIT            rts
 
 
 ;======================================
-;   FindLn(line)
+; FindLine(line)
 ;======================================
-findln          .proc
+FindLine        .proc
                 sta arg0
                 stx arg1
 
@@ -221,7 +223,7 @@ findln          .proc
 
                 rts
 
-_next1          ldy #5
+_next1          ldy #$05
                 lda (arg2),Y
 
                 tax
@@ -244,3 +246,5 @@ _3              ldx arg3
 
                 rts
                 .endproc
+
+                .endnamespace

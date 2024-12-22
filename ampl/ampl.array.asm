@@ -4,44 +4,47 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.arr.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: ampl.array.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+array           .namespace
+
 ;======================================
-;   ArrRef()
+; Ref()
 ;======================================
-arrref          .proc
+Ref             .proc
                 ldx nxttoken
-                cpx #lparen
+                cpx #tokLParen
                 beq arrconst._2
 
-                cpx #uparrow
+                cpx #tokUpArrow
                 beq arrconst._2
 
-arrvar          ldy #vart+cardt         ; no index!
+arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
                 sty token
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcc arrconst._XIT1
 
-arrconst        jsr procref._ENTRY1
+arrconst        jsr compiler.ProcRef._ENTRY1
 
-_XIT1           jmp pushst
+_XIT1           jmp compiler.PushST
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda (stack),Y
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcs _1                  ; small array
 
                 iny
-                jsr stkp
+                jsr ampl.cgu.StkP
 
-                cpx #0
+                cpx #$00
                 bne _1
 
 ;   page zero pointer
-                ldy #1
+                ldy #$01
                 sta (stack),Y
+
                 dey
                 lda (stack),Y
                 ora #$B0                ; temp array mode
@@ -49,123 +52,124 @@ _next1          ldy #0
 
                 rts
 
-_1              jsr zerost
+_1              jsr compiler.ZeroST
                 bne _3                  ; [unc]
 
-_2              jsr pushnext
+_2              jsr compiler.PushNext
 
-                cmp #uparrow
+                cmp #tokUpArrow
                 beq _next1
 
-                jsr getexp
+                jsr compiler.GetExp
 
-                cmp #rparen
+                cmp #tokRParen
                 bne arrerr
 
-                ldx op
+                ldx zpAllocOP
                 bne arrerr
 
-_3              ldy #7
+_3              ldy #$07
                 lda (stack),Y
 arra0           pha
 
-                lda #vart+cardt
+                lda #tokVAR_t+tokCARD_t
                 sta (stack),Y
 
-                lda #plusid
-                jsr genops
+                lda #tokPLUS
+                jsr compiler.GenOps
 
                 pla
-                cmp #arrayt+8
+                cmp #tokARRAY_t+8
                 bcs arrerr._small
 
-                and #7
+                and #$07
                 tax
                 ora #$B0                ; temp array mode
                 sta arg7
 
                 ldy arg1
-                cpy #constt+strt
-                ldy #1                  ; clear Z flag if we branch
+                cpy #tokCONST_t+tokSTR_t
+                ldy #$01                ; clear Z flag if we branch
                 bcs _4
 
                 lda (stack),Y
                 iny
                 ora (stack),Y
-_4              sta fr1
+_4              sta FR1
                 beq _5                  ; pointer
 
-                ldy vartype-1,X
+                ldy compiler.vartype-1,X
                 beq arrerr._XIT2
 
-;               cpy #3
-;               beq _ARReal
+                ; cpy #$03
+                ; beq _ARReal
 
 ;   integer or cardinal
 
-_5              jsr gettemps
+_5              jsr ampl.cgu.GetTemps
 
                 lda #$A1                ; LDA
-                ldx fr1
+                ldx FR1
                 beq _6
 
-                jsr load2l
+                jsr ampl.cgu.Load2L
 
                 lda #$0A                ; ASL A
                 ldx #$08                ; PHP
                 ldy #$18                ; CLC
-                jsr push3
+                jsr ampl.cgu.Push3
 
                 lda #$61                ; ADC
-        .if ramzap
+            .if ZAPRAM
                 sta (arg8),Y
-        .else
+            .else
                 nop
                 nop
-        .endif
+            .endif
 
-_6              jsr loadx.op1l
-                jsr stempl
+_6              jsr ampl.cgu.Op1L
+                jsr ampl.cgu.STempL
 
                 lda #$A1                ; LDA
-                ldx fr1
+                ldx FR1
                 beq _7
 
-                jsr load2h
+                jsr ampl.cgu.Load2H
 
                 lda #$2A                ; ROL A
                 ldx #$28                ; PLP, restore carry
-                jsr push2
+                jsr ampl.cgu.Push2
 
                 lda #$61                ; ADC
-_7              jsr op1h
-                jmp cgadd._ENTRY2
+_7              jsr ampl.cgu.Op1H
+                jmp compiler.CGAdd._ENTRY2
 
-arrerr          ldy #arrer              ; bad array ref
-                jmp splerr
+arrerr          ldy #arrayERR           ; bad array ref
+                jmp bankSPLErr
 
-_XIT2           jmp codegen._ENTRY1
+_XIT2           jmp compiler.CodeGen._ENTRY1
 
 ;   small arrary
-
-_small          ldy #7
+_small          ldy #$07
                 sta (stack),Y           ; restore correct type
 
                 lda arg1
                 bpl arrerr              ; can't index with bool.
 
-                bit arrmode
+                bit ampl.cgu.modeArr
                 bne arrerr              ; can't index with array
 
-                ldy #10
+                ldy #$0A
                 sta (stack),Y
 
-                ldy #2
-                jsr loadi
+                ldy #$02
+                jsr ampl.cgu.LoadI
 
-                ldy #11
-                jsr savecd.savstk
+                ldy #$0B
+                jsr ampl.cgu.SaveCd._ToStack
 
-                jmp popst
+                jmp compiler.PopST
 
                 .endproc
+
+                .endnamespace

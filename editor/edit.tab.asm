@@ -5,41 +5,43 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: edit.tab.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
+
+tab            .namespace
 
 ;======================================
 ;   Tab()
 ;======================================
-tab             .proc
-                jsr setsp
-                jsr tabloc._ENTRY1
+Tab            .proc
+                jsr editor.command.SetSpacing
+                jsr CalcTableByteBit._ENTRY1    ; X=byte, Y=bit
 
-_next1          lda TABMAP,X
+_next1          lda TABMAP,X            ; ignore if no tabstops within this byte
                 beq _2
 
-                and _onbit,Y
-                beq _1
+                and _onbit,Y            ; is there a tabstop here?
+                beq _1                  ;   no
 
-;   found tab setting
+;   found, calculate line offset
                 sty arg0
 
                 txa
+                asl                     ; *8
                 asl
                 asl
-                asl
-                ora arg0
+                ora arg0                ; add bit offset
 
-                jmp back._ENTRY1          ; do the tab
+                jmp editor.command.Back._ENTRY1 ; do the tab
 
-_1              iny
-                cpy #8
+_1              iny                     ; advance to next position within this byte
+                cpy #$08
                 bmi _next1
 
-_2              ldy #0
+_2              ldy #$00                ; advance to next byte, high-bit
                 inx
-                cpx #15
-                bmi _next1
+                cpx #$0F                ; reached EOL?
+                bmi _next1              ;   no
 
                 rts
 
@@ -47,22 +49,23 @@ _2              ldy #0
 
 _onbit          .byte $80,$40,$20,$10
                 .byte $08,$04,$02,$01
-                .byte $00
+                .byte $00               ; end of line, no change (e.g. ignore)
+
 _offbit         .byte $7F,$BF,$DF,$EF
                 .byte $F7,$FB,$FD,$FE
-                .byte $FF
+                .byte $FF               ; end of line, no change (e.g. ignore)
 
                 .endproc
 
 
 ;======================================
-;
+; set tabstop at the cursor position
 ;======================================
-settab          .proc
-                jsr tabloc
+Set             .proc
+                jsr CalcTableByteBit    ; X=byte, Y=bit
 
                 lda TABMAP,X
-                ora tab._onbit,Y
+                ora Tab._onbit,Y        ; set tabstop
                 sta TABMAP,X
 
                 rts
@@ -70,13 +73,13 @@ settab          .proc
 
 
 ;======================================
-;
+; clear tabstop at the cursor position
 ;======================================
-clrtab          .proc
-                jsr tabloc
+Clear           .proc
+                jsr CalcTableByteBit    ; X=byte, Y=bit
 
                 lda TABMAP,X
-                and tab._offbit,Y
+                and Tab._offbit,Y       ; clear tabstop
                 sta TABMAP,X
 
                 rts
@@ -84,28 +87,41 @@ clrtab          .proc
 
 
 ;======================================
-;
+; calculate the byte and bit offset
+; within the TABMAP table
+;--------------------------------------
+; on exit:
+;   X           byte offset [0:14]
+;               =15 when at EOL
+;   Y           bit offset  [0:7]
+;               =8 when at EOL
 ;======================================
-tabloc          .proc
-                jsr setsp
+CalcTableByteBit .proc
+                jsr editor.command.SetSpacing   ; A=sp (sp=indent+choff+COLCRS-LMARGN)
 
                 sec
-                sbc #1
+                sbc #$01                ; 0-indexed adjustment
 
-_ENTRY1         tay
+_ENTRY1         tay                     ; preserve
+
+;   calculate the byte offset
+                lsr                     ; /8
                 lsr
                 lsr
-                lsr
+                tax                     ; X=byte offset
 
-                tax
-                tya
-                and #7
+;   calculate the bit offset
+                tya                     ; restore
+                and #$07
+                tay                     ; Y=bit offset
 
-                tay
-                cpx #15
-                bmi _XIT
+;   check bounds
+                cpx #$0F
+                bmi _XIT                ; good
 
-                ldy #8
+                ldy #$08                ; end of line, special value to prevent change (e.g. ignore)
 
 _XIT            rts
                 .endproc
+
+                .endnamespace

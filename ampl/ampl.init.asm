@@ -4,19 +4,22 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.ini.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: ampl.init.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+init            .namespace
+
 ;======================================
-;   SPLsetup()
+; SetupSPL()
+;--------------------------------------
+; SPL = Scanner/Parser/Lexeme
 ;======================================
-splsetup        .proc
-                lda #0
+SetupSPL        .proc
+                lda #$00
                 tay
-
                 sta sp
-                sta chan
+                sta Channel
                 sta symtab
                 sta INITAD+1
                 sta (buf),Y
@@ -26,29 +29,29 @@ splsetup        .proc
                 sta arrayptr+1
                 sta whaddr+1
                 sta curnxt+1
-                sta procsp
+                sta procSP
 
 ;   clear qglobal symbol table
-                ldx bigst               ; big symbol table?
+                ldx isBigSymTbl
                 beq _next2              ;   no
 
-_next1          sta (stg2),Y
+_next1          sta (bigSymTblGlobal),Y
 
                 iny
                 bne _next1
 
-_next2          sta (stglobal),Y
+_next2          sta (symTblGlobal),Y
 
                 iny
                 bne _next2
 
 ;   get last block in heap
-                lda afbase
-                ldx afbase+1
+                lda zpAllocBase
+                ldx zpAllocBase+1
                 sta arg0
                 stx arg1
 
-_next3          ldy #1
+_next3          ldy #$01
                 lda (arg0),Y
                 beq _1
 
@@ -62,17 +65,17 @@ _next3          ldy #1
 
 _1              clc
                 lda arg0
-                adc #4
+                adc #$04
                 bcc _2
 
                 inc arg1
 
 _2              sta codebase
-                sta qcode
+                sta QCODE
 
                 lda arg1
                 sta codebase+1
-                sta qcode+1
+                sta QCODE+1
 
                 lda MEMTOP+1
                 sta stmax
@@ -80,13 +83,12 @@ _2              sta codebase
                 dec stmax
 
                 clc
-                sbc stsp
+                sbc SymTblSizePages
                 sta stbase
                 sta symtab+1
 
                 inc symtab+1
-
-                cmp qcode+1
+                cmp QCODE+1
                 bcs _3
 
 ;   can't allocate memory
@@ -95,8 +97,8 @@ _2              sta codebase
                 lda sparem+1
                 sta symtab+1
 
-_err            ldy #alcer
-                jmp splerr
+_err            ldy #allocateERR
+                jmp bankSPLErr
 
 _3              lda sparem
                 sta frame
@@ -115,3 +117,5 @@ _3              lda sparem
 
                 rts
                 .endproc
+
+                .endnamespace

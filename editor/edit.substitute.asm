@@ -4,16 +4,16 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.sub.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.substitute.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;   Subst()
+; Substitute()
 ;======================================
-subst           .proc
-                jsr setsp
-                jsr savewd
+Substitute      .proc
+                jsr editor.command.SetSpacing
+                jsr editor.display.SaveWindow
 
                 lda lastch
                 cmp #$7D
@@ -21,14 +21,14 @@ subst           .proc
 
                 pha
 
-                lda #<submsg
-                ldx #>submsg
+                lda #<msgSubtitute
+                ldx #>msgSubtitute
 
                 ldy #>subbuf
                 sty arg3
                 ldy #<subbuf
 
-                jsr cmdstr
+                jsr editor.window.CommandString
 
                 pla
 
@@ -43,19 +43,19 @@ subst           .proc
 _1              cmp #$F8
                 beq _3                  ; string already found
 
-                lda #<formsg
-                ldx #>formsg
-                jsr find._ENTRY1
+                lda #<msgFor
+                ldx #>msgFor
+                jsr editor.find.Find._ENTRY1
                 bne _3
 
 _XIT1           rts
 
-_2              jsr find._ENTRY2
+_2              jsr editor.find.Find._ENTRY2
                 beq _XIT1
 
 _3              lda #$7D
                 sta curch
-                sta dirtyf              ; flag line as dirty
+                sta isDirty             ; flag line as dirty
 
                 sec
                 lda subbuf
@@ -65,14 +65,14 @@ _3              lda #$7D
                 php                     ; save status for test below
                 bcs _4
 
-                lda #1
+                lda #$01
                 sbc arg3                ; negate delta size
 
 _4              clc
                 adc buf
                 sta arg0
 
-                lda #0
+                lda #$00
                 tay
                 adc buf+1
                 sta arg1
@@ -105,7 +105,7 @@ _next2          iny
                 bcc _next2
 
 _6              ldy sp
-                ldx #0
+                ldx #$00
                 beq _7
 
 _next3          inx
@@ -117,17 +117,16 @@ _7              cpx subbuf
                 bne _next3
 
                 clc
-                ldy #0
+                ldy #$00
                 lda (buf),Y
                 adc arg3
                 sta (buf),Y
 
-                jmp rfrshbuf
+                jmp editor.chr.RefreshBuf
 
                 .endproc
 
 ;--------------------------------------
 
-submsg          .text 12,"Substitute? "
-
-formsg          .text 5,"for? "
+msgSubtitute    .ptext "Substitute? "
+msgFor          .ptext "for? "

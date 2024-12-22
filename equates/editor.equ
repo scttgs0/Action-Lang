@@ -5,26 +5,28 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: editor.equ
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
-ramzap          = 1                     ; to zap or not to zap, that is the question?
+ZAPRAM          = 1                     ; to zap or not to zap, that is the question?
 
 ; Page Zero defs
-;----------------
+;--------------------------------------
+
 ; Alloc/Free defs, also used by compiler
-afbase          = $80
-aflast          = $82
-afcur           = $84
-afsize          = $86
-afbest          = $88
-props           = $88
-afbsze          = $8A
-op              = $8A
-lsttoken        = $8B                   ; prev. token value
+zpAllocBase             = $80
+zpAllocLast             = $82
+zpAllocCurrent          = $84
+zpAllocSize             = $86
+zpAllocBest             = $88
+zpAllocProps            = $88
+zpAllocBSize            = $8A
+zpAllocOP               = $8A
+zpAllocPrevToken        = $8B           ; prev. token value
 
 ; current window data / comp. vars
-;----------------------------------
+;--------------------------------------
+
 sp              = $8C
 choff           = $8D
 lnum            = $8E
@@ -34,10 +36,10 @@ top             = $90                   ; -> top line
 bot             = $92                   ; -> bottom line
 whaddr          = $92                   ; -> current DO frame
 cur             = $94                   ; -> current line
-x               = $96                   ; don't use in comp.
-y               = $97                   ; don't use in comp.
+x__             = $96                   ; don't use in comp.
+y__             = $97                   ; don't use in comp.
 nlines          = $98
-chan            = $98                   ; current input file
+Channel         = $98                   ; current input file
 ytop            = $99
 defflg          = $99
 indent          = $9A
@@ -48,7 +50,8 @@ insert          = $9D                   ; insert/replace flag
 delnxt          = $9E                   ; ->, USED BY LEX
 
 ; arguments and temps
-;---------------------
+;--------------------------------------
+
 args            = $A0
 arg0            = $A0
 arg1            = $A1
@@ -68,10 +71,11 @@ arg14           = $AE
 arg15           = $AF
 
 ; compiler vars
-;---------------
+;--------------------------------------
+
 stbase          = $B0                   ; s.t. base (page)
-stglobal        = $B1                   ; qglobal hash table
-stlocal         = $B3                   ; local hash table
+symTblGlobal    = $B1                   ; qglobal hash table
+symTblLocal     = $B3                   ; local hash table
 codeoff         = $B5                   ; relocation offset
 device          = $B7                   ; default device
 qglobal         = $B8                   ; qglobal/local flag
@@ -84,30 +88,32 @@ token           = $C2                   ; token value
 
 ; following defs can be used during
 ; program execution (user program)
-;-----------------------------------
-dirtyf          = $C3
+;--------------------------------------
+
+isDirty         = $C3
 spln            = $C4                   ; error char
 curln           = $C5                   ; error line
 curnxt          = $C7                   ; next error line
 nxtaddr         = $C9                   ; next token address
 
-        ; note: $CA-$CD never referenced
+;  note: $CA-$CD never referenced
 
-stg2            = $CE                   ; only used if big s.t.
+bigSymTblGlobal = $CE                   ; only used if big s.t.
 arrayptr        = $D0                   ; array mem. list
 spnxt           = $D2                   ; next error char
 nxttoken        = $D3                   ; next token value
 
 
-; ACTION! vars ($480 - $57D)
-;----------------------------
+; ACTION! vars ($480 - $57F)
+;--------------------------------------
+
 w1              = $0480                 ; window 1 data
 top1            = $048F
-chcvt           = $0490                 ; char convert
+chrConvert      = $0490                 ; char convert
 codebase        = $0491                 ; 2 bytes
 codesize        = $0493                 ; 2 bytes
-stsp            = $0495                 ; s.t. size (pages)
-mpc             = $0496                 ; edit/mon flag
+SymTblSizePages = $0495                 ; symbol table size (pages)
+isMonitorLive   = $0496                 ; edit/mon flag
 gbase           = $0497                 ; 2 bytes
 type            = $0499
 list            = $049A                 ; listing flag
@@ -115,7 +121,7 @@ numargs         = $049B
 cmdln           = $049C                 ; command line offset
 param           = $049D
 opmode          = $049E
-curwdw          = $049F                 ; window memory offset
+currentWindow   = $049F                 ; window memory offset
 cury            = $04A0                 ; current Y reg (0/1/unknown)
 lastch          = $04A1                 ; last char
 curch           = $04A2                 ; current char
@@ -123,56 +129,58 @@ sparem          = $04A3                 ; -> spare mem
 numwd           = $04A5                 ; number of windows
 allocerr        = $04A6                 ; INC on Alloc error
 delbuf          = $04A7                 ; 6 bytes
-frstchar        = $04AD                 ; used for big s.t.
+FirstChar       = $04AD                 ; used for big symbol table
 taglist         = $04AE                 ; 2 bytes
-chcvt1          = $04B0
+chrConvert1     = $04B0                 ; char convert
 w2              = $04B1                 ; window 2 data
 bckgrnd         = $04C0                 ; background color
-procsp          = $04C1                 ; Break stack pointer
+procSP          = $04C1                 ; Break stack pointer
 argbytes        = $04C2
 trace           = $04C3                 ; trace flag
-bigst           = $04C4                 ; big s.t. flag
+isBigSymTbl     = $04C4                 ; big symbol table flag
 
-        ; note: $4C5 available
+;   note: $4C5 available
 
-jmps            = $04C6                 ; see EDIT.CAR
+jt_jmps         = $04C6                 ; see EDIT.CAR
 
 ; Jump table goes to $4FF
-;-------------------------
-segend          = $04C6
-curbank         = $04C9
-stmask          = $04CA
-error           = $04CB
-wsize           = $04CE
-linemax         = $04CF
-chcvt2          = $04D0
-expend          = $04D1
-dclend          = expend+3
-cgend           = dclend+3
-arend           = cgend+3
-splend          = arend+3
-alarm           = splend+3
-eolch           = alarm+3
-lsh             = eolch+1
+;--------------------------------------
 
-chcvt3          = $04F0
-tvdisp          = $04F1
-disptb          = $04F2
-smtend          = $04F8
-stmradr         = $04FE
+jt_segend       = $04C6
+jt_curbank      = $04C9
+jt_stmask       = $04CA
+jt_error        = $04CB
+jt_wsize        = $04CE
+jt_linemax      = $04CF
+jt_chrConvert2  = $04D0                 ; char convert
+jt_expend       = $04D1
+jt_dclend       = jt_expend+3
+jt_cgend        = jt_dclend+3
+jt_arend        = jt_cgend+3
+jt_splend       = jt_arend+3
+jt_alarm        = jt_splend+3
+jt_eolch        = jt_alarm+3
+jt_lsh          = jt_eolch+1
 
-subbuf          = $0500                 ; 40 bytes
-findbuf         = $0528                 ; 40 bytes
+jt_chrConvert3  = $04F0                 ; char convert
+jt_tvdisp       = $04F1
+jt_disptb       = $04F2
+jt_smtend       = $04F8
+jt_stmradr      = $04FE
+
+subbuf          = $0500                 ; 40 bytes     ; rowSize
+findbuf         = $0528                 ; 40 bytes     ; rowSize
 numbuf          = $0550                 ; 24 bytes
 stkbase         = $0577
 
-opstack         = $0580
+opstack         = $0580                 ; floating-point buffer
 
 ; $580 TO ? is used for output of
 ; FASC routine.  Should not exceed
 ; 16 bytes, $58F (worst case?).
-;---------------------------------
-tempbuf         = $0590                 ; 40 bytes
+;--------------------------------------
+
+tempbuf         = $0590                 ; 40 bytes     ; rowSize
 argtypes        = $05B8                 ;  8 bytes
 eof             = $05C0                 ;  8 bytes
 inbuf           = $05C8                 ; 36 bytes
@@ -181,55 +189,58 @@ temps           = $05F0                 ; 16 bytes
 
 
 ; system vars
-;-------------
-warmst          = $08
-dosvec          = $0A
+;--------------------------------------
+
+WARMST          = $08
+DOSVEC          = $0A
 dosini          = $0C
-qcode           = $0E                   ; ap. high mem.
-brkkey          = $11
+QCODE           = $0E                   ; ap. high mem.
+BRKKEY          = $11
 rtclok          = $12
-adress          = $64
-lmargin         = $52
-rmargin         = $53
-rowcrs          = $54
-colcrs          = $55
-dindex          = $57
-savmsc          = $58
-oldrow          = $5A
-oldcol          = $5B
-oldadr          = $5E
-oldchr          = $5D
-csrch           = $5D
+ADRESS          = $64
+LMARGN          = $52
+RMARGN          = $53
+ROWCRS          = $54
+COLCRS          = $55
+DINDEX          = $57
+SAVMSC          = $58
+OLDROW          = $5A
+OLDCOL          = $5B
+OLDADR          = $5E
+OLDCHR          = $5D
+CSRCH           = $5D
 ramtop          = $6A
-fr0             = $D4
-fr1             = $E0
-cix             = $F2
-inbuff          = $F3
+FR0             = $D4
+FR1             = $E0
+CIX             = $F2
+INBUFF          = $F3
 flptr           = $FC
 
-lbuff           = $0580                 ; fp ASCII buf
+LBUFF           = $0580                 ; line buffer
 
 
 ; window record offsets
-;-----------------------
-wsp             = 0
-wch             = 1
-wlnum           = 2
-wdirty          = 3
-wtop            = 4
-wbot            = 6
-wcur            = 8
-wx              = 10
-wy              = 11
-wnlns           = 12                    ; num lines
-wytop           = 13
-windent         = 14
+;--------------------------------------
+
+WSP             = 0
+WCH             = 1
+WLNUM           = 2
+WDIRTY          = 3
+WTOP            = 4
+WBOT            = 6
+WCUR            = 8
+WX              = 10
+WY              = 11
+WNLINES         = 12                    ; num lines
+WYTOP           = 13
+WINDENT         = 14
 
 
 ; system defs
-;-------------
-eol             = $9B
-esc             = $1B
+;--------------------------------------
+
+EOL             = $9B
+ESC             = $1B
 
 
 ; bank switching defs

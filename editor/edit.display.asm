@@ -4,62 +4,63 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.dsp.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.display.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+display         .namespace
+
 ;======================================
-;   CmdMsg(msg)
+; CommandMsg(message)
 ;======================================
-cmdmsg          .proc
+CommandMsg      .proc
                 sta arg0
 
-                jsr cmdcol
+                jsr ioCmdColumn
 
-                lda #0
+                lda #$00
                 sta arg3
 
                 lda arg0
                 ldy #$80
-                jsr putstr
-
-                jmp rstcol
+                jsr ioPutStr
+                jmp ioResetColumn
 
                 .endproc
 
 
 ;======================================
-;   ClnLn()
+; CleanLine()
 ;======================================
-clnln           .proc
-                jsr chkcur
+CleanLine       .proc
+                jsr ioChkCursor
 
-                lda dirtyf
+                lda isDirty
                 beq _XIT
 
                 sta dirty
 
-                lda #0
-                sta dirtyf
+                lda #$00
+                sta isDirty
 
-                jsr delcur
-                jsr instb
+                jsr editor.memory.DeleteCurrentLine
+                jsr editor.memory.InsertByte
 
-_XIT            jmp chkcur
+_XIT            jmp ioChkCursor
 
                 .endproc
 
 
 ;======================================
-;   SaveWd()
+; SaveWindow()
 ;======================================
-savewd          .proc
-                jsr clnln
+SaveWindow      .proc
+                jsr CleanLine
 
 _ENTRY1         clc
-                lda #14
+                lda #$0E
                 tax
-                adc curwdw
+                adc currentWindow
 
                 tay
 _next1          lda sp,X
@@ -74,13 +75,15 @@ _next1          lda sp,X
 
 
 ;======================================
-;   RstWd() restore window
+; RestoreWindow()
+;--------------------------------------
+; restore window
 ;======================================
-rstwd           .proc
+RestoreWindow   .proc
                 clc
-                lda #14
+                lda #$0E
                 tax
-                adc curwdw
+                adc currentWindow
 
                 tay
 _next1          lda w1,Y
@@ -90,15 +93,15 @@ _next1          lda w1,Y
                 dex
                 bpl _next1
 
-_XIT             rts
+_XIT            rts
                 .endproc
 
 
 ;======================================
-;
+; EndLine()
 ;======================================
-endln           .proc
-                jsr clnln
+EndLine         .proc
+                jsr CleanLine
 
                 lda bot
                 sta cur
@@ -111,31 +114,33 @@ endln           .proc
 
 
 ;======================================
-;   CtrLn() center line
+; CenterLine()
+;--------------------------------------
+; center line
 ;======================================
-ctrln           .proc
-                lda #0
+CenterLine      .proc
+                lda #$00
                 sta temps
 
-                jsr clnln
+                jsr CleanLine
                 beq _1
 
-                jsr nextup
-                beq _1
-
-                inc temps
-
-                jsr nextup
+                jsr mscNextUp
                 beq _1
 
                 inc temps
 
-_1              jsr newpage
+                jsr mscNextUp
+                beq _1
+
+                inc temps
+
+_1              jsr NewPage
 
 _next1          lda temps
-                beq rstwd._XIT
+                beq RestoreWindow._XIT
 
-                jsr scrldwn
+                jsr editor.command.ScrollDown
 
                 dec temps
 
@@ -145,11 +150,11 @@ _next1          lda temps
 
 
 ;======================================
-;   TopLn()
+; TopLine()
 ;======================================
-topln           .proc
-                jsr clnln
-                jsr chkcur._ENTRY1
+TopLine         .proc
+                jsr CleanLine
+                jsr ioChkCursor._ENTRY1
 
                 .endproc
 
@@ -157,20 +162,18 @@ topln           .proc
 
 
 ;======================================
-;   NewPage()
+; NewPage()
 ;======================================
-newpage         .proc
-                lda #0
+NewPage         .proc
+                lda #$00
                 sta lnum
 
 _ENTRY1         sta choff
 
-                jsr rstcsr              ; for command line
+                jsr ioRestoreCursorChar ; for command line
 
-                lda lmargin
-                sta colcrs
-
-;               jmp Refresh             ; do all the work
+                lda LMARGN
+                sta COLCRS
 
                 .endproc
 
@@ -178,20 +181,20 @@ _ENTRY1         sta choff
 
 
 ;======================================
-;   Refresh()
+; Refresh()
 ;======================================
-refresh         .proc
+Refresh         .proc
                 clc
                 lda ytop
                 adc lnum
-                sta rowcrs
+                sta ROWCRS
 
-                jsr savecol
-                jsr savewd
+                jsr ioSaveColumn
+                jsr SaveWindow
 
-                inc rowcrs
+                inc ROWCRS
 
-                jsr nextdwn
+                jsr mscNextDown
 
                 sta arg9
 
@@ -201,16 +204,16 @@ refresh         .proc
                 sta arg10
                 beq _2
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda indent
                 sta arg3
 
                 ldx arg9
                 beq _3
 
-                jsr curstr
+                jsr mscCurStr
 
-_next2          jsr putstr
+_next2          jsr ioPutStr
 
                 lda arg9
                 bne _1
@@ -218,23 +221,23 @@ _next2          jsr putstr
                 tay
                 sta (arg0),Y
 
-_1              inc rowcrs
+_1              inc ROWCRS
 
-                jsr nextdwn
-
+                jsr mscNextDown
                 sta arg9
 
                 dec arg10
                 bne _next1
 
-_2              jsr rstcur
-                jsr rstcol
+_2              jsr ioResetCursor
+                jsr ioResetColumn
+                jmp editor.chr.RefreshBuf
 
-                jmp rfrshbuf
-
-_3              lda #<zero
-                ldx #>zero
+_3              lda #<editor.cartridge.zero
+                ldx #>editor.cartridge.zero
 
                 bne _next2                ; [unc]
 
                 .endproc
+
+                .endnamespace

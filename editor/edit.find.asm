@@ -4,16 +4,18 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: edit.fnd.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: edit.find.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+find            .namespace
+
 ;======================================
-;   Find()
+; Find()
 ;======================================
-find            .proc
-                jsr setsp
-                jsr savewd
+Find            .proc
+                jsr editor.command.SetSpacing
+                jsr editor.display.SaveWindow
 
                 lda lastch
                 cmp #$F8
@@ -26,7 +28,7 @@ _ENTRY1         ldy #>findbuf
                 sty arg3
 
                 ldy #<findbuf
-                jsr cmdstr
+                jsr editor.window.CommandString
 
                 lda #$F8
                 sta curch
@@ -34,7 +36,7 @@ _ENTRY1         ldy #>findbuf
 _ENTRY2         lda findbuf
                 beq _3
 
-_next1          ldy #0
+_next1          ldy #$00
                 lda (buf),Y
                 tay
                 iny
@@ -46,7 +48,7 @@ _next2          ldy sp
                 bcs _1
 
                 sty sp
-                ldx #0
+                ldx #$00
 
 _next3          lda (buf),Y
                 inx
@@ -55,30 +57,30 @@ _next3          lda (buf),Y
 
                 iny
                 cpx findbuf
-                beq found
+                beq Found
 
                 cpy arg0
                 bcc _next3
 
-_1              jsr nextdwn
+_1              jsr mscNextDown
                 beq _2
 
-                jsr ldbuf
+                jsr ioLoadBuffer
 
-                lda #0
+                lda #$00
                 sta sp
                 beq _next1
 
 _2              sta curch
 
-                jsr rstcur
-                jsr ldbuf
+                jsr ioResetCursor
+                jsr ioLoadBuffer
 
                 lda #<notfnd
                 ldx #>notfnd
-                jsr cmdmsg
+                jsr editor.display.CommandMsg
 
-                lda #0
+                lda #$00
 _3              sta curch
 
                 rts
@@ -86,16 +88,15 @@ _3              sta curch
 
 
 ;======================================
-;
+;   Found()
 ;======================================
-
-found           .proc
-                jsr ctrln
+Found           .proc
+                jsr editor.display.CenterLine
 
                 ldy sp
                 dey
                 tya
-                jsr back._ENTRY1
+                jsr editor.command.Back._ENTRY1
 
                 lda #$FE
 
@@ -106,6 +107,8 @@ found           .proc
 ;--------------------------------------
 ;--------------------------------------
 
-notfnd          .text 9,"not found"
+notfnd          .ptext "not found"
 
-findmsg         .text 6,"Find? "
+findmsg         .ptext "Find? "
+
+                .endnamespace

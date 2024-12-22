@@ -5,15 +5,17 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: edit.io.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+io              .namespace
+
 ;======================================
-;   GetStr(prompt, str, invert)
+; GetString(prompt, str, invert)
 ;======================================
-getstr          .proc
-                jsr dspstr
-_next1          jsr getkey
+GetString       .proc
+                jsr ioDisplayStr
+_next1          jsr bankGetKey
 
                 tax
                 cpx #$7E
@@ -22,15 +24,15 @@ _next1          jsr getkey
                 cpx #$7D
                 beq _3                  ; clear
 
-_next2          ldy #0
+_next2          ldy #$00
                 clc
                 lda (arg12),Y
-                adc #1
+                adc #$01
 
                 cpx #$1B                ; ESC
                 beq _1
 
-                cpx #eol
+                cpx #EOL
                 beq _2
 
                 cpy arg3                ; first char?
@@ -38,8 +40,8 @@ _next2          ldy #0
 
                 stx arg3
 
-                ldx colcrs
-                cpx rmargin
+                ldx COLCRS
+                cpx RMARGN
                 bcs _next1              ; don't go off screen
 
                 sta (arg12),Y
@@ -49,11 +51,11 @@ _next2          ldy #0
                 sta (arg12),Y
 
                 eor arg2
-                jsr scrch
+                jsr screenCh
 
                 jmp _next1
 
-_1              lda #0
+_1              lda #$00
                 sta curch
                 sta (arg12),Y
 
@@ -68,21 +70,21 @@ _2              tay
 
 _3              stx arg3
 
-_next3          ldy #0
+_next3          ldy #$00
                 lda (arg12),Y
                 beq _4
 
                 sec
-                sbc #1
+                sbc #$01
                 sta (arg12),Y
 
-                jsr scrlft
+                jsr screenCursorLeft
 
                 lda #$20
                 eor arg2
 
-                jsr scrch
-                jsr scrlft
+                jsr screenCh
+                jsr screenCursorLeft
 
                 ldx arg3
                 cpx #$7E
@@ -97,102 +99,100 @@ _4              cpx #$7D
 
 
 ;======================================
-;   FRead()
+; FRead()
 ;======================================
-fread           .proc
-                lda #0
+FRead           .proc
+                lda #$00
                 sta inbuf
 
                 lda #<rdmsg
                 ldx #>rdmsg
-                ldy #4
-                jsr fopen
+                ldy #$04
+                jsr FOpen
 
-_next1          lda #1
-                jsr rdbuf
+_next1          lda #$01
+                jsr ioReadBuffer
                 bmi _1
 
-                jsr instb
+                jsr editor.memory.InsertByte
 
                 lda allocerr
                 beq _next1
 
-                ldy #22                 ; file too big
+                ldy #$16                ; file too big
                 bne _2
 
 _1              cpy #$88                ; EOF
                 beq _3
 
-_2              jsr syserr
-_3              jsr fwrite._ENTRY1
+_2              jsr ioSystemError
+_3              jsr FWrite._ENTRY1
 
-                jmp ctrln
+                jmp editor.display.CenterLine
 
 ;--------------------------------------
 
-rdmsg           .text 6,"Read? "
+rdmsg           .ptext "Read? "
 
                 .endproc
 
 
 ;======================================
-;   FWrite()
+; FWrite()
 ;======================================
-fwrite          .proc
+FWrite          .proc
                 lda #<wrtmsg
                 ldx #>wrtmsg
-                ldy #8
-                jsr fopen
+                ldy #$08
+                jsr FOpen
 
-                jsr chkcur._ENTRY1
+                jsr ioChkCursor._ENTRY1
                 beq _1
 
-_next1          jsr ldbuf
+_next1          jsr ioLoadBuffer
 
-;               inc COLOR4              ; let user know we're here
+                ; inc COLOR4            ; let user know we're here
 
                 nop
                 nop
                 nop
 
-                lda #1
-                jsr wrtbuf
+                lda #$01
+                jsr ioWriteBuffer
                 bmi _1
 
-                jsr nextdwn
+                jsr mscNextDown
                 bne _next1
 
-                lda #0
+                lda #$00
                 sta dirty
 
-_ENTRY1         lda #1
-                jsr close
-                jsr rstcur
+_ENTRY1         lda #$01
+                jsr ioClose
+                jsr ioResetCursor
+                jmp ioDisplayOn
 
-                jmp dspon
-
-_1              jsr syserr
-
+_1              jsr ioSystemError
                 jmp _ENTRY1
 
 ;--------------------------------------
 
-wrtmsg          .text 7,"Write? "
+wrtmsg          .ptext "Write? "
 
                 .endproc
 
 
 ;======================================
-;   FOpen(prompt, mode)
+; FOpen(prompt, mode)
 ;======================================
-fopen           .proc
+FOpen           .proc
                 sta arg10
                 stx arg11
                 sty opmode
 
 ;               jsr ClnLn               ; in SaveWd
-                jsr savewd
-                jsr rstcsr
+                jsr editor.display.SaveWindow
+                jsr ioRestoreCursorChar
 
                 ldy #<inbuf
                 lda #>inbuf
@@ -200,10 +200,10 @@ fopen           .proc
 
                 lda arg10
                 ldx arg11
-                jsr cmdstr
+                jsr editor.window.CommandString
 
-                lda #1
-                jsr close
+                lda #$01
+                jsr ioClose
 
                 ldy inbuf
                 beq _5
@@ -234,23 +234,23 @@ _1              lda inbuf+1
                 cmp #'?'                ; read directory?
                 bne _3                  ;   no
 
-                ldx #6
+                ldx #$06
 _2              lda #'D'
                 sta inbuf+1
 
 _3              stx arg3
-                jsr dspoff
+                jsr ioDisplayOff
 
-                lda #1
+                lda #$01
                 sta arg4                ; clear high bit for cassette
 
                 ldx #<inbuf
                 ldy #>inbuf
-                jsr open
+                jsr ioOpen
                 bmi _4
 
                 lda arg3                ; see if directory
-                eor #6
+                eor #$06
                 bne _XIT
 
                 sta inbuf               ; clear inbuf
@@ -260,7 +260,7 @@ _XIT            rts
 _4              pla
                 pla                     ; pop return
 
-                jmp syserr
+                jmp ioSystemError
 
 _5              pla
                 pla
@@ -270,33 +270,36 @@ _5              pla
 
 
 ;======================================
-;   InitKeys()
+; InitKeys()
 ;======================================
-initkeys        .proc
-                lda #7
-                jsr close
+InitKeys        .proc
+                lda #$07
+                jsr ioClose
 
-                lda #4
+                lda #$04
                 sta arg3                ; read only
 
-                lda #7
+                lda #$07
                 ldx #<keybd
                 ldy #>keybd
 
-                jmp open
+                jmp ioOpen
 
 ;--------------------------------------
 
-keybd           .text 2,"K:"
+keybd           .ptext "K:"
+
                 .endproc
 
 
 ;======================================
 ; Test if key in buffer
 ;======================================
-gotkey          .proc
+GotKey          .proc
                 lda CH_                 ; key down?
-                eor #$FF
+                eor #$FF                ; flip the bits
 
                 rts
                 .endproc
+
+                .endnamespace

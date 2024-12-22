@@ -5,19 +5,19 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: main.msc.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;   LShift(val, cnt)
+; mscLShift(val, cnt)
 ;======================================
-lsh1            .proc
-_a              = aflast+1
-_b              = aflast
-_c              = afcur+1
-_d              = afcur
-_rl             = afsize
-_rh             = afsize+1
+mscLShift       .proc
+_a              = zpAllocLast+1
+_b              = zpAllocLast
+_c              = zpAllocCurrent+1
+_d              = zpAllocCurrent
+_rl             = zpAllocSize
+_rh             = zpAllocSize+1
 _t1             = addr
 _t2             = addr+1
 _sign           = token
@@ -38,20 +38,20 @@ _lshret         rts
 
 
 ;======================================
-;   NextUp()
+; mscNextUp()
 ;======================================
-nextup          .proc
-                ldy #1
-                bne next                ; [unc]
+mscNextUp       .proc
+                ldy #$01
+                bne mscNext             ; [unc]
 
                 .endproc
 
 
 ;======================================
-;   NextDwn()
+; mscNextDown()
 ;======================================
-nextdwn         .proc
-                ldy #5
+mscNextDown     .proc
+                ldy #$05
 
                 .endproc
 
@@ -59,10 +59,10 @@ nextdwn         .proc
 
 
 ;======================================
-;   Next(,,dir)
+; mscNext(,,dir)
 ;======================================
-next            .proc
-                jsr chkcur
+mscNext         .proc
+                jsr ioChkCursor
                 beq _XIT
 
                 lda (cur),Y
@@ -80,9 +80,9 @@ _XIT            rts
 
 
 ;======================================
-;   CurStr()
+; mscCurStr()
 ;======================================
-curstr          .proc
+mscCurStr       .proc
                 lda cur
                 ldx cur+1
 
@@ -92,11 +92,11 @@ curstr          .proc
 
 
 ;======================================
-;   StrPtr()
+; mscStrPtr()
 ;======================================
-strptr          .proc
+mscStrPtr       .proc
                 clc
-                adc #6
+                adc #$06
                 sta arg0
                 bcc _1
 
@@ -109,129 +109,129 @@ _1              stx arg1
 
 
 ;======================================
-;   MNum()
+; mscMNum()
 ;======================================
-mnum            .proc
-                lda #0
-                sta afsize
-                sta afsize+1
+mscMNum         .proc
+                lda #$00
+                sta zpAllocSize
+                sta zpAllocSize+1
 
 _next1          lda nxttoken
-                cmp #timesid
-                beq _4                  ; qcode reference
+                cmp #tokMULT
+                beq _4                  ; QCODE reference
 
-                cmp #lbrack
+                cmp #tokLBracket
                 beq _5
 
-                cmp #record
+                cmp #tokRECORD
                 beq _1
 
-                cmp #typet
+                cmp #tokTYPE_t
                 beq _1
 
-                cmp #typet+8
+                cmp #tokTYPE_t+8
                 beq _1
 
-                cmp #quote
+                cmp #tokQuote
                 beq _6
 
-                cmp #undec
+                cmp #tokUNDEC
                 beq _9
                 bcs _1
 
-                jsr getconst
+                jsr mscGetConst
                 bcc _next3
 
-_1              lda #1
-                jsr nxtprop
-_next2          jsr rstp
+_1              lda #$01
+                jsr mscNextProp
+_next2          jsr mscResetProp
 
 _next3          clc
-                adc afsize
-                sta afsize
+                adc zpAllocSize
+                sta zpAllocSize
 
                 txa
-                adc afsize+1
-_next4          sta afsize+1
+                adc zpAllocSize+1
+_next4          sta zpAllocSize+1
 
-                jsr nextchar
+                jsr compiler.lexicon.NextChar
 
                 cmp #'+'
                 bne _2
 
-                jsr getnext
+                jsr compiler.lexicon.GetNext
                 bne _next1              ; [unc]
 
-_2              ldy #0
+_2              ldy #$00
                 cmp #'^'
                 bne _3
 
-                lda (afsize),Y
+                lda (zpAllocSize),Y
                 tax
                 iny
 
-                lda (afsize),Y
-                stx afsize
+                lda (zpAllocSize),Y
+                stx zpAllocSize
 
                 jmp _next4
 
 _3              dec choff               ; put back character
-                lda afsize
-                ldx afsize+1
-;               ldy #0
+                lda zpAllocSize
+                ldx zpAllocSize+1
+;               ldy #$00
 
                 rts
 
-_4              jsr getcdoff            ; qcode reference
+_4              jsr mscGetCodeOffset    ; QCODE reference
                 jmp _next3
 
-_5              jsr getcdoff            ; table reference
+_5              jsr mscGetCodeOffset    ; table reference
 
                 pha
                 txa
                 pha
                 bne _8                  ; [unc]
 
-_6              jsr copystr             ; string ref
+_6              jsr mscCopyStr          ; string ref
                 jmp _next3
 
 _next5          lda nxttoken            ; body of table
-                cmp #rbrack
+                cmp #tokRBracket
                 beq _XIT
 
-                jsr getconst
+                jsr mscGetConst
 
-                ldy #0
-                jsr storevar
+                ldy #$00
+                jsr mscStoreVar
 
-                lda op
+                lda zpAllocOP
                 beq _7                  ; byte?
 
                 iny                     ; no, word
 _7              tya
-                jsr codeincr
-_8              jsr getnext
+                jsr mscCodeIncr
+_8              jsr compiler.lexicon.GetNext
                 bne _next5              ; [unc]
 
-_9              lda #1
-                jsr nxtprop
+_9              lda #$01
+                jsr mscNextProp
 
                 tax
                 iny
-                lda (props),Y
+                lda (zpAllocProps),Y
                 beq _varerr
 
                 tay
                 sta bank+lbank
 
-                lda #1
-                jsr gprop
-                jsr rstbank
+                lda #$01
+                jsr mscGProp
+                jsr bankRestore
 
                 jmp _next2
 
-_varerr         ldy #varer
-_adrerr         jmp splerr
+_varerr         ldy #varERR
+_adrerr         jmp bankSPLErr
 
 _XIT            pla                     ; end of table
                 tax
@@ -242,15 +242,15 @@ _XIT            pla                     ; end of table
 
 
 ;======================================
-;   GetConst(token)
+; mscGetConst(token)
 ;======================================
-getconst        .proc
-                ldy #conster
+mscGetConst     .proc
+                ldy #constERR
                 cmp #$81
-                bcc mnum._adrerr
+                bcc mscMNum._adrerr
 
-                cmp #constt+strt
-                bcs mnum._adrerr
+                cmp #tokCONST_t+tokSTR_t
+                bcs mscMNum._adrerr
 
                 lda nxtaddr
                 ldx nxtaddr+1
@@ -262,21 +262,21 @@ getconst        .proc
 ;======================================
 ;
 ;======================================
-copystr         .proc
-                jsr getcdoff
+mscCopyStr      .proc
+                jsr mscGetCodeOffset
 
                 pha
                 txa
                 pha
 
-                ldy #0
+                ldy #$00
                 lda (nxtaddr),Y         ; size
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 tax
                 tay
 _next1          lda (nxtaddr),Y
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 dey
                 bne _next1
@@ -285,9 +285,9 @@ _next1          lda (nxtaddr),Y
                 txa
                 bne _1
 
-                inc qcode+1
+                inc QCODE+1
 
-_1              jsr codeincr
+_1              jsr mscCodeIncr
 
                 inc choff               ; get rid of end quote
 
@@ -300,15 +300,15 @@ _1              jsr codeincr
 
 
 ;======================================
-;   GetCdOff()
+; mscGetCodeOffset()
 ;======================================
-getcdoff        .proc
+mscGetCodeOffset .proc
                 clc
-                lda qcode
+                lda QCODE
                 adc codeoff
                 pha
 
-                lda qcode+1
+                lda QCODE+1
                 adc codeoff+1
 
                 tax
@@ -318,14 +318,14 @@ getcdoff        .proc
 
 
 ;======================================
-;   StoreVar(low, high, index)
+; mscStoreVar(low, high, index)
 ;======================================
-storevar        .proc
-                sta (qcode),Y
+mscStoreVar     .proc
+                sta (QCODE),Y
 
                 iny
                 txa
-                sta (qcode),Y
+                sta (QCODE),Y
 
                 rts
                 .endproc
@@ -334,20 +334,20 @@ storevar        .proc
 ;======================================
 ;
 ;======================================
-lookup          .proc
+mscLookup       .proc
                 sty arg2
 
-        .if ramzap
+            .if ZAPRAM
                 sta (arg1),Y            ; zap RAM if any
-        .else
+            .else
                 nop
                 nop
-        .endif
+            .endif
 
                 stx arg1
 
                 tax
-                ldy #2
+                ldy #$02
                 lda (arg1),Y
 
                 tay
@@ -358,7 +358,7 @@ _next1          cmp (arg1),Y
                 dey
                 dey
                 dey
-                cpy #2
+                cpy #$02
                 bne _next1
 
 _1              dey
@@ -376,10 +376,10 @@ _1              dey
 
 
 ;======================================
-;   AlphaNum(char)
+; mscAlphaNum(char)
 ;======================================
-alphanum        .proc
-                jsr alpha
+mscAlphaNum     .proc
+                jsr mscAlpha
                 bne _XIT
 
 _num            cmp #'0'
@@ -388,15 +388,15 @@ _num            cmp #'0'
                 cmp #':'
                 bmi _XIT
 
-_1              ldx #0
+_1              ldx #$00
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   Alpha(char)
+; mscAlpha(char)
 ;======================================
-alpha           .proc
+mscAlpha        .proc
                 pha
 
                 ora #$20
@@ -409,15 +409,15 @@ alpha           .proc
                 cpx #$7B
                 bmi _XIT
 
-_1              ldx #0
+_1              ldx #$00
 _XIT            rts
                 .endproc
 
 
 ;======================================
-;   STIncr(size)
+; mscSTIncr(size)
 ;======================================
-stincr          .proc
+mscSTIncr       .proc
                 clc
                 adc symtab
                 sta symtab
@@ -427,52 +427,52 @@ stincr          .proc
 
 _1              lda stmax
                 cmp symtab+1
-                bcs alpha._XIT          ; return
+                bcs mscAlpha._XIT       ; return
 
                 ldy #61                 ; out of symbol table space
 
-                jmp splerr
+                jmp bankSPLErr
 
                 .endproc
 
 
 ;======================================
-;   CodeIncr(size)
+; mscCodeIncr(size)
 ;======================================
-codeincr        .proc
+mscCodeIncr     .proc
                 clc
-                adc qcode
-                sta qcode
+                adc QCODE
+                sta QCODE
                 bcc _1
 
-                inc qcode+1
+                inc QCODE+1
 
 _1              lda stbase
-                cmp qcode+1
-                bcs alpha._XIT          ; return
+                cmp QCODE+1
+                bcs mscAlpha._XIT       ; return
 
 cderr           sta bank+ebank
 
-                jsr splsetup            ; reset compiler
+                jsr ampl.init.SetupSPL  ; reset compiler
 
-                ldy #cder               ; out of qcode space
-                jmp splerr
+                ldy #qcodeERR           ; out of QCODE space
+                jmp bankSPLErr
 
                 .endproc
 
 
 ;======================================
-;   NxtProp(offset)
+; mscNextProp(offset)
 ;======================================
-nxtprop         .proc
-                ldx props
-                stx aflast
-                ldx props+1
-                stx aflast+1
+mscNextProp     .proc
+                ldx zpAllocProps
+                stx zpAllocLast
+                ldx zpAllocProps+1
+                stx zpAllocLast+1
 
                 ldx nxtaddr
                 ldy nxtaddr+1
-                bne gprop
+                bne mscGProp
 
                 .endproc
 
@@ -480,12 +480,12 @@ nxtprop         .proc
 
 
 ;======================================
-;   CProp(offset)
+; mscCProp(offset)
 ;======================================
-cprop           .proc
+mscCProp        .proc
                 ldx curproc
                 ldy curproc+1
-                bne gprop
+                bne mscGProp
 
                 .endproc
 
@@ -493,9 +493,9 @@ cprop           .proc
 
 
 ;======================================
-;   GetProp(offset)
+; mscGetProp(offset)
 ;======================================
-getprop         .proc
+mscGetProp      .proc
                 ldx addr
                 ldy addr+1
 
@@ -505,35 +505,35 @@ getprop         .proc
 
 
 ;======================================
-;   GProp(offset, addr)
+; mscGProp(offset, addr)
 ;======================================
-gprop           .proc
-                stx props
-                sty props+1
+mscGProp        .proc
+                stx zpAllocProps
+                sty zpAllocProps+1
 
-                ldx props+1
+                ldx zpAllocProps+1
                 clc
-                adc props
+                adc zpAllocProps
                 bcc _1
 
                 inx
 
 _1              sec
-                ldy #0
-                adc (props),Y
-                sta props
+                ldy #$00
+                adc (zpAllocProps),Y
+                sta zpAllocProps
                 bcc _2
 
                 inx
 
-_2              stx props+1
+_2              stx zpAllocProps+1
 
                 iny
-                lda (props),Y
+                lda (zpAllocProps),Y
 
                 tax
                 dey
-                lda (props),Y
+                lda (zpAllocProps),Y
 
                 rts
                 .endproc
@@ -542,22 +542,22 @@ _2              stx props+1
 ;======================================
 ;
 ;======================================
-rstp            .proc
-                ldy aflast
-                sty props
-                ldy aflast+1
-                sty props+1
+mscResetProp    .proc
+                ldy zpAllocLast
+                sty zpAllocProps
+                ldy zpAllocLast+1
+                sty zpAllocProps+1
 
                 rts
                 .endproc
 
 
 ;======================================
-;   JSRInd(addr)
+; mscJSRIndirect(addr)
 ;======================================
-jsrind          .proc
-                sta adress
-                stx adress+1
-                jmp (adress)
+mscJSRIndirect  .proc
+                sta ADRESS
+                stx ADRESS+1
+                jmp (ADRESS)
 
                 .endproc

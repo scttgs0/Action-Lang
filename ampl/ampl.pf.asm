@@ -5,63 +5,65 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: ampl.pf.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
+
+pf              .namespace
 
 ;======================================
 ;
 ;======================================
-ld1             .proc
-                ldy #0
+Load1           .proc
+                ldy #$00
                 lda (stack),Y
-                cmp #arrayt
-                bcs pf._ENTRY1
+                cmp #tokARRAY_t
+                bcs ProcFunc._ENTRY1
 
                 inc abt-args,X
 
-                ldy #7
+                ldy #$07
                 lda (stack),Y
-                cmp #tempt+bytet
-                beq pf._ENTRY2
+                cmp #tokTEMP_t+tokBYTE_t
+                beq ProcFunc._ENTRY2
 
                 dec abt+1-args,X
 
                 cpx #args+2
-                bcc pf._ENTRY2
+                bcc ProcFunc._ENTRY2
 
-                jsr genops._ENTRY1
-                jsr load2h
+                jsr compiler.GenOps._ENTRY1
+                jsr ampl.cgu.Load2H
 
                 lda #$81                ; STA
-                jsr op1h
+                jsr ampl.cgu.Op1H
 
-                jmp pf._ENTRY2
+                jmp ProcFunc._ENTRY2
 
                 .endproc
 
 
 ;======================================
-;   PF()
+; PF()
 ;======================================
-pf              .proc
-                lda #0                  ; load arg types flag
-                jsr getargs
-                jsr pushst
-                jsr getnext
+ProcFunc        .proc
+                lda #$00                ; load arg types flag
+                jsr bankGetArgs
+                jsr compiler.PushST
+                jsr compiler.lexicon.GetNext
 
                 ldx #args
                 stx argbytes
 
                 ldx nxttoken
-                cpx #rparen
+                cpx #tokRParen
                 bne _next1
 
-                jsr getnext
+                jsr compiler.lexicon.GetNext
 
                 bne _next2              ; [unc]
 
 _next1          ldx numargs
-                ldy #tempt+bytet
+                ldy #tokTEMP_t+tokBYTE_t
                 lda argtypes-1,X
 
                 ldx argbytes
@@ -78,23 +80,23 @@ _1              sta temps-args,X
                 inc argbytes
 
                 txa
-                jsr storst
-                jsr getexp
+                jsr compiler.StoreST
+                jsr compiler.GetExp
 
                 dec numargs
                 bmi _err
 
                 ldx abt+3
                 cpx #args+3
-                bcc ld1
+                bcc Load1
 
-_ENTRY1         jsr cgassign
+_ENTRY1         jsr compiler.CGAssign
 
 _ENTRY2         lda token
-                cmp #comma
+                cmp #tokComma
                 beq _next1
 
-                cmp #rparen
+                cmp #tokRParen
                 bne _err
 
                 lda argbytes
@@ -107,13 +109,13 @@ _ENTRY2         lda token
                 cmp #args+1
                 bcs _4
 
-_next2          jsr trashy
+_next2          jsr ampl.cgu.TrashY
 
-                ldy #1
-                jsr stkaddr
+                ldy #$01
+                jsr ampl.cgu.StkAddr
 
                 lda #$20                ; JSR
-                jmp push3
+                jmp ampl.cgu.Push3
 
 _2              ldx #args+2
                 jsr _push
@@ -126,28 +128,28 @@ _4              ldx #args
 
                 jmp _next2
 
-_err            jmp segment._argerr
+_err            jmp ampl.Segment._argerr
 
 
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 ;
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 _push           lda abt-args,X
                 bne _5
 
                 lda _ops-args,X
                 ora #$04
 
-                jmp push2
+                jmp ampl.cgu.Push2
 
 _5              stx arg0
-                jsr genops._ENTRY1
+                jsr compiler.GenOps._ENTRY1
 
                 ldx arg0
                 lda _ops-args,X
 
-;   all of this for LDX # and LDY #
-;   can't use OpXX for these instr.
+; all of this for LDX # and LDY #
+; can't use OpXX for these instr.
 
                 cpx #args
                 beq _9                  ; LDA instr.
@@ -155,27 +157,27 @@ _5              stx arg0
                 ldy arg1
                 bpl _7                  ; record element
 
-                cpy #vart
+                cpy #tokVAR_t
                 ldy abt-args,X
                 bcs _8                  ; not const.
 
                 pha
                 sty arg0
 
-                ldy #2
-                jsr loadi
+                ldy #$02
+                jsr ampl.cgu.LoadI
 
                 ldy arg0
                 bmi _6
 
                 tax
                 pla
-                jsr push2               ; low byte of const
+                jsr ampl.cgu.Push2      ; low byte of const
 
-                jmp cgassign._ENTRY5
+                jmp compiler.CGAssign._ENTRY5
 
 _6              pla
-_XIT1           jmp push2               ; high byte
+_XIT1           jmp ampl.cgu.Push2      ; high byte
 
 _7              ldy abt-args,X
 _8              bpl _9
@@ -183,15 +185,16 @@ _8              bpl _9
                 ldx arg3
                 beq _XIT1
 
-                jmp op2h
+                jmp ampl.cgu.Op2H
 
-_9              jsr op2l
+_9              jsr ampl.cgu.Op2L
 
-                jmp cgassign._ENTRY5
+                jmp compiler.CGAssign._ENTRY5
 
-;--------------------------------------
 ;--------------------------------------
 
 _ops            .byte $a1,$a2,$a0       ; LDA, LDX, LDY
 
                 .endproc
+
+                .endnamespace

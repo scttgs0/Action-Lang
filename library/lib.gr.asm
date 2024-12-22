@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.gr.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
@@ -13,24 +13,24 @@
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-graphics        .proc
+libgrGraphics   .proc
                 pha
 
-                lda #0
-                jsr clos
+                lda #$00
+                jsr libioClose
 
                 lda #$0C
                 sta arg3
 
-                lda #0
+                lda #$00
                 ldx #<_e
                 ldy #>_e
 
-                jsr open
-                jsr chkerr
+                jsr ioOpen
+                jsr libioChkErr
 
-                lda #6
-                jsr clos
+                lda #$06
+                jsr libioClose
 
                 pla
                 sta arg4
@@ -39,18 +39,21 @@ graphics        .proc
                 eor #$1C
                 sta arg3
 
-                lda #6
+                lda #$06
                 ldx #<_devs
                 ldy #>_devs
 
-                jsr open
+                jsr ioOpen
 
-                jmp chkerr
+                jmp libioChkErr
 
 ;--------------------------------------
 
-_e              .text 2,"E:",eol
-_devs           .text 2,"S:",eol
+_e              .ptext "E:"
+                .byte EOL
+_devs           .ptext "S:"
+                .byte EOL
+
 _color          = $02FD
 _atachr         = $02FB
 
@@ -62,34 +65,34 @@ _atachr         = $02FB
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-drawto          .proc
+libgrDrawTo     .proc
                 jsr graphicIO           ; DrawTo(col, row)
 
                 ldy #$11
-                jmp xio
+                jmp libioXIO
 
                 .endproc
 
 
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 ;
-;======================================
+; = = = = = = = = = = = = = = = = = = =
 graphicIO       .proc
-                jsr position.pos1
+                jsr libgrPosition.pos1
 
-                lda graphics._color
-                sta graphics._atachr
+                lda libgrGraphics._color
+                sta libgrGraphics._atachr
 
-                lda #<graphics._devs
+                lda #<libgrGraphics._devs
                 sta arg5
-                lda #>graphics._devs
+                lda #>libgrGraphics._devs
                 sta arg6
 
-                lda #0
+                lda #$00
                 sta arg3
                 sta arg4
 
-                lda #6
+                lda #$06
 
                 rts
                 .endproc
@@ -100,14 +103,14 @@ graphicIO       .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-position        .proc
-                sta oldcol              ; Position(col, row)
-                stx oldcol+1
-                sty oldrow
+libgrPosition   .proc
+                sta OLDCOL              ; Position(col, row)
+                stx OLDCOL+1
+                sty OLDROW
 
-pos1            sta colcrs
-                stx colcrs+1
-                sty rowcrs
+pos1            sta COLCRS
+                stx COLCRS+1
+                sty ROWCRS
 
                 rts
                 .endproc
@@ -118,12 +121,11 @@ pos1            sta colcrs
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-locate          .proc
-                jsr position            ; Locate(col, row)
+libgrLocate     .proc
+                jsr libgrPosition       ; Locate(col, row)
 
-                lda #6
-
-                jmp getd
+                lda #$06
+                jmp libioGetD
 
                 .endproc
 
@@ -133,13 +135,13 @@ locate          .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-plot            .proc
-                jsr position.pos1       ; Plot(col, row)
+libgrPlot       .proc
+                jsr libgrPosition.pos1  ; Plot(col, row)
 
-                lda #6
-                ldx graphics._color
+                lda #$06
+                ldx libgrGraphics._color
 
-                jmp putd
+                jmp libioPutD
 
                 .endproc
 
@@ -149,8 +151,8 @@ plot            .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-setcolor        .proc
-                cmp #5                  ; SetColor(reg, hue, lum)
+libgrSetColor   .proc
+                cmp #$05                ; SetColor(reg, hue, lum)
                 bpl _XIT
 
                 sta arg0
@@ -183,10 +185,10 @@ _XIT            rts
 ;   XIO 18,#6,0,0,"S:"
 ; in BASIC
 ;======================================
-fill            .proc
+libgrFill       .proc
                 jsr graphicIO
 
                 ldy #$12
-                jmp xio
+                jmp libioXIO
 
                 .endproc

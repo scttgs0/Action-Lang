@@ -5,28 +5,28 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: lib.opt.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
 ;======================================
-;
+; SetOpts()
 ;======================================
-setopts         .proc
+liboptSet       .proc
 ;   Display On?
                 ldx #domsg-optmsg
-                ldy tvdisp
+                ldy jt_tvdisp
                 jsr _14
                 beq _1
 
-                lda #0
+                lda #$00
                 beq _2
 
 _1              lda #$22
-_2              sta tvdisp
+_2              sta jt_tvdisp
 
 ;   Alarm?
                 ldx #amsg-optmsg
-                ldy alarm
+                ldy jt_alarm
                 cpy #$60
                 jsr _14
                 beq _3
@@ -35,11 +35,11 @@ _2              sta tvdisp
                 bne _4
 
 _3              lda #$4C                ; JMP
-_4              sta alarm
+_4              sta jt_alarm
 
 ;   Case sensitive?
                 ldx #cmsg-optmsg
-                ldy stmask
+                ldy jt_stmask
                 cpy #$DF
                 jsr _14
                 beq _5
@@ -48,7 +48,7 @@ _4              sta alarm
                 bne _6
 
 _5              lda #$FF
-_6              sta stmask
+_6              sta jt_stmask
 
 ;   Trace On?
                 ldx #tmsg-optmsg
@@ -56,7 +56,7 @@ _6              sta stmask
                 jsr _14
                 beq _7
 
-                lda #0
+                lda #$00
                 beq _8
 
 _7              lda #$FF
@@ -68,69 +68,69 @@ _8              sta trace
                 jsr _14
                 beq _9
 
-                lda #0
+                lda #$00
                 beq _10
 
 _9              lda #$FF
 _10             sta list
 
 ;   window size
-                lda wsize
+                lda jt_wsize
                 jsr _18
 
                 ldx #wmsg-optmsg
                 jsr _19
 
-                cmp #5
+                cmp #$05
                 bcs _11                 ; make sure at least 5
 
-                lda #5
-_11             cmp #19
+                lda #$05
+_11             cmp #$13
                 bcc _12                 ; make sure less than 19
 
-                lda #18
-_12             sta wsize
+                lda #$12
+_12             sta jt_wsize
 
                 ldx numwd
                 beq _13
 
-                sta w1+wnlns
+                sta w1+WNLINES
 
                 tay
                 iny
-                sty w2+wytop
+                sty w2+WYTOP
 
                 sec
-                lda #23
-                sbc wsize
-                sta w2+wnlns
+                lda #$17
+                sbc jt_wsize
+                sta w2+WNLINES
 
 ;   line size
-_13             lda linemax
+_13             lda jt_linemax
                 jsr _18
 
                 ldx #lmsg-optmsg
                 jsr _19
 
-                sta linemax
+                sta jt_linemax
 
 ;   left margin
-                lda lmargin
+                lda LMARGN
                 jsr _18
 
                 ldx #lmmsg-optmsg
                 jsr _19
 
-                sta lmargin
+                sta LMARGN
 
 ;   EOL char
-                lda eolch
+                lda jt_eolch
                 tay
                 rol a
                 rol a
                 rol a
                 rol a
-                and #3
+                and #$03
 
                 tax
                 tya
@@ -148,8 +148,8 @@ _13             lda linemax
                 tax
                 tya
                 and #$9F
-                ora chcvt,X
-                sta eolch
+                ora chrConvert,X
+                sta jt_eolch
 
                 rts
 
@@ -161,8 +161,8 @@ _14             beq _15
 _15             ldy #'N'
 _16             sty tempbuf+1
 
-                ldy #1
-                jsr gettmpbuf
+                ldy #$01
+                jsr liboptGetTmpBuf
 
                 lda tempbuf+1
                 ldy tempbuf
@@ -182,17 +182,17 @@ _17             ora #$20
                 rts
 
 ; get string
-_18             ldx #0
+_18             ldx #$00
                 ldy #>tempbuf
                 sty arg3
 
                 ldy #<tempbuf
 
-                jmp strc
+                jmp libioStrC
 
-;   get number
+; get number
 _19             ldy tempbuf
-                jsr gettmpbuf
+                jsr liboptGetTmpBuf
 
                 ldy tempbuf
                 bne _20
@@ -203,7 +203,7 @@ _19             ldy tempbuf
 
 _20             lda #<tempbuf
                 ldx #>tempbuf
-                jsr valb
+                jsr libioValB
 
                 lda args
 
@@ -214,30 +214,31 @@ _20             lda #<tempbuf
 ;--------------------------------------
 ;--------------------------------------
 
-domsg           .text 9,"Display?"
+domsg           .text $09,"Display?"
 
 optmsg          = domsg-20              ; see GetTemp
 
-amsg            .text 6,"Bell?"
-cmsg            .text 16,"Case sensitive?"
-tmsg            .text 7,"Trace?"
-lstmsg          .text 6,"List?"
-wmsg            .text 15,"Window 1 size:"
-lmsg            .text 11,"Line size:"
-lmmsg           .text 13,"Left margin:"
-emsg            .text 10,"EOL char:"
+;   note, these are not 'ptext', because the length is off by one
+amsg            .text $06,"Bell?"
+cmsg            .text $10,"Case sensitive?"
+tmsg            .text $07,"Trace?"
+lstmsg          .text $06,"List?"
+wmsg            .text $0F,"Window 1 size:"
+lmsg            .text $0B,"Line size:"
+lmmsg           .text $0D,"Left margin:"
+emsg            .text $0A,"EOL char:"
 
 stoa_           .byte $20,$40,$00,$60
 
 
 ;======================================
-;   GetTmpBuf()
+; GetTmpBuf()
 ;======================================
-gettmpbuf       .proc
+liboptGetTmpBuf .proc
                 sty arg2
 
 ;   copy string to tempBuf+10
-                ldy #20
+                ldy #$14
 _next1          lda optmsg+20,X
                 sta tempbuf+10,Y
 
@@ -254,6 +255,6 @@ _next1          lda optmsg+20,X
                 ldx #>(tempbuf+10)
                 ldy arg2
 
-                jmp mgett1
+                jmp bankMGetT1
 
                 .endproc

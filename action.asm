@@ -5,7 +5,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ; SPDX-FileName: action.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
                 .enc "atari-screen-inverse"
@@ -32,38 +32,46 @@ date            .byte $01,$17,$84       ; assemble date of latest version!
 propid          ldx $A0
 
                 .include "screen.mac.asm"
-                .include "comp.lex.asm"
+
+                .include "compiler.inc"
+compiler    .namespace
+                .include "compiler.lexicon.asm"
+            .endnamespace
+
                 .include "main.msc.asm"
-                .include "main.bnk.asm"
+                .include "main.bank.asm"
 
 amplfin
+
 ;    ACTION! 3.6 - Editor Routines
 ;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
 ;    ------------------------------
 
+editor      .namespace
                 .fill 4,$00
-
-                .include "editor/edit.fnd.asm"
-                .include "editor/edit.sub.asm"
+                .include "editor/edit.find.asm"
+                .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"
+            .endnamespace
 
 
 ;    "ACTION! 3.6 - Compiler Routines
 ;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
 ;    ---------------------------------------
 
+ampl        .namespace
                 .fill 3,$00
-
-                .include "ampl/ampl.seg.asm"
+                .include "ampl/ampl.segment.asm"
                 .include "ampl/ampl.pf.asm"
-                .include "ampl/ampl.arr.asm"
+                .include "ampl/ampl.array.asm"
                 .include "ampl/ampl.cgu.asm"
+            .endnamespace
 
                 .fill 9,$00
 
-                .addr cstart
+                .addr bankCartStart
                 .byte $00,$05           ; boot disk and start cart.
-                .addr rstbank.init
+                .addr bankRestore.init
 
 
 ;--------------------------------------
@@ -81,8 +89,11 @@ amplfin
                 .logical ll
 ;--------------------------------------
 
-                .include "ampl/ampl.mth.asm"
-                .include "ampl/ampl.sym.asm"
+            .namespace ampl
+                .include "ampl/ampl.math.asm"
+                .include "ampl/ampl.symbol.asm"
+            .endnamespace
+
                 .include "library/lib.key.asm"
                 .include "spl.err.asm"
                 .include "library/lib.io.asm"
@@ -117,10 +128,12 @@ doc
                 .logical cl
 ;--------------------------------------
 
-main            .include "comp.main.asm"
+            .namespace compiler
+                .include "compiler.main.asm"
 
-cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
-
+comp_copyright  .null "ACTION! (c)1983 Action Computer Services"
+                .byte $00
+            .endnamespace
 
 ;--------------------------------------
 ;--------------------------------------
@@ -146,21 +159,27 @@ cright          .text "ACTION! (c)1983 Action Computer Services",$00,$00
 ;--------------------------------------
 
                 .include "storage.mac.asm"
-                .include "editor/edit.mem.asm"
-                .include "editor/edit.car.asm"
-                .include "editor/edit.man.asm"
+
+            .namespace editor
+                .include "editor/edit.memory.asm"
+                .include "editor/edit.cartridge.asm"
+                .include "editor/edit.main.asm"
                 .include "editor/edit.chr.asm"
-                .include "editor/edit.ini.asm"
+                .include "editor/edit.init.asm"
                 .include "editor/edit.io.asm"
-                .include "editor/edit.wnd.asm"
-                .include "editor/edit.dsp.asm"
-                .include "editor/edit.cmd.asm"
+                .include "editor/edit.window.asm"
+                .include "editor/edit.display.asm"
+                .include "editor/edit.command.asm"
                 .include "editor/edit.tag.asm"
+            .endnamespace
 
-                .include "ampl/ampl.mon.asm"
-                .include "ampl/ampl.ini.asm"
+            .namespace ampl
+                .include "ampl/ampl.monitor.asm"
+                .include "ampl/ampl.init.asm"
+            .endnamespace
 
-                .text "ces",$00,$00
+edit_copyright  .null "ces"
+                .byte $00
 
 
 ;--------------------------------------

@@ -4,69 +4,71 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: ampl.mon.asm
-; SPDX-FileCopyrightText: Copyright 2023 Scott Giese
+; SPDX-FileName: ampl.monitor.asm
+; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+monitor         .namespace
+
 ;======================================
-; Monitor for ACTION!
+;   ACTION! Monitor
 ;======================================
-monitor         .proc
-                jsr savworld
+Monitor         .proc
+                jsr editor.window.SaveWorld
 
                 lda delbuf              ; delete buffer bottom
                 ldx delbuf+1
-                jsr delfree             ; get rid of delete buf
+                jsr editor.chr.DeleteFree   ; get rid of delete buf
 
                 lda top+1
                 sta top1
 
-_ENTRY1         jsr scrinit
+_ENTRY1         jsr screenInit
 
-                ldx #1
-                stx rowcrs
-                stx mpc
+                ldx #$01
+                stx ROWCRS
+                stx isMonitorLive
 
                 dex
                 stx cmdln
                 stx device
 
-                jsr splsetup
+                jsr ampl.init.SetupSPL
 
 _ENTRY2
-_next1          jsr initkeys
+_next1          jsr editor.io.InitKeys
 
-                lda dindex              ; display mode
+                lda DINDEX              ; display mode
                 beq _1
 
-                jsr scrinit             ; get Graphics(0)
+                jsr screenInit          ; get Graphics(0)
 
-_1              jsr alarm
-                jsr rstcsr
+_1              jsr jt_alarm
+                jsr ioRestoreCursorChar
 
-                lda #<monitorPrompt
-                ldx #>monitorPrompt
-                jsr gettemp
+                lda #<prompt
+                ldx #>prompt
+                jsr editor.window.GetTemp
 
                 ldy tempbuf
                 beq _next1
 
-                lda #0
+                lda #$00
                 sta top+1
-                sta chan
+                sta Channel
 
                 lda #<tempbuf
                 ldx #>tempbuf
                 ldy sp
                 iny                     ; make sure non-zero
-                jsr lexexpand._ENTRY1
-                jsr getnext
+                jsr compiler.lexicon.Expand._ENTRY1
+                jsr compiler.lexicon.GetNext
 
                 lda tempbuf+1
                 ora #$20
-                ldx #<mcmd
-                ldy #>mcmd
-                jsr lookup
+                ldx #<tblCmds
+                ldy #>tblCmds
+                jsr mscLookup
 
                 jmp _next1
 
@@ -76,12 +78,12 @@ _1              jsr alarm
 ;--------------------------------------
 ;
 ;--------------------------------------
-mquit           .proc
-                ldy #0
-                sty mpc
+Quit            .proc
+                ldy #$00
+                sty isMonitorLive
                 sty subbuf
                 sty findbuf
-                sty dirtyf
+                sty isDirty
 
                 .endproc
 
@@ -89,48 +91,47 @@ mquit           .proc
 
 
 ;======================================
-;   RSTwnd()
+; ResetWindow()
 ;======================================
-rstwnd          .proc
-                lda #23
+ResetWindow     .proc
+                lda #$17
                 sta cmdln
 
                 lda numwd
                 beq _1
 
-                lda wsize
+                lda jt_wsize
                 sta cmdln
 
                 lda #w2-w1
-                jsr paintw
+                jsr PaintWindow
 
-                lda #0
-_1              jsr paintw
-                jsr einit._ENTRY3
+                lda #$00
+_1              jsr PaintWindow
+                jsr editor.init.EditorInit._ENTRY3
 
-                jmp floop
-
-                .endproc
-
-
-;======================================
-;   PaintW(window)
-;======================================
-paintw          .proc
-                sta curwdw
-
-                jsr rstwd
-
-                jmp found
+                jmp editor.main.Loop
 
                 .endproc
 
 
 ;======================================
-;   MDump()
+; PaintWindow(window)
 ;======================================
-mdump           .proc
-                jsr mprint
+PaintWindow     .proc
+                sta currentWindow
+
+                jsr editor.display.RestoreWindow
+                jmp editor.find.Found
+
+                .endproc
+
+
+;======================================
+; MemDump()
+;======================================
+MemDump         .proc
+                jsr Print
 
 _next1          inc arg11
                 bne _1
@@ -139,12 +140,13 @@ _next1          inc arg11
 
 _1              lda arg11
                 ldx arg12
-                jsr mprint._ENTRY1
-                jsr gotkey
+                jsr Print._ENTRY1
+                jsr editor.io.GotKey
                 beq _next1
 
                 ldx #$FF
                 stx CH_
+
                 cmp #$DE
                 bne _next1
 
@@ -153,50 +155,51 @@ _1              lda arg11
 
 
 ;======================================
-;   MPrint()
+; Print()
 ;======================================
-mprint          .proc
-                jsr mpsave
+Print           .proc
+                jsr SaveParams
 
-_ENTRY1         jsr printc
+_ENTRY1         jsr ioPrintCard
 
                 ldy #','
-                jsr putchar
+                jsr ioPutChar
 
                 lda arg11
                 ldx arg12
-                jsr printh
-                jsr putsp
+                jsr PrintHex
+                jsr ioPutSpace
 
                 ldy #'='
-                jsr putchar
-                jsr putsp
-                jsr mpload
+                jsr ioPutChar
+                jsr ioPutSpace
+                jsr LoadParams
 
                 tay
-                jsr putchar
-                jsr putsp
-                jsr mpload
-                jsr printh
-                jsr putsp
-                jsr mpload
+                jsr ioPutChar
+                jsr ioPutSpace
+                jsr LoadParams
 
-                ldx #0
-                jsr printc
-                jsr putsp
-                jsr mpload
-                jsr printc
+                jsr PrintHex
+                jsr ioPutSpace
+                jsr LoadParams
 
-                jmp puteol
+                ldx #$00
+                jsr ioPrintCard
+                jsr ioPutSpace
+                jsr LoadParams
+
+                jsr ioPrintCard
+                jmp ioPutEOL
 
                 .endproc
 
 
 ;======================================
-;   MpLoad()
+; LoadParams()
 ;======================================
-mpload          .proc
-                ldy #1
+LoadParams      .proc
+                ldy #$01
                 lda (arg11),Y
                 tax
 
@@ -208,10 +211,10 @@ mpload          .proc
 
 
 ;======================================
-;   MpSave()
+; SaveParams()
 ;======================================
-mpsave          .proc
-                jsr mnum
+SaveParams      .proc
+                jsr mscMNum
 
                 sta arg11
                 stx arg12
@@ -221,35 +224,36 @@ mpsave          .proc
 
 
 ;======================================
-;   Boot()
+; Boot()
 ;======================================
-boot            .proc
+Boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
-                jsr yesno
-                bne mrun._XIT
-
-                jmp start.cold
+                jsr editor.window.YesNo
+                bne MemRun._XIT
+                jmp editor.cartridge.START._cold
 
 ;--------------------------------------
 
-_bmsg           .text 6,"Boot? "
+_bmsg           .ptext "Boot? "
 
                 .endproc
 
 
 ;======================================
-;   MRun()
+; MemRun()
+;--------------------------------------
+; execute from memory
 ;======================================
-mrun            .proc
+MemRun          .proc
                 lda nxttoken
-                cmp #eofid
+                cmp #tokEOF
                 beq _1
 
-                cmp #quote              ; compile and go?
+                cmp #tokQuote           ; compile and go?
                 bne _2                  ;   no
 
-                jsr comp
+                jsr Compile
 
 _1              lda INITAD
                 ldx INITAD+1
@@ -257,10 +261,10 @@ _1              lda INITAD
 
 _XIT            rts
 
-_2              jsr mnum
-_3              jsr run
+_2              jsr mscMNum
+_3              jsr bankRun
 
-                lda #0
+                lda #$00
                 sta device
 
                 rts
@@ -268,24 +272,24 @@ _3              jsr run
 
 
 ;======================================
-;   MWrite()
+; MemWrite()
 ;======================================
-mwrite          .proc                   ; write object file
+MemWrite        .proc                   ; write object file
                 lda nxttoken
-                cmp #quote
-                bne mrun._XIT           ; no output file!
+                cmp #tokQuote
+                bne MemRun._XIT         ; no output file!
 
                 lda INITAD+1
-                beq mrun._XIT           ; no program!!
+                beq MemRun._XIT         ; no program!!
 
-                lda #1
-                sta chan
+                lda #$01
+                sta Channel
 
-                lda #8                  ; output
-                jsr openchan
+                lda #$08                ; output
+                jsr ioOpenChannel
 
 ;   write header
-                lda #6
+                lda #$06
                 sta arg9
 
                 lda #$FF
@@ -316,9 +320,9 @@ _1              dec arg14
                 adc codesize+1
                 sta arg15
 
-                jsr mwout
+                jsr WOut
 
-;   write the qcode
+;   write the QCODE
                 ldx #$10
                 lda #$0B                ; output command
                 sta IOCB0+ICCOM,X
@@ -334,10 +338,10 @@ _1              dec arg14
                 sta IOCB0+ICBLH,X
 
                 jsr CIOV
-                bmi mwout._mwerr
+                bmi WOut._mwerr
 
 ;   save start address
-                ldx #4
+                ldx #$04
 _next1          lda _mwinit,X
                 sta arg9,X
 
@@ -349,79 +353,86 @@ _next1          lda _mwinit,X
                 lda INITAD+1
                 sta arg15
 
-                jsr mwout
+                jsr WOut
 
 ;   close file
-                lda #1
-                jmp close
+                lda #$01
+                jmp ioClose
 
 ;--------------------------------------
 
 _mwinit         .byte 6
-                .word INITAD
-                .word INITAD+1
+                .addr INITAD
+                .addr INITAD+1
 
                 .endproc
 
 
 ;======================================
-;   MWOut()
+; WOut()
 ;======================================
-mwout           .proc
-                lda #1
+WOut            .proc
+                lda #$01
                 ldx #arg9
-                ldy #0
-                jsr output
+                ldy #$00
+                jsr ioOutput
 
                 bmi _mwerr
 
                 rts
 
 
-;======================================
+;--------------------------------------
 ;
-;======================================
-_mxerr          ldy #ender
+;--------------------------------------
+_mxerr          ldy #endERR
 
-_mwerr          jmp splerr
+_mwerr          jmp bankSPLErr
 
-_ENTRY1         lda #0                  ; execute command line
+                .endproc
+
+
+;--------------------------------------
+;
+;--------------------------------------
+Execute         .proc
+                lda #$00                ; execute command line
                 sta codeoff
                 sta codeoff+1
 
-                lda qcode
+                lda QCODE
                 pha
-                lda qcode+1
+                lda QCODE+1
                 pha
 
-                jsr getnext
-                jsr cstmtlst
+                jsr compiler.lexicon.GetNext
+                jsr bankCStmtList
 
-                cmp #eofid
-                bne _mxerr
+                cmp #tokEOF
+                bne WOut._mxerr
 
                 lda #$60                ; RTS
-                ldy #0
-                sta (qcode),Y
+                ldy #$00
+                sta (QCODE),Y
 
                 pla
                 tax
                 pla
 
-                jmp run
+                jmp bankRun
 
                 .endproc
 
 
 ;======================================
-;   Comp()
+; Compile()
 ;======================================
-comp            .proc
-                jsr splsetup
-                jsr dspoff
-                jsr compile
+Compile         .proc
+                jsr ampl.init.SetupSPL
+                jsr ioDisplayOff
+                jsr bankCompile
 
-                jmp dspon
+                jmp ioDisplayOn
 
                 .endproc
 
@@ -436,45 +447,46 @@ comp            .proc
 ;======================================
 ;   Proceed()
 ;======================================
-proceed         .proc
-                ldx procsp
+Proceed         .proc
+                ldx procSP
                 beq _XIT
 
 ;               lda #<_pmsg
 ;               ldx #>_pmsg
-;               jsr YesNo
+;               jsr editor.window.YesNo
 ;               bne _XIT
 
 ;               ldx procSP              ; break stack pointer
 
-                lda #0
-                sta procsp
+                lda #$00
+                sta procSP
 
                 txs
 
-                jmp lproceed
+                jmp bankLProceed
 
 _XIT            rts
+
+;_pmsg          DEFMSG "Proceed? "
+
                 .endproc
 
-;:Pmsg DEFMSG "Proceed? "
-
 
 ;======================================
-;   PrintH(num)
+; PrintHex(num)
 ;======================================
-printh          .proc
+PrintHex        .proc
                 sta arg0
                 stx arg1
 
-                lda #4
+                lda #$04
                 sta arg2
 
                 ldy #'$'
-                jsr putchar
+                jsr ioPutChar
 
-_next1          lda #0
-                ldx #4
+_next1          lda #$00
+                ldx #$04
 _next2          asl arg0
                 rol arg1
                 rol a
@@ -487,10 +499,10 @@ _next2          asl arg0
                 cmp #':'
                 bmi _1
 
-                adc #6
+                adc #$06
 
 _1              tay
-                jsr putchar
+                jsr ioPutChar
 
                 dec arg2
                 bne _next1
@@ -502,33 +514,42 @@ _1              tay
 ;--------------------------------------
 ;--------------------------------------
 
-mcmd            .word disptb+9          ; unknown cmd
+tblCmds         .addr jt_disptb+9       ; unknown cmd
                 .byte 35                ; table size
-                .word boot
-                .byte 'b'
-                .word comp
-                .byte 'c'
-                .word dret
-                .byte 'd'
-                .word mquit
-                .byte 'e'
 
-; .WORD Format
-; .BYTE 'f
+                .addr Boot
+                .text 'b'               ; BOOT
 
-                .word options
-                .byte 'o'
-                .word proceed
-                .byte 'p'
-                .word mrun
-                .byte 'r'
-                .word mwrite
-                .byte 'w'
-                .word mwout._ENTRY1
-                .byte 'x'
-                .word mprint
-                .byte '?'
-                .word mdump
-                .byte '*'
+                .addr Compile
+                .text 'c'               ; COMPILE
 
-monitorPrompt   .byte 1,">"
+                .addr bankDosRet
+                .text 'd'               ; DOS
+
+                .addr Quit
+                .text 'e'               ; EDITOR
+
+                .addr bankOptions
+                .text 'o'               ; OPTIONS
+
+                .addr Proceed
+                .text 'p'               ; PROCEED (continue after BRK)
+
+                .addr MemRun
+                .text 'r'               ; MEMORY RUN
+
+                .addr MemWrite
+                .text 'w'               ; MEMORY WRITE
+
+                .addr Execute
+                .text 'x'               ; EXECUTE
+
+                .addr Print
+                .text '?'               ; PRINT
+
+                .addr MemDump
+                .text '*'               ; MEMORY DUMP
+
+prompt          .ptext '>'
+
+                .endnamespace
