@@ -8,6 +8,8 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+str             .namespace
+
 ;======================================
 ; INT FUNC SCompare(STRING a,b)
 ;--------------------------------------
@@ -16,7 +18,7 @@
 ;   low 0 if a<b
 ;   high 0 if a>b
 ;======================================
-libstrSCompare  .proc
+SCompare        .proc
                 sta arg4
                 stx arg5
                 sty arg2
@@ -65,7 +67,7 @@ _4              stx args+1
 ;--------------------------------------
 ; dest = src
 ;======================================
-libstrSCopy     .proc
+SCopy           .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -92,7 +94,7 @@ _XIT            rts
 ; if LEN(src)<stop then stop=LEN(src)
 ; dest = src(start, stop)
 ;======================================
-libstrSCopyS    .proc
+SCopyS          .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -121,7 +123,7 @@ _2              sec
 
                 lda #$00
 
-_XIT            jmp libstrSCopy._ENTRY1
+_XIT            jmp SCopy._ENTRY1
 
                 .endproc
 
@@ -135,7 +137,7 @@ _XIT            jmp libstrSCopy._ENTRY1
 ;   LEN(dest) = stop
 ; dest(start, stop) = src
 ;======================================
-libstrSAssign   .proc
+SAssign         .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -181,7 +183,7 @@ _3              lda arg0
                 inc arg1
 
 _4              txa
-                jmp libstrSCopy._ENTRY2
+                jmp SCopy._ENTRY2
 
                 .endproc
 
@@ -196,71 +198,71 @@ _4              txa
 
 _en7            .ptext "Open"
                 .byte 200
-                .addr libioOpen         ; #96
+                .addr lib.io.Open       ; #96
                 .byte 4,138,17,138,138
 _en8            .ptext "PrintE"
                 .byte 200
-                .addr libioPrintE       ; #116
+                .addr lib.io.PrintE     ; #116
                 .byte 1,17
 _en9            .ptext "PrintDE"
                 .byte 200
-                .addr libioPrintDE      ; #75
+                .addr lib.io.PrintDE    ; #75
                 .byte 2,138,17
 _en10           .ptext "Close"
                 .byte 200
-                .addr libioClose        ; #253
+                .addr lib.io.Close      ; #253
                 .byte 1,138
 _en11           .ptext "Print"
                 .byte 200
-                .addr libioPrint        ; #135
+                .addr lib.io.Print      ; #135
                 .byte 1,17
 _en12           .ptext "PrintD"
                 .byte 200
-                .addr libioPrintD       ; #115
+                .addr lib.io.PrintD     ; #115
                 .byte 2,138,17
 _en13           .ptext "InputS"
                 .byte 200
-                .addr libioInputS       ; #249
+                .addr lib.io.InputS     ; #249
                 .byte 1,17
 _en14           .ptext "InputSD"
                 .byte 200
-                .addr libioInputSD      ; #87
+                .addr lib.io.InputSD    ; #87
                 .byte 2,138,17
 _en15           .ptext "InputMD"
                 .byte 200
-                .addr libioInputMD      ; #75
+                .addr lib.io.InputMD    ; #75
                 .byte 3,138,17,138
 _en16           .ptext "GetD"
                 .byte 202
-                .addr libioGetD         ; #138
+                .addr lib.io.GetD       ; #138
                 .byte 1,138
 _en17           .ptext "PutE"
                 .byte 200
-                .addr libioPutE         ; #162
+                .addr lib.io.PutE       ; #162
                 .byte 0
 _en18           .ptext "Put"
                 .byte 200
-                .addr libioPut          ; #158
+                .addr lib.io.Put        ; #158
                 .byte 1,137
 _en19           .ptext "PutD"
                 .byte 200
-                .addr libioPutD         ; #161
+                .addr lib.io.PutD       ; #161
                 .byte 2,138,137
 _en20           .ptext "PutDE"
                 .byte 200
-                .addr libioPutDE        ; #168
+                .addr lib.io.PutDE      ; #168
                 .byte 1,138
 _en21           .ptext "XIO"
                 .byte 200
-                .addr libioXIO          ; #225
+                .addr lib.io.XIO        ; #225
                 .byte 6,138,138,138,138,138,17
 _en22           .ptext "PrintB"
                 .byte 200
-                .addr libioPrintB       ; #113
+                .addr lib.io.PrintB     ; #113
                 .byte 1,138
 _en23           .ptext "PrintBE"
                 .byte 200
-                .addr libioPrintBE      ; #71
+                .addr lib.io.PrintBE    ; #71
                 .byte 1,138
 
 ;:EN24          .byte 7,"PrintBD",200
@@ -269,199 +271,199 @@ _en23           .ptext "PrintBE"
 
 _en25           .ptext "PrintBDE"
                 .byte 200
-                .addr libioPrintBDE     ; #241
+                .addr lib.io.PrintBDE   ; #241
                 .byte 2,138,138
 _en26           .ptext "PrintC"
                 .byte 200
-                .addr libioPrintC       ; #114
+                .addr lib.io.PrintC     ; #114
                 .byte 1,12
 _en27           .ptext "PrintCE"
                 .byte 200
-                .addr libioPrintCE      ; #73
+                .addr lib.io.PrintCE    ; #73
                 .byte 1,12
 _en28           .ptext "PrintCD"
                 .byte 200
-                .addr libioPrintCD      ; #72
+                .addr lib.io.PrintCD    ; #72
                 .byte 2,138,12
 _en29           .ptext "PrintCDE"
                 .byte 200
-                .addr libioPrintCDE     ; #245
+                .addr lib.io.PrintCDE   ; #245
                 .byte 2,138,12
 _en30           .ptext "PrintI"
                 .byte 200
-                .addr libioPrintI       ; #120
+                .addr lib.io.PrintI     ; #120
                 .byte 1,11
 _en31           .ptext "PrintID"
                 .byte 200
-                .addr libioPrintID      ; #84
+                .addr lib.io.PrintID    ; #84
                 .byte 2,138,11
 _en32           .ptext "PrintIE"
                 .byte 200
-                .addr libioPrintIE      ; #85
+                .addr lib.io.PrintIE    ; #85
                 .byte 1,11
 _en33           .ptext "PrintIDE"
                 .byte 200
-                .addr libioPrintIDE     ; #13
+                .addr lib.io.PrintIDE   ; #13
                 .byte 2,138,11
 _en34           .ptext "InputB"
                 .byte 202
-                .addr libioInputB       ; #232
+                .addr lib.io.InputB     ; #232
                 .byte 0
 _en35           .ptext "InputBD"
                 .byte 202
-                .addr libioInputBD      ; #53
+                .addr lib.io.InputBD    ; #53
                 .byte 1,138
 _en36           .ptext "InputI"
                 .byte 203
-                .addr libioInputI       ; #239
+                .addr lib.io.InputI     ; #239
                 .byte 0
 _en37           .ptext "InputID"
                 .byte 203
-                .addr libioInputID      ; #67
+                .addr lib.io.InputID    ; #67
                 .byte 1,138
 _en38           .ptext "InputC"
                 .byte 204
-                .addr libioInputC       ; #233
+                .addr lib.io.InputC     ; #233
                 .byte 0
 _en39           .ptext "InputCD"
                 .byte 204
-                .addr libioInputCD      ; #55
+                .addr lib.io.InputCD    ; #55
                 .byte 1,138
 _en40           .ptext "ValB"
                 .byte 202
-                .addr libioValB         ; #207
+                .addr lib.io.ValB       ; #207
                 .byte 1,17
 _en41           .ptext "ValI"
                 .byte 203
-                .addr libioValI         ; #214
+                .addr lib.io.ValI       ; #214
                 .byte 1,17
 _en42           .ptext "ValC"
                 .byte 204
-                .addr libioValC         ; #208
+                .addr lib.io.ValC       ; #208
                 .byte 1,17
 _en43           .ptext "StrB"
                 .byte 200
-                .addr libioStrB         ; #223
+                .addr lib.io.StrB       ; #223
                 .byte 2,138,17
 _en44           .ptext "StrI"
                 .byte 200
-                .addr libioStrI         ; #230
+                .addr lib.io.StrI       ; #230
                 .byte 2,11,17
 _en45           .ptext "StrC"
                 .byte 200
-                .addr libioStrC         ; #224
+                .addr lib.io.StrC       ; #224
                 .byte 2,12,17
 _en46           .ptext "Note"
                 .byte 200
-                .addr libioNote         ; #89
+                .addr lib.io.Note       ; #89
                 .byte 3,138,20,18
 _en47           .ptext "Point"
                 .byte 200
-                .addr libioPoint        ; #110
+                .addr lib.io.Point      ; #110
                 .byte 3,138,12,138
 _en48           .ptext "Graphics"
                 .byte 200
-                .addr libgrGraphics     ; #108
+                .addr lib.gr.Graphics   ; #108
                 .byte 1,138
 _en49           .ptext "DrawTo"
                 .byte 200
-                .addr libgrDrawTo       ; #231
+                .addr lib.gr.DrawTo     ; #231
                 .byte 2,12,138
 _en50           .ptext "Position"
                 .byte 200
-                .addr libgrPosition     ; #94
+                .addr lib.gr.Position   ; #94
                 .byte 2,12,138
 _en51           .ptext "Locate"
                 .byte 202
-                .addr libgrLocate       ; #97
+                .addr lib.gr.Locate     ; #97
                 .byte 2,12,138
 _en52           .ptext "Plot"
                 .byte 200
-                .addr libgrPlot         ; #131
+                .addr lib.gr.Plot       ; #131
                 .byte 2,12,138
 _en53           .ptext "SetColor"
                 .byte 200
-                .addr libgrSetColor     ; #6
+                .addr lib.gr.SetColor   ; #6
                 .byte 3,138,138,138
 _en54           .ptext "Fill"
                 .byte 200
-                .addr libgrFill         ; #122
+                .addr lib.gr.Fill       ; #122
                 .byte 2,12,138
 _en55           .ptext "Rand"
                 .byte 202
-                .addr libmscRand        ; #117
+                .addr lib.msc.Rand      ; #117
                 .byte 1,138
 _en56           .ptext "Sound"
                 .byte 200
-                .addr libmscSound       ; #31
+                .addr lib.msc.Sound     ; #31
                 .byte 4,138,138,138,138
 _en57           .ptext "SndRst"
                 .byte 200
-                .addr libmscSndRst      ; #73
+                .addr lib.msc.SndRst    ; #73
                 .byte 0
 _en58           .ptext "Paddle"
                 .byte 202
-                .addr libstrPaddle      ; #254
+                .addr Paddle            ; #254
                 .byte 1,138
 _en59           .ptext "PTrig"
                 .byte 202
-                .addr libmscPTrig       ; #164
+                .addr lib.msc.PTrig     ; #164
                 .byte 1,138
 _en60           .ptext "Stick"
                 .byte 202
-                .addr libmscStick       ; #8
+                .addr lib.msc.Stick     ; #8
                 .byte 1,138
 _en61           .ptext "STrig"
                 .byte 202
-                .addr libstrSTrig       ; #52
+                .addr STrig             ; #52
                 .byte 1,138
 
 ;:EN62          .byte 4,"Peek",202
-;               .addr Peek ; #73
+;               .addr Peek              ; #73
 ;               .byte 1,12
 ;:EN63          .byte 5,"PeekC",204
-;               .addr PeekC ; #245
+;               .addr PeekC             ; #245
 ;               .byte 1,12
 
 _en64           .ptext "Poke"
                 .byte 200
-                .addr libmscPoke        ; #120
+                .addr lib.msc.Poke      ; #120
                 .byte 2,12,138
 _en65           .ptext "PokeC"
                 .byte 200
-                .addr libmscPokeC       ; #83
+                .addr lib.msc.PokeC     ; #83
                 .byte 2,12,12
 _en66           .ptext "Zero"
                 .byte 200
-                .addr libmscZero        ; #88
+                .addr lib.msc.Zero      ; #88
                 .byte 2,18,12
 _en67           .ptext "SetBlock"
                 .byte 200
-                .addr libmscSetBlock    ; #203
+                .addr lib.msc.SetBlock  ; #203
                 .byte 3,18,12,138
 
 ;:EN68          .byte 9,"MoveBlock",200
-;               .word MoveBlock ; #85
+;               .word MoveBlock         ; #85
 ;               .byte 3,18,18,12
 
 _en69           .ptext "Break"
                 .byte 200
-                .addr libmscBreak       ; #183
+                .addr lib.msc.Break     ; #183
 _en70           .ptext "SCompare"
                 .byte 203
-                .addr libstrSCompare    ; #92
+                .addr SCompare          ; #92
                 .byte 2,17,17
 _en71           .ptext "SCopy"
                 .byte 200
-                .addr libstrSCopy       ; #192
+                .addr SCopy             ; #192
                 .byte 2,17,17
 _en72           .ptext "SCopyS"
                 .byte 200
-                .addr libstrSCopyS      ; #244
+                .addr SCopyS            ; #244
                 .byte 4,17,17,138,138
 _en73           .ptext "SAssign"
                 .byte 200
-                .addr libstrSAssign     ; #23
+                .addr SAssign           ; #23
                 .byte 4,17,17,138,138
 
 
@@ -603,7 +605,7 @@ libst           .byte 0                     ; 1
 ;======================================
 ;   STrig()
 ;======================================
-libstrSTrig     .proc
+STrig           .proc
                 tax
                 lda TRIG0,X
                 sta args
@@ -622,7 +624,7 @@ libstrSTrig     .proc
 ;======================================
 ; Paddle()
 ;======================================
-libstrPaddle    .proc
+Paddle          .proc
                 tax
                 lda PADDL0,X
                 sta args
@@ -642,7 +644,7 @@ libstrPaddle    .proc
 
 _en6            .ptext "PrintF"
                 .byte 200
-                .addr libioPrintF           ; #117
+                .addr lib.io.PrintF         ; #117
                 .byte 6,17,12,12,12,12,12
 
                 .byte <_en61
@@ -655,7 +657,7 @@ _en6            .ptext "PrintF"
 
 _en63           .ptext "PeekC"
                 .byte 204
-                .addr libmscPeekC           ; #245
+                .addr lib.msc.PeekC         ; #245
                 .byte 1,12
 
                 .byte <_en37
@@ -717,7 +719,7 @@ copyright       .byte 8,99,9,17,25,24,19,33,35,51   ; (c)1983ACS (in internal ch
 
 _en68           .ptext "MoveBlock"
                 .byte 200
-                .addr libmscMoveBlock       ; #85
+                .addr lib.msc.MoveBlock     ; #85
                 .byte 3,18,18,12
 
                 .byte <en0
@@ -736,7 +738,7 @@ _en68           .ptext "MoveBlock"
 
 _en24           .ptext "PrintBD"
                 .byte 200
-                .addr libioPrintBD          ; #70
+                .addr lib.io.PrintBD        ; #70
                 .byte 2,138,138
 
                 .byte <_en69
@@ -748,7 +750,7 @@ _en24           .ptext "PrintBD"
 
 _en62           .ptext "Peek"
                 .byte 202
-                .addr libmscPeek            ; #73
+                .addr lib.msc.Peek          ; #73
                 .byte 1,12
 
                 .byte <_en67
@@ -781,3 +783,5 @@ _en62           .ptext "Peek"
                 .byte <_en58
 
 ;               .byte 0                     ; 1
+
+                .endnamespace

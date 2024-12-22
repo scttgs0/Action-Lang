@@ -8,16 +8,18 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+gr              .namespace
+
 ;======================================
 ; PROC Graphics(BYTE mode)
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrGraphics   .proc
+Graphics        .proc
                 pha
 
                 lda #$00
-                jsr libioClose
+                jsr lib.io.Close
 
                 lda #$0C
                 sta arg3
@@ -27,10 +29,10 @@ libgrGraphics   .proc
                 ldy #>_e
 
                 jsr ioOpen
-                jsr libioChkErr
+                jsr lib.io.ChkErr
 
                 lda #$06
-                jsr libioClose
+                jsr lib.io.Close
 
                 pla
                 sta arg4
@@ -45,12 +47,13 @@ libgrGraphics   .proc
 
                 jsr ioOpen
 
-                jmp libioChkErr
+                jmp lib.io.ChkErr
 
 ;--------------------------------------
 
 _e              .ptext "E:"
                 .byte EOL
+
 _devs           .ptext "S:"
                 .byte EOL
 
@@ -65,11 +68,11 @@ _atachr         = $02FB
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrDrawTo     .proc
-                jsr graphicIO           ; DrawTo(col, row)
+DrawTo          .proc
+                jsr GfxIO
 
                 ldy #$11
-                jmp libioXIO
+                jmp lib.io.XIO
 
                 .endproc
 
@@ -77,15 +80,15 @@ libgrDrawTo     .proc
 ; = = = = = = = = = = = = = = = = = = =
 ;
 ; = = = = = = = = = = = = = = = = = = =
-graphicIO       .proc
-                jsr libgrPosition.pos1
+GfxIO           .proc
+                jsr Position.pos1
 
-                lda libgrGraphics._color
-                sta libgrGraphics._atachr
+                lda Graphics._color
+                sta Graphics._atachr
 
-                lda #<libgrGraphics._devs
+                lda #<Graphics._devs
                 sta arg5
-                lda #>libgrGraphics._devs
+                lda #>Graphics._devs
                 sta arg6
 
                 lda #$00
@@ -103,8 +106,8 @@ graphicIO       .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrPosition   .proc
-                sta OLDCOL              ; Position(col, row)
+Position        .proc
+                sta OLDCOL
                 stx OLDCOL+1
                 sty OLDROW
 
@@ -121,11 +124,11 @@ pos1            sta COLCRS
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrLocate     .proc
-                jsr libgrPosition       ; Locate(col, row)
+Locate          .proc
+                jsr Position
 
                 lda #$06
-                jmp libioGetD
+                jmp lib.io.GetD
 
                 .endproc
 
@@ -135,13 +138,13 @@ libgrLocate     .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrPlot       .proc
-                jsr libgrPosition.pos1  ; Plot(col, row)
+Plot            .proc
+                jsr Position.pos1
 
                 lda #$06
-                ldx libgrGraphics._color
+                ldx Graphics._color
 
-                jmp libioPutD
+                jmp lib.io.PutD
 
                 .endproc
 
@@ -151,8 +154,8 @@ libgrPlot       .proc
 ;--------------------------------------
 ; same as BASIC
 ;======================================
-libgrSetColor   .proc
-                cmp #$05                ; SetColor(reg, hue, lum)
+SetColor        .proc
+                cmp #$05
                 bpl _XIT
 
                 sta arg0
@@ -185,10 +188,12 @@ _XIT            rts
 ;   XIO 18,#6,0,0,"S:"
 ; in BASIC
 ;======================================
-libgrFill       .proc
-                jsr graphicIO
+Fill            .proc
+                jsr GfxIO
 
                 ldy #$12
-                jmp libioXIO
+                jmp lib.io.XIO
 
                 .endproc
+
+                .endnamespace

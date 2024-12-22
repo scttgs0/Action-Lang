@@ -196,8 +196,8 @@ NewEntry        .proc
                 lda symtab
                 sta (arg4),Y
 
-                lda #<libst
-                ldx #>libst
+                lda #<lib.str.libst
+                ldx #>lib.str.libst
                 jsr STM                 ; lookup shadow name
 
                 lda #tokUNDEC

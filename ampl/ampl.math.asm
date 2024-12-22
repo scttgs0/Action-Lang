@@ -306,7 +306,7 @@ _sa1            lda args,Y
                 bne _sa2
 
                 inc BRKKEY
-                jmp libmscBreak
+                jmp lib.msc.Break
 
 _sa2            rts
                 .endproc

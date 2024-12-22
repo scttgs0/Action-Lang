@@ -94,8 +94,13 @@ ampl        .namespace
                 .include "ampl/ampl.symbol.asm"
             .endnamespace
 
+lib         .namespace
                 .include "library/lib.key.asm"
+            .endnamespace
+
                 .include "spl.err.asm"
+
+            .namespace lib
                 .include "library/lib.io.asm"
                 .include "library/lib.gr.asm"
                 .include "library/lib.msc.asm"
@@ -103,6 +108,7 @@ ampl        .namespace
                 .include "library/lib.opt.asm"
 
 cpyright        .null "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  "
+            .endnamespace
 
 
 ;--------------------------------------

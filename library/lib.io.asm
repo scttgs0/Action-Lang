@@ -8,6 +8,8 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+io              .namespace
+
 ;======================================
 ; PROC ChkErr=*(BYTE result, block, errCode)
 ;--------------------------------------
@@ -16,7 +18,7 @@
 ; does not call Error if EOF error ($88)
 ; see Hardware manual for CIO details
 ;======================================
-libioChkErr     .proc
+ChkErr          .proc
                 bpl _2
 
                 cpy #$88                ; EOF
@@ -24,7 +26,7 @@ libioChkErr     .proc
 
                 tya
                 cpy #$80                ; break key
-                beq libioBreak1
+                beq Break1
 
                 jmp jt_error
 
@@ -39,7 +41,7 @@ _1              txa
                 sta eof,X
 _2
             .if ZAPRAM
-                dec libioChkErr-$10,X
+                dec ChkErr-$10,X
             .else
                 nop
                 nop
@@ -53,13 +55,13 @@ _2
 ;======================================
 ; Break1(error)
 ;======================================
-libioBreak1     .proc
+Break1          .proc
                 ldx #$01
                 stx BRKKEY
 
                 pha
 
-                jsr libmscBreak
+                jsr lib.msc.Break
 
                 pla
                 tay
@@ -85,7 +87,7 @@ _XIT            rts
 ; any other char after % is treated
 ; the same as %U.
 ;======================================
-libioPrintF     .proc
+PrintF          .proc
                 sta addr
                 stx addr+1
                 sty temps
@@ -109,7 +111,7 @@ _next1          lda args+2,X
 _next2          inc zpAllocOP
                 ldy zpAllocOP
                 cpy token
-                bcs libioBreak1._XIT
+                bcs Break1._XIT
 
                 lda (addr),Y
                 cmp #'%'
@@ -126,7 +128,7 @@ _next2          inc zpAllocOP
                 bne _1
 
                 lda #EOL
-_next3          jsr libioPut
+_next3          jsr Put
                 jmp _next2
 
 _1              ldy zpAllocPrevToken
@@ -143,13 +145,13 @@ _1              ldy zpAllocPrevToken
                 cpy #'S'
                 bne _2
 
-                jsr libioPrint
+                jsr Print
                 jmp _next2
 
 _2              cpy #'I'
                 bne _3
 
-                jsr libioPrintI
+                jsr PrintI
                 jmp _next2
 
 _3              cpy #'H'
@@ -159,7 +161,7 @@ _3              cpy #'H'
 
                 jmp _next2
 
-_4              jsr libioPrintC
+_4              jsr PrintC
 
                 jmp _next2
 
@@ -171,7 +173,7 @@ _4              jsr libioPrintC
 ;--------------------------------------
 ; opens fileSpec and assigns it to IOCB dev
 ;======================================
-libioOpen       .proc
+Open            .proc
                 pha
 
                 stx arg1
@@ -202,7 +204,7 @@ _1              sta (buf),Y
                 ldy buf+1
 
                 jsr ioOpen
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -212,7 +214,7 @@ _1              sta (buf),Y
 ;--------------------------------------
 ; outputs str to default IOCB with EOL
 ;======================================
-libioPrintE     .proc
+PrintE          .proc
                 stx arg1
 
                 tax
@@ -229,9 +231,9 @@ libioPrintE     .proc
 ;--------------------------------------
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
-libioPrintDE    .proc
+PrintDE         .proc
                 jsr ioPrint
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -241,9 +243,9 @@ libioPrintDE    .proc
 ;--------------------------------------
 ; closes IOCB dev
 ;======================================
-libioClose      .proc
+Close           .proc
                 jsr ioClose
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -253,7 +255,7 @@ libioClose      .proc
 ;--------------------------------------
 ; outputs str to default IOCB
 ;======================================
-libioPrint      .proc
+Print           .proc
                 stx arg1
 
                 tax
@@ -270,9 +272,9 @@ libioPrint      .proc
 ;--------------------------------------
 ; outputs str to IOCB dev
 ;======================================
-libioPrintD     .proc
+PrintD          .proc
                 jsr ioOutput
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -282,7 +284,7 @@ libioPrintD     .proc
 ;--------------------------------------
 ; same as InputSD, but uses default IOCB
 ;======================================
-libioInputS     .proc
+InputS          .proc
                 stx arg2
 
                 tax
@@ -299,7 +301,7 @@ libioInputS     .proc
 ;--------------------------------------
 ; see Input, size set to 255
 ;======================================
-libioInputSD    .proc
+InputSD         .proc
                 pha
 
                 lda #255
@@ -317,7 +319,7 @@ libioInputSD    .proc
 ;--------------------------------------
 ; see Input, size set to max
 ;======================================
-libioInputMD    .proc
+InputMD         .proc
                 pha
 
                 stx arg1
@@ -343,9 +345,9 @@ libioInputMD    .proc
 ; on return, first byte set to size of
 ; string input
 ;======================================
-libioInputD     .proc
+InputD          .proc
                 jsr ioReadBuffer.inputs
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -355,7 +357,7 @@ libioInputD     .proc
 ;--------------------------------------
 ; inputs character from IOCB dev
 ;======================================
-libioGetD       .proc
+GetD            .proc
                 ldx #$07
 
 _ENTRY1         stx arg4
@@ -377,7 +379,7 @@ _ENTRY1         stx arg4
                 jsr CIOV
                 sta args
 
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -387,7 +389,7 @@ _ENTRY1         stx arg4
 ;--------------------------------------
 ; output EOL do default IOCB
 ;======================================
-libioPutE       .proc
+PutE            .proc
                 lda #EOL
 
                 .endproc
@@ -400,7 +402,7 @@ libioPutE       .proc
 ;--------------------------------------
 ; outputs ch to default IOCB
 ;======================================
-libioPut        .proc
+Put             .proc
                 tax
                 lda device
 
@@ -414,13 +416,13 @@ libioPut        .proc
 ;--------------------------------------
 ; outputs ch to IOCB dev
 ;======================================
-libioPutD       .proc
+PutD            .proc
                 stx arg1
 
                 ldy arg1
 _ENTRY1         ldx #$0B
 
-                jmp libioGetD._ENTRY1
+                jmp GetD._ENTRY1
 
                 .endproc
 
@@ -430,9 +432,9 @@ _ENTRY1         ldx #$0B
 ;--------------------------------------
 ; outputs EOL to IOCD dev
 ;======================================
-libioPutDE      .proc
+PutDE           .proc
                 ldy #EOL
-                bne libioPutD._ENTRY1   ; [unc]
+                bne PutD._ENTRY1   ; [unc]
 
                 .endproc
 
@@ -450,9 +452,9 @@ libioPutDE      .proc
 ; CIO is not called if str(0)=0
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
-libioXIO        .proc
+XIO             .proc
                 jsr ioXioStr
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -462,7 +464,7 @@ libioXIO        .proc
 ;--------------------------------------
 ; outputs byte num to default IOCB
 ;======================================
-libioPrintB     .proc
+PrintB          .proc
                 ldx #$00
 
                 .endproc
@@ -475,9 +477,9 @@ libioPrintB     .proc
 ;--------------------------------------
 ; outputs cardinal num to default IOCB
 ;======================================
-libioPrintC     .proc
+PrintC          .proc
                 jsr ioPrintCard
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -487,7 +489,7 @@ libioPrintC     .proc
 ;--------------------------------------
 ; same as PrintB except EOL appended
 ;======================================
-libioPrintBE    .proc
+PrintBE         .proc
                 ldx #$00
 
                 .endproc
@@ -500,9 +502,9 @@ libioPrintBE    .proc
 ;--------------------------------------
 ; same as PrintC except EOL appended
 ;======================================
-libioPrintCE    .proc
-                jsr libioPrintC
-                jmp libioPutE
+PrintCE         .proc
+                jsr PrintC
+                jmp PutE
 
                 .endproc
 
@@ -512,7 +514,7 @@ libioPrintCE    .proc
 ;--------------------------------------
 ; output byte num to IOCB dev
 ;======================================
-libioPrintBD    .proc
+PrintBD         .proc
                 ldy #$00
 
                 .endproc
@@ -525,7 +527,7 @@ libioPrintBD    .proc
 ;--------------------------------------
 ; output cardinal num to IOCB dev
 ;======================================
-libioPrintCD    .proc
+PrintCD         .proc
                 sta arg0
 
                 txa
@@ -536,7 +538,7 @@ libioPrintCD    .proc
 
                 lda arg0
                 jsr ioPrintCard.pnum+2
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
 
@@ -546,7 +548,7 @@ libioPrintCD    .proc
 ;--------------------------------------
 ; output num to IOCB dev with EOL
 ;======================================
-libioPrintBDE   .proc
+PrintBDE        .proc
                 ldy #$00
 
                 .endproc
@@ -559,11 +561,11 @@ libioPrintBDE   .proc
 ;--------------------------------------
 ; output num to IOCB dev with EOL
 ;======================================
-libioPrintCDE   .proc
-                jsr libioPrintCD
+PrintCDE        .proc
+                jsr PrintCD
 
                 lda arg0
-                jmp libioPutDE
+                jmp PutDE
 
                 .endproc
 
@@ -573,7 +575,7 @@ libioPrintCDE   .proc
 ;--------------------------------------
 ; outputs integer num to default IOCB
 ;======================================
-libioPrintI     .proc
+PrintI          .proc
                 stx arg2
 
                 tax
@@ -590,9 +592,9 @@ libioPrintI     .proc
 ;--------------------------------------
 ; outputs integer num to IOCB dev
 ;======================================
-libioPrintID    .proc
+PrintID         .proc
                 cpy #$00
-                bpl libioPrintCD
+                bpl PrintCD
 
                 pha
 
@@ -600,7 +602,7 @@ libioPrintID    .proc
                 sty arg2
 
                 ldy #'-'
-                jsr libioPutD._ENTRY1
+                jsr PutD._ENTRY1
 
                 sec
                 lda #$00
@@ -613,7 +615,7 @@ libioPrintID    .proc
                 tay
                 pla
 
-                jmp libioPrintCD
+                jmp PrintCD
 
                 .endproc
 
@@ -623,9 +625,9 @@ libioPrintID    .proc
 ;--------------------------------------
 ; same as PrintI with EOL
 ;======================================
-libioPrintIE    .proc
-                jsr libioPrintI
-                jmp libioPutE
+PrintIE         .proc
+                jsr PrintI
+                jmp PutE
 
                 .endproc
 
@@ -635,11 +637,11 @@ libioPrintIE    .proc
 ;--------------------------------------
 ; same as PrintID with EOL
 ;======================================
-libioPrintIDE   .proc
-                jsr libioPrintID
+PrintIDE        .proc
+                jsr PrintID
 
                 lda arg0
-                jmp libioPutDE
+                jmp PutDE
 
                 .endproc
 
@@ -649,7 +651,7 @@ libioPrintIDE   .proc
 ;--------------------------------------
 ; convert number to string
 ;======================================
-libioStrB       .proc
+StrB            .proc
                 stx arg2
                 sty arg3
 
@@ -666,7 +668,7 @@ libioStrB       .proc
 ;--------------------------------------
 ; convert number to string
 ;======================================
-libioStrC       .proc
+StrC            .proc
                 sty arg2
 
                 jsr ioCardToStr
@@ -687,9 +689,9 @@ _next1          lda numbuf,Y
 ;--------------------------------------
 ; convert number to string
 ;======================================
-libioStrI       .proc
+StrI            .proc
                 cpx #$00
-                bpl libioStrC
+                bpl StrC
 
                 sta arg0
                 stx arg1
@@ -737,9 +739,9 @@ _next1          lda numbuf-1,Y
 ; input number from default IOCB
 ; number must be terminated with EOL
 ;======================================
-libioInputB
-libioInputC
-libioInputI     lda device
+InputB
+InputC
+InputI          lda device
 
                 ;[fall-through]
 
@@ -751,14 +753,14 @@ libioInputI     lda device
 ;--------------------------------------
 ; same as InputI, but from IOCB dev
 ;======================================
-libioInputBD
-libioInputCD
-libioInputID    ldx #$13
+InputBD
+InputCD
+InputID         ldx #$13
                 stx numbuf
 
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr libioInputD
+                jsr InputD
 
                 lda #<numbuf
                 ldx #>numbuf
@@ -773,9 +775,9 @@ libioInputID    ldx #$13
 ;--------------------------------------
 ; returns numeric value of s
 ;======================================
-libioValB
-libioValI
-libioValC       sta arg4
+ValB
+ValI
+ValC            sta arg4
                 stx arg5
 
                 ldy #$00
@@ -875,7 +877,7 @@ _XIT            rts
 ; example:  Note(1, @sect, @pos)
 ; see Hardware manual
 ;======================================
-libioNote       .proc
+Note            .proc
                 stx arg1
                 sty arg2
 
@@ -889,7 +891,7 @@ libioNote       .proc
                 sta IOCB0+ICCOM,X
 
                 jsr CIOV
-                jsr libioChkErr
+                jsr ChkErr
 
                 ldy #$00
                 lda IOCB0+ICAX5,X       ; offset
@@ -913,7 +915,7 @@ libioNote       .proc
 ; must be open for update (mode=12)
 ; see Hardware manual
 ;======================================
-libioPoint      .proc
+Point           .proc
                 stx arg1
 
                 asl
@@ -934,6 +936,8 @@ libioPoint      .proc
                 sta IOCB0+ICCOM,X
 
                 jsr CIOV
-                jmp libioChkErr
+                jmp ChkErr
 
                 .endproc
+
+                .endnamespace
