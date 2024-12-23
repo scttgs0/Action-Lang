@@ -17,7 +17,7 @@ ioOpen          .proc
                 stx arg5
                 sty arg6
 
-                ldy #$03
+                ldy #$03                ; OPEN
                 bne ioXioStr            ; [unc]
 
                 .endproc
@@ -33,11 +33,11 @@ ioPrint         .proc
                 ldx #$00
                 stx arg3
 
-                ldy #$09
+                ldy #$09                ; PUTSTR
                 jsr ioXioStr
                 bne _XIT
 
-                lda #$0B
+                lda #$0B                ; PUTCHR
                 sta IOCB0+ICCOM,X
 
                 lda #EOL

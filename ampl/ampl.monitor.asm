@@ -324,7 +324,7 @@ _1              dec arg14
 
 ;   write the QCODE
                 ldx #$10
-                lda #$0B                ; output command
+                lda #$0B                ; PUTCHR
                 sta IOCB0+ICCOM,X
 
                 lda codebase
