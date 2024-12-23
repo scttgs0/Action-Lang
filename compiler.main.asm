@@ -229,7 +229,6 @@ _next2          jsr MakeEntry
 ;
 ;======================================
 Declare         jsr jt_dclend
-
                 cmp #tokCHAR
                 bcs _1
 
@@ -442,7 +441,6 @@ _next5          jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
                 beq _next1
-
                 jmp Declare
 
 _2              jsr Params
@@ -549,7 +547,6 @@ _3              lda #$00
 
                 jsr mscGetCodeOffset
                 jsr StoreProps
-
                 jmp compiler.lexicon.GetNext
 
                 .endproc
@@ -731,7 +728,6 @@ _2              jsr compiler.lexicon.GetNext
                 bra _next1
 
 _3              jsr compiler.lexicon.GetNext
-
                 jmp RecRet.nxtstmt
 
 _next2          ldx nxttoken
@@ -781,7 +777,6 @@ _7              ldx #<tblStmtList
 Call            .proc
                 jsr ampl.pf.ProcFunc
                 jsr PopST
-
                 jmp RecRet.nxtstmt
 
                 .endproc
@@ -1085,7 +1080,6 @@ StmtEXIT        .proc
                 pla
                 tay
                 jsr PushJMP
-
                 jmp RecRet.nxtstmt
 
                 .endproc
@@ -1367,7 +1361,6 @@ ExpressionFOR   .proc
                 sta arg0
 
                 jsr _1
-
                 jmp PopST
 
 
@@ -1464,7 +1457,6 @@ _5              ldy #$04
                 ldy #$05
                 lda #$01
 _6              jsr ampl.cgu.LoadCd
-
                 jmp _next1
 
                 .endproc
@@ -1569,7 +1561,6 @@ StmtRETURN      .proc
 
 _1              lda #$60
                 jsr ampl.cgu.Push1
-
                 jmp RecRet.nxtstmt
 
 _err            ldy #retrnERR
@@ -1816,7 +1807,6 @@ _err            ldy #nestERR
 ;======================================
 SetRel          .proc
                 jsr ampl.cgu.LoadI
-
                 jmp LoadN._ENTRY1
 
                 .endproc
@@ -1941,7 +1931,6 @@ Expression      .proc
                 sta zpAllocOP
 
 _ENTRY1         jsr jt_expend
-
                 cmp #tokSColon
                 bcc _7
 
@@ -1952,7 +1941,6 @@ _ENTRY1         jsr jt_expend
                 bne _err
 
                 jsr RollOps
-
                 cmp #tokLParen
                 beq _next4
 
@@ -1965,7 +1953,6 @@ _1              cmp #tokLParen
 
                 ldx zpAllocOP
                 bne _9
-
 _err            jmp ErrorExpression
 
 _2              ldx zpAllocOP
@@ -2344,7 +2331,6 @@ _1              jsr ETypeP              ; set type
 ETypeA          .proc
                 cpx #tokPeriod
                 beq _1
-
                 jmp ampl.array.Ref.arrvar
 
 _1              jsr ETypeP              ; set type
@@ -2501,7 +2487,6 @@ PushOp          .proc
 ;======================================
 PushNext        .proc
                 jsr PushST
-
                 jmp compiler.lexicon.GetNext
 
                 .endproc
@@ -2756,7 +2741,6 @@ _3              jsr ampl.cgu.Load2L
 _ENTRY4         lda #$81                ; STA
 _4              jsr ampl.cgu.Op1L
 _ENTRY5         jsr PopST
-
                 jmp PopST
 
 _5              and #$10                ; rhs array?
@@ -3025,7 +3009,6 @@ _next1          lda arg3                ; shift Op
                 bne _next1
 
                 jsr ampl.cgu.STempL
-
                 jmp CGAdd._ENTRY3
 
                 .endproc
@@ -3107,7 +3090,6 @@ _2              ldx arg8
 
                 lda #$8A                ; TXA
                 jsr ampl.cgu.Push1
-
                 jsr ampl.cgu.STempH
 
 _XIT            jmp CGAdd._ENTRY3
@@ -3222,7 +3204,6 @@ _ENTRY1         ldy #$02
                 ldy #$0C
                 jsr ampl.cgu.SaveCd
                 jsr ampl.cgu.TrashY     ; just in case array in cond.
-
                 jmp PopST               ; done at last, whew!
 
                 .endproc
@@ -3301,7 +3282,6 @@ _ENTRY1         jsr ampl.cgu.OpCd1
 
                 ldy #$0C
                 jsr ampl.cgu.SaveCd
-
                 jmp CGAdd._ENTRY3
 
                 .endproc

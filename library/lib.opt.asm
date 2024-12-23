@@ -8,10 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+opt             .namespace
+
 ;======================================
 ; SetOpts()
 ;======================================
-liboptSet       .proc
+Set             .proc
 ;   Display On?
                 ldx #domsg-optmsg
                 ldy jt_tvdisp
@@ -162,7 +164,7 @@ _15             ldy #'N'
 _16             sty tempbuf+1
 
                 ldy #$01
-                jsr liboptGetTmpBuf
+                jsr GetTmpBuf
 
                 lda tempbuf+1
                 ldy tempbuf
@@ -188,11 +190,11 @@ _18             ldx #$00
 
                 ldy #<tempbuf
 
-                jmp libioStrC
+                jmp lib.io.StrC
 
 ; get number
 _19             ldy tempbuf
-                jsr liboptGetTmpBuf
+                jsr GetTmpBuf
 
                 ldy tempbuf
                 bne _20
@@ -203,7 +205,7 @@ _19             ldy tempbuf
 
 _20             lda #<tempbuf
                 ldx #>tempbuf
-                jsr libioValB
+                jsr lib.io.ValB
 
                 lda args
 
@@ -214,18 +216,19 @@ _20             lda #<tempbuf
 ;--------------------------------------
 ;--------------------------------------
 
-domsg           .ptext "Display? "
+domsg           .text $09,"Display?"
 
 optmsg          = domsg-20              ; see GetTemp
 
-amsg            .ptext "Bell? "
-cmsg            .ptext "Case sensitive? "
-tmsg            .ptext "Trace? "
-lstmsg          .ptext "List? "
-wmsg            .ptext "Window 1 size: "
-lmsg            .ptext "Line size: "
-lmmsg           .ptext "Left margin: "
-emsg            .ptext "EOL char: "
+;   note, these are not 'ptext', because the length is off by one
+amsg            .text $06,"Bell?"
+cmsg            .text $10,"Case sensitive?"
+tmsg            .text $07,"Trace?"
+lstmsg          .text $06,"List?"
+wmsg            .text $0F,"Window 1 size:"
+lmsg            .text $0B,"Line size:"
+lmmsg           .text $0D,"Left margin:"
+emsg            .text $0A,"EOL char:"
 
 stoa_           .byte $20,$40,$00,$60
 
@@ -233,7 +236,7 @@ stoa_           .byte $20,$40,$00,$60
 ;======================================
 ; GetTmpBuf()
 ;======================================
-liboptGetTmpBuf .proc
+GetTmpBuf       .proc
                 sty arg2
 
 ;   copy string to tempBuf+10
@@ -257,3 +260,5 @@ _next1          lda optmsg+20,X
                 jmp bankMGetT1
 
                 .endproc
+
+                .endnamespace

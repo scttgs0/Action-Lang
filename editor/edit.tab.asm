@@ -25,6 +25,7 @@ _next1          lda TABMAP,X            ; ignore if no tabstops within this byte
 
 ;   found, calculate line offset
                 sty arg0
+
                 txa
                 asl                     ; *8
                 asl

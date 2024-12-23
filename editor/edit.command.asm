@@ -214,13 +214,13 @@ _rmsg           .ptext "REPLACE"
 
 
 ;======================================
-; Intialize Scrolling
+; Initialize Scrolling
 ;======================================
 ScrollInit      .proc
                 sty arg13
 
                 jsr editor.display.CleanLine
-                beq _XIT
+                beq _1
 
                 ldy arg13
                 jsr mscNext
@@ -236,7 +236,6 @@ ScrollInit      .proc
                 sta choff
 
                 jsr ioDisplayBuffer
-
                 jmp ioLoadBuffer
 
 _1              pla
@@ -255,7 +254,6 @@ ScrollUp        .proc
 
                 dec lnum
                 bmi _1
-
                 jmp screenCursorUp
 
 _1              inc lnum
@@ -268,7 +266,6 @@ _1              inc lnum
                 lda nlines
                 jsr MoveDown
                 jsr ioResetColumn
-
                 jmp editor.chr.RefreshBuf
 
                 .endproc
@@ -291,7 +288,6 @@ ScrollDown      .proc
                 jmp screenCursorDown
 
 _1              jsr BottomLine
-
                 stx y__
 
                 lda nlines
@@ -300,7 +296,6 @@ _1              jsr BottomLine
 
                 jsr ioResetColumn
                 jsr ioDisplayBuffer
-
                 jmp ioResetColumn
 
                 .endproc
@@ -438,8 +433,8 @@ MoveUp          .proc
 MoveContent     .proc
                 sty arg6                ; save registers
                 sta arg4
-
                 stx ROWCRS
+
                 jsr ioRestoreCursorChar
                 jsr ioGetDisplayAddr    ; get display address
 

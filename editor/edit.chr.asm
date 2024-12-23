@@ -19,7 +19,7 @@ InsertChar      .proc
                 ldy #$00
                 lda (buf),Y
                 cmp jt_linemax
-                bcc _1                 ; test line too long
+                bcc _1                  ; test line too long
 
                 jsr screenBell
 
@@ -49,7 +49,6 @@ _next2          ldy sp
                 sta isDirty
 
                 jsr ioDisplayBuffer
-
                 jmp editor.command.ScrollRight
 
 _2              ldx insert
@@ -96,9 +95,9 @@ InsertSpace     .proc
 
 
 ;======================================
-; Insert()
+; Insert_2()
 ;======================================
-Insert          .proc
+Insert_2        .proc
                 jsr editor.display.CleanLine
                 jsr mscNextUp
 
@@ -162,7 +161,7 @@ _1              ldy sp
 
                 ldy #$00
                 lda arg0
-                jsr Insert._ENTRY2
+                jsr Insert_2._ENTRY2
                 jsr mscNextUp
                 jsr editor.display.Refresh
 
@@ -181,7 +180,7 @@ Return          .proc
                 jsr CheckDown
                 bne _ENTRY1
 
-                jsr Insert._ENTRY1
+                jsr Insert_2._ENTRY1
                 jsr mscNextUp
                 jsr ioLoadBuffer
 
@@ -298,7 +297,6 @@ DeleteNext      .proc
 ;======================================
 Undo            .proc
                 jsr ioLoadBuffer
-
                 jmp editor.command.Front
 
                 .endproc
@@ -376,7 +374,6 @@ _ENTRY1         jsr editor.command.ScrollLeft
 
                 lda insert
                 bne DeleteChar
-
                 jmp RefreshBuf
 
                 .endproc
@@ -433,7 +430,6 @@ _next1          iny
                 bne _next1
 
 _next2          jsr editor.memory.DeleteCurrentLine
-
                 jmp editor.display.Refresh
 
                 .endproc

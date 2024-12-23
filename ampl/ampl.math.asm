@@ -45,6 +45,7 @@ MultI           .proc
 
                 dex
                 stx params._t2
+
                 ldx #$08
 _mc3            asl                     ; b*d, 16-bit result
                 rol params._rh
@@ -80,6 +81,7 @@ _setsign        ldy params._sign
 
 _ss1            sta params._rl
                 stx params._rh
+
                 sec
                 lda #$00
                 sbc params._rl
@@ -105,6 +107,7 @@ MulB            .proc
                 beq _mb3
 
                 stx params._t1
+
                 lda #$00
                 ldx #$08
 _mb1            asl
@@ -137,17 +140,20 @@ SMOps           .proc
 
 _smo1           sta params._b
                 stx params._a
+
                 lda params._c
                 bpl _smo2
 
                 tax
                 eor params._sign
                 sta params._sign
+
                 lda params._d
                 jsr MultI._ss1
 
                 sta params._d
                 stx params._c
+
 _smo2           lda #$00
                 sta params._rh
 
@@ -169,9 +175,11 @@ _dlarge         ldx #$08
 _dl1            rol params._b
                 rol params._a
                 rol params._rh
+
                 sec
                 lda params._a
                 sbc params._d
+
                 tay
                 lda params._rh
                 sbc params._c
@@ -179,6 +187,7 @@ _dl1            rol params._b
 
                 sta params._rh
                 sty params._a
+
 _dl2            dex
                 bne _dl1
 
@@ -201,12 +210,14 @@ _ds1            rol params._b
 
 _ds1a           sbc params._d
                 sec                     ; for carry out in ROL A above
+
 _ds2            dex
                 bne _ds1
 
                 rol params._b
                 rol params._a
                 sta params._rl
+
                 lda params._b
                 ldx params._a
 
@@ -238,6 +249,7 @@ RShift          .proc
                 stx params._c
 _rsh1           lsr params._c
                 ror a
+
                 dey
                 bne _rsh1
 
@@ -254,28 +266,38 @@ SArgs           .proc                   ; saves args for call
                 sta arg0
                 stx arg1
                 sty arg2
+
                 clc
                 pla
                 sta zpAllocCurrent
+
                 adc #$03                ; jump over data
                 tay
+
                 pla
                 sta zpAllocCurrent+1
+
                 adc #$00
                 pha
+
                 tya
                 pha
+
                 ldy #$01
                 lda (zpAllocCurrent),Y  ; local address
                 sta zpAllocLast
+
                 iny
                 lda (zpAllocCurrent),Y
                 sta zpAllocLast+1
+
                 iny
                 lda (zpAllocCurrent),Y  ; # of bytes
                 tay
+
 _sa1            lda args,Y
                 sta (zpAllocLast),Y
+
                 dey
                 bpl _sa1
 
@@ -284,33 +306,46 @@ _sa1            lda args,Y
                 bne _sa2
 
                 inc BRKKEY
-                jmp libmscBreak
+                jmp lib.msc.Break
 
 _sa2            rts
                 .endproc
 
                 ;.endproc
 
-;
+;--------------------------------------
 ; IToReal(int) -> FR0
-;IToReal stx _sign
-;        jsr _SetSign
-;        sta FR0
-;        stx FR0+1
-;        jsr IFP
-;:FSign  lda _sign
-;        bpl _Rem1
-;        jsr FMOVE
-;        jsr ZFR0
-;        jmp FSUB
+;--------------------------------------
+;IToReal        stx _sign
 
+;               jsr _SetSign
+
+;               sta FR0
+;               stx FR0+1
+
+;               jsr IFP
+
+;:FSign         lda _sign
+;               bpl _Rem1
+
+;               jsr FMOVE
+;               jsr ZFR0
+
+;               jmp FSUB
+
+
+;--------------------------------------
 ; RToInt() real in FR0
-;RToInt lda FR0
-;       sta _sign
-;       jsr _FSign
-;       jsr FPI
-;       lda FR0
-;       lda FR0+1
-;       jmp _SetSign
+;--------------------------------------
+;RToInt         lda FR0
+;               sta _sign
+
+;               jsr _FSign
+;               jsr FPI
+
+;               lda FR0
+;               lda FR0+1
+
+;               jmp _SetSign
 
                 .endnamespace

@@ -8,6 +8,8 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+msc             .namespace
+
 ;======================================
 ; BYTE FUNC Rand(BYTE range)
 ;--------------------------------------
@@ -15,7 +17,7 @@
 ; range-1.  If range=0, then a random
 ; number between 0 and 255 is returned
 ;======================================
-libmscRand      .proc
+Rand            .proc
                 .frsRandomByteX
                 cmp #$00
                 beq _1
@@ -39,7 +41,7 @@ _1              stx args
 ; set voice to specified pitch, distortion,
 ; and volume.  Assumes volume low  16.
 ;======================================
-libmscSound     .proc
+Sound           .proc
                 asl
                 sty arg2
 
@@ -70,7 +72,7 @@ _1              txa
 ;--------------------------------------
 ; reset sound channels
 ;======================================
-libmscSndRst    .proc
+SndRst          .proc
                 ;!!lda SSKCTL
                 and #$EF                ; turn off two tone bit
                 ;!!sta SSKCTL
@@ -94,7 +96,7 @@ _next1          ;!!sta AUDF1,X          ; zero sound regs
 ; Assumes port low 8.
 ; see LIB.ST
 ;======================================
-; libmscPaddle   tax
+; Paddle         tax
 ;                lda POT0,X
 ;                sta args
 ;                rts
@@ -106,7 +108,7 @@ _next1          ;!!sta AUDF1,X          ; zero sound regs
 ; returns zero if trigger of paddle
 ; port is depressed.  Assumes port<8
 ;======================================
-libmscPTrig     .proc
+PTrig           .proc
                 ldx #$00
                 cmp #$04
                 bmi _1
@@ -134,7 +136,7 @@ _data1          .byte $04,$08,$40,$80
 ; returns current value of joystick
 ; controller port.  Assumes port<4
 ;======================================
-libmscStick     .proc
+Stick           .proc
                 ldx #$00
                 cmp #$02
                 bmi _1
@@ -168,7 +170,7 @@ _2              and #$0F
 ;
 ; see LIB.ST
 ;======================================
-;libmscSTrig     tax
+;STrig           tax
 ;                ;!!lda TRIG0,X
 ;                sta args
 ;                rts
@@ -179,7 +181,7 @@ _2              and #$0F
 ;--------------------------------------
 ; returns value stored at address
 ;======================================
-libmscPeek
+Peek
                 ;[fall-through]
 
 
@@ -188,7 +190,7 @@ libmscPeek
 ;--------------------------------------
 ; returns value stored at address
 ;======================================
-libmscPeekC     .proc
+PeekC           .proc
                 sta arg2
                 stx arg3
 
@@ -210,7 +212,7 @@ libmscPeekC     .proc
 ; store byte or char value at address
 ; (single byte store)
 ;======================================
-libmscPoke      .proc
+Poke            .proc
                 sta arg0
                 stx arg1
 
@@ -228,8 +230,8 @@ libmscPoke      .proc
 ; store cardinal or integer value at
 ; address (2 byte store)
 ;======================================
-libmscPokeC     .proc
-                jsr libmscPoke
+PokeC           .proc
+                jsr Poke
 
                 iny
                 lda arg3
@@ -247,7 +249,7 @@ libmscPokeC     .proc
 ; to zero.  Note this modifies size
 ; bytes of memory.
 ;======================================
-libmscZero      .proc
+Zero            .proc
                 pha
 
                 lda #$00
@@ -267,7 +269,7 @@ libmscZero      .proc
 ; to value.  Note this modifies size
 ; bytes of memory.
 ;======================================
-libmscSetBlock  .proc
+SetBlock        .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -305,7 +307,7 @@ _1              cpy arg2
 ; If dest>src and dest<=src+size-1 then
 ; transfer will not work properly!
 ;======================================
-libmscMoveBlock .proc
+MoveBlock       .proc
                 sta arg0
                 stx arg1
                 sty arg2
@@ -343,7 +345,7 @@ _1              cpy arg4
 ; returns to Monitor after saving
 ; stack pointer in procSP
 ;======================================
-libmscBreak     .proc
+Break           .proc
                 tsx
                 stx procSP
 
@@ -358,7 +360,7 @@ libmscBreak     .proc
 ;======================================
 ; Call Trace handler
 ;======================================
-libmscCTrace    .proc
+CTrace          .proc
 ;   name passed following JSR
                 clc
                 pla
@@ -373,10 +375,10 @@ libmscCTrace    .proc
 ;   ok, let's print the name
                 lda arg10
                 ldx arg11
-                jsr libioPrint
+                jsr lib.io.Print
 
                 lda #'('
-                jsr libioPut
+                jsr lib.io.Put
 
 ;   now get addr of args
                 sec
@@ -423,20 +425,20 @@ _next1          inc arg14
 
 ;   integer
                 lda (arg12),Y
-                jsr libioPrintI
+                jsr lib.io.PrintI
                 jmp _4
 
 _2              ldx #$00
                 ldy arg15
 _3              lda (arg12),Y
-                jsr libioPrintC
+                jsr lib.io.PrintC
 
 _4              inc arg15
                 dec arg9
                 beq _5                  ; all done
 
                 lda #','
-                jsr libioPut
+                jsr lib.io.Put
                 jmp _next1
 
 ;   setup return
@@ -453,7 +455,9 @@ _5              clc
                 pha
 
                 lda #')'
-                jsr libioPut
-                jmp libioPutE
+                jsr lib.io.Put
+                jmp lib.io.PutE
 
                 .endproc
+
+                .endnamespace

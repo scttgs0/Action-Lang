@@ -61,7 +61,7 @@ serial          .word $0A00             ; serial number of ROM
 
                 jmp compiler.lexicon.GetNext._ENTRY5  ; STM catch all
 
-                rts                     ; illegal Monitor cmd
+                rts                     ; illegal monitor cmd
 
                 .byte $86
                 .byte $9D
@@ -105,12 +105,12 @@ _next2          lda emjmps-1,Y          ; init RAM
                 sta jt_jmps,Y
                 bne _next2
 
-                lda #<ampl.symbol.STMres
-                sta jt_stmradr
-                lda #>ampl.symbol.STMres
-                sta jt_stmradr+1
-                lda #`ampl.symbol.STMres
-                sta jt_stmradr+2
+                ;-- lda #<ampl.symbol.STMres
+                ;-- sta jt_stmradr
+                ;-- lda #>ampl.symbol.STMres
+                ;-- sta jt_stmradr+1
+                ;-- lda #`ampl.symbol.STMres
+                ;-- sta jt_stmradr+2
 
                 ; sty chrConvert1       ; Y=0
 
@@ -119,7 +119,7 @@ _next2          lda emjmps-1,Y          ; init RAM
 ;SPLInit PROC ; init compiler RAM
 
             .if ZAPRAM
-                jsr zap4
+                jsr editor.main.zap4
             .else
                 nop
                 nop

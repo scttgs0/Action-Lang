@@ -24,7 +24,6 @@ CommandMsg      .proc
                 lda arg0
                 ldy #$80
                 jsr ioPutStr
-
                 jmp ioResetColumn
 
                 .endproc
@@ -225,7 +224,6 @@ _next2          jsr ioPutStr
 _1              inc ROWCRS
 
                 jsr mscNextDown
-
                 sta arg9
 
                 dec arg10
@@ -233,7 +231,6 @@ _1              inc ROWCRS
 
 _2              jsr ioResetCursor
                 jsr ioResetColumn
-
                 jmp editor.chr.RefreshBuf
 
 _3              lda #<editor.cartridge.zero

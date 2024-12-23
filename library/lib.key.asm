@@ -8,18 +8,20 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+key             .namespace
+
 ;======================================
 ; get next key in buffer
 ;======================================
-libkeyGet       .proc
-                clc                     ; blink cursor
+Get             .proc
+_next1          clc                     ; blink cursor
                 lda JIFFYCLOCK
                 adc #$0E
 
                 tax
 _waitForKey     lda KEYCHAR             ; key down?
                 eor #$FF                ; flip the bits
-                bne _faster
+                bne _1
 
                 cpx JIFFYCLOCK
                 bpl _waitForKey
@@ -29,7 +31,7 @@ _waitForKey     lda KEYCHAR             ; key down?
                 eor #$80
                 sta (OLDADR),Y
 
-                jmp libkeyGet
+                jmp _next1
 
 _1              ldy #$00
                 lda OLDCHR
@@ -50,7 +52,7 @@ _2              lda KEYCHAR             ; last key pressed
                 cmp #$C0                ; Ctrl-Shft?
                 bcc _3                  ;   no
 
-                jsr libkeyClick
+                jsr Click
                 bra _4
 
 _3              and #$3F
@@ -84,8 +86,8 @@ _7              lda KEYCHAR             ; last key pressed
                 and #$C0                ; isolate control (128) and uppercase (64)
                 ;!!sta SHFLOK
 
-_next3          jsr libkeyClick
-                bmi libkeyGet
+_next3          jsr Click
+                bmi _next1
 
 _8              ;!!lda INVFLG
                 eor #$80
@@ -101,7 +103,7 @@ _8              ;!!lda INVFLG
 ;--------------------------------------
 ; click the keyboard
 ;======================================
-libkeyClick     .proc
+Click           .proc
                 ldx #$7F
 _next1          stx CONSOL
                 ;!!stx WSYNC
@@ -113,3 +115,5 @@ _next1          stx CONSOL
 
                 rts
                 .endproc
+
+                .endnamespace

@@ -170,11 +170,9 @@ _next1          jsr ioLoadBuffer
 _ENTRY1         lda #$01
                 jsr ioClose
                 jsr ioResetCursor
-
                 jmp ioDisplayOn
 
 _1              jsr ioSystemError
-
                 jmp _ENTRY1
 
 ;--------------------------------------

@@ -25,7 +25,6 @@ LoadY           .proc
 
                 lda #$88                ; DEY
 _next1          jsr Insrt1
-
                 jmp _3
 
 _1              cmp #$00
@@ -99,7 +98,7 @@ _3              lda (stack),Y
                 pla
                 pla
                 tay
-                bra Op1L.ophigh._opv
+                bne Op1L.ophigh._opv
 
 _optype         and #$20
                 beq Op1L.ophigh._operr   ; con. exp.
@@ -181,7 +180,7 @@ _6              bit modeConst
 
                 ; lda arg7
                 ; and #$F7
-                ; sta arg7 ; flag Y reg used
+                ; sta arg7              ; flag Y reg used
 
                 lda #$00
                 sta arg12

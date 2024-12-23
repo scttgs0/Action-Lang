@@ -109,15 +109,15 @@ Window2         .proc
 ; Initialize the Editor
 ;======================================
 EditorInit      .proc
-                lda #<$7FFF
-                sta MEMTOP
-                lda #>$7FFF
-                sta MEMTOP+1
+                ;-- lda #<$7FFF
+                ;-- sta MEMTOP
+                ;-- lda #>$7FFF
+                ;-- sta MEMTOP+1
 
-                lda #<$0600
-                sta MEMLO
-                lda #>$0600
-                sta MEMLO+1
+                ;-- lda #<$0600
+                ;-- sta MEMLO
+                ;-- lda #>$0600
+                ;-- sta MEMLO+1
 
                 jsr Memory
 
@@ -160,7 +160,7 @@ _ENTRY3         lda #<editCmdMsg
 
 ;--------------------------------------
 
-editCmdMsg      .ptext "ACTION! (c) 2023 GPL3"
+editCmdMsg      .ptext "ACTION! (c)2024 GPL3"
                 .endproc
 
                 .endnamespace

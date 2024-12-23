@@ -203,8 +203,8 @@ _8              lda trace               ; check for trace
                 beq _9                  ; no trace
 
                 lda #$20                ; JSR CTrace
-                ldx #<libmscCTrace
-                ldy #>libmscCTrace
+                ldx #<lib.msc.CTrace
+                ldy #>lib.msc.CTrace
 
                 jsr ampl.cgu.Push3
 
@@ -246,7 +246,6 @@ _next5          lda (zpAllocProps),Y
                 jsr mscCodeIncr
 
 _9              jsr compiler.StmtList
-
                 jmp Segment
 
                 .endproc

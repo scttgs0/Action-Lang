@@ -61,16 +61,15 @@ GeneralErr      .proc
 ;
 ;--------------------------------------
 Punt            jsr editor.display.SaveWindow   ; we're in big trouble
-
                 jmp ampl.monitor.ResetWindow
 
                 .endproc
 
 
 ;======================================
-; Free(addr)
+; FreeMem(addr) - unused
 ;======================================
-Free            ;.proc
+FreeMem         ;.proc
                 sec
                 sbc #$04
                 bcs _XIT

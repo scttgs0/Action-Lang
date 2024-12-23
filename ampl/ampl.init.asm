@@ -81,6 +81,7 @@ _2              sta codebase
                 sta stmax
 
                 dec stmax
+
                 clc
                 sbc SymTblSizePages
                 sta stbase

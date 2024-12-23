@@ -13,23 +13,26 @@
 ;======================================
 screenInit      .proc
 ;   80x60 text mode
-                .frsGraphics mcTextOn,mcVideoMode240
-                stz DINDEX              ; text mode
+                ;!!.frsGraphics mcTextOn,mcVideoMode240
+                ;?? stz DINDEX              ; text mode
 
-                ; lda #$00
-                ; jsr ioClose           ; close #$00, sets X to 0
+                lda #$00
+                jsr ioClose             ; close #$00, sets X to 0
 
-                ; lda #$0C
-                ; sta arg3
-                ; lda #$00
-                ; ldx #<_data
-                ; ldy #>_data
-                ; jmp ioOpen
+                lda #$0C
+                sta arg3
+
+                lda #$00
+                ldx #<_data
+                ldy #>_data
+
+                jmp ioOpen
 
 ;--------------------------------------
 
-; _data         .ptext "E:"
-;               .byte $9B
+_data           .ptext "E:"
+                .byte $9B
+
                 .endproc
 
 
@@ -77,6 +80,7 @@ _ENTRY2         sta IOCB0+ICCOM,X
 
                 tya
                 jmp CIOV
+
                 .endproc
 
 

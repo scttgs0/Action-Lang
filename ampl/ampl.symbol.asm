@@ -4,7 +4,7 @@
 ; SPDX-PackageCopyrightText: Copyright 1983 by Clinton W Parker
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
-; SPDX-FileName: asm
+; SPDX-FileName: ampl.symbol.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
@@ -131,7 +131,7 @@ _next1          iny
                 adc arg15
                 sta arg15
 
-                jsr LexNextChar
+                jsr compiler.lexicon.NextChar
 
                 ldy arg14
                 cmp #'_'
@@ -196,8 +196,8 @@ NewEntry        .proc
                 lda symtab
                 sta (arg4),Y
 
-                lda #<libst
-                ldx #>libst
+                lda #<lib.str.libst
+                ldx #>lib.str.libst
                 jsr STM                 ; lookup shadow name
 
                 lda #tokUNDEC

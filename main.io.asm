@@ -51,7 +51,7 @@ _XIT            rts
 ; ioClose(device)
 ;======================================
 ioClose         .proc
-                ldx #>$B000      ;; ml
+                ldx #>$B000  ;; ml
                 stx arg6                ; note: address must be non-zero to
                                         ; fake out zero check in XIOstr
             .if ZAPRAM
@@ -62,7 +62,7 @@ ioClose         .proc
             .endif
 
                 ldy #$0C
-                bne ioInput._ENTRY1       ; [unc]
+                bne ioInput._ENTRY1     ; [unc]
 
                 .endproc
 
@@ -123,6 +123,7 @@ _1              tay
                 sta IOCB0+ICBAH,X
 
                 jmp CIOV
+
                 .endproc
 
 
@@ -428,7 +429,6 @@ _1              lda Channel
 ioPrintBuffer   .proc
                 lda list
                 bne ioRealToCard._XIT   ; return
-
                 jmp ioWriteBuffer
 
                 .endproc
@@ -627,7 +627,7 @@ _next2          lda arg2
                 bne _5                  ; no EOL char if inverted
 
                 iny
-_next3          lda EOL
+_next3          lda $04E3 ;!! EOL
                 sta (arg0),Y
 
                 jmp _5
@@ -694,7 +694,6 @@ ioResetColumn   .proc
 
                 jsr ioZapCursor
 _ENTRY1         jsr screenCursorLeft
-
                 jmp screenCursorRight
 
                 .endproc

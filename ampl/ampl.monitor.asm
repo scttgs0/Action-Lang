@@ -231,7 +231,6 @@ Boot            .proc
                 ldx #>_bmsg
                 jsr editor.window.YesNo
                 bne MemRun._XIT
-
                 jmp editor.cartridge.START._cold
 
 ;--------------------------------------
@@ -341,7 +340,7 @@ _1              dec arg14
                 jsr CIOV
                 bmi WOut._mwerr
 
-;   save START address
+;   save start address
                 ldx #$04
 _next1          lda _mwinit,X
                 sta arg9,X

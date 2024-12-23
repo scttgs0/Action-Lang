@@ -65,7 +65,6 @@ SaveWorld       .proc
                 jsr ioSaveColumn
                 jsr ioRestoreCursorChar
                 jsr editor.command.SetSpacing
-
                 jmp editor.display.SaveWindow
 
 _XIT            rts
@@ -121,7 +120,6 @@ RestoreWorld    .proc
 
                 jsr editor.display.RestoreWindow
                 jsr ioLoadBuffer
-
                 jmp ioResetColumn
 
                 .endproc
@@ -156,11 +154,8 @@ Delete          .proc
 _1              sty currentWindow
 
                 jsr editor.display.RestoreWindow
-
                 jmp editor.init.EditorInit._ENTRY1
 
-
-;--------------------------------------
 ;--------------------------------------
 
 msgClear        .ptext "CLEAR? "
@@ -203,7 +198,6 @@ CommandString   .proc
 
                 jsr editor.io.GetString
                 jsr ioRestoreCursorChar
-
                 jmp ioResetColumn
 
                 .endproc

@@ -10,7 +10,6 @@
 
 lexicon        .namespace
 
-
 ;--------------------------------------
 ;    Compiler lexicon - get tokens
 ;--------------------------------------
@@ -348,7 +347,7 @@ _1              ldy top+1
                 jsr mscNextDown
                 bne _2
 
-            ;    lda #$00
+                ; lda #$00
                 sta top+1
 
 _2              lda list
@@ -418,7 +417,6 @@ _ENTRY1         lda #$00
                 lda #$04
                 jsr ioOpenChannel
                 jsr NextLine
-
                 jmp GetNext._ENTRY2
 
                 .endproc
@@ -570,21 +568,21 @@ tblLexChars     .byte tokXOR            ; !
                 .byte 126               ; ?
                 .byte tokAT             ; @
 
-;PrintTok lda token
-;         ldx #$00
-;         jsr PrintC
-;         jsr PutSp
-;         lda addr
-;         ldx addr+1
-;         jsr ampl.monitor.PrintHex
-;         jsr PutSp
-;         lda nxtToken
-;         ldx #$00
-;         jsr PrintC
-;         jsr PutSp
-;         lda nxtAddr
-;         ldx nxtAddr+1
-;         jsr ampl.monitor.PrintHex
-;         jmp ioPutEOL
+;PrintTok       lda token
+;               ldx #0
+;               jsr PrintC
+;               jsr PutSp
+;               lda addr
+;               ldx addr+1
+;               jsr PrintH
+;               jsr PutSp
+;               lda nxtToken
+;               ldx #0
+;               jsr PrintC
+;               jsr PutSp
+;               lda nxtAddr
+;               ldx nxtAddr+1
+;               jsr PrintH
+;               jmp PutEOL
 
                 .endnamespace

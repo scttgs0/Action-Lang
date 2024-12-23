@@ -9,7 +9,7 @@
 
 
                 .enc "atari-screen-inverse"
-                    .cdef " z", $A0
+                    .cdef " z",$A0
                 .enc "none"
 
 ;--------------------------------------
@@ -134,8 +134,13 @@ ampl        .namespace
                 .include "ampl/ampl.symbol.asm"
             .endnamespace
 
+lib         .namespace
                 .include "library/lib.key.asm"
+            .endnamespace
+
                 .include "spl.err.asm"
+
+            .namespace lib
                 .include "library/lib.io.asm"
                 .include "library/lib.gr.asm"
                 .include "library/lib.msc.asm"
@@ -143,6 +148,7 @@ ampl        .namespace
                 .include "library/lib.opt.asm"
 
 ampl_copyright  .null " ACTION! (c) 2024 GPL3           Foenix Adaptation           v4.0 Dec 04, 2024 "
+            .endnamespace
 
 
 ;--------------------------------------

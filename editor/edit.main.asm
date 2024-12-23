@@ -88,7 +88,7 @@ zap4            .byte $7e
                 .byte $1b
                 .addr editor.window.Clear
                 .byte $7d
-                .addr editor.chr.Insert
+                .addr editor.chr.Insert_2
                 .byte $9d
                 .addr editor.tab.Set
                 .byte $9f
