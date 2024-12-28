@@ -20,12 +20,12 @@ coreSPLErr      .proc
 ;   set pointer to error
                 ldx currentWindow
                 lda spln
-                sta w1+WSP,X
+                sta win1Base+WSP,X
 
                 lda curln
-                sta w1+WCUR,X
+                sta win1Base+WCUR,X
                 lda curln+1
-                sta w1+WCUR+1,X
+                sta win1Base+WCUR+1,X
 
 _1              jsr ioSystemError
                 jsr ioPutEOL

@@ -28,7 +28,7 @@ ChkErr          .proc
                 cpy #$80                ; break key
                 beq Break1
 
-                jmp jt_error
+                jmp jt_vecError
 
 _1              txa
                 lsr
@@ -358,7 +358,7 @@ InputD          .proc
 ; inputs character from IOCB dev
 ;======================================
 GetD            .proc
-                ldx #$07
+                ldx #$07                ; GET
 
 _ENTRY1         stx arg4
 
@@ -366,8 +366,8 @@ _ENTRY1         stx arg4
                 asl
                 asl
                 asl
-
                 tax
+
                 lda arg4
                 sta IOCB0+ICCOM,X
 
@@ -420,8 +420,7 @@ PutD            .proc
                 stx arg1
 
                 ldy arg1
-_ENTRY1         ldx #$0B
-
+_ENTRY1         ldx #$0B                ; PUTCHR
                 jmp GetD._ENTRY1
 
                 .endproc

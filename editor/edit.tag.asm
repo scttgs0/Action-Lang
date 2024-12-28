@@ -26,7 +26,7 @@ Set             .proc
                 bne _1                  ; tag already exists
 
 ;   get a new tag
-                lda #$08
+                lda #$08                ; allocate 8 bytes???
                 jsr Allocate
 
                 ldy #$01

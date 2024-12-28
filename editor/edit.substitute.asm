@@ -15,7 +15,7 @@ Substitute      .proc
                 jsr editor.command.SetSpacing
                 jsr editor.display.SaveWindow
 
-                lda lastch
+                lda lastCH
                 cmp #$7D
                 beq _2
 
@@ -54,7 +54,7 @@ _2              jsr editor.find.Find._ENTRY2
                 beq _XIT1
 
 _3              lda #$7D
-                sta curch
+                sta curCH
                 sta isDirty             ; flag line as dirty
 
                 sec

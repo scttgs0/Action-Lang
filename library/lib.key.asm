@@ -20,7 +20,7 @@ _next1          clc                     ; blink cursor
 
                 tax
 _waitForKey     lda CH_                 ; key down?
-                eor #$FF
+                eor #$FF                ; flip the bits
                 bne _1
 
                 cpx rtclok+2
@@ -49,8 +49,8 @@ _faster         ldx SRTIMR              ; faster repeat
 _next2          stx SRTIMR
 
 _2              lda CH_
-                cmp #$C0
-                bcc _3                  ; not Ctrl-Shft
+                cmp #$C0                ; Ctrl-Shft?
+                bcc _3                  ;   no
 
                 jsr Click
                 bmi _4                  ; [unc]
@@ -75,7 +75,7 @@ _4              ldx SRTIMR
                 ldx #$03
                 stx SRTIMR
 
-_5              sta curch
+_5              sta curCH
 
                 rts
 

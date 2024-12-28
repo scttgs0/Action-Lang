@@ -50,7 +50,7 @@ Sound           .proc
                 bmi _1
 
                 ldy #100
-                jsr jt_error
+                jsr jt_vecError
 
 _1              txa
                 sta AUDF1,Y
@@ -352,7 +352,7 @@ Break           .proc
                 ldy #brkERR
                 tya
 
-                jmp jt_error
+                jmp jt_vecError
 
                 .endproc
 

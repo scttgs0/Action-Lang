@@ -14,58 +14,65 @@ cartridge      .namespace
 ;--------------------------------------
 ;   Editor/Monitor jump table
 
-emjmps          rts                     ; Seg catch all
+;   clone into jt_jmps [$04C6:04FF]
 
+emjmps
+_jt_vecSegEnd   rts                     ; Seg catch all
                 .word 0
-                .byte ebank             ; curBank
-                .byte $df               ; stMask
-                jmp bankSPLErr          ; Error
 
-                .byte 18                ; wSize
-                .byte 120               ; line input max
-                .byte $20               ; jt_chrConvert2
-                rts                     ; Exp catch all
+_jt_curbank     .byte ebank             ; curBank
+_jt_stmask      .byte $DF
 
+_jt_vecError    jmp bankSPLErr
+
+_jt_wsize       .byte 18
+_jt_linemax     .byte 120               ; line input max
+_jt_chrConvert2 .byte $20
+
+_jt_vecExpEnd   rts                     ; Exp catch all
                 .word 0
-                rts                     ; Dcl catch all
 
+_jt_vecDeclEnd  rts                     ; Dcl catch all
                 .word 0
-                rts                     ; CodeGen catch all
 
+_jt_vecCGenEnd  rts                     ; CodeGen catch all
                 .word 0
-                rts                     ; ampl.array.Ref Catch all
 
+_jt_vecArrEnd   rts                     ; ampl.array.Ref Catch all
 zero            .word 0
-                rts                     ; SPLEnd
 
+_jt_vecSPLEnd   rts
                 .word 0
-                jmp screenBell          ; Alarm
 
-                .byte 0                 ; EOLch (default = space)
+_jt_vecAlarm    jmp screenBell          ; Alarm
 
-ltab            .addr mscLShift._lshift ; LSH
+_jt_eolch       .byte 0                 ; EOLch (default = space)
+
+_jt_lsh
+ltab            .addr mscLShift._lshift
                 .addr ampl.math.RShift
                 .addr ampl.math.MultI
                 .addr ampl.math.DivC
                 .addr ampl.math.RemL
                 .addr ampl.math.SArgs
-                .byte $60               ; jt_chrConvert3
-                .byte $22               ; tvDisp
 
-                jmp editor.chr.InsertChar   ; normal char
+_jt_chrConvert3 .byte $60
+_jt_tvdisp      .byte $22
+
+_jt_vecDispTb   jmp editor.chr.InsertChar   ; normal char
 
                 rts                     ; ctrl-shift char
 
 serial          .word $0A00             ; serial number of ROM
                                         ; TODO: to be filled in before burning ROM
 
-                jmp compiler.lexicon.GetNext._ENTRY5  ; STM catch all
+_jt_vecStmtEnd  jmp compiler.lexicon.GetNext._ENTRY5  ; STM catch all
 
                 rts                     ; illegal monitor cmd
-
                 .byte $86
                 .byte $9D
-                .addr ampl.symbol.STMres         ; STMrAdr in EDIT.DEF
+
+_jt_vecStmRAdr  .addr ampl.symbol.STMres    ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -92,6 +99,7 @@ _XIT1           jmp editor.memory.GeneralErr.Punt  ; editor
 
 ; - - - - - - - - - - - - - - - - - - -
 
+;   clear RAM [$0480:057F]
 _cold           lda #$00
                 tay
 _next1          sta $0480,Y             ; zero RAM
@@ -99,6 +107,7 @@ _next1          sta $0480,Y             ; zero RAM
                 dey
                 bne _next1
 
+;   build jump table jt_jmps [$B282:B2BC] -> [$04C6:04FF]
                 ldy #$3A
 _next2          lda emjmps-1,Y          ; init RAM
                 dey
@@ -106,17 +115,17 @@ _next2          lda emjmps-1,Y          ; init RAM
                 bne _next2
 
                 ;-- lda #<ampl.symbol.STMres
-                ;-- sta jt_stmradr
+                ;-- sta jt_vecStmRAdr
                 ;-- lda #>ampl.symbol.STMres
-                ;-- sta jt_stmradr+1
+                ;-- sta jt_vecStmRAdr+1
                 ;-- lda #`ampl.symbol.STMres
-                ;-- sta jt_stmradr+2
+                ;-- sta jt_vecStmRAdr+2
 
                 ; sty chrConvert1       ; Y=0
 
                 jsr editor.init.EditorInit  ; init editor
 
-;SPLInit PROC ; init compiler RAM
+;SPLInit PROC   ; init compiler RAM
 
             .if ZAPRAM
                 jsr editor.main.zap4
@@ -127,7 +136,7 @@ _next2          lda emjmps-1,Y          ; init RAM
             .endif
 
                 ldx #$08                ; 2K id space
-                stx SymTblSizePages
+                stx nSymTblPages
 
                 lda #$00
                 ldx #$04
@@ -154,5 +163,7 @@ _3              inx
                 stx symTblLocal+1
 
                 .endproc
+
+                ;[fall-through to edit.main.asm]
 
                 .endnamespace

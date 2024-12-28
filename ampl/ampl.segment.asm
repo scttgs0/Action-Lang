@@ -43,7 +43,7 @@ _func           clc
 ; - - - - - - - - - - - - - - - - - - -
 
 _1              jsr compiler.MakeEntry
-                jsr jt_segend
+                jsr jt_vecSegEnd
 
                 lda addr
                 sta curproc
@@ -199,8 +199,8 @@ _7              ldx #$0A
 
                 jsr ampl.cgu.Push3
 
-_8              lda trace               ; check for trace
-                beq _9                  ; no trace
+_8              lda isTrace             ; do trace?
+                beq _9                  ;   no
 
                 lda #$20                ; JSR CTrace
                 ldx #<lib.msc.CTrace

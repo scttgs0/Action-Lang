@@ -16,12 +16,12 @@ monitor         .namespace
 Monitor         .proc
                 jsr editor.window.SaveWorld
 
-                lda delbuf              ; delete buffer bottom
+                lda delbuf                  ; delete buffer bottom
                 ldx delbuf+1
                 jsr editor.chr.DeleteFree   ; get rid of delete buf
 
                 lda top+1
-                sta top1
+                sta cacheTop_HI
 
 _ENTRY1         jsr screenInit
 
@@ -43,7 +43,7 @@ _next1          jsr editor.io.InitKeys
 
                 jsr screenInit          ; get Graphics(0)
 
-_1              jsr jt_alarm
+_1              jsr jt_vecAlarm
                 jsr ioRestoreCursorChar
 
                 lda #<prompt
@@ -55,7 +55,7 @@ _1              jsr jt_alarm
 
                 lda #$00
                 sta top+1
-                sta Channel
+                sta ioChnnl
 
                 lda #<tempbuf
                 ldx #>tempbuf
@@ -97,19 +97,21 @@ ResetWindow     .proc
                 lda #$17
                 sta cmdln
 
-                lda numwd
-                beq _1
+                lda is2Windows          ; single window?
+                beq _skipWin2           ;   yes
 
                 lda jt_wsize
                 sta cmdln
 
-                lda #w2-w1
+;   paint window2
+                lda #win2Base-win1Base
                 jsr PaintWindow
 
+;   paint window1
                 lda #$00
-_1              jsr PaintWindow
-                jsr editor.init.EditorInit._ENTRY3
+_skipWin2       jsr PaintWindow
 
+                jsr editor.init.EditorInit._ENTRY3
                 jmp editor.main.Loop
 
                 .endproc
@@ -283,7 +285,7 @@ MemWrite        .proc                   ; write object file
                 beq MemRun._XIT         ; no program!!
 
                 lda #$01
-                sta Channel
+                sta ioChnnl
 
                 lda #$08                ; output
                 jsr ioOpenChannel
@@ -297,18 +299,18 @@ MemWrite        .proc                   ; write object file
                 sta arg11               ; $FF
 
                 clc
-                lda codebase            ; starting address
+                lda codeBase            ; starting address
                 adc codeoff
                 sta arg12
 
-                lda codebase+1
+                lda codeBase+1
                 adc codeoff+1
                 sta arg13
                 tax
 
                 clc                     ; ending address
                 lda arg12
-                adc codesize
+                adc codeSize
                 sta arg14
                 bne _1
 
@@ -317,24 +319,24 @@ MemWrite        .proc                   ; write object file
 _1              dec arg14
 
                 txa
-                adc codesize+1
+                adc codeSize+1
                 sta arg15
 
                 jsr WOut
 
 ;   write the QCODE
                 ldx #$10
-                lda #$0B                ; output command
+                lda #$0B                ; PUTCHR
                 sta IOCB0+ICCOM,X
 
-                lda codebase
+                lda codeBase
                 sta IOCB0+ICBAL,X       ; buffer address
-                lda codebase+1
+                lda codeBase+1
                 sta IOCB0+ICBAH,X
 
-                lda codesize
+                lda codeSize
                 sta IOCB0+ICBLL,X       ; size
-                lda codesize+1
+                lda codeSize+1
                 sta IOCB0+ICBLH,X
 
                 jsr CIOV
@@ -514,7 +516,7 @@ _1              tay
 ;--------------------------------------
 ;--------------------------------------
 
-tblCmds         .addr jt_disptb+9       ; unknown cmd
+tblCmds         .addr jt_vecDispTb+9    ; unknown cmd
                 .byte 35                ; table size
 
                 .addr Boot

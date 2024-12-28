@@ -42,7 +42,7 @@ _next1          iny
                 bcc _next1
 
 _next2          ldy sp
-                lda curch
+                lda curCH
                 sta (buf),Y
 
                 lda #$FF
@@ -82,7 +82,7 @@ InsertSpace     .proc
 
                 lda #$20
                 sta insert
-                sta curch
+                sta curCH
 
                 jsr InsertChar
 
@@ -97,7 +97,7 @@ InsertSpace     .proc
 ;======================================
 ; Insert_2()
 ;======================================
-Insert_2          .proc
+Insert_2        .proc
                 jsr editor.display.CleanLine
                 jsr mscNextUp
 
@@ -201,7 +201,7 @@ Delete          .proc
                 ldx delbuf+1
                 stx dirty
 
-                ldy lastch
+                ldy lastCH
                 cpy #$9C
                 beq _1
 

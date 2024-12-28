@@ -10,7 +10,7 @@
 
 en0             .ptext "Error"
                 .byte $C0
-                .addr jt_error
+                .addr jt_vecError
 
 ; - - - - - - - - - - - - - - - - - - -
                 .byte 3,138,138,138
@@ -26,7 +26,7 @@ en2             .ptext "color"
 
 en3             .ptext "LIST"
                 .byte $8A
-                .addr list
+                .addr isListing
 
 en4             .ptext "device"
                 .byte $8A
@@ -34,7 +34,7 @@ en4             .ptext "device"
 
 en5             .ptext "TRACE"
                 .byte $8A
-                .addr trace
+                .addr isTrace
 
 
 ;======================================
@@ -86,9 +86,9 @@ init            rts
 bankRun         .proc
 ;   reset Error routine
                 ldy #<bankSPLErr
-                sty jt_error+1
+                sty jt_vecError+1
                 ldy #>bankSPLErr
-                sty jt_error+2
+                sty jt_vecError+2
 
                 jsr bankLProceed
                 jsr mscJSRIndirect
@@ -161,7 +161,6 @@ bankLocalName   .proc
                 sta bank+lbank
 
                 jsr ampl.symbol.GetName._ENTRY1
-
                 jmp bankRestore
 
                 .endproc
@@ -297,7 +296,6 @@ bankPrintH      .proc
                 sty bank+ebank
 
                 jsr ampl.monitor.PrintHex
-
                 sty bank+lbank
 
                 jmp lib.io.ChkErr

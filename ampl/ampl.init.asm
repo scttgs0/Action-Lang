@@ -19,7 +19,7 @@ SetupSPL        .proc
                 lda #$00
                 tay
                 sta sp
-                sta Channel
+                sta ioChnnl
                 sta symtab
                 sta INITAD+1
                 sta (buf),Y
@@ -70,11 +70,11 @@ _1              clc
 
                 inc arg1
 
-_2              sta codebase
+_2              sta codeBase
                 sta QCODE
 
                 lda arg1
-                sta codebase+1
+                sta codeBase+1
                 sta QCODE+1
 
                 lda MEMTOP+1
@@ -83,7 +83,7 @@ _2              sta codebase
                 dec stmax
 
                 clc
-                sbc SymTblSizePages
+                sbc nSymTblPages
                 sta stbase
                 sta symtab+1
 
@@ -92,18 +92,18 @@ _2              sta codebase
                 bcs _3
 
 ;   can't allocate memory
-                lda sparem
+                lda spareMem
                 sta symtab
-                lda sparem+1
+                lda spareMem+1
                 sta symtab+1
 
 _err            ldy #allocateERR
                 jmp bankSPLErr
 
-_3              lda sparem
+_3              lda spareMem
                 sta frame
 
-                ldx sparem+1
+                ldx spareMem+1
                 inx
                 inx
                 stx frame+1

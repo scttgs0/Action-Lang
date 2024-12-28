@@ -28,6 +28,7 @@ screenInit         .proc
 
 _data           .ptext "E:"
                 .byte $9B
+
                 .endproc
 
 

@@ -24,7 +24,7 @@
 ;--------------------------------------
 
 version         .byte $36
-date            .byte $01,$17,$84       ; assemble date of latest version!
+versionDate     .byte $01,$17,$84       ; assemble date of latest version!
 
 
                 .include "main.io.asm"
@@ -43,9 +43,8 @@ compiler    .namespace
 
 amplfin
 
-;    ACTION! 3.6 - Editor Routines
-;    [EDIT.FND, EDIT.SUB, EDIT.TAB]
-;    ------------------------------
+;--------------------------------------
+;    ACTION! - Editor Routines
 
 editor      .namespace
                 .fill 4,$00
@@ -54,10 +53,8 @@ editor      .namespace
                 .include "editor/edit.tab.asm"
             .endnamespace
 
-
-;    "ACTION! 3.6 - Compiler Routines
-;    [AMPL.SEG, AMPL.PF, AMPL.ARR, AMPL.CGU]
-;    ---------------------------------------
+;--------------------------------------
+;    "ACTION! - Compiler Routines
 
 ampl        .namespace
                 .fill 3,$00
@@ -80,8 +77,8 @@ ampl        .namespace
 ;--------------------------------------
 
 
-;    ACTION! 3.6 - S.T.
-;    ------------------
+;--------------------------------------
+;    ACTION! - Symbol Table
 
 
 ;--------------------------------------
@@ -107,7 +104,7 @@ lib         .namespace
                 .include "library/lib.str.asm"
                 .include "library/lib.opt.asm"
 
-cpyright        .null "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  "
+ampl_copyright  .null "ACTION! (c)1983 Action Computer Services (ACS)  November 4, 1983  "
             .endnamespace
 
 
@@ -125,8 +122,8 @@ doc
 ;--------------------------------------
 
 
-;    "ACTION! 3.6 - Compiler
-;    -----------------------
+;--------------------------------------
+;    "ACTION! - Compiler
 
 
 ;--------------------------------------
@@ -155,8 +152,8 @@ comp_copyright  .null "ACTION! (c)1983 Action Computer Services"
 ;--------------------------------------
 
 
-;    ACTION! 3.6 - Editor
-;    --------------------
+;--------------------------------------
+;    ACTION! 4.0 - Editor
 
 
 ;--------------------------------------

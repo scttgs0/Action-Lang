@@ -45,8 +45,8 @@ GeneralErr      .proc
                 ldy #$00
                 jsr ioSystemError
 
-                lda sparem
-                ldx sparem+1
+                lda spareMem
+                ldx spareMem+1
                 ldy allocerr
                 bne Punt                ; really out of memory
 

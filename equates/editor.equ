@@ -39,7 +39,7 @@ cur             = $94                   ; -> current line
 x__             = $96                   ; don't use in comp.
 y__             = $97                   ; don't use in comp.
 nlines          = $98
-Channel         = $98                   ; current input file
+ioChnnl         = $98                   ; current input file
 ytop            = $99
 defflg          = $99
 indent          = $9A
@@ -107,66 +107,68 @@ nxttoken        = $D3                   ; next token value
 ; ACTION! vars ($480 - $57F)
 ;--------------------------------------
 
-w1              = $0480                 ; window 1 data
-top1            = $048F
-chrConvert      = $0490                 ; char convert
-codebase        = $0491                 ; 2 bytes
-codesize        = $0493                 ; 2 bytes
-SymTblSizePages = $0495                 ; symbol table size (pages)
+win1Base        = $0480                 ; window 1 data
+cacheTop_HI     = $048F
+chrConvert      = $0490                 ; char convert (translate screen code to ascii)
+codeBase        = $0491                 ; [word]
+codeSize        = $0493                 ; [word]
+nSymTblPages    = $0495                 ; symbol table size (pages)
 isMonitorLive   = $0496                 ; edit/mon flag
-gbase           = $0497                 ; 2 bytes
+gbase           = $0497                 ; [word]
 type            = $0499
-list            = $049A                 ; listing flag
+isListing       = $049A                 ; listing flag
 numargs         = $049B
 cmdln           = $049C                 ; command line offset
 param           = $049D
 opmode          = $049E
 currentWindow   = $049F                 ; window memory offset
 cury            = $04A0                 ; current Y reg (0/1/unknown)
-lastch          = $04A1                 ; last char
-curch           = $04A2                 ; current char
-sparem          = $04A3                 ; -> spare mem
-numwd           = $04A5                 ; number of windows
+lastCH          = $04A1                 ; last char
+curCH           = $04A2                 ; current char
+spareMem        = $04A3                 ; -> spare memory
+is2Windows      = $04A5                 ; number of windows (0=single; non-zero=double)
 allocerr        = $04A6                 ; INC on Alloc error
 delbuf          = $04A7                 ; 6 bytes
-FirstChar       = $04AD                 ; used for big symbol table
-taglist         = $04AE                 ; 2 bytes
+firstChar       = $04AD                 ; used for big symbol table
+taglist         = $04AE                 ; [word]
 chrConvert1     = $04B0                 ; char convert
-w2              = $04B1                 ; window 2 data
+win2Base        = $04B1                 ; window 2 data
 bckgrnd         = $04C0                 ; background color
 procSP          = $04C1                 ; Break stack pointer
 argbytes        = $04C2
-trace           = $04C3                 ; trace flag
+isTrace         = $04C3                 ; trace flag
 isBigSymTbl     = $04C4                 ; big symbol table flag
 
 ;   note: $4C5 available
 
 jt_jmps         = $04C6                 ; see EDIT.CAR
 
-; Jump table goes to $4FF
+
+; Jump table goes to $04FF
 ;--------------------------------------
 
-jt_segend       = $04C6
+jt_vecSegEnd    = $04C6
 jt_curbank      = $04C9
 jt_stmask       = $04CA
-jt_error        = $04CB
+jt_vecError     = $04CB
 jt_wsize        = $04CE
 jt_linemax      = $04CF
 jt_chrConvert2  = $04D0                 ; char convert
-jt_expend       = $04D1
-jt_dclend       = jt_expend+3
-jt_cgend        = jt_dclend+3
-jt_arend        = jt_cgend+3
-jt_splend       = jt_arend+3
-jt_alarm        = jt_splend+3
-jt_eolch        = jt_alarm+3
+jt_vecExpEnd    = $04D1
+jt_vecDeclEnd   = jt_vecExpEnd+3
+jt_vecCGenEnd   = jt_vecDeclEnd+3
+jt_vecArrEnd    = jt_vecCGenEnd+3
+jt_vecSPLEnd    = jt_vecArrEnd+3
+jt_vecAlarm     = jt_vecSPLEnd+3
+jt_eolch        = jt_vecAlarm+3
 jt_lsh          = jt_eolch+1
 
 jt_chrConvert3  = $04F0                 ; char convert
 jt_tvdisp       = $04F1
-jt_disptb       = $04F2
-jt_smtend       = $04F8
-jt_stmradr      = $04FE
+jt_vecDispTb    = $04F2
+jt_vecStmtEnd   = $04F8
+jt_vecStmRAdr   = $04FE
+
 
 subbuf          = $0500                 ; 40 bytes     ; rowSize
 findbuf         = $0528                 ; 40 bytes     ; rowSize

@@ -268,7 +268,7 @@ _next1          jsr NextChar
 _next2          ldy arg9
                 sta (symtab),Y
 
-                lda Channel
+                lda ioChnnl
                 bpl _next1              ; if not EOF
 
 _1              ldy #strERR
@@ -319,7 +319,7 @@ _ENTRY1         ldy choff
 ; NextLine()
 ;======================================
 NextLine        .proc
-                lda Channel
+                lda ioChnnl
                 beq _1
                 bmi _4                  ; eof
 
@@ -331,7 +331,7 @@ NextLine        .proc
 
                 jmp bankSPLErr
 
-_next1          dec Channel
+_next1          dec ioChnnl
                 bne NextLine
 
 _1              ldy top+1
@@ -350,7 +350,7 @@ _1              ldy top+1
                 ; lda #$00
                 sta top+1
 
-_2              lda list
+_2              lda isListing
                 beq _3                  ; don't list
 
                 lda device
@@ -412,7 +412,7 @@ Get             .proc
 _ENTRY1         lda #$00
                 sta defflg
 
-                inc Channel
+                inc ioChnnl
 
                 lda #$04
                 jsr ioOpenChannel

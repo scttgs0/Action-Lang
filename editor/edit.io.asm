@@ -56,7 +56,7 @@ _next2          ldy #$00
                 jmp _next1
 
 _1              lda #$00
-                sta curch
+                sta curCH
                 sta (arg12),Y
 
                 iny

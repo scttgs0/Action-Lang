@@ -146,7 +146,7 @@ _next1          jsr mscStrPtr
 _1              jsr ioResetCursor
 
                 ldy currentWindow
-                lda w1+WCUR+1,Y
+                lda win1Base+WCUR+1,Y
                 beq _2
 
                 jsr mscNextDown
@@ -192,23 +192,23 @@ IndentRight     .proc
 ; insert/replace toggle
 ;======================================
 InsertToggle    .proc
-                lda #<_rmsg
-                ldx #>_rmsg
+                lda #<_msgREPLACE
+                ldx #>_msgREPLACE
                 inc insert
                 beq _XIT
 
                 lda #$FF
                 sta insert
 
-                lda #<_imsg
-                ldx #>_imsg
+                lda #<_msgINSERT
+                ldx #>_msgINSERT
 
 _XIT            jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-_imsg           .ptext "INSERT"
-_rmsg           .ptext "REPLACE"
+_msgINSERT      .ptext "INSERT"
+_msgREPLACE     .ptext "REPLACE"
 
                 .endproc
 

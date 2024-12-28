@@ -13,26 +13,26 @@ main           .namespace
 ;======================================
 ; Main program for EDIT/FLASH
 ;======================================
-Loop           .proc
+Loop            .proc
                 lda allocerr
                 beq _1
 
-                lda #<outmem
-                ldx #>outmem
+                lda #<msgOutOfMem
+                ldx #>msgOutOfMem
                 jsr editor.display.CommandMsg
 
-_1              lda curch
-                sta lastch
+_1              lda curCH
+                sta lastCH
 
                 jsr bankGetKey
                 jsr editor.init.EditorInit._ENTRY3
 
-                lda curch
+                lda curCH
                 ldy CH1
                 cpy #$C0                ; Ctrl-Shft?
                 bcs _2                  ;   yes
 
-                ldy lastch
+                ldy lastCH
                 cpy #$1B                ; escape
                 bne _3
 
@@ -60,7 +60,7 @@ _4              jsr mscLookup
 ;--------------------------------------
 ;--------------------------------------
 
-fmcmd           .addr jt_disptb         ; default routine
+fmcmd           .addr jt_vecDispTb      ; default routine
                 .byte 50                ; table size
                 .addr editor.command.ScrollUp
                 .byte $1c
@@ -95,7 +95,7 @@ zap4            .byte $7e
                 .addr editor.tab.Clear
                 .byte $9e
 
-fmcscmd         .addr jt_disptb+3       ; default
+fmcscmd         .addr jt_vecDispTb+3    ; default
                 .byte 71                ; table size
                 .addr editor.command.Front
                 .byte $f6
@@ -144,16 +144,14 @@ fmcscmd         .addr jt_disptb+3       ; default
                 .addr editor.tag.Locate
                 .byte $fd
 
-outmem          .text 14," "
+msgOutOfMem     .text 14," "
             .enc "atari-screen-inverse"
                 .text "Out"
             .enc "none"
-
                 .text " "
             .enc "atari-screen-inverse"
                 .text "of"
             .enc "none"
-
                 .text " "
             .enc "atari-screen-inverse"
                 .text "Memory"

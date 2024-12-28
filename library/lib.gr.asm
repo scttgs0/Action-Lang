@@ -127,7 +127,7 @@ pos1            sta COLCRS
 Locate          .proc
                 jsr Position
 
-                lda #$06
+                lda #$06                ; channel #6
                 jmp lib.io.GetD
 
                 .endproc

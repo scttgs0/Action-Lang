@@ -12,6 +12,9 @@ display         .namespace
 
 ;======================================
 ; CommandMsg(message)
+;--------------------------------------
+; on entry:
+;   X:A         message
 ;======================================
 CommandMsg      .proc
                 sta arg0
@@ -21,8 +24,8 @@ CommandMsg      .proc
                 lda #$00
                 sta arg3
 
-                lda arg0
-                ldy #$80
+                lda arg0                ; message_LO
+                ldy #$80                ; char used for clearing (inverse space)
                 jsr ioPutStr
                 jmp ioResetColumn
 
@@ -64,7 +67,7 @@ _ENTRY1         clc
 
                 tay
 _next1          lda sp,X
-                sta w1,Y
+                sta win1Base,Y
 
                 dey
                 dex
@@ -86,7 +89,7 @@ RestoreWindow   .proc
                 adc currentWindow
 
                 tay
-_next1          lda w1,Y
+_next1          lda win1Base,Y
                 sta sp,X
 
                 dey
