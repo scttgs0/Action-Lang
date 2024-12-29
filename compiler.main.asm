@@ -17,7 +17,7 @@ Compile
 ;======================================
 ;======================================
 ScanParseLex    ;.proc
-                jsr jt_splend
+                jsr jt_vecSPLEnd
 
                 lda nxttoken
                 cmp #tokQuote
@@ -26,7 +26,7 @@ ScanParseLex    ;.proc
                 jsr compiler.lexicon.Get._ENTRY1
                 jmp _next1
 
-_1              lda top1
+_1              lda cacheTop_HI
                 sta top+1
 
                 jsr ioChkCursor._ENTRY1
@@ -63,11 +63,11 @@ _next2          lda #$60                ; RTS
 ;   get QCODE size
                 sec
                 lda QCODE
-                sbc codebase
-                sta codesize
+                sbc codeBase
+                sta codeSize
                 lda QCODE+1
-                sbc codebase+1
-                sta codesize+1
+                sbc codeBase+1
+                sta codeSize+1
 
 ;   patch array addresses
                 lda arrayptr+1
@@ -228,7 +228,7 @@ _next2          jsr MakeEntry
 ;======================================
 ;
 ;======================================
-Declare         jsr jt_dclend
+Declare         jsr jt_vecDeclEnd
                 cmp #tokCHAR
                 bcs _1
 
@@ -703,7 +703,7 @@ StmtList        .proc
                 jsr ClearTemps
 
                 sta zpAllocOP
-                jsr jt_smtend
+                jsr jt_vecStmtEnd
 
                 cmp #tokLBracket
                 bne _next2
@@ -1786,9 +1786,9 @@ GetFrame        .proc
                 sta frame+1
 
                 lda frame
-                cmp sparem
+                cmp spareMem
                 lda frame+1
-                sbc sparem+1
+                sbc spareMem+1
                 bcc _err
 
                 tya
@@ -1868,8 +1868,9 @@ _next1          sta temps-1,X
 ;--------------------------------------
 ;--------------------------------------
 
-tblStmtList     .addr jt_smtend         ; not found
-                .byte 20                ; #entries*3 - 1
+tblStmtList     .addr jt_vecStmtEnd     ; default routine
+                .byte $14               ; table size (#entries*3 - 1)
+
                 .addr StmtIF
                 .byte tokIF
                 .addr StmtFOR
@@ -1930,7 +1931,7 @@ Expression      .proc
                 lda token               ; always non-zero
                 sta zpAllocOP
 
-_ENTRY1         jsr jt_expend
+_ENTRY1         jsr jt_vecExpEnd
                 cmp #tokSColon
                 bcc _7
 
@@ -2087,7 +2088,6 @@ _15             jsr ampl.cgu.Push2
 
 _errParen       ldy #parenthERR
                 jmp bankSPLErr
-
 
 ;   QCODE to handle function ref
 _16             cmp #tokFUNC_t+8
@@ -2601,7 +2601,7 @@ _XIT            jmp PopST
 ;======================================
 CodeGen         .proc
                 jsr GenOps
-_ENTRY1         jsr jt_cgend
+_ENTRY1         jsr jt_vecCGenEnd
 
                 lda arg0
                 asl
@@ -2670,7 +2670,7 @@ CGExpError      jmp ErrorExpression
 CGAssign        .proc
                 lda #$00
                 jsr GenOps
-                jsr jt_cgend
+                jsr jt_vecCGenEnd
                 jsr ChAssEQ.ChStkEQ     ; see if INC
                 bne _ENTRY5             ;   yes, just return
 

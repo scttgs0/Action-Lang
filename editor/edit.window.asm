@@ -44,12 +44,12 @@ Window2         .proc
                 lda currentWindow
                 bne SaveWorld._XIT
 
-                lda numwd
-                bne _1
+                lda is2Windows          ; single window?
+                bne _1                  ;   no
 
                 jmp editor.init.Window2
 
-_1              lda #w2-w1
+_1              lda #win2Base-win1Base
                 pha
 
                 bra SwapWindows
@@ -63,7 +63,7 @@ _1              lda #w2-w1
 SaveWorld       .proc
                 jsr editor.display.CleanLine
                 jsr ioSaveColumn
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
                 jsr editor.command.SetSpacing
                 jmp editor.display.SaveWindow
 
@@ -75,7 +75,7 @@ _XIT            rts
 ; Clear()
 ;======================================
 Clear           .proc
-                jsr jt_alarm
+                jsr jt_vecAlarm
 
                 lda #<Delete.msgClear
                 ldx #>Delete.msgClear
@@ -129,10 +129,10 @@ RestoreWorld    .proc
 ; Delete()
 ;======================================
 Delete          .proc
-                lda numwd
-                beq SaveWorld._XIT
+                lda is2Windows          ; single window?
+                beq SaveWorld._XIT      ;   yes
 
-                jsr jt_alarm
+                jsr jt_vecAlarm
 
                 lda #<msgDelete
                 ldx #>msgDelete
@@ -144,13 +144,14 @@ Delete          .proc
                 lda dirty
                 bne SaveWorld._XIT
 
+;   now have a single window active
                 ldy #$00
-                sty numwd
+                sty is2Windows
 
                 cpy currentWindow
                 bne _1
 
-                ldy #w2-w1
+                ldy #win2Base-win1Base
 _1              sty currentWindow
 
                 jsr editor.display.RestoreWindow
@@ -197,7 +198,7 @@ CommandString   .proc
                 ldy arg2
 
                 jsr editor.io.GetString
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
                 jmp ioResetColumn
 
                 .endproc

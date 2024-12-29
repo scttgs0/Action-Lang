@@ -10,7 +10,7 @@
 
 en0             .ptext "Error"
                 .byte $C0
-                .addr jt_error
+                .addr jt_vecError
 
 ; - - - - - - - - - - - - - - - - - - -
                 .byte 3,138,138,138
@@ -27,7 +27,7 @@ en2             .ptext "color"
 
 en3             .ptext "LIST"
                 .byte $8A
-                .addr list
+                .addr isListing
 
 en4             .ptext "device"
                 .byte $8A
@@ -35,16 +35,16 @@ en4             .ptext "device"
 
 en5             .ptext "TRACE"
                 .byte $8A
-                .addr trace
+                .addr isTrace
 
 
 ;======================================
 ; bankCartStart()
 ;======================================
 bankCartStart   .proc
-                ;!!ldy #ebank
+                ldy #edtr_bank
                 sty jt_curbank
-                ;!!sty bank+ebank
+                sty bank+edtr_bank
 
                 jmp editor.cartridge.START
 
@@ -55,7 +55,7 @@ bankCartStart   .proc
 ; bankGetName(char)
 ;======================================
 bankGetName     .proc
-                ;!!sta bank+lbank
+                sta bank+lib_bank
                 jsr ampl.symbol.GetName
 
                 .endproc
@@ -72,7 +72,7 @@ bankRestore     .proc
 
                 tya
                 ldy jt_curbank
-rbank1          ;!!sta bank,Y
+rbank1          sta bank,Y
                 tay
 
                 pla
@@ -87,9 +87,9 @@ init            rts
 bankRun         .proc
 ;   reset Error routine
                 ldy #<bankSPLErr
-                sty jt_error+1
+                sty jt_vecError+1
                 ldy #>bankSPLErr
-                sty jt_error+2
+                sty jt_vecError+2
 
                 jsr bankLProceed
                 jsr mscJSRIndirect
@@ -102,9 +102,9 @@ bankRun         .proc
 ; bankCompile()
 ;======================================
 bankCompile     .proc
-                ;!!ldy #cbank
+                ldy #cmpl_bank
                 sty jt_curbank
-                ;!!sty bank+cbank
+                sty bank+cmpl_bank
 
                 jsr compiler.Compile
 
@@ -121,7 +121,7 @@ bankEditBank    .proc
                 pha
 
                 tya
-                ;!!ldy #ebank
+                ldy #edtr_bank
                 sty jt_curbank
 
                 jmp bankRestore.rbank1
@@ -141,7 +141,7 @@ bankGetAlias    .proc
 
                 sta addr
                 stx addr+1
-                ;!!sta bank+lbank
+                sta bank+lib_bank
 
                 lda #$00
                 jsr mscGetProp
@@ -159,10 +159,9 @@ _XIT            jmp mscMNum._varerr
 ; bankLocalName()
 ;======================================
 bankLocalName   .proc
-                ;!!sta bank+lbank
+                sta bank+lib_bank
 
                 jsr ampl.symbol.GetName._ENTRY1
-
                 jmp bankRestore
 
                 .endproc
@@ -172,9 +171,9 @@ bankLocalName   .proc
 ; bankCStmtList()
 ;======================================
 bankCStmtList   .proc
-                ;!!ldy #cbank
+                ldy #cmpl_bank
                 sty jt_curbank
-                ;!!sta bank+cbank
+                sta bank+cmpl_bank
 
                 jsr compiler.StmtList
                 jmp bankEditBank
@@ -198,9 +197,9 @@ bankMGetT1      .proc
 ; bankLProceed()
 ;======================================
 bankLProceed    .proc
-                ;!!ldy #lbank
+                ldy #lib_bank
                 sty jt_curbank
-                ;!!sty bank+lbank
+                sty bank+lib_bank
 
                 rts
                 .endproc
@@ -221,7 +220,7 @@ bankOptions     .proc
 ;
 ;======================================
 bankGetKey      .proc
-                ;!!sta bank+lbank
+                sta bank+lib_bank
 
                 jsr lib.key.Get
                 jmp bankRestore
@@ -233,7 +232,7 @@ bankGetKey      .proc
 ; Scanner/Parser/Lexeme error
 ;======================================
 bankSPLErr      .proc
-                ;!!sta bank+lbank
+                sta bank+lib_bank
 
                 jmp coreSPLErr
 
@@ -256,7 +255,7 @@ bankEmLoop      .proc
 bankGetArgs     .proc
                 pha                     ; save arg type load flag
 
-                ;!!sty bank+lbank
+                sty bank+lib_bank
 
                 lda #$01
                 jsr mscGetProp
@@ -295,11 +294,10 @@ _XIT            jmp bankRestore
 ; call only from LBANK!
 ;======================================
 bankPrintH      .proc
-                ;!!sty bank+ebank
+                sty bank+edtr_bank
 
                 jsr ampl.monitor.PrintHex
-
-                ;!!sty bank+lbank
+                sty bank+lib_bank
 
                 jmp lib.io.ChkErr
 

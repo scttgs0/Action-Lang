@@ -627,6 +627,7 @@ STrig           .proc
 Paddle          .proc
                 tax
                 ;!!lda PADDL0,X
+                lda #$1F    ; HACK:
                 sta args
 
                 rts

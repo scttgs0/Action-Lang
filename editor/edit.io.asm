@@ -40,7 +40,7 @@ _next2          ldy #$00
 
                 stx arg3
 
-                ldx COLCRS
+                ldx CURSOR_X    ;!!COLCRS
                 cpx RMARGN
                 bcs _next1              ; don't go off screen
 
@@ -56,7 +56,7 @@ _next2          ldy #$00
                 jmp _next1
 
 _1              lda #$00
-                sta curch
+                sta curCH
                 sta (arg12),Y
 
                 iny
@@ -116,7 +116,7 @@ _next1          lda #$01
 
                 jsr editor.memory.InsertByte
 
-                lda allocerr
+                lda allocErr
                 beq _next1
 
                 ldy #$16                ; file too big
@@ -192,7 +192,7 @@ FOpen           .proc
 
 ;               jsr ClnLn               ; in SaveWd
                 jsr editor.display.SaveWindow
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
 
                 ldy #<inbuf
                 lda #>inbuf

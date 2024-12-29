@@ -107,13 +107,13 @@ GfxIO           .proc
 ; same as BASIC
 ;======================================
 Position        .proc
-                sta OLDCOL
-                stx OLDCOL+1
-                sty OLDROW
+                ;!!sta OLDCOL
+                ;!!stx OLDCOL+1
+                ;!!sty OLDROW
 
-pos1            sta COLCRS
-                stx COLCRS+1
-                sty ROWCRS
+pos1            sta CURSOR_X    ;!!COLCRS
+                stx CURSOR_X+1  ;!!COLCRS+1
+                sty CURSOR_Y    ;!!ROWCRS
 
                 rts
                 .endproc

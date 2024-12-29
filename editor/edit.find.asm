@@ -17,21 +17,20 @@ Find            .proc
                 jsr editor.command.SetSpacing
                 jsr editor.display.SaveWindow
 
-                lda lastch
+                lda lastCH
                 cmp #$F8
                 beq _ENTRY2
 
-                lda #<findmsg
-                ldx #>findmsg
+                lda #<msgFIND
+                ldx #>msgFIND
 
 _ENTRY1         ldy #>findbuf
                 sty arg3
-
                 ldy #<findbuf
                 jsr editor.window.CommandString
 
                 lda #$F8
-                sta curch
+                sta curCH
 
 _ENTRY2         lda findbuf
                 beq _3
@@ -71,17 +70,17 @@ _1              jsr mscNextDown
                 sta sp
                 beq _next1
 
-_2              sta curch
+_2              sta curCH
 
                 jsr ioResetCursor
                 jsr ioLoadBuffer
 
-                lda #<notfnd
-                ldx #>notfnd
+                lda #<msgNOTFOUND
+                ldx #>msgNOTFOUND
                 jsr editor.display.CommandMsg
 
                 lda #$00
-_3              sta curch
+_3              sta curCH
 
                 rts
                 .endproc
@@ -107,8 +106,7 @@ Found           .proc
 ;--------------------------------------
 ;--------------------------------------
 
-notfnd          .ptext "not found"
-
-findmsg         .ptext "Find? "
+msgNOTFOUND     .ptext "not found"
+msgFIND         .ptext "Find? "
 
                 .endnamespace

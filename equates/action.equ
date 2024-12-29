@@ -52,7 +52,7 @@ EXTMEMLO        = $02EB                 ; pointer to the bottom of free extended
 
 ; --- IOCB ----------------------------
 
-CIOV            = $E456
+;!!CIOV         = $E456
 IOCB0           = $0340
 ICCOM       = $02
 ICBAL       = $04
@@ -76,15 +76,15 @@ ICAX5       = $0E
 
 ; --- Bank-switching ------------------
 
-;!!bank            = $D500
-;!!lbank       = $00                       ; local bank
-;!!ebank       = $03                       ; editor bank
-;!!cbank       = $09                       ; compiler bank
+bank            = $D500
+lib_bank    = $00                       ; library bank
+edtr_bank   = $03                       ; editor bank
+cmpl_bank   = $09                       ; compiler bank
 
 ;--------------------------------------
 ;--------------------------------------
 
 ScreenResX      = 320
 ScreenResY      = 240
-CharResX        = 80
-CharResY        = 60
+CharResX        = 40
+CharResY        = 30

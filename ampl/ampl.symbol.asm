@@ -59,7 +59,7 @@ _1              inc arg13               ; try next entry
 
 _XIT2           jmp bankSPLErr
 
-_XIT            jmp (jt_stmradr)
+_XIT            jmp (jt_vecStmRAdr)
 
                 .endproc
 
@@ -115,7 +115,7 @@ _1              clc
 ;======================================
 GetName         .proc
                 ldy #$00
-                sta FirstChar           ; indicates a big symbol table is not needed (yet)
+                sta firstChar           ; indicates a big symbol table is not needed (yet)
 
                 tax                     ; preserve A
                 ora #$20
@@ -160,7 +160,7 @@ _next1          iny
 _1              lda symTblGlobal
                 ldx symTblGlobal+1
 
-                ldy FirstChar
+                ldy firstChar
                 cpy isBigSymTbl
                 bpl _2
 

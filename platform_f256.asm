@@ -505,8 +505,9 @@ InitBitmap      .proc
 ;======================================
 ClearScreen     .proc
 v_QtyPages      .var $05                ; 40x30 = $4B0... 4 pages + 176 bytes
+;v_QtyPages      .var $13                ; 80x60 = $12C0... 18 pages + 192 bytes
 
-v_EmptyText     .var $00
+v_EmptyText     .var ' '
 v_TextColor     .var $40
 ;---
 
@@ -527,7 +528,6 @@ v_TextColor     .var $40
                 sta zpDest
                 lda #>CS_COLOR_MEM_PTR
                 sta zpDest+1
-                stz zpDest+2
 
                 ldx #v_QtyPages
                 lda #v_TextColor
@@ -908,17 +908,15 @@ SetFont         .proc
                 sta IOPAGE_CTRL
 
 ;   Font #0
-FONT0           lda #<GameFont
+FONT0           lda #<ATARI_FONT
                 sta zpSource
-                lda #>GameFont
+                lda #>ATARI_FONT
                 sta zpSource+1
-                stz zpSource+2
 
                 lda #<FONT_MEMORY_BANK0
                 sta zpDest
                 lda #>FONT_MEMORY_BANK0
                 sta zpDest+1
-                stz zpDest+2
 
                 ldx #$08                ; 8 pages
 _nextPage       ldy #$00

@@ -13,11 +13,10 @@
 ;======================================
 screenInit      .proc
 ;   80x60 text mode
-                ;!!.frsGraphics mcTextOn,mcVideoMode240
-                ;?? stz DINDEX              ; text mode
+                jsr CLS                 ; init text mode and clear the screen
 
                 lda #$00
-                jsr ioClose             ; close #$00, sets X to 0
+                jsr ioClose             ; close #0, sets X to 0
 
                 lda #$0C
                 sta arg3

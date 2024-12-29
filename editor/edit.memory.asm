@@ -45,12 +45,12 @@ GeneralErr      .proc
                 ldy #$00
                 jsr ioSystemError
 
-                lda sparem
-                ldx sparem+1
-                ldy allocerr
+                lda spareMem
+                ldx spareMem+1
+                ldy allocErr
                 bne Punt                ; really out of memory
 
-                inc allocerr
+                inc allocErr
 
                 jsr Free
 

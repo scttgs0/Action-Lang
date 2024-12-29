@@ -222,7 +222,7 @@ _9              lda #$01
                 beq _varerr
 
                 tay
-                ;!!sta bank+lbank
+                sta bank+lib_bank
 
                 lda #$01
                 jsr mscGProp
@@ -333,26 +333,32 @@ mscStoreVar     .proc
 
 ;======================================
 ;
+;--------------------------------------
+; on entry:
+;   Y:X         command table address
 ;======================================
 mscLookup       .proc
-                sty arg2
+_tblCmd_LO      = arg1
+_tblCmd_HI      = arg2
+;---
+                sty _tblCmd_HI
 
             .if ZAPRAM
-                sta (arg1),Y            ; zap RAM if any
+                sta (_tblCmd_LO),Y      ; zap RAM if any
             .else
                 nop
                 nop
             .endif
 
-                stx arg1
+                stx _tblCmd_LO
 
                 tax
                 ldy #$02
-                lda (arg1),Y
+                lda (_tblCmd_LO),Y
 
                 tay
                 txa
-_next1          cmp (arg1),Y
+_next1          cmp (_tblCmd_LO),Y
                 beq _1
 
                 dey
@@ -363,11 +369,11 @@ _next1          cmp (arg1),Y
 
 _1              dey
 
-                lda (arg1),Y
+                lda (_tblCmd_LO),Y
                 sta arg4
 
                 dey
-                lda (arg1),Y
+                lda (_tblCmd_LO),Y
                 sta arg3
 
                 jmp (arg3)
@@ -451,8 +457,7 @@ _1              lda stbase
                 cmp QCODE+1
                 bcs mscAlpha._XIT       ; return
 
-cderr           ;!!sta bank+ebank
-
+cderr           sta bank+edtr_bank
                 jsr ampl.init.SetupSPL  ; reset compiler
 
                 ldy #qcodeERR           ; out of QCODE space

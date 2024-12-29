@@ -28,7 +28,7 @@ ChkErr          .proc
                 cpy #$80                ; break key
                 beq Break1
 
-                jmp jt_error
+                jmp jt_vecError
 
 _1              txa
                 lsr

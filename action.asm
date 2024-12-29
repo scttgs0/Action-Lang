@@ -27,7 +27,7 @@
 
 ;--------------------------------------
 ;--------------------------------------
-                * = $7800
+                * = $7000
 ;--------------------------------------
 
 ;   Boot from RAM data block
@@ -58,8 +58,30 @@ BOOT            cld
 INIT            .proc
                 clc
 
+                stz LMARGN
+                lda #39
+                sta RMARGN
+
+                lda #<$7FFF
+                sta MEMTOP
+                lda #>$7FFF
+                sta MEMTOP+1
+
+                lda #<$0700
+                sta MEMLO
+                lda #>$0700
+                sta MEMLO+1
+
                 jsr PrepBanks
+                jsr SetFont
+
+                .frsGraphics mcTextOn,mcVideoMode240|mcTextDoubleX|mcTextDoubleY
+                stz DINDEX              ; text mode
+                jsr ClearScreen
+
                 jsr bankCartStart
+                ;[no return]
+
                 jmp editor.cartridge.START
 
                 .endproc
@@ -78,6 +100,10 @@ PrepBanks       .proc
 ;--------------------------------------
 
                 .include "platform_f256.asm"
+                .include "CIO_wedge.asm"
+
+                .align $0100
+                .include "atari-screen.inc"
 
 
 ;--------------------------------------
@@ -91,7 +117,7 @@ versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest
 
                 .include "main.io.asm"
 
-propid          ldx arg0
+propid          ldx $A0
 
                 .include "screen.mac.asm"
 
@@ -190,6 +216,14 @@ comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
 
 edit_copyright  .null "ces"
                 .byte $00
+
+
+;--------------------------------------
+;--------------------------------------
+                ;* = el+$0fff
+;--------------------------------------
+
+                ;.byte $01
 
 editend
                 .end

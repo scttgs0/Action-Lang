@@ -17,10 +17,10 @@ WARMST                  = ZPBASE+$00    ; 0=cold powerup; 255=warm RESET
 DOSVEC                  = ZPBASE+$01    ; [long] jump to DOS
 RMARGN                  = ZPBASE+$04    ; [word]
 LMARGN                  = ZPBASE+$06
-OLDCHR                  = ZPBASE+$07    ; character under the cursor
-                                        ; used to restore that character when the cursor moves
-COLCRS                  = ZPBASE+$08    ; [word] Column of cursor
-ROWCRS                  = ZPBASE+$0A    ; [word] Row of cursor
+;!!OLDCHR                  = ZPBASE+$07    ; character under the cursor
+                                           ; used to restore that character when the cursor moves
+;!!COLCRS                  = ZPBASE+$08    ; [word] Column of cursor
+;!!ROWCRS                  = ZPBASE+$0A    ; [word] Row of cursor
 DINDEX                  = ZPBASE+$0C    ; display mode/current screen mode
 ADRESS                  = ZPBASE+$0D    ; [3-byte] temporary storage / line buffer
 BRKKEY                  = ZPBASE+$10    ; 0=the BREAK key is pressed; 1=not pressed
@@ -35,9 +35,9 @@ INBUFF                  = ZPBASE+$2D    ; [3-byte]
 
 ; Editor equates
 
-OLDROW                  = ZPBASE+$5A
-OLDCOL                  = ZPBASE+$5B    ; [word]
-OLDADR                  = ZPBASE+$5E    ; [word]
+;!!OLDROW                  = ZPBASE+$5A
+;!!OLDCOL                  = ZPBASE+$5B    ; [word]
+;!!OLDADR                  = ZPBASE+$5E    ; [word]
 
 
 ; Page Zero defs
@@ -64,19 +64,20 @@ choff                   = ZPBASE+$8D
 lnum                    = ZPBASE+$8E
 curproc                 = ZPBASE+$8E    ; [word]
 dirty                   = ZPBASE+$8F
-top                     = ZPBASE+$90    ; -> top line
-bot                     = ZPBASE+$92    ; -> bottom line
-whaddr                  = ZPBASE+$92    ; -> current DO frame
-cur                     = ZPBASE+$94    ; -> current line
+top                     = ZPBASE+$90    ; [word] -> top line
+bot                     = ZPBASE+$92    ; [word] -> bottom line
+whaddr                  = ZPBASE+$92    ; [word] -> current DO frame
+cur                     = ZPBASE+$94    ; [word] -> current line
 x__                     = ZPBASE+$96    ; don't use in compiler
 y__                     = ZPBASE+$97    ; don't use in compiler
 nlines                  = ZPBASE+$98
-Channel                 = ZPBASE+$98    ; current input file
+ioChnnl                 = ZPBASE+$98    ; current input file
 ytop                    = ZPBASE+$99
 defflg                  = ZPBASE+$99
 indent                  = ZPBASE+$9A
 stackptr                = ZPBASE+$9A    ; op stack offset
-buf                     = ZPBASE+$9B    ; -> edit buf
+
+buf                     = ZPBASE+$9B    ; [word] -> edit buf
 insert                  = ZPBASE+$9D    ; insert/replace flag
 delnxt                  = ZPBASE+$9E    ; ->, USED BY LEX
 

@@ -22,31 +22,29 @@ Memory          .proc
                 lda #$00
                 tay
                 sta (zpAllocBase),Y
-
                 iny
                 sta (zpAllocBase),Y
 
+;   calculate memory available for allocation
                 sec
                 lda MEMTOP
                 sbc zpAllocBase
-
                 iny
                 sta (zpAllocBase),Y
 
                 lda MEMTOP+1
                 sbc zpAllocBase+1
-
                 iny
                 sta (zpAllocBase),Y
 
-                lda #$00                ; allocate 2 pages of spare memory
-                ldx #$02
+                lda #<$0200             ; allocate 2 pages of spare memory
+                ldx #>$0200
                 jsr Allocate
 
                 lda zpAllocCurrent
-                sta sparem
+                sta spareMem
                 ldx zpAllocCurrent+1
-                stx sparem+1
+                stx spareMem+1
 
                 rts
                 .endproc
@@ -85,8 +83,9 @@ Window2         .proc
 
                 jsr editor.window.SaveWorld
 
-                lda #w2-w1
-                sta numwd
+;   activate window2
+                lda #win2Base-win1Base
+                sta is2Windows          ; non-zero means window2 is active
                 sta currentWindow
 
                 jsr ZeroWindow
@@ -96,7 +95,7 @@ Window2         .proc
                 sty ytop
 
                 sec
-                lda #$17
+                lda #$1D        ;;#59
                 sbc jt_wsize
                 sta nlines
 
@@ -109,30 +108,23 @@ Window2         .proc
 ; Initialize the Editor
 ;======================================
 EditorInit      .proc
-                ;-- lda #<$7FFF
-                ;-- sta MEMTOP
-                ;-- lda #>$7FFF
-                ;-- sta MEMTOP+1
-
-                ;-- lda #<$0600
-                ;-- sta MEMLO
-                ;-- lda #>$0600
-                ;-- sta MEMLO+1
-
+    ; [debug] $B621
                 jsr Memory
 
-                lda #$00
-                ldx #$01
-                jsr Allocate            ; get edit buffer
+                lda #<$0100             ; allocate 1 page for edit buffer
+                ldx #>$0100
+                jsr Allocate
 
                 lda zpAllocCurrent
                 sta buf
                 ldx zpAllocCurrent+1
                 stx buf+1
 
-                lda #$40
+                lda #$40             ; translate screen code into ascii code
+                ;;lda #$00    ; HACK:
                 sta chrConvert
 
+;   set HEAD and TAIL within the delete buffer
                 lda #<delbuf
                 sta delbuf
                 sta delbuf+4
@@ -143,24 +135,24 @@ EditorInit      .proc
 ;   initialize window
                 jsr ZeroWindow
 
-_ENTRY1         lda #$17                ; rowcount
+_ENTRY1         lda #$1D        ;;#59                 ; rowcount
                 sta nlines
                 sta cmdln
 
+;   activate window1
                 lda #$00
                 sta currentWindow
                 sta ytop
 
 _ENTRY2         jsr editor.display.CenterLine
 
-_ENTRY3         lda #<editCmdMsg
-                ldx #>editCmdMsg
-
+_ENTRY3         lda #<msgEditCmd
+                ldx #>msgEditCmd
                 jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-editCmdMsg      .ptext "ACTION! (c)2024 GPL3"
+msgEditCmd      .ptext "ACTION! (c)2024 GPL3"
                 .endproc
 
                 .endnamespace

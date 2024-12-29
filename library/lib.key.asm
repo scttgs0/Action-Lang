@@ -26,19 +26,22 @@ _waitForKey     lda KEYCHAR             ; key down?
                 cpx JIFFYCLOCK
                 bpl _waitForKey
 
-                ldy #$00
-                lda (OLDADR),Y
-                eor #$80
-                sta (OLDADR),Y
+;   unnecessary code
+                ;!! ldy #$00
+                ;!! lda (OLDADR),Y
+                ;!! eor #$80
+                ;!! sta (OLDADR),Y
 
                 jmp _next1
 
-_1              ldy #$00
-                lda OLDCHR
-                eor #$80
-                sta (OLDADR),Y          ; restore cursor
+;   unnecessary code
+_1              ;!! ldy #$00
+                ;!! lda OLDCHR
+                ;!! eor #$80
+                ;!! sta (OLDADR),Y          ; restore cursor
 
 _faster         ;!!ldx SRTIMR           ; faster repeat
+                ldx #$0A    ; HACK:
                 cpx #$0C
                 bcs _6
 
@@ -69,13 +72,14 @@ _3              and #$3F
                 jsr screenPutCh._ENTRY2
 
 _4              ;!!ldx SRTIMR
+                ldx #$0A    ; HACK:
                 cpx #$0A
                 bcs _5
 
                 ldx #$03
                 ;!!stx SRTIMR
 
-_5              sta curch
+_5              sta curCH
 
                 rts
 
@@ -90,6 +94,7 @@ _next3          jsr Click
                 bmi _next1
 
 _8              ;!!lda INVFLG
+                lda #$00    ; HACK:
                 eor #$80
                 ;!!sta INVFLG
 

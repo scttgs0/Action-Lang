@@ -137,7 +137,7 @@ _next1          jsr mscStrPtr
                 jsr ioLoadBuffer._ENTRY1
                 jsr editor.memory.InsertByte
 
-                lda allocerr
+                lda allocErr
                 bne _1                  ; check for out of memory
 
                 jsr editor.chr.DeleteNext
@@ -146,7 +146,7 @@ _next1          jsr mscStrPtr
 _1              jsr ioResetCursor
 
                 ldy currentWindow
-                lda w1+WCUR+1,Y
+                lda win1Base+WCUR+1,Y
                 beq _2
 
                 jsr mscNextDown
@@ -192,23 +192,23 @@ IndentRight     .proc
 ; insert/replace toggle
 ;======================================
 InsertToggle    .proc
-                lda #<_rmsg
-                ldx #>_rmsg
+                lda #<_msgREPLACE
+                ldx #>_msgREPLACE
                 inc insert
                 beq _XIT
 
                 lda #$FF
                 sta insert
 
-                lda #<_imsg
-                ldx #>_imsg
+                lda #<_msgINSERT
+                ldx #>_msgINSERT
 
 _XIT            jmp editor.display.CommandMsg
 
 ;--------------------------------------
 
-_imsg           .ptext "INSERT"
-_rmsg           .ptext "REPLACE"
+_msgINSERT      .ptext "INSERT"
+_msgREPLACE     .ptext "REPLACE"
 
                 .endproc
 
@@ -226,7 +226,7 @@ ScrollInit      .proc
                 jsr mscNext
                 beq _1                  ; EOF
 
-                lda COLCRS
+                lda CURSOR_X    ;!!COLCRS
                 sta x__
 
                 ; lda choff
@@ -342,7 +342,7 @@ ScrollLeft      .proc
                 jsr CheckColumn
 
                 lda LMARGN
-                cmp COLCRS
+                cmp CURSOR_X    ;!!COLCRS
                 bcc _XIT
 
                 clc
@@ -367,7 +367,7 @@ ScrollRight     .proc
                 jsr CheckColumn
                 bcc CheckColumn._XIT
 
-                lda COLCRS
+                lda CURSOR_X    ;!!COLCRS
                 cmp RMARGN
                 bcc _XIT
 
@@ -390,7 +390,7 @@ SetSpacing      .proc
                 adc choff
 
                 clc
-                adc COLCRS
+                adc CURSOR_X    ;!!COLCRS
 
                 sec
                 sbc LMARGN
@@ -433,13 +433,23 @@ MoveUp          .proc
 MoveContent     .proc
                 sty arg6                ; save registers
                 sta arg4
-                stx ROWCRS
+                stx CURSOR_Y    ;!!ROWCRS
 
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
                 jsr ioGetDisplayAddr    ; get display address
 
                 ldx arg4
                 dex
+
+; - - - - - - - - - - - - - - - - - - -
+;   preserve IOPAGE control
+                lda IOPAGE_CTRL
+                pha
+
+;   switch to text map
+                lda #iopPage2
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
 
 _next1          lda arg0
                 sta arg2
@@ -454,7 +464,7 @@ _next1          lda arg0
                 adc arg6
                 sta arg1
 
-                ldy #39
+                ldy #CharResX-1
 _next2          lda (arg0),Y
                 sta (arg2),Y
 
@@ -463,6 +473,12 @@ _next2          lda (arg0),Y
 
                 dex
                 bne _next1
+
+; - - - - - - - - - - - - - - - - - - -
+;   restore IOPAGE control
+                pla
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
 
                 rts
                 .endproc

@@ -28,7 +28,7 @@ _2              sta jt_tvdisp
 
 ;   Alarm?
                 ldx #amsg-optmsg
-                ldy jt_alarm
+                ldy jt_vecAlarm
                 cpy #$60
                 jsr _14
                 beq _3
@@ -37,7 +37,7 @@ _2              sta jt_tvdisp
                 bne _4
 
 _3              lda #$4C                ; JMP
-_4              sta jt_alarm
+_4              sta jt_vecAlarm
 
 ;   Case sensitive?
                 ldx #cmsg-optmsg
@@ -54,27 +54,27 @@ _6              sta jt_stmask
 
 ;   Trace On?
                 ldx #tmsg-optmsg
-                ldy trace
+                ldy isTrace
                 jsr _14
                 beq _7
 
                 lda #$00
                 beq _8
 
-_7              lda #$FF
-_8              sta trace
+_7              lda #$FF                ; isTrace=ON
+_8              sta isTrace
 
 ;   List On?
                 ldx #lstmsg-optmsg
-                ldy list
+                ldy isListing
                 jsr _14
                 beq _9
 
                 lda #$00
                 beq _10
 
-_9              lda #$FF
-_10             sta list
+_9              lda #$FF                ; isListing=ON
+_10             sta isListing
 
 ;   window size
                 lda jt_wsize
@@ -93,19 +93,19 @@ _11             cmp #$13
                 lda #$12
 _12             sta jt_wsize
 
-                ldx numwd
-                beq _13
+                ldx is2Windows          ; single window?
+                beq _13                 ;   yes
 
-                sta w1+WNLINES
+                sta win1Base+WNLINES
 
                 tay
                 iny
-                sty w2+WYTOP
+                sty win2Base+WYTOP
 
                 sec
-                lda #$17
+                lda #$1D        ;;#59
                 sbc jt_wsize
-                sta w2+WNLINES
+                sta win2Base+WNLINES
 
 ;   line size
 _13             lda jt_linemax

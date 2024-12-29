@@ -50,7 +50,7 @@ Sound           .proc
                 bmi _1
 
                 ldy #100
-                jsr jt_error
+                jsr jt_vecError
 
 _1              txa
                 ;!!sta AUDF1,Y
@@ -74,6 +74,7 @@ _1              txa
 ;======================================
 SndRst          .proc
                 ;!!lda SSKCTL
+                lda #$00    ; HACK:
                 and #$EF                ; turn off two tone bit
                 ;!!sta SSKCTL
                 ;!!sta SKCTL
@@ -118,6 +119,7 @@ PTrig           .proc
 
 _1              tay
                 ;!!lda PORTA,X
+                lda #$1F            ; HACK:
                 and _data1,Y
                 sta args
 
@@ -146,6 +148,7 @@ Stick           .proc
 
 _1              tay
                 ;!!lda PORTA,X
+                lda #$1F            ; HACK:
 
                 dey
                 bne _2
@@ -352,7 +355,7 @@ Break           .proc
                 ldy #brkERR
                 tya
 
-                jmp jt_error
+                jmp jt_vecError
 
                 .endproc
 

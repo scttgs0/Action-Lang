@@ -33,7 +33,7 @@ ioPrint         .proc
                 ldx #$00
                 stx arg3
 
-                ldy #$09                ; PUTSTR
+                ldy #$09                ; PUTTEXT
                 jsr ioXioStr
                 bne _XIT
 
@@ -141,6 +141,11 @@ ioOutput        .proc
 
 ;======================================
 ; ioDisplayStr(prompt, str, invert)
+;--------------------------------------
+; on entry:
+;   X:A         message
+;   Y
+;   arg4        char used for clearing
 ;======================================
 ioDisplayStr    .proc
                 sty arg12
@@ -151,13 +156,13 @@ ioDisplayStr    .proc
                 ldy #$00
                 sty arg3
 
-                ldy arg4
+                ldy arg4                ; char used for clearing
                 jsr ioPutStr
 
                 lda arg6                ; PutStr size
                 clc
                 adc LMARGN
-                sta COLCRS
+                sta CURSOR_X    ;!!COLCRS
 
                 jsr screenCursorRight
 
@@ -232,9 +237,9 @@ ioWriteBuffer   .proc
 ;======================================
 ioResetCursor   .proc
                 ldy currentWindow
-                lda w1+WCUR,Y
+                lda win1Base+WCUR,Y
                 sta cur
-                lda w1+WCUR+1,Y
+                lda win1Base+WCUR+1,Y
                 sta cur+1
 
                 jmp ioLoadBuffer
@@ -262,7 +267,7 @@ ioSystemError   .proc
                 lda #<msgSysErr
                 ldx #>msgSysErr
                 jsr ioDisplayStr
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
                 jsr ioResetColumn
 
                 jmp screenBell
@@ -297,7 +302,7 @@ ioCardToStr     .proc
 ;--------------------------------------
 ; real in FR0
 ;======================================
-ioRealToStr       ;.proc
+ioRealToStr     ;.proc
                 ;!!jsr FASC
 
                 ldy #$FF
@@ -367,7 +372,7 @@ pnum            lda device
 ioOpenChannel   .proc
                 pha
 
-                lda Channel
+                lda ioChnnl
                 jsr ioClose
 
                 pla
@@ -412,7 +417,7 @@ _next1          lda (nxtaddr),Y         ; move string up...
                 lda #':'
                 sta (nxtaddr),Y
 
-_1              lda Channel
+_1              lda ioChnnl
                 ldx nxtaddr
                 ldy nxtaddr+1
                 jsr ioOpen
@@ -427,7 +432,7 @@ _1              lda Channel
 ; ioPrintBuffer()
 ;======================================
 ioPrintBuffer   .proc
-                lda list
+                lda isListing
                 bne ioRealToCard._XIT   ; return
                 jmp ioWriteBuffer
 
@@ -545,67 +550,125 @@ ioPutChar       .proc
 
 ;======================================
 ; ioPutStr(str, invert, offset)
+;--------------------------------------
+; on entry:
+;   X:A         message
+;   Y           char used for clearing
 ;======================================
 ioPutStr        .proc
-                sta arg6
-                stx arg7
-                sty arg2
+_DEST_LO        = arg0
+_DEST_HI        = arg1
+_clearChar      = arg2
+_idxSRC         = arg3
+_SRC_LO         = arg4
+_SRC_HI         = arg5
+_message_LO     = arg6
+_message_HI     = arg7
+;---
 
-                sec
-                adc arg3
-                sta arg4
+                sta _message_LO
+                stx _message_HI
+                sty _clearChar
+
+;   calculate the SRC address
+                lda _message_LO
+                sec                     ; skip length byte
+                adc _idxSRC
+                sta _SRC_LO
                 bcc _1
 
-                inx
+                inx                     ; message_HI++
 
-_1              stx arg5
+_1              stx _SRC_HI
 
                 jsr ioGetDisplayAddr
-                jsr ioZapCursor
+                ;!! jsr ioZapCursor     ; unnecessary
 
-                ldy #39
-                lda arg2
-_next1          sta (arg0),Y            ; clear line
+                lda _clearChar
+                bpl _1a
+
+; - - - - - - - - - - - - - - - - - - -
+;   preserve IOPAGE control
+                lda IOPAGE_CTRL
+                pha
+
+;   switch to text map
+                lda #iopPage3
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
+
+;   inverse the line
+                ldy #CharResX-1
+                lda #$10
+_next1a         sta (_DEST_LO),Y        ; clear line
+
+                dey
+                bpl _next1a
+
+; - - - - - - - - - - - - - - - - - - -
+;   restore IOPAGE control
+                pla
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
+
+; - - - - - - - - - - - - - - - - - - -
+;   preserve IOPAGE control
+_1a             lda IOPAGE_CTRL
+                pha
+
+;   switch to text map
+                lda #iopPage2
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
+
+;   erase the current line
+                ldy #CharResX-1
+                lda _clearChar
+                ;;and #$7F                ; ignore the inverse bit
+_next1          sta (_DEST_LO),Y        ; clear line
 
                 dey
                 bpl _next1
 
+;   adjust DEST address by margin
                 clc                     ; handle left margin
-                lda arg0
+                lda _DEST_LO
                 adc LMARGN
-                sta arg0
+                sta _DEST_LO
                 bcc _2
 
-                inc arg1
+                inc _DEST_HI
 
 _2              iny                     ; sets Y to 0
 
+;   fetch the message length
                 clc
-                lda (arg6),Y
-                sbc arg3
+                lda (_message_LO),Y
+                sbc _idxSRC
                 bcc _6                  ; no chars
 
-                sta arg6
+                sta _message_LO
 
                 tay
                 lda #$00
-                sta arg7
+                sta _message_HI
 
+;   message extended beyond right margin?
                 sec
                 lda RMARGN
                 sbc LMARGN
-                cmp arg6
+                cmp _message_LO
                 beq _3                  ; handle EOL char
                 bcs _next2              ; length ok
 
-                sta arg6
+                sta _message_LO
 
-                ldy arg6                ; length too long
+                ldy _message_LO         ; length too long
 _3              lda #$80
-                sta arg7
+                sta _message_HI
 
-_next2          lda arg2
-                eor (arg4),Y
+_next2          lda _clearChar
+                eor (_SRC_LO),Y
                 pha
 
                 and #$60
@@ -614,38 +677,47 @@ _next2          lda arg2
                 pla
                 and #$9F
                 ora chrConvert,X
-                sta (arg0),Y
+                sta (_DEST_LO),Y
 
                 dey
                 bpl _next2
 
-                ldy arg6
-                lda arg7
+                ldy _message_LO
+                lda _message_HI
                 bne _4
 
-                lda arg2
+                lda _clearChar
                 bne _5                  ; no EOL char if inverted
 
                 iny
-_next3          lda $04E3 ;!! EOL
-                sta (arg0),Y
+_next3          lda jt_eolch
+                sta (_DEST_LO),Y
 
                 jmp _5
 
-_4              eor (arg0),Y
-                sta (arg0),Y
+_4              eor (_DEST_LO),Y
+                sta (_DEST_LO),Y
 
-_5              lda arg3
+_5              lda _idxSRC
                 beq _XIT1
 
 _next4          ldy #$00
-                lda (arg0),Y
+                lda (_DEST_LO),Y
                 eor #$80
-                sta (arg0),Y
+                sta (_DEST_LO),Y
 
-_XIT1           rts
+_XIT1
+; - - - - - - - - - - - - - - - - - - -
+;   restore IOPAGE control
+                pla
+                sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
 
-_6              lda arg3
+                rts
+
+; - - - - - - - - - - - - - - - - - - -
+
+_6              lda _idxSRC
                 bne _next4
 
                 tay
@@ -659,10 +731,10 @@ _6              lda arg3
 ;======================================
 ioCmdColumn     .proc
                 jsr ioSaveColumn
-                jsr ioRestoreCursorChar
+                ;!! jsr ioRestoreCursorChar ; unnecessary
 
                 ldy cmdln
-                sty ROWCRS
+                sty CURSOR_Y    ;!!ROWCRS
 
                 rts
                 .endproc
@@ -672,10 +744,9 @@ ioCmdColumn     .proc
 ; Preserve column
 ;======================================
 ioSaveColumn    .proc
-                lda ROWCRS
+                lda CURSOR_Y    ;!!ROWCRS
                 sta y__
-
-                lda COLCRS
+                lda CURSOR_X    ;!!COLCRS
                 sta x__
 
                 rts
@@ -687,12 +758,11 @@ ioSaveColumn    .proc
 ;======================================
 ioResetColumn   .proc
                 lda y__
-                sta ROWCRS
-
+                sta CURSOR_Y    ;!!ROWCRS
                 lda x__
-                sta COLCRS
+                sta CURSOR_X    ;!!COLCRS
 
-                jsr ioZapCursor
+                ;!! jsr ioZapCursor     ; unnecessary
 _ENTRY1         jsr screenCursorLeft
                 jmp screenCursorRight
 
@@ -753,10 +823,9 @@ ioDisplayBuffer .proc
                 adc choff
                 sta arg3
 
-                ldy #$00
-                lda buf
+                ldy #$00        ;;#' '                ; char used for clearing (space)
+                lda buf                 ; X:A = message
                 ldx buf+1
-
                 jmp ioPutStr
 
                 .endproc
@@ -768,7 +837,7 @@ ioDisplayBuffer .proc
 ioGetDisplayAddr .proc
                 lda #<CS_TEXT_MEM_PTR
                 ldx #>CS_TEXT_MEM_PTR
-                ldy ROWCRS
+                ldy CURSOR_Y    ;!!ROWCRS
                 beq _2
 
 _next1          clc
@@ -790,23 +859,25 @@ _2              sta arg0
 ;======================================
 ; Get rid of the old cursor
 ;======================================
-ioZapCursor     .proc
-                lda #<CSRCH
-                sta OLDADR
-                lda #>CSRCH
-                sta OLDADR+1
+;!!ioZapCursor     .proc
+;   unnecessary code
+                ;!!lda #<CSRCH
+                ;!!sta OLDADR
+                ;!!lda #>CSRCH
+                ;!!sta OLDADR+1
 
-                rts
-                .endproc
+;!!                rts
+;!!                .endproc
 
 
 ;======================================
 ; Restore char under cursor
 ;======================================
-ioRestoreCursorChar .proc
-                ldy #$00
-                lda OLDCHR
-                sta (OLDADR),Y
+;!!ioRestoreCursorChar .proc
+;   unnecessary code
+                ;!! ldy #$00
+                ;!! lda OLDCHR
+                ;!! sta (OLDADR),Y
 
-                rts
-                .endproc
+;!!                rts
+;!!                .endproc
