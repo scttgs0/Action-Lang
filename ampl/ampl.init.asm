@@ -98,7 +98,7 @@ _2              sta codeBase
                 sta symtab+1
 
 _err            ldy #allocateERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _3              lda spareMem
                 sta frame

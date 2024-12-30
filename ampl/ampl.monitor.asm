@@ -23,7 +23,7 @@ Monitor         .proc
                 lda top+1
                 sta cacheTop_HI
 
-_ENTRY1         jsr screenInit
+_ENTRY1         jsr screen.Init
 
                 ldx #$01
                 stx ROWCRS
@@ -41,10 +41,10 @@ _next1          jsr editor.io.InitKeys
                 lda DINDEX              ; display mode
                 beq _1
 
-                jsr screenInit          ; get Graphics(0)
+                jsr screen.Init         ; get Graphics(0)
 
 _1              jsr jt_vecAlarm
-                jsr ioRestoreCursorChar
+                jsr mainio.RestoreCursorChar
 
                 lda #<prompt
                 ldx #>prompt
@@ -66,9 +66,9 @@ _1              jsr jt_vecAlarm
 
                 lda tempbuf+1
                 ora #$20
-                ldx #<tblCmds
-                ldy #>tblCmds
-                jsr mscLookup
+                ldx #<tblMonitorCmd
+                ldy #>tblMonitorCmd
+                jsr mainmsc.Lookup
 
                 jmp _next1
 
@@ -147,7 +147,7 @@ _1              lda arg11
                 beq _next1
 
                 ldx #$FF
-                stx CH_
+                stx CH_                 ; reset last keypress
 
                 cmp #$DE
                 bne _next1
@@ -162,37 +162,37 @@ _1              lda arg11
 Print           .proc
                 jsr SaveParams
 
-_ENTRY1         jsr ioPrintCard
+_ENTRY1         jsr mainio.PrintCard
 
                 ldy #','
-                jsr ioPutChar
+                jsr mainio.PutChar
 
                 lda arg11
                 ldx arg12
                 jsr PrintHex
-                jsr ioPutSpace
+                jsr mainio.PutSpace
 
                 ldy #'='
-                jsr ioPutChar
-                jsr ioPutSpace
+                jsr mainio.PutChar
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 tay
-                jsr ioPutChar
-                jsr ioPutSpace
+                jsr mainio.PutChar
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 jsr PrintHex
-                jsr ioPutSpace
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 ldx #$00
-                jsr ioPrintCard
-                jsr ioPutSpace
+                jsr mainio.PrintCard
+                jsr mainio.PutSpace
                 jsr LoadParams
 
-                jsr ioPrintCard
-                jmp ioPutEOL
+                jsr mainio.PrintCard
+                jmp mainio.PutEOL
 
                 .endproc
 
@@ -216,7 +216,7 @@ LoadParams      .proc
 ; SaveParams()
 ;======================================
 SaveParams      .proc
-                jsr mscMNum
+                jsr mainmsc.MNum
 
                 sta arg11
                 stx arg12
@@ -232,6 +232,7 @@ Boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr editor.window.YesNo
+
                 bne MemRun._XIT
                 jmp editor.cartridge.START._cold
 
@@ -263,8 +264,8 @@ _1              lda INITAD
 
 _XIT            rts
 
-_2              jsr mscMNum
-_3              jsr bankRun
+_2              jsr mainmsc.MNum
+_3              jsr mainbank.Run
 
                 lda #$00
                 sta device
@@ -288,7 +289,7 @@ MemWrite        .proc                   ; write object file
                 sta ioChnnl
 
                 lda #$08                ; output
-                jsr ioOpenChannel
+                jsr mainio.OpenChannel
 
 ;   write header
                 lda #$06
@@ -359,7 +360,7 @@ _next1          lda _mwinit,X
 
 ;   close file
                 lda #$01
-                jmp ioClose
+                jmp mainio.Close
 
 ;--------------------------------------
 
@@ -377,7 +378,7 @@ WOut            .proc
                 lda #$01
                 ldx #arg9
                 ldy #$00
-                jsr ioOutput
+                jsr mainio.Output
 
                 bmi _mwerr
 
@@ -389,7 +390,7 @@ WOut            .proc
 ;--------------------------------------
 _mxerr          ldy #endERR
 
-_mwerr          jmp bankSPLErr
+_mwerr          jmp mainbank.SPLErr
 
                 .endproc
 
@@ -408,7 +409,7 @@ Execute         .proc
                 pha
 
                 jsr compiler.lexicon.GetNext
-                jsr bankCStmtList
+                jsr mainbank.CStmtList
 
                 cmp #tokEOF
                 bne WOut._mxerr
@@ -421,7 +422,7 @@ Execute         .proc
                 tax
                 pla
 
-                jmp bankRun
+                jmp mainbank.Run
 
                 .endproc
 
@@ -431,10 +432,10 @@ Execute         .proc
 ;======================================
 Compile         .proc
                 jsr ampl.init.SetupSPL
-                jsr ioDisplayOff
-                jsr bankCompile
+                jsr mainio.DisplayOff
+                jsr mainbank.Compile
 
-                jmp ioDisplayOn
+                jmp mainio.DisplayOn
 
                 .endproc
 
@@ -465,7 +466,7 @@ Proceed         .proc
 
                 txs
 
-                jmp bankLProceed
+                jmp mainbank.LProceed
 
 _XIT            rts
 
@@ -485,7 +486,7 @@ PrintHex        .proc
                 sta arg2
 
                 ldy #'$'
-                jsr ioPutChar
+                jsr mainio.PutChar
 
 _next1          lda #$00
                 ldx #$04
@@ -504,7 +505,7 @@ _next2          asl arg0
                 adc #$06
 
 _1              tay
-                jsr ioPutChar
+                jsr mainio.PutChar
 
                 dec arg2
                 bne _next1
@@ -516,41 +517,33 @@ _1              tay
 ;--------------------------------------
 ;--------------------------------------
 
-tblCmds         .addr jt_vecDispTb+9    ; unknown cmd
-                .byte 35                ; table size
+tblMonitorCmd   .addr jt_vecDispTb+9    ; default routine
+                .byte $23               ; table size (#entries*3 - 1)
 
                 .addr Boot
                 .text 'b'               ; BOOT
-
                 .addr Compile
                 .text 'c'               ; COMPILE
-
-                .addr bankDosRet
+                .addr mainbank.DosRet
                 .text 'd'               ; DOS
-
                 .addr Quit
                 .text 'e'               ; EDITOR
-
-                .addr bankOptions
+                .addr mainbank.Options
                 .text 'o'               ; OPTIONS
-
                 .addr Proceed
                 .text 'p'               ; PROCEED (continue after BRK)
-
                 .addr MemRun
                 .text 'r'               ; MEMORY RUN
-
                 .addr MemWrite
                 .text 'w'               ; MEMORY WRITE
-
                 .addr Execute
                 .text 'x'               ; EXECUTE
-
                 .addr Print
                 .text '?'               ; PRINT
-
                 .addr MemDump
                 .text '*'               ; MEMORY DUMP
+
+; - - - - - - - - - - - - - - - - - - -
 
 prompt          .ptext '>'
 

@@ -29,7 +29,7 @@ ScanParseLex    ;.proc
 _1              lda cacheTop_HI
                 sta top+1
 
-                jsr ioChkCursor._ENTRY1
+                jsr mainio.ChkCursor._ENTRY1
                 beq _XIT1               ; no program !
 
                 jsr compiler.lexicon.GetNext
@@ -51,7 +51,7 @@ _next1          jsr compiler.lexicon.GetNext
                 bne _2
 
                 lda #$01                ; save run address
-                jsr mscCProp
+                jsr mainmsc.CProp
 
                 sta INITAD
                 stx INITAD+1
@@ -83,7 +83,7 @@ _next3          ldy #$01
                 lda (arrayptr),Y
                 sta arg0
 
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
 
                 sta (arrayptr),Y
 
@@ -119,7 +119,7 @@ _next3          ldy #$01
 
 _XIT1           rts
 
-_2              jsr mscGetCodeOffset    ; no main PROC
+_2              jsr mainmsc.GetCodeOffset   ; no main PROC
 
                 sta INITAD
                 stx INITAD+1
@@ -134,7 +134,7 @@ _2              jsr mscGetCodeOffset    ; no main PROC
 _err            ldy #endERR
                 jmp ErrorFI
 
-_err2           jmp mscCodeIncr.cderr   ; out of QCODE space
+_err2           jmp mainmsc.CodeIncr.cderr   ; out of QCODE space
 
                 ;.endproc
 
@@ -200,7 +200,7 @@ _next1          cmp #tokCHAR
 _next2          jsr MakeEntry
 
                 lda zpAllocCurrent
-                jsr mscCodeIncr
+                jsr mainmsc.CodeIncr
                 jsr compiler.lexicon.GetNext
 
                 cmp #tokComma
@@ -242,7 +242,7 @@ _1              cmp #tokTYPE
 
 ;   record decl.
                 lda #$00
-                jsr mscGetProp
+                jsr mainmsc.GetProp
 
                 stx zpAllocCurrent
 
@@ -305,7 +305,7 @@ _4              lda nxttoken
                 bne _6
 
 _5              lda zpAllocCurrent
-                jsr mscCodeIncr
+                jsr mainmsc.CodeIncr
 
 _6              jsr compiler.lexicon.GetNext
 
@@ -340,7 +340,7 @@ _define         jsr MakeEntry
                 clc
                 adc #$02                ; real size + EOL
 
-                jsr mscSTIncr
+                jsr mainmsc.STIncr
                 jsr compiler.lexicon.GetNext    ; string itself
                 jsr compiler.lexicon.GetNext    ; dummy string
                 jsr compiler.lexicon.GetNext
@@ -354,7 +354,7 @@ _define         jsr MakeEntry
 ;
 ;--------------------------------------
 DefineError     ldy #declERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 
 ;--------------------------------------
@@ -389,7 +389,7 @@ _next1          jsr MakeEntry
                 ldx arrayptr+1
                 ldy #$00
 
-                jsr mscStoreVar
+                jsr mainmsc.StoreVar
                 jsr GetArraySize
                 jsr compiler.lexicon.GetNext
 
@@ -435,7 +435,7 @@ _1              cmp #$04
                 ldx QCODE+1
                 stx arrayptr+1
 
-_next4          jsr mscCodeIncr
+_next4          jsr mainmsc.CodeIncr
 
 _next5          jsr compiler.lexicon.GetNext
 
@@ -458,8 +458,8 @@ _4              jsr IDEqual
                 beq _5
 
                 ldy #$00
-                jsr mscStoreVar
-                jsr mscGetCodeOffset
+                jsr mainmsc.StoreVar
+                jsr mainmsc.GetCodeOffset
 
 _5              ldy #$01
                 jsr StoreProps
@@ -479,7 +479,7 @@ _6              ldy #$00
                 sta (zpAllocProps),Y
 
                 iny
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
                 jsr StoreProps
                 bne _next2              ; [unc]
 
@@ -521,7 +521,7 @@ MakeEntry       .proc
 _1              lda qglobal
                 beq CheckParam._ENTRY1
 
-                jsr bankLocalName
+                jsr mainbank.LocalName
 
                 cmp #tokUNDEC
                 beq _2
@@ -531,7 +531,7 @@ _err            jmp DefineError
 _2              sta nxttoken
 
 _3              lda #$00
-                jsr mscNextProp
+                jsr mainmsc.NextProp
 
                 sec
                 lda #tokVAR_t-tokCHAR
@@ -545,7 +545,7 @@ _3              lda #$00
 
                 iny
 
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
                 jsr StoreProps
                 jmp compiler.lexicon.GetNext
 
@@ -561,7 +561,7 @@ IDEqual         .proc
                 ldx param
                 bne Params._err
 
-                jmp mscMNum
+                jmp mainmsc.MNum
 
                 .endproc
 
@@ -592,7 +592,7 @@ _next1          clc
                 lda arg0
                 ldy #$02
 
-                jmp mscStoreVar
+                jmp mainmsc.StoreVar
 
                 .endproc
 
@@ -631,7 +631,7 @@ Params          .proc
                 pha
 
                 lda #$03
-                jsr mscCProp
+                jsr mainmsc.CProp
 
                 cmp #$08
                 bcs _err
@@ -715,7 +715,7 @@ _next1          ldx nxttoken
                 cpx #tokRBracket
                 beq _3
 
-                jsr mscMNum
+                jsr mainmsc.MNum
 
                 cpx #$00
                 beq _1
@@ -747,7 +747,7 @@ _next2          ldx nxttoken
 _4              cmp #tokUNDEC
                 bne _5
 
-                jsr bankGetAlias
+                jsr mainbank.GetAlias
                 bne _next2              ; [unc]
 
 _5              cmp #tokTYPE_t
@@ -764,7 +764,7 @@ _6              cmp #tokTYPE_t+8
 
 _7              ldx #<tblStmtList
                 ldy #>tblStmtList
-                jmp mscLookup
+                jmp mainmsc.Lookup
 
                 .endproc
 
@@ -843,7 +843,7 @@ _3              jsr Expression._ENTRY1
 ;--------------------------------------
 AssignError     .proc
                 ldy #assgnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -986,7 +986,7 @@ ThenError       ldy #thenERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-StmtErr         jmp bankSPLErr
+StmtErr         jmp mainbank.SPLErr
 
 
 ;--------------------------------------
@@ -1010,7 +1010,7 @@ ErrorFI         .proc
                 cmp #tokUNDEC
                 bne StmtErr
 
-                jmp mscMNum._varerr
+                jmp mainmsc.MNum._varerr
 
                 .endproc
 
@@ -1175,7 +1175,7 @@ _2              cmp #tokDO
                 bne _next1
 
 ;   generate end test
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
 
                 ldy #$04
                 jsr FrameCd._ENTRY2
@@ -1278,7 +1278,7 @@ _6              jsr ampl.cgu.Push1
                 sta (symtab),Y
 
                 lda #$04
-                jsr mscSTIncr
+                jsr mainmsc.STIncr
 
 ;   patch branch
 _7              ldy #$15
@@ -1470,7 +1470,7 @@ fmem            lda (frame),Y
                 bcc ExpressionFOR._XIT1 ; const
 
                 sty arg2
-                jsr mscGetCodeOffset    ; save address for step
+                jsr mainmsc.GetCodeOffset   ; save address for step
 
                 ldy #$02
                 sta (symtab),Y
@@ -1496,7 +1496,7 @@ _1              iny
                 jsr FillJmp._ENTRY1
 
                 lda #$01
-                jmp mscCodeIncr
+                jmp mainmsc.CodeIncr
 
 
 ;======================================
@@ -1521,7 +1521,7 @@ doinit          .proc
                 lda #$08
                 jsr GetFrame
                 jsr AddressWHILE
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
 
                 ldy #$04
                 jsr FrameCd._ENTRY2
@@ -1536,7 +1536,7 @@ doinit          .proc
 ;--------------------------------------
 StmtRETURN      .proc
                 lda #$00
-                jsr mscCProp
+                jsr mainmsc.CProp
 
                 and #$07
                 beq _1
@@ -1564,7 +1564,7 @@ _1              lda #$60
                 jmp RecRet.nxtstmt
 
 _err            ldy #retrnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -1703,7 +1703,7 @@ FillJmp         .proc
                 jsr FrameAdr._ENTRY2
 
 _ENTRY1         jsr SaveN
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
                 jsr Save4
                 jsr LoadN
                 bne _ENTRY1
@@ -1797,7 +1797,7 @@ GetFrame        .proc
                 jmp FrameCd._ENTRY2
 
 _err            ldy #nestERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -1868,8 +1868,9 @@ _next1          sta temps-1,X
 ;--------------------------------------
 ;--------------------------------------
 
-tblStmtList     .addr jt_vecStmtEnd     ; not found
-                .byte 20                ; #entries*3 - 1
+tblStmtList     .addr jt_vecStmtEnd     ; default routine
+                .byte $14               ; table size (#entries*3 - 1)
+
                 .addr StmtIF
                 .byte tokIF
                 .addr StmtFOR
@@ -2048,7 +2049,7 @@ _10             jsr RollOps
                 rts
 
 ;   undefined
-_11             jsr bankGetAlias
+_11             jsr mainbank.GetAlias
                 bne _next1              ; [unc]
 
 ;   proc
@@ -2060,7 +2061,7 @@ _next5          jsr ProcRef
 ;   string
 _13             lda #$4C                ; JMP around string
                 jsr ampl.cgu.Push1
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
 
                 adc #$03                ; includes size byte
                 bcc _14
@@ -2075,7 +2076,7 @@ _14             ldy #$00
                 inx
 
 _15             jsr ampl.cgu.Push2
-                jsr mscCopyStr
+                jsr mainmsc.CopyStr
 
                 ldy #tokCONST_t+tokSTR_t
                 jsr StoreST
@@ -2086,7 +2087,7 @@ _15             jsr ampl.cgu.Push2
                 bne _next4              ; [unc]
 
 _errParen       ldy #parenthERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 ;   QCODE to handle function ref
 _16             cmp #tokFUNC_t+8
@@ -2198,7 +2199,7 @@ ErrorExpression ldy #exprERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-ErrorExp2       jmp bankSPLErr
+ErrorExp2       jmp mainbank.SPLErr
 
 
 ;======================================
@@ -2290,7 +2291,7 @@ ETypeP          .proc
 
 ;   get offset
                 lda #$01
-                jmp mscGetProp
+                jmp mainmsc.GetProp
 
                 .endproc
 
@@ -2365,7 +2366,7 @@ ProcRef         .proc
                 cmp #tokFUNC_t+8
                 bcc _1
 
-_ENTRY1         jsr bankGetArgs             ; A#0, no arg types
+_ENTRY1         jsr mainbank.GetArgs        ; A#0, no arg types
 
                 ldy #tokCONST_t+tokCARD_t   ; sys proc
 _1              sty token
@@ -2614,7 +2615,7 @@ _ENTRY1         jsr jt_vecCGenEnd
                 lda cgops-2,Y
                 ldx cgops-1,Y
 
-                jmp mscJSRIndirect      ; jmp to QCODE for op
+                jmp mainmsc.JSRIndirect ; jmp to QCODE for op
 
                 .endproc
 
@@ -3234,7 +3235,7 @@ _1              pla
 ;--------------------------------------
 ErrCond         .proc
                 ldy #condtERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 

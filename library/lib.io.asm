@@ -157,7 +157,7 @@ _2              cpy #'I'
 _3              cpy #'H'
                 bne _4
 
-                jsr bankPrintH
+                jsr mainbank.PrintH
 
                 jmp _next2
 
@@ -203,7 +203,7 @@ _1              sta (buf),Y
                 ldx buf
                 ldy buf+1
 
-                jsr ioOpen
+                jsr mainio.Open
                 jmp ChkErr
 
                 .endproc
@@ -232,7 +232,7 @@ PrintE          .proc
 ; outputs str to IOCB dev appended with an EOL
 ;======================================
 PrintDE         .proc
-                jsr ioPrint
+                jsr mainio.Print
                 jmp ChkErr
 
                 .endproc
@@ -244,7 +244,7 @@ PrintDE         .proc
 ; closes IOCB dev
 ;======================================
 Close           .proc
-                jsr ioClose
+                jsr mainio.Close
                 jmp ChkErr
 
                 .endproc
@@ -273,7 +273,7 @@ Print           .proc
 ; outputs str to IOCB dev
 ;======================================
 PrintD          .proc
-                jsr ioOutput
+                jsr mainio.Output
                 jmp ChkErr
 
                 .endproc
@@ -346,7 +346,7 @@ InputMD         .proc
 ; string input
 ;======================================
 InputD          .proc
-                jsr ioReadBuffer.inputs
+                jsr mainio.ReadBuffer.inputs
                 jmp ChkErr
 
                 .endproc
@@ -452,7 +452,7 @@ PutDE           .proc
 ; ICAX1 and ICAX2 are not set if aux1=0
 ;======================================
 XIO             .proc
-                jsr ioXioStr
+                jsr mainio.XioStr
                 jmp ChkErr
 
                 .endproc
@@ -477,7 +477,7 @@ PrintB          .proc
 ; outputs cardinal num to default IOCB
 ;======================================
 PrintC          .proc
-                jsr ioPrintCard
+                jsr mainio.PrintCard
                 jmp ChkErr
 
                 .endproc
@@ -533,10 +533,10 @@ PrintCD         .proc
                 sty arg2
                 ldx arg2
 
-                jsr ioCardToStr
+                jsr mainio.CardToStr
 
                 lda arg0
-                jsr ioPrintCard.pnum+2
+                jsr mainio.PrintCard.pnum+2
                 jmp ChkErr
 
                 .endproc
@@ -670,7 +670,7 @@ StrB            .proc
 StrC            .proc
                 sty arg2
 
-                jsr ioCardToStr
+                jsr mainio.CardToStr
 
                 iny
 _next1          lda numbuf,Y
@@ -707,7 +707,7 @@ StrI            .proc
                 tax
                 tya
 
-                jsr ioCardToStr
+                jsr mainio.CardToStr
 
                 inx
                 txa

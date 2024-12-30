@@ -145,7 +145,7 @@ _7              jsr ampl.cgu.Op1H
                 jmp compiler.CGAdd._ENTRY2
 
 arrerr          ldy #arrayERR           ; bad array ref
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _XIT2           jmp compiler.CodeGen._ENTRY1
 

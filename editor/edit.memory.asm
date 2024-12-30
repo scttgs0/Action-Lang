@@ -43,14 +43,14 @@ _XIT            rts
 ;======================================
 GeneralErr      .proc
                 ldy #$00
-                jsr ioSystemError
+                jsr mainio.SystemError
 
                 lda spareMem
                 ldx spareMem+1
-                ldy allocerr
+                ldy allocErr
                 bne Punt                ; really out of memory
 
-                inc allocerr
+                inc allocErr
 
                 jsr Free
 

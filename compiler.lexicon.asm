@@ -58,7 +58,7 @@ _ENTRY2         cmp #tokEOF
                 and #$7F
                 bne _3                  ; [unc]
 
-_1              jsr mscAlpha
+_1              jsr mainmsc.Alpha
                 bne _2
 
                 cmp #'['
@@ -71,14 +71,14 @@ _1              jsr mscAlpha
                 beq _ENTRY3
                 bne _ENTRY1             ; [unc]
 
-_2              jsr bankGetName
+_2              jsr mainbank.GetName
                 bmi _ENTRY3
 
 _3              sta nxttoken
 
                 ldx #<tblLexCmd
                 ldy #>tblLexCmd
-                jmp mscLookup
+                jmp mainmsc.Lookup
 
 _ENTRY3         sta nxttoken
 
@@ -113,10 +113,10 @@ Dig             .proc
                 sta nxttoken
 
                 jsr LexBuf              ; get buf ptr
-                jsr ioStrToReal
+                jsr mainio.StrToReal
 
 _next1          jsr NextChar            ; cardinal?
-                jsr mscAlphaNum._num
+                jsr mainmsc.AlphaNum._num
                 bne _next1
 
                 cmp #'.'
@@ -127,11 +127,11 @@ _next1          jsr NextChar            ; cardinal?
 
                 dec choff
 
-                jsr ioRealToCard
+                jsr mainio.RealToCard
                 bcc _1
 
 _err            ldy #constERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _ENTRY1         dey
                 sty choff
@@ -209,7 +209,7 @@ Hex             .proc
                 inc choff
 
                 jsr LexBuf
-                jsr ioHexToCard
+                jsr mainio.HexToCard
                 bne Dig._ENTRY1         ; [unc]
 
                 .endproc
@@ -272,7 +272,7 @@ _next2          ldy arg9
                 bpl _next1              ; if not EOF
 
 _1              ldy #strERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _2              jsr NextChar
 
@@ -323,13 +323,13 @@ NextLine        .proc
                 beq _1
                 bmi _4                  ; eof
 
-                jsr ioReadBuffer
+                jsr mainio.ReadBuffer
                 bpl _2
 
                 cpy #$88                ; EOF
                 beq _next1
 
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _next1          dec ioChnnl
                 bne NextLine
@@ -337,14 +337,14 @@ _next1          dec ioChnnl
 _1              ldy top+1
                 beq _next1              ; set eof, tricky QCODE
 
-                jsr ioLoadBuffer
+                jsr mainio.LoadBuffer
 
                 lda cur
                 sta curnxt
                 ldx cur+1
                 stx curnxt+1
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 bne _2
 
                 ; lda #$00
@@ -354,7 +354,7 @@ _2              lda isListing
                 beq _3                  ; don't list
 
                 lda device
-                jsr ioWriteBuffer
+                jsr mainio.WriteBuffer
 
 _3              ldy #$00
                 sty choff
@@ -415,7 +415,7 @@ _ENTRY1         lda #$00
                 inc ioChnnl
 
                 lda #$04
-                jsr ioOpenChannel
+                jsr mainio.OpenChannel
                 jsr NextLine
                 jmp GetNext._ENTRY2
 
@@ -451,10 +451,10 @@ Set             .proc
 _XIT1           jmp GetNext._ENTRY1
 
 _err            ldy #setERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _1              jsr GetNext._ENTRY1
-                jmp mscMNum
+                jmp mainmsc.MNum
 
                 .endproc
 
@@ -467,14 +467,14 @@ Expand          .proc
                 beq _1
 
                 ldy #dfnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _1              lda #$03
-                jsr mscNextProp
+                jsr mainmsc.NextProp
 
                 lda zpAllocProps
                 ldx zpAllocProps+1
-                jsr mscResetProp
+                jsr mainmsc.ResetProp
 
                 ldy choff
 _ENTRY1         sta delnxt
@@ -513,8 +513,9 @@ _1              lda buf
 ;--------------------------------------
 ;--------------------------------------
 
-tblLexCmd       .addr GetNext._ENTRY4
-                .byte 41
+tblLexCmd       .addr GetNext._ENTRY4   ; default routine
+                .byte $29               ; table size (#entries*3 - 1)
+
                 .addr Dig
                 .byte tokDigit-$80
                 .addr Hex

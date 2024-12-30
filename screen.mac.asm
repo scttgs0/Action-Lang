@@ -8,12 +8,14 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+screen          .namespace
+
 ;======================================
 ;
 ;======================================
-screenInit         .proc
+Init            .proc
                 lda #$00
-                jsr ioClose             ; close #0, sets X to 0
+                jsr mainio.Close        ; close #0, sets X to 0
 
                 lda #$0C
                 sta arg3
@@ -22,7 +24,7 @@ screenInit         .proc
                 ldx #<_data
                 ldy #>_data
 
-                jmp ioOpen
+                jmp mainio.Open
 
 ;--------------------------------------
 
@@ -33,29 +35,29 @@ _data           .ptext "E:"
 
 
 ;======================================
-; screenCh(char)
+; PutChar(char)
 ;--------------------------------------
 ; outputs char to screen
 ; Char passed in A reg
 ; Control characters are ignored
 ;======================================
-screenCh        .proc
+PutChar         .proc
                 tay
                 lda #$00
 _ENTRY1         ldx #$01
-                bne screenPutCh._ENTRY1 ; [unc]
+                bne PutCh._ENTRY1 ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenPutCh(char)
+; PutCh(char)
 ;--------------------------------------
 ; outputs char to screen.
 ; Char passed in A reg.
 ; Processes control characters.
 ;======================================
-screenPutCh     .proc
+PutCh           .proc
                 tay
                 lda #$00
                 tax
@@ -81,60 +83,62 @@ _ENTRY2         sta IOCB0+ICCOM,X
 
 
 ;======================================
-; screenCursorUp()
+; CursorUp()
 ;--------------------------------------
 ; Move cursor up one
 ;======================================
-screenCursorUp  .proc
+CursorUp        .proc
                 lda #$1C
-                bne screenPutCh         ; [unc]
+                bne PutCh               ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenCursorDown()
+; CursorDown()
 ;--------------------------------------
 ; Move cursor down one
 ;======================================
-screenCursorDown .proc
+CursorDown      .proc
                 lda #$1D
-                bne screenPutCh         ; [unc]
+                bne PutCh               ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenBell()
+; Bell()
 ;--------------------------------------
 ; Bell Char
 ;======================================
-screenBell      .proc
+Bell            .proc
                 lda #$FD
-                bne screenPutCh         ; [unc]
+                bne PutCh               ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenCursorLeft()
+; CursorLeft()
 ;--------------------------------------
 ; Move cursor left one
 ;======================================
-screenCursorLeft .proc
+CursorLeft      .proc
                 lda #$1E
-                bne screenPutCh         ; [unc]
+                bne PutCh               ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenCursorRight()
+; CursorRight()
 ;--------------------------------------
 ; Move cursor right one
 ;======================================
-screenCursorRight .proc
+CursorRight     .proc
                 lda #$1F
-                bne screenPutCh         ; [unc]
+                bne PutCh               ; [unc]
 
                 .endproc
+
+                .endnamespace

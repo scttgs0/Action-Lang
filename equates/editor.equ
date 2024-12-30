@@ -127,7 +127,7 @@ lastCH          = $04A1                 ; last char
 curCH           = $04A2                 ; current char
 spareMem        = $04A3                 ; -> spare memory
 is2Windows      = $04A5                 ; number of windows (0=single; non-zero=double)
-allocerr        = $04A6                 ; INC on Alloc error
+allocErr        = $04A6                 ; INC on Alloc error
 delbuf          = $04A7                 ; 6 bytes
 firstChar       = $04AD                 ; used for big symbol table
 taglist         = $04AE                 ; [word]

@@ -19,10 +19,10 @@ Front           .proc
                 sbc indent
                 sta choff
 
-                jsr ioDisplayBuffer
+                jsr mainio.DisplayBuffer
 
                 lda LMARGN
-                jmp ioResetColumn+6
+                jmp mainio.RestoreColumn+6
 
                 .endproc
 
@@ -46,7 +46,7 @@ _ENTRY1         pha
 _1              sbc indent
                 sta choff
 
-                jsr ioDisplayBuffer
+                jsr mainio.DisplayBuffer
 
                 sec
                 pla
@@ -58,7 +58,7 @@ _1              sbc indent
                 clc
                 adc LMARGN
 
-                jmp ioResetColumn+6
+                jmp mainio.RestoreColumn+6
 
                 .endproc
 
@@ -106,7 +106,7 @@ PageContent     .proc
                 jsr editor.display.CleanLine
 
 _next1          ldy arg13
-                jsr mscNext
+                jsr mainmsc.Next
 
                 dec arg14
                 bne _next1
@@ -126,30 +126,30 @@ Paste           .proc
                 stx dirty
 
                 jsr editor.display.CleanLine
-                jsr mscNextUp
+                jsr mainmsc.NextUp
 
                 sta cur+1               ; tricky, fake out top
 
                 jsr editor.display.SaveWindow._ENTRY1
                 jsr editor.chr.DeleteTop
 
-_next1          jsr mscStrPtr
-                jsr ioLoadBuffer._ENTRY1
+_next1          jsr mainmsc.StrPtr
+                jsr mainio.LoadBuffer._ENTRY1
                 jsr editor.memory.InsertByte
 
-                lda allocerr
+                lda allocErr
                 bne _1                  ; check for out of memory
 
                 jsr editor.chr.DeleteNext
                 bne _next1
 
-_1              jsr ioResetCursor
+_1              jsr mainio.ResetCursor
 
                 ldy currentWindow
                 lda win1Base+WCUR+1,Y
                 beq _2
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 
 _2              lda #$00
                 jmp editor.display.NewPage._ENTRY1
@@ -223,7 +223,7 @@ ScrollInit      .proc
                 beq _1
 
                 ldy arg13
-                jsr mscNext
+                jsr mainmsc.Next
                 beq _1                  ; EOF
 
                 lda COLCRS
@@ -235,8 +235,8 @@ ScrollInit      .proc
                 lda #$00
                 sta choff
 
-                jsr ioDisplayBuffer
-                jmp ioLoadBuffer
+                jsr mainio.DisplayBuffer
+                jmp mainio.LoadBuffer
 
 _1              pla
                 pla
@@ -254,7 +254,7 @@ ScrollUp        .proc
 
                 dec lnum
                 bmi _1
-                jmp screenCursorUp
+                jmp screen.CursorUp
 
 _1              inc lnum
 
@@ -265,7 +265,7 @@ _1              inc lnum
 
                 lda nlines
                 jsr MoveDown
-                jsr ioResetColumn
+                jsr mainio.RestoreColumn
                 jmp editor.chr.RefreshBuf
 
                 .endproc
@@ -285,7 +285,7 @@ ScrollDown      .proc
 
                 stx lnum
 
-                jmp screenCursorDown
+                jmp screen.CursorDown
 
 _1              jsr BottomLine
                 stx y__
@@ -294,9 +294,9 @@ _1              jsr BottomLine
                 ldx ytop
                 jsr MoveUp
 
-                jsr ioResetColumn
-                jsr ioDisplayBuffer
-                jmp ioResetColumn
+                jsr mainio.RestoreColumn
+                jsr mainio.DisplayBuffer
+                jmp mainio.RestoreColumn
 
                 .endproc
 
@@ -352,10 +352,10 @@ ScrollLeft      .proc
 
                 dec choff
 
-                jsr ioDisplayBuffer
-                jsr screenCursorRight
+                jsr mainio.DisplayBuffer
+                jsr screen.CursorRight
 
-_XIT            jmp screenCursorLeft
+_XIT            jmp screen.CursorLeft
 
                 .endproc
 
@@ -373,10 +373,10 @@ ScrollRight     .proc
 
                 inc choff
 
-                jsr ioDisplayBuffer
-                jsr screenCursorLeft
+                jsr mainio.DisplayBuffer
+                jsr screen.CursorLeft
 
-_XIT            jmp screenCursorRight
+_XIT            jmp screen.CursorRight
 
                 .endproc
 
@@ -435,8 +435,8 @@ MoveContent     .proc
                 sta arg4
                 stx ROWCRS
 
-                jsr ioRestoreCursorChar
-                jsr ioGetDisplayAddr    ; get display address
+                jsr mainio.RestoreCursorChar
+                jsr mainio.GetDisplayAddr   ; get display address
 
                 ldx arg4
                 dex

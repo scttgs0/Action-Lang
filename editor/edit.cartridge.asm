@@ -20,10 +20,10 @@ emjmps
 _jt_vecSegEnd   rts                     ; Seg catch all
                 .word 0
 
-_jt_curbank     .byte ebank             ; curBank
+_jt_curbank     .byte ebank
 _jt_stmask      .byte $DF
 
-_jt_vecError    jmp bankSPLErr
+_jt_vecError    jmp mainbank.SPLErr
 
 _jt_wsize       .byte 18
 _jt_linemax     .byte 120               ; line input max
@@ -44,12 +44,12 @@ zero            .word 0
 _jt_vecSPLEnd   rts
                 .word 0
 
-_jt_vecAlarm    jmp screenBell          ; Alarm
+_jt_vecAlarm    jmp screen.Bell         ; Alarm
 
 _jt_eolch       .byte 0                 ; EOLch (default = space)
 
 _jt_lsh
-ltab            .addr mscLShift._lshift
+ltab            .addr mainmsc.LShift._lshift
                 .addr ampl.math.RShift
                 .addr ampl.math.MultI
                 .addr ampl.math.DivC
@@ -128,7 +128,7 @@ _next2          lda emjmps-1,Y          ; init RAM
 ;SPLInit PROC   ; init compiler RAM
 
             .if ZAPRAM
-                jsr editor.main.zap4
+                jsr editor.main.zapBckSpc
             .else
                 nop
                 nop

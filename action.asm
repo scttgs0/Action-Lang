@@ -66,9 +66,9 @@ ampl        .namespace
 
                 .fill 9,$00
 
-                .addr bankCartStart
+                .addr mainbank.CartStart
                 .byte $00,$05           ; boot disk and start cart.
-                .addr bankRestore.init
+                .addr mainbank.Restore.init
 
 
 ;--------------------------------------

@@ -19,15 +19,15 @@ display         .namespace
 CommandMsg      .proc
                 sta arg0
 
-                jsr ioCmdColumn
+                jsr mainio.CmdColumn
 
                 lda #$00
                 sta arg3
 
                 lda arg0                ; message_LO
                 ldy #$80                ; char used for clearing (inverse space)
-                jsr ioPutStr
-                jmp ioResetColumn
+                jsr mainio.PutStr
+                jmp mainio.RestoreColumn
 
                 .endproc
 
@@ -36,7 +36,7 @@ CommandMsg      .proc
 ; CleanLine()
 ;======================================
 CleanLine       .proc
-                jsr ioChkCursor
+                jsr mainio.ChkCursor
 
                 lda isDirty
                 beq _XIT
@@ -49,7 +49,7 @@ CleanLine       .proc
                 jsr editor.memory.DeleteCurrentLine
                 jsr editor.memory.InsertByte
 
-_XIT            jmp ioChkCursor
+_XIT            jmp mainio.ChkCursor
 
                 .endproc
 
@@ -128,12 +128,12 @@ CenterLine      .proc
                 jsr CleanLine
                 beq _1
 
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 beq _1
 
                 inc temps
 
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 beq _1
 
                 inc temps
@@ -157,7 +157,7 @@ _next1          lda temps
 ;======================================
 TopLine         .proc
                 jsr CleanLine
-                jsr ioChkCursor._ENTRY1
+                jsr mainio.ChkCursor._ENTRY1
 
                 .endproc
 
@@ -173,7 +173,7 @@ NewPage         .proc
 
 _ENTRY1         sta choff
 
-                jsr ioRestoreCursorChar ; for command line
+                jsr mainio.RestoreCursorChar ; for command line
 
                 lda LMARGN
                 sta COLCRS
@@ -192,12 +192,12 @@ Refresh         .proc
                 adc lnum
                 sta ROWCRS
 
-                jsr ioSaveColumn
+                jsr mainio.SaveColumn
                 jsr SaveWindow
 
                 inc ROWCRS
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 
                 sta arg9
 
@@ -214,9 +214,9 @@ _next1          ldy #$00
                 ldx arg9
                 beq _3
 
-                jsr mscCurStr
+                jsr mainmsc.CurStr
 
-_next2          jsr ioPutStr
+_next2          jsr mainio.PutStr
 
                 lda arg9
                 bne _1
@@ -226,14 +226,14 @@ _next2          jsr ioPutStr
 
 _1              inc ROWCRS
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 sta arg9
 
                 dec arg10
                 bne _next1
 
-_2              jsr ioResetCursor
-                jsr ioResetColumn
+_2              jsr mainio.ResetCursor
+                jsr mainio.RestoreColumn
                 jmp editor.chr.RefreshBuf
 
 _3              lda #<editor.cartridge.zero

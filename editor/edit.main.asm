@@ -14,7 +14,7 @@ main           .namespace
 ; Main program for EDIT/FLASH
 ;======================================
 Loop            .proc
-                lda allocerr
+                lda allocErr
                 beq _1
 
                 lda #<msgOutOfMem
@@ -24,11 +24,11 @@ Loop            .proc
 _1              lda curCH
                 sta lastCH
 
-                jsr bankGetKey
+                jsr mainbank.GetKey
                 jsr editor.init.EditorInit._ENTRY3
 
                 lda curCH
-                ldy CH1
+                ldy CH1                 ; prior key pressed
                 cpy #$C0                ; Ctrl-Shft?
                 bcs _2                  ;   yes
 
@@ -40,18 +40,20 @@ _1              lda curCH
                 beq Loop
 
                 jsr editor.chr.InsertChar
-
                 jmp Loop
 
-_2              ldx #<fmcscmd
-                ldy #>fmcscmd
+; - - - - - - - - - - - - - - - - - - -
+
+_2              ldx #<tblEditCtrlShft
+                ldy #>tblEditCtrlShft
                 bne _4
 
-_3              ldx #<fmcmd
-                ldy #>fmcmd
+; - - - - - - - - - - - - - - - - - - -
 
-_4              jsr mscLookup
+_3              ldx #<tblEditCmd
+                ldy #>tblEditCmd
 
+_4              jsr mainmsc.Lookup
                 jmp Loop
 
                 .endproc
@@ -60,89 +62,95 @@ _4              jsr mscLookup
 ;--------------------------------------
 ;--------------------------------------
 
-fmcmd           .addr jt_vecDispTb      ; default routine
-                .byte 50                ; table size
+tblEditCmd      .addr jt_vecDispTb      ; default routine
+                .byte $32               ; table size (#entries*3 - 1)
+
                 .addr editor.command.ScrollUp
-                .byte $1c
+                .byte $1C
                 .addr editor.command.ScrollDown
-                .byte $1d
+                .byte $1D
                 .addr editor.command.ScrollRight
-                .byte $1f
+                .byte $1F
                 .addr editor.command.ScrollLeft
-zap2            .byte $1e
+zapScrlLft      .byte $1E
                 .addr editor.chr.DeleteChar
-zap3            .byte $fe
+zapDelChr       .byte $FE
                 .addr editor.chr.BackSpc
-zap4            .byte $7e
+zapBckSpc       .byte $7E
                 .addr editor.chr.InsertChar
                 .byte $60
                 .addr editor.chr.InsertSpace
-                .byte $ff
+                .byte $FF
                 .addr editor.chr.Return
                 .byte EOL
                 .addr editor.tab.Tab
-                .byte $7f
+                .byte $7F
                 .addr editor.chr.Delete
-                .byte $9c
+                .byte $9C
                 .addr editor.command.BottomLine._XIT
-                .byte $1b
+                .byte $1B
                 .addr editor.window.Clear
-                .byte $7d
+                .byte $7D
                 .addr editor.chr.Insert_2
-                .byte $9d
+                .byte $9D
                 .addr editor.tab.Set
-                .byte $9f
+                .byte $9F
                 .addr editor.tab.Clear
-                .byte $9e
+                .byte $9E
 
-fmcscmd         .addr jt_vecDispTb+3    ; default
-                .byte 71                ; table size
+; - - - - - - - - - - - - - - - - - - -
+
+tblEditCtrlShft .addr jt_vecDispTb+3    ; default routine
+                .byte $47               ; table size (#entries*3 - 1)
+
                 .addr editor.command.Front
-                .byte $f6
+                .byte $F6
                 .addr editor.command.Back
-                .byte $f7
+                .byte $F7
                 .addr editor.command.PageUp
-                .byte $ce
+                .byte $CE
                 .addr editor.command.PageDown
-                .byte $cf
+                .byte $CF
                 .addr editor.command.IndentLeft
-                .byte $e0
+                .byte $E0
                 .addr editor.command.IndentRight
-                .byte $e2
+                .byte $E2
                 .addr editor.io.FRead
-                .byte $e8
+                .byte $E8
                 .addr editor.io.FWrite
-                .byte $ee
+                .byte $EE
                 .addr editor.command.Paste
-                .byte $ca
+                .byte $CA
                 .addr editor.command.InsertToggle
-                .byte $cd
+                .byte $CD
                 .addr ampl.monitor.Monitor
-                .byte $e5
+                .byte $E5
                 .addr editor.find.Find
-                .byte $f8
+                .byte $F8
                 .addr editor.Substitute
-                .byte $fe
+                .byte $FE
                 .addr editor.window.Window1
-                .byte $df
+                .byte $DF
                 .addr editor.window.Window2
-                .byte $de
+                .byte $DE
                 .addr editor.window.Delete
-                .byte $fa
+                .byte $FA
                 .addr editor.chr.CSBS
-                .byte $f4
+                .byte $F4
                 .addr editor.chr.CSRet
-                .byte $cc
+                .byte $CC
                 .addr editor.chr.Undo
-                .byte $cb
+                .byte $CB
                 .addr editor.display.TopLine
-                .byte $f9
+                .byte $F9
                 .addr editor.display.EndLine
-                .byte $ea
+                .byte $EA
                 .addr editor.tag.Set
-                .byte $ed
+                .byte $ED
                 .addr editor.tag.Locate
-                .byte $fd
+                .byte $FD
+
+; - - - - - - - - - - - - - - - - - - -
 
 msgOutOfMem     .text 14," "
             .enc "atari-screen-inverse"
@@ -157,4 +165,4 @@ msgOutOfMem     .text 14," "
                 .text "Memory"
             .enc "none"
 
-            .endnamespace
+                .endnamespace

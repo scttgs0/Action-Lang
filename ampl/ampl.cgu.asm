@@ -509,7 +509,7 @@ StkP            .proc
                 jsr StkAddr
 
                 lda #$01
-                jmp mscGProp
+                jmp mainmsc.GProp
 
                 .endproc
 
@@ -634,7 +634,7 @@ Insrt1          .proc
 _ENTRY1         iny
                 tya
 
-                jmp mscCodeIncr
+                jmp mainmsc.CodeIncr
 
                 .endproc
 

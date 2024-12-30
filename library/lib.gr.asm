@@ -28,7 +28,7 @@ Graphics        .proc
                 ldx #<_e
                 ldy #>_e
 
-                jsr ioOpen
+                jsr mainio.Open
                 jsr lib.io.ChkErr
 
                 lda #$06
@@ -45,7 +45,7 @@ Graphics        .proc
                 ldx #<_devs
                 ldy #>_devs
 
-                jsr ioOpen
+                jsr mainio.Open
 
                 jmp lib.io.ChkErr
 

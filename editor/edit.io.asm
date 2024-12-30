@@ -14,8 +14,8 @@ io              .namespace
 ; GetString(prompt, str, invert)
 ;======================================
 GetString       .proc
-                jsr ioDisplayStr
-_next1          jsr bankGetKey
+                jsr mainio.DisplayStr
+_next1          jsr mainbank.GetKey
 
                 tax
                 cpx #$7E
@@ -51,7 +51,7 @@ _next2          ldy #$00
                 sta (arg12),Y
 
                 eor arg2
-                jsr screenCh
+                jsr screen.PutChar
 
                 jmp _next1
 
@@ -78,13 +78,13 @@ _next3          ldy #$00
                 sbc #$01
                 sta (arg12),Y
 
-                jsr screenCursorLeft
+                jsr screen.CursorLeft
 
                 lda #$20
                 eor arg2
 
-                jsr screenCh
-                jsr screenCursorLeft
+                jsr screen.PutChar
+                jsr screen.CursorLeft
 
                 ldx arg3
                 cpx #$7E
@@ -111,12 +111,12 @@ FRead           .proc
                 jsr FOpen
 
 _next1          lda #$01
-                jsr ioReadBuffer
+                jsr mainio.ReadBuffer
                 bmi _1
 
                 jsr editor.memory.InsertByte
 
-                lda allocerr
+                lda allocErr
                 beq _next1
 
                 ldy #$16                ; file too big
@@ -125,7 +125,7 @@ _next1          lda #$01
 _1              cpy #$88                ; EOF
                 beq _3
 
-_2              jsr ioSystemError
+_2              jsr mainio.SystemError
 _3              jsr FWrite._ENTRY1
 
                 jmp editor.display.CenterLine
@@ -146,10 +146,10 @@ FWrite          .proc
                 ldy #$08
                 jsr FOpen
 
-                jsr ioChkCursor._ENTRY1
+                jsr mainio.ChkCursor._ENTRY1
                 beq _1
 
-_next1          jsr ioLoadBuffer
+_next1          jsr mainio.LoadBuffer
 
                 ; inc COLOR4            ; let user know we're here
 
@@ -158,21 +158,21 @@ _next1          jsr ioLoadBuffer
                 nop
 
                 lda #$01
-                jsr ioWriteBuffer
+                jsr mainio.WriteBuffer
                 bmi _1
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 bne _next1
 
                 lda #$00
                 sta dirty
 
 _ENTRY1         lda #$01
-                jsr ioClose
-                jsr ioResetCursor
-                jmp ioDisplayOn
+                jsr mainio.Close
+                jsr mainio.ResetCursor
+                jmp mainio.DisplayOn
 
-_1              jsr ioSystemError
+_1              jsr mainio.SystemError
                 jmp _ENTRY1
 
 ;--------------------------------------
@@ -192,7 +192,7 @@ FOpen           .proc
 
 ;               jsr ClnLn               ; in SaveWd
                 jsr editor.display.SaveWindow
-                jsr ioRestoreCursorChar
+                jsr mainio.RestoreCursorChar
 
                 ldy #<inbuf
                 lda #>inbuf
@@ -203,7 +203,7 @@ FOpen           .proc
                 jsr editor.window.CommandString
 
                 lda #$01
-                jsr ioClose
+                jsr mainio.Close
 
                 ldy inbuf
                 beq _5
@@ -239,14 +239,14 @@ _2              lda #'D'
                 sta inbuf+1
 
 _3              stx arg3
-                jsr ioDisplayOff
+                jsr mainio.DisplayOff
 
                 lda #$01
                 sta arg4                ; clear high bit for cassette
 
                 ldx #<inbuf
                 ldy #>inbuf
-                jsr ioOpen
+                jsr mainio.Open
                 bmi _4
 
                 lda arg3                ; see if directory
@@ -260,7 +260,7 @@ _XIT            rts
 _4              pla
                 pla                     ; pop return
 
-                jmp ioSystemError
+                jmp mainio.SystemError
 
 _5              pla
                 pla
@@ -274,7 +274,7 @@ _5              pla
 ;======================================
 InitKeys        .proc
                 lda #$07
-                jsr ioClose
+                jsr mainio.Close
 
                 lda #$04
                 sta arg3                ; read only
@@ -283,7 +283,7 @@ InitKeys        .proc
                 ldx #<keybd
                 ldy #>keybd
 
-                jmp ioOpen
+                jmp mainio.Open
 
 ;--------------------------------------
 

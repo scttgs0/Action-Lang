@@ -61,10 +61,10 @@ _next3          lda (buf),Y
                 cpy arg0
                 bcc _next3
 
-_1              jsr mscNextDown
+_1              jsr mainmsc.NextDown
                 beq _2
 
-                jsr ioLoadBuffer
+                jsr mainio.LoadBuffer
 
                 lda #$00
                 sta sp
@@ -72,8 +72,8 @@ _1              jsr mscNextDown
 
 _2              sta curCH
 
-                jsr ioResetCursor
-                jsr ioLoadBuffer
+                jsr mainio.ResetCursor
+                jsr mainio.LoadBuffer
 
                 lda #<msgNOTFOUND
                 ldx #>msgNOTFOUND
