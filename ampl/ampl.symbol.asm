@@ -68,9 +68,9 @@ _XIT            jmp (jt_vecStmRAdr)
 
 
 ;======================================
-; STMres() lookup reserved names
+; StmtReserved() lookup reserved names
 ;======================================
-STMres          .proc
+StmtReserved    .proc
                 ldy arg14
                 cpy #$08
                 lda #$FF                ; if name too long!
@@ -147,7 +147,7 @@ _next1          iny
                 dec choff               ; put character back
 
                 jsr STM._XIT            ; check for res. name
-                bpl STMres._XIT1        ; return
+                bpl StmtReserved._XIT1  ; return
 
                 lda qglobal
                 beq _1
@@ -155,7 +155,7 @@ _next1          iny
                 lda symTblLocal
                 ldx symTblLocal+1
                 jsr STM
-                bne STMres._XIT1        ; return
+                bne StmtReserved._XIT1  ; return
 
 _1              lda symTblGlobal
                 ldx symTblGlobal+1
@@ -167,7 +167,7 @@ _1              lda symTblGlobal
                 lda bigSymTblGlobal
                 ldx bigSymTblGlobal+1
 _2              jsr STM
-                bne STMres._XIT1        ; return
+                bne StmtReserved._XIT1  ; return
 
                 lda qglobal
                 beq NewEntry
@@ -175,7 +175,7 @@ _2              jsr STM
 _ENTRY1         lda symTblLocal
                 ldx symTblLocal+1
                 jsr STM
-                bne STMres._XIT1
+                bne StmtReserved._XIT1
 
             .if ZAPRAM
                 inc STM,X

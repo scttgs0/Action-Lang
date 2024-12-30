@@ -41,7 +41,7 @@ _next1          jsr editor.io.InitKeys
                 lda DINDEX              ; display mode
                 beq _1
 
-                jsr screen.Init          ; get Graphics(0)
+                jsr screen.Init         ; get Graphics(0)
 
 _1              jsr jt_vecAlarm
                 ;!! jsr mainio.RestoreCursorChar ; unnecessary
@@ -69,7 +69,6 @@ _1              jsr jt_vecAlarm
                 ldx #<tblMonitorCmd
                 ldy #>tblMonitorCmd
                 jsr mainmsc.Lookup
-
                 jmp _next1
 
                 .endproc
@@ -143,14 +142,15 @@ _next1          inc arg11
 _1              lda arg11
                 ldx arg12
                 jsr Print._ENTRY1
+
                 jsr editor.io.GotKey
                 beq _next1
 
                 ldx #$FF
                 stx KEYCHAR             ; reset last keypress
 
-                cmp #$DE
-                bne _next1
+                cmp #$DE                ; window2?
+                bne _next1              ;   no
 
                 rts
                 .endproc
@@ -175,22 +175,22 @@ _ENTRY1         jsr mainio.PrintCard
                 ldy #'='
                 jsr mainio.PutChar
                 jsr mainio.PutSpace
-                jsr LoadParams
 
+                jsr LoadParams
                 tay
                 jsr mainio.PutChar
                 jsr mainio.PutSpace
-                jsr LoadParams
 
+                jsr LoadParams
                 jsr PrintHex
                 jsr mainio.PutSpace
-                jsr LoadParams
 
+                jsr LoadParams
                 ldx #$00
                 jsr mainio.PrintCard
                 jsr mainio.PutSpace
-                jsr LoadParams
 
+                jsr LoadParams
                 jsr mainio.PrintCard
                 jmp mainio.PutEOL
 
@@ -217,7 +217,6 @@ LoadParams      .proc
 ;======================================
 SaveParams      .proc
                 jsr mainmsc.MNum
-
                 sta arg11
                 stx arg12
 
@@ -229,16 +228,16 @@ SaveParams      .proc
 ; Boot()
 ;======================================
 Boot            .proc
-                lda #<_bmsg
-                ldx #>_bmsg
+                lda #<_msgBOOT
+                ldx #>_msgBOOT
                 jsr editor.window.YesNo
-
                 bne MemRun._XIT
+
                 jmp editor.cartridge.START._cold
 
 ;--------------------------------------
 
-_bmsg           .ptext "Boot? "
+_msgBOOT        .ptext "Boot? "
 
                 .endproc
 
@@ -249,7 +248,7 @@ _bmsg           .ptext "Boot? "
 ; execute from memory
 ;======================================
 MemRun          .proc
-                lda nxttoken
+                lda nextToken
                 cmp #tokEOF
                 beq _1
 
@@ -263,6 +262,8 @@ _1              lda INITAD
                 bne _3
 
 _XIT            rts
+
+; - - - - - - - - - - - - - - - - - - -
 
 _2              jsr mainmsc.MNum
 _3              jsr mainbank.Run
@@ -278,7 +279,7 @@ _3              jsr mainbank.Run
 ; MemWrite()
 ;======================================
 MemWrite        .proc                   ; write object file
-                lda nxttoken
+                lda nextToken
                 cmp #tokQuote
                 bne MemRun._XIT         ; no output file!
 
@@ -379,7 +380,6 @@ WOut            .proc
                 ldx #arg9
                 ldy #$00
                 jsr mainio.Output
-
                 bmi _mwerr
 
                 rts
@@ -492,7 +492,7 @@ _next1          lda #$00
                 ldx #$04
 _next2          asl arg0
                 rol arg1
-                rol a
+                rol
 
                 dex
                 bne _next2

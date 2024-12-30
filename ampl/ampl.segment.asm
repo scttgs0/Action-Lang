@@ -20,7 +20,7 @@ Segment         .proc
                 cmp #tokPROC
                 beq _proc
 
-                ldx nxttoken
+                ldx nextToken
                 cpx #tokFUNC
                 beq _func
 
@@ -49,7 +49,6 @@ _1              jsr compiler.MakeEntry
                 sta curproc
                 lda addr+1
                 sta curproc+1
-
                 sta qglobal
 
                 lda #$01
@@ -58,7 +57,7 @@ _1              jsr compiler.MakeEntry
                 ldy #$03
                 lda #$00                ; no args yet
                 sta (zpAllocProps),Y
-                sta argbytes
+                sta argBytes
 
                 tay
 _next1          sta (symTblLocal),Y
@@ -71,20 +70,20 @@ _next1          sta (symTblLocal),Y
                 lda symtab+1
                 sta gbase+1
 
-;   space for arg list (8 bytes) and room for name of next proc/func
-;   up to 20 letters (24 bytes)
-;   unused space will be reclaimed
-;   see Params
+;   space for arg list (8 bytes) and room for name of next proc/func.
+;   up to 20 letters (24 bytes).
+;   unused space will be reclaimed.
+;   see Params.
                 lda #$20
                 jsr mainmsc.STIncr      ; arg list space
                 jsr ampl.cgu.TrashY
 
-                lda nxttoken
+                lda nextToken
                 eor #tokEQU
                 sta param               ; this is very tricky!!
                 bne _2
 
-                jsr compiler.IDEqual    ; param must = 0 here
+                jsr compiler.IDEqual    ; param must =0 here
 
                 iny
                 jsr compiler.StoreProps
@@ -99,7 +98,7 @@ _next1          sta (symTblLocal),Y
 
 _2              jsr compiler.lexicon.GetNext
 
-                cmp #tokLParen
+                cmp #tokLeftParen
                 bne _argerr
 
 
@@ -108,7 +107,7 @@ _2              jsr compiler.lexicon.GetNext
 
                 jsr compiler.lexicon.GetNext
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 beq _3
 
 _next2          jsr compiler.Declare
@@ -118,7 +117,7 @@ _next2          jsr compiler.Declare
                 cpx #tokComma
                 beq _next2
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 beq _3
 
 _argerr         ldy #argERR
@@ -161,7 +160,7 @@ _3              lda param
 _4              jsr ampl.cgu.Push2
 
 ;   QCODE to transfer arguments to local frame
-_next3          lda argbytes
+_next3          lda argBytes
                 beq _8                  ; no arguments
 
                 cmp #$03
@@ -182,7 +181,7 @@ _next3          lda argbytes
 
 _5              jsr ampl.cgu.Push3
 
-                dec argbytes
+                dec argBytes
 
                 jmp _next3
 
@@ -194,7 +193,7 @@ _7              ldx #$0A
                 lda arg0
                 ldx arg1
 
-                ldy argbytes
+                ldy argBytes
                 dey
 
                 jsr ampl.cgu.Push3

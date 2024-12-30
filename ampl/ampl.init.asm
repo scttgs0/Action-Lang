@@ -79,7 +79,6 @@ _2              sta codeBase
 
                 lda MEMTOP+1
                 sta stmax
-
                 dec stmax
 
                 clc
@@ -113,7 +112,7 @@ _3              lda spareMem
                 lda #>stkbase
                 sta stack+1
 
-                sta cury                ; unknown initial Y value
+                sta curYReg             ; unknown initial Y value
 
                 rts
                 .endproc

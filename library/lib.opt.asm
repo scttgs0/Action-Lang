@@ -128,10 +128,10 @@ _13             lda jt_linemax
 ;   EOL char
                 lda jt_eolch
                 tay
-                rol a
-                rol a
-                rol a
-                rol a
+                rol
+                rol
+                rol
+                rol
                 and #$03
 
                 tax

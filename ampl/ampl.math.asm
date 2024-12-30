@@ -37,28 +37,31 @@ MultI           .proc
                 jsr SMOps
 
                 ldx params._b
-                beq _mc5
+                beq _2
 
                 stx params._t1
                 ldx params._d
-                beq _mc5
+                beq _2
 
                 dex
                 stx params._t2
 
                 ldx #$08
-_mc3            asl                     ; b*d, 16-bit result
+_next1          asl                     ; b*d, 16-bit result
                 rol params._rh
                 asl params._t1
-                bcc _mc4
+                bcc _1
 
                 adc params._t2
-                bcc _mc4
+                bcc _1
 
                 inc params._rh
-_mc4            dex
-                bne _mc3
-_mc5            sta params._rl
+
+_1              dex
+                bne _next1
+
+_2              sta params._rl
+
                 lda params._b
                 ldx params._c
                 jsr MulB                ; b*c, 8-bit result
@@ -67,9 +70,8 @@ _mc5            sta params._rl
                 ldx params._d
                 jsr MulB                ; a*d, 8-bit result
 
-
 _setsign        ldy params._sign
-                bpl _ss2
+                bpl _XIT
 
             .if ZAPRAM
                 sta MulB,X
@@ -79,7 +81,7 @@ _setsign        ldy params._sign
                 nop
             .endif
 
-_ss1            sta params._rl
+_setsign2       sta params._rl
                 stx params._rh
 
                 sec
@@ -91,7 +93,7 @@ _ss1            sta params._rl
                 tax
                 tya
 
-_ss2            rts
+_XIT            rts
                 .endproc
 
 
@@ -99,29 +101,31 @@ _ss2            rts
 ; MulB()
 ;======================================
 MulB            .proc
-                beq _mb3
+                beq _2
 
                 dex
                 stx params._t2
                 tax
-                beq _mb3
+                beq _2
 
                 stx params._t1
 
                 lda #$00
                 ldx #$08
-_mb1            asl
+_next1          asl
                 asl params._t1
-                bcc _mb2
+                bcc _1
 
                 adc params._t2
-_mb2            dex
-                bne _mb1
+
+_1              dex
+                bne _next1
 
                 clc
                 adc params._rh
                 sta params._rh
-_mb3            lda params._rl
+
+_2              lda params._rl
                 ldx params._rh
 
                 rts
@@ -134,27 +138,27 @@ _mb3            lda params._rl
 SMOps           .proc
                 stx params._sign
                 cpx #$00                ; check signs
-                bpl _smo1
+                bpl _1
 
-                jsr MultI._ss1
+                jsr MultI._setsign2
 
-_smo1           sta params._b
+_1              sta params._b
                 stx params._a
 
                 lda params._c
-                bpl _smo2
+                bpl _2
 
                 tax
                 eor params._sign
                 sta params._sign
 
                 lda params._d
-                jsr MultI._ss1
+                jsr MultI._setsign2
 
                 sta params._d
                 stx params._c
 
-_smo2           lda #$00
+_2              lda #$00
                 sta params._rh
 
                 rts
@@ -169,10 +173,12 @@ DivC            .proc
 
 ;   see MultC above
                 lda params._c
-                beq _dsmall
+                beq _small
 
-_dlarge         ldx #$08
-_dl1            rol params._b
+; - - - - - - - - - - - - - - - - - - -
+
+_large          ldx #$08
+_next1          rol params._b
                 rol params._a
                 rol params._rh
 
@@ -183,36 +189,38 @@ _dl1            rol params._b
                 tay
                 lda params._rh
                 sbc params._c
-                bcc _dl2                ; overflow, don't subtract
+                bcc _1                ; overflow, don't subtract
 
                 sta params._rh
                 sty params._a
 
-_dl2            dex
-                bne _dl1
+_1              dex
+                bne _next1
 
                 lda params._b
-                rol a
+                rol
                 ldx #$00
                 ldy params._a
                 sty params._rl          ; save low byte of REM
 
                 jmp MultI._setsign
 
-_dsmall         ldx #$10
-_ds1            rol params._b
+; - - - - - - - - - - - - - - - - - - -
+
+_small          ldx #$10
+_next2          rol params._b
                 rol params._a
-                rol a
-                bcs _ds1a               ; keep track of shift output
+                rol
+                bcs _2                  ; keep track of shift output
 
                 cmp params._d
-                bcc _ds2                ; overflow, don't subtract
+                bcc _3                  ; overflow, don't subtract
 
-_ds1a           sbc params._d
+_2              sbc params._d
                 sec                     ; for carry out in ROL A above
 
-_ds2            dex
-                bne _ds1
+_3              dex
+                bne _next2
 
                 rol params._b
                 rol params._a
@@ -235,7 +243,7 @@ RemL            .proc
                 lda params._rl
                 ldx params._rh
 
-_rem1           rts
+                rts
                 .endproc
 
 
@@ -244,18 +252,18 @@ _rem1           rts
 ;======================================
 RShift          .proc
                 ldy params._d
-                beq _rshret
+                beq _XIT
 
                 stx params._c
-_rsh1           lsr params._c
-                ror a
+_next1          lsr params._c
+                ror
 
                 dey
-                bne _rsh1
+                bne _next1
 
                 ldx params._c
 
-_rshret         rts
+_XIT            rts
                 .endproc
 
 
@@ -295,20 +303,20 @@ SArgs           .proc                   ; saves args for call
                 lda (zpAllocCurrent),Y  ; # of bytes
                 tay
 
-_sa1            lda args,Y
+_next1          lda args,Y
                 sta (zpAllocLast),Y
 
                 dey
-                bpl _sa1
+                bpl _next1
 
 ;   check for break key
                 lda BRKKEY
-                bne _sa2
+                bne _XIT
 
                 inc BRKKEY
                 jmp lib.msc.Break
 
-_sa2            rts
+_XIT            rts
                 .endproc
 
                 ;.endproc

@@ -7,14 +7,16 @@
 ; SPDX-FileName: ampl.cgu.asm
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
-
+;   Code Generation Unit
 cgu             .namespace
 
 ;======================================
-; LoadY() value in arg12
+; LoadY()
+;--------------------------------------
+; arg12         value
 ;======================================
 LoadY           .proc
-                lda cury
+                lda curYReg
                 cmp arg12
                 beq _XIT
 
@@ -24,7 +26,7 @@ LoadY           .proc
                 bne _1
 
                 lda #$88                ; DEY
-_next1          jsr Insrt1
+_next1          jsr Insert1
                 jmp _3
 
 _1              cmp #$00
@@ -33,12 +35,12 @@ _1              cmp #$00
                 lda #$C8                ; INY
                 bne _next1
 
-_2              lda #$A0
+_2              lda #$A0                ; LDY #
                 ldx arg12
-                jsr Insrt2              ; LDY #$00 or #$01
+                jsr Insert2             ; LDY #$00 or #$01
 
 _3              lda arg12
-                sta cury
+                sta curYReg
 
                 ldy arg13
 _XIT            rts
@@ -50,7 +52,7 @@ _XIT            rts
 ;======================================
 TrashY          .proc
                 lda #$FF
-                sta cury
+                sta curYReg
 
                 rts
                 .endproc
@@ -71,13 +73,16 @@ LoadX           .proc
                 bit modeConst
                 beq _3
 
+; - - - - - - - - - - - - - - - - - - -
+
 ;   var to load
                 jsr StkProp
-
                 beq _2
 
                 lda #$AE                ; LDX addr16
                 jmp Push3
+
+; - - - - - - - - - - - - - - - - - - -
 
 _1              lda (stack),Y
                 tax
@@ -85,6 +90,8 @@ _1              lda (stack),Y
 
 _2              lda #$A6                ; LDX addr
 _XIT1           jmp Push2
+
+; - - - - - - - - - - - - - - - - - - -
 
 _3              lda (stack),Y
 
@@ -97,22 +104,23 @@ _3              lda (stack),Y
                 pla
                 pla
                 pla
+
                 tay
-                bne Op1L.ophigh._opv
+                bne Op1L._opv
 
 _optype         and #$20
-                beq Op1L.ophigh._operr   ; con. exp.
+                beq Op1L._operr         ; con. exp.
 
                 jsr StkAddr
 
                 lda arg12
-                beq Op1L.ophigh._4
+                beq Op1L._4
 
                 inx
-                bne Op1L.ophigh._4
+                bne Op1L._4
 
                 iny
-                jmp Op1L.ophigh._4
+                jmp Op1L._4
 
                 .endproc
 
@@ -133,11 +141,10 @@ Op1L            .proc
 
                 lda arg2
                 ldy #$08
-oplow           ldx #$00
-ophigh          stx arg12
+_opLow          ldx #$00
+_opHigh         stx arg12
 
-; NOTE:  the order of following
-; comparisons is important!
+; NOTE:  the order of following comparisons is important!
 
                 tax
                 bpl LoadX._optype
@@ -156,8 +163,7 @@ ophigh          stx arg12
 
 ;   var if we get here
 _opv            jsr StkProp
-
-                beq _14                 ; page zero var
+                beq _14                 ; zero-page var
 
 ;   16 bit address
 _4              pla
@@ -212,7 +218,7 @@ _7              tya                     ; small array
                 pla
                 tay
                 jsr StkProp
-                beq _8                  ; page zero
+                beq _8                  ; zero-page
 
                 pla
                 ora #$1C                ; addr16,X
@@ -235,6 +241,7 @@ _9              lda #$08                ; data
 
 _10             lda (stack),Y
 _11             tax
+
 _12             pla
                 ora arg10               ; op mode
                 jmp Push2
@@ -267,7 +274,7 @@ Op2L            .proc
 
                 lda arg1
                 ldy #$01
-                jmp Op1L.oplow
+                jmp Op1L._opLow
 
                 .endproc
 
@@ -295,7 +302,7 @@ Op1H            .proc
                 lda arg2
                 ldy #$08
 _ENTRY1         ldx #$01
-                jmp Op1L.ophigh
+                jmp Op1L._opHigh
 
                 .endproc
 
@@ -319,6 +326,7 @@ Op2H            .proc
                 beq _ophz
 
                 pha
+
                 lda arg1
                 ldy #$01
                 bne Op1H._ENTRY1
@@ -602,7 +610,7 @@ PushTrue        .proc
                 ldy #$0A
                 jsr SaveCd
 
-                lda #$00                ; no other true branches
+                lda #$00                ; no other TRUE branches
                 sta arg9
 
                 .endproc
@@ -615,9 +623,8 @@ PushTrue        .proc
 ;======================================
 Push1           .proc
                 jsr Push0
-
                 sta (arg14),Y
-                beq Insrt1._ENTRY1
+                beq Insert1._ENTRY1
 
                 .endproc
 
@@ -625,9 +632,9 @@ Push1           .proc
 
 
 ;======================================
-; Insrt1(op)
+; Insert1(op)
 ;======================================
-Insrt1          .proc
+Insert1         .proc
                 ldy #$01
                 jsr AddCdSp
 
@@ -678,7 +685,7 @@ Push2           .proc
                 jsr Push0
 
                 sta (arg14),Y
-                beq Insrt2._ENTRY1
+                beq Insert2._ENTRY1
 
                 .endproc
 
@@ -686,16 +693,16 @@ Push2           .proc
 
 
 ;======================================
-; Insrt2(op,data)
+; Insert2(op,data)
 ;======================================
-Insrt2          .proc
+Insert2         .proc
                 ldy #$02
                 jsr AddCdSp
 
 _ENTRY1         txa
                 iny
                 sta (arg14),Y
-                bne Insrt1._ENTRY1
+                bne Insert1._ENTRY1
 
                 .endproc
 
@@ -709,7 +716,7 @@ Push3           .proc
                 jsr Push0
 
                 sta (arg14),Y
-                beq Insrt3._ENTRY2
+                beq Insert3._ENTRY2
 
                 .endproc
 
@@ -717,9 +724,9 @@ Push3           .proc
 
 
 ;======================================
-; Insrt3(op,data16)
+; Insert3(op,data16)
 ;======================================
-Insrt3          .proc
+Insert3         .proc
                 sty arg13
 
                 ldy #$03
@@ -729,7 +736,7 @@ _ENTRY2         txa
                 ldx arg13
                 iny
                 sta (arg14),Y
-                bne Insrt2._ENTRY1
+                bne Insert2._ENTRY1
 
                 .endproc
 

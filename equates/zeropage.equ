@@ -134,7 +134,7 @@ nxtaddr                 = ZPBASE+$C9    ; next token address
 bigSymTblGlobal         = ZPBASE+$CE    ; only used if big symbol table
 arrayptr                = ZPBASE+$D0    ; array mem. list
 spnxt                   = ZPBASE+$D2    ; next error char
-nxttoken                = ZPBASE+$D3    ; next token value
+nextToken               = ZPBASE+$D3    ; next token value
 
 
 ;--------------------------------------
@@ -170,6 +170,6 @@ RND_MIN                 .byte ?
 RND_SEC                 .byte ?
 RND_RESULT              .word ?
 
-;; $4d-$59 available
-;; $60-$7f available
-;; $ca-$cd available
+;; $4D-$59 available
+;; $60-$7F available
+;; $CA-$CD available

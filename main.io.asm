@@ -425,7 +425,7 @@ _1              lda ioChnnl
                 jsr Open
                 bpl PrintBuffer
 
-                jmp mainbank.SPLErr          ; oops, error in Open
+                jmp mainbank.SPLErr     ; oops, error in Open
 
                 .endproc
 

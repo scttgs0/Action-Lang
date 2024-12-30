@@ -19,7 +19,7 @@ Compile
 ScanParseLex    ;.proc
                 jsr jt_vecSPLEnd
 
-                lda nxttoken
+                lda nextToken
                 cmp #tokQuote
                 bne _1                  ; no name
 
@@ -246,7 +246,7 @@ _1              cmp #tokTYPE
 
                 stx zpAllocCurrent
 
-                ldx nxttoken
+                ldx nextToken
                 lda #tokTYPE_t-(tokVAR_t-tokCHAR)-1
                 sta type
                 bra _3
@@ -261,7 +261,7 @@ _2              cmp #tokDEFINE
                 ldy varsize-tokCHAR,X
                 sty zpAllocCurrent
 
-                ldx nxttoken
+                ldx nextToken
                 cpx #tokFUNC
                 beq _XIT1
 
@@ -292,7 +292,7 @@ _simple         jsr MakeEntry
                 bpl _5
                 bra _6
 
-_4              lda nxttoken
+_4              lda nextToken
                 cmp #tokEQU
                 bne _5
 
@@ -331,7 +331,7 @@ _define         jsr MakeEntry
                 cmp #tokEQU
                 bne DefineError
 
-                lda nxttoken
+                lda nextToken
                 cmp #tokQuote
                 bne DefineError
 
@@ -375,11 +375,11 @@ _next1          jsr MakeEntry
                 ldx param
                 bne _2
 
-                lda nxttoken
+                lda nextToken
                 ldx zpAllocCurrent
                 beq _3                  ; no size for pointers
 
-                cmp #tokLParen
+                cmp #tokLeftParen
                 bne _3
 
                 lda #$04
@@ -406,10 +406,10 @@ _next1          jsr MakeEntry
 
 _next2          jsr compiler.lexicon.GetNext
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 bne DefineError
 
-                lda nxttoken
+                lda nextToken
                 cmp #tokEQU
                 beq _4
 
@@ -504,7 +504,7 @@ _ENTRY1         beq MakeEntry._err
 ; MakeEntry()
 ;======================================
 MakeEntry       .proc
-                lda nxttoken
+                lda nextToken
                 cmp #tokUNDEC
                 beq _3
                 bcs _1                  ; var of some kind
@@ -528,7 +528,7 @@ _1              lda qglobal
 
 _err            jmp DefineError
 
-_2              sta nxttoken
+_2              sta nextToken
 
 _3              lda #$00
                 jsr mainmsc.NextProp
@@ -641,8 +641,8 @@ Params          .proc
                 tay
 
 ;   see if time to update gbase
-                ldx nxttoken
-                cpx #tokRParen
+                ldx nextToken
+                cpx #tokRightParen
                 bne _1
 
 ;   see AMPL.SEG
@@ -669,10 +669,10 @@ _2              cmp #tokVAR_t+tokINT_t
 
 ;   two-byte arg
 _3              and #$1F
-                inc argbytes
+                inc argBytes
 
 _4              and #$9F
-                inc argbytes
+                inc argBytes
                 sta (zpAllocProps),Y
 
                 rts
@@ -711,7 +711,7 @@ StmtList        .proc
 ;   machine QCODE block
                 jsr ampl.cgu.TrashY
 
-_next1          ldx nxttoken
+_next1          ldx nextToken
                 cpx #tokRBracket
                 beq _3
 
@@ -730,7 +730,7 @@ _2              jsr compiler.lexicon.GetNext
 _3              jsr compiler.lexicon.GetNext
                 jmp RecRet.nxtstmt
 
-_next2          ldx nxttoken
+_next2          ldx nextToken
                 cmp #tokVAR_t+tokCHAR_t
                 bcc _4
 
@@ -738,7 +738,7 @@ _next2          ldx nxttoken
                 bcc Assign
 
 ;   routine reference
-                cpx #tokLParen
+                cpx #tokLeftParen
                 beq Call
 
                 jsr ProcRef
@@ -885,7 +885,7 @@ _if             jsr ExpressionCond
                 bne ThenError
 
 ;   save current Y
-                lda cury
+                lda curYReg
                 ldy #$06
                 sta (frame),Y
 
@@ -895,7 +895,7 @@ _if             jsr ExpressionCond
                 tax
                 ldy #$06
                 lda (frame),Y
-                sta cury
+                sta curYReg
 
                 txa
                 cmp #tokELSEIF
@@ -1236,7 +1236,7 @@ _4              lda #$E1                ; SBC
 
 ;   body
 _5              lda arg3
-                ror a                   ; get type
+                ror                     ; get type
 
                 lda #$B0                ; BCS, CARD
                 bcc _6
@@ -1547,14 +1547,14 @@ StmtRETURN      .proc
                 lda #args
                 jsr StoreST
 
-                ldx nxttoken
-                cpx #tokLParen
+                ldx nextToken
+                cpx #tokLeftParen
                 bne _err
 
                 jsr compiler.lexicon.GetNext
                 jsr GetExp
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 bne _err
 
                 jsr CGAssign
@@ -1935,21 +1935,21 @@ _ENTRY1         jsr jt_vecExpEnd
                 cmp #tokSColon
                 bcc _7
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 bne _1
 
                 ldx zpAllocOP
                 bne _err
 
                 jsr RollOps
-                cmp #tokLParen
+                cmp #tokLeftParen
                 beq _next4
 
                 lda token
 
                 rts
 
-_1              cmp #tokLParen
+_1              cmp #tokLeftParen
                 bne _2
 
                 ldx zpAllocOP
@@ -1964,7 +1964,7 @@ _2              ldx zpAllocOP
                 cmp #tokQuote
                 beq _13
 
-_next1          ldx nxttoken
+_next1          ldx nextToken
                 cmp #tokRECORD
                 beq _4                  ; record
 
@@ -2010,7 +2010,6 @@ _6              cmp #tokFUNC_t
 
 ;   array
                 jsr ampl.array.Ref
-
                 jmp _next4
 
 ;   pop
@@ -2035,13 +2034,13 @@ _8              tax
 
                 lda token
 _9              jsr PushOp
-_next4          jsr compiler.lexicon.GetNext
 
+_next4          jsr compiler.lexicon.GetNext
                 jmp Expression._ENTRY1
 
 _10             jsr RollOps
 
-                cmp #tokLParen
+                cmp #tokLeftParen
                 beq _errParen
 
                 lda token
@@ -2093,7 +2092,7 @@ _errParen       ldy #parenthERR
 _16             cmp #tokFUNC_t+8
                 beq _next5
 
-                cpx #tokLParen
+                cpx #tokLeftParen
                 bne _next5
 
                 lda #$11
@@ -2305,7 +2304,7 @@ EType           .proc
 
 ;   record addr, size or field offset
 ;   A reg must be nonzero before call
-                jmp ampl.array.Ref.arrconst
+                jmp ampl.array.Ref._arrConst
 
 _1              jsr ETypeP              ; set type
 
@@ -2331,7 +2330,7 @@ _1              jsr ETypeP              ; set type
 ETypeA          .proc
                 cpx #tokPeriod
                 beq _1
-                jmp ampl.array.Ref.arrvar
+                jmp ampl.array.Ref._arrVar
 
 _1              jsr ETypeP              ; set type
 
@@ -2346,8 +2345,7 @@ _1              jsr ETypeP              ; set type
 
                 lda #tokARRAY_t+tokBYTE_t
                 ldy #$07
-
-                jsr ampl.array.Ref.arra0
+                jsr ampl.array.Ref._arrA0
 
                 ldy #$00
                 pla
@@ -2366,7 +2364,7 @@ ProcRef         .proc
                 cmp #tokFUNC_t+8
                 bcc _1
 
-_ENTRY1         jsr mainbank.GetArgs             ; A#0, no arg types
+_ENTRY1         jsr mainbank.GetArgs        ; A#0, no arg types
 
                 ldy #tokCONST_t+tokCARD_t   ; sys proc
 _1              sty token
@@ -2403,7 +2401,7 @@ RollOps         .proc
                 jsr PopOp
                 beq _XIT
 
-                cmp #tokLParen
+                cmp #tokLeftParen
                 beq _XIT
 
                 tax
@@ -2778,13 +2776,13 @@ _6              ldy #$04
                 bne _7                  ;   yes
 
                 jsr ampl.cgu.StkPZ
-                beq _8                  ; page zero
+                beq _8                  ; zero-page
 
                 sty arg13
 
                 ldy #$01
                 lda #$8D                ; STA addr16
-                jsr ampl.cgu.Insrt3._ENTRY1   ; insert STA data16
+                jsr ampl.cgu.Insert3._ENTRY1   ; insert STA data16
 
                 lda #$01
 _next1          ldy #$05
@@ -3167,7 +3165,7 @@ _next1          jsr SaveN               ; patch addresses
                 jsr ampl.cgu.StkAddr
 
                 lda #$4C                ; JMP
-                jsr ampl.cgu.Insrt3     ; patch in JMP false
+                jsr ampl.cgu.Insert3    ; patch in JMP false
 
                 lda QCODE
                 pha
