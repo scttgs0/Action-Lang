@@ -8,6 +8,8 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+mainbank        .namespace
+
 en0             .ptext "Error"
                 .byte $C0
                 .addr jt_vecError
@@ -39,9 +41,9 @@ en5             .ptext "TRACE"
 
 
 ;======================================
-; bankCartStart()
+; CartStart()
 ;======================================
-bankCartStart   .proc
+CartStart       .proc
                 ldy #edtr_bank
                 sty jt_curbank
                 sty bank+edtr_bank
@@ -52,9 +54,9 @@ bankCartStart   .proc
 
 
 ;======================================
-; bankGetName(char)
+; GetName(char)
 ;======================================
-bankGetName     .proc
+GetName         .proc
                 sta bank+lib_bank
                 jsr ampl.symbol.GetName
 
@@ -64,9 +66,9 @@ bankGetName     .proc
 
 
 ;======================================
-; bankRestore()
+; Restore()
 ;======================================
-bankRestore     .proc
+Restore         .proc
                 php
                 pha
 
@@ -82,26 +84,26 @@ init            rts
 
 
 ;======================================
-; bankRun(address)
+; Run(address)
 ;======================================
-bankRun         .proc
+Run             .proc
 ;   reset Error routine
-                ldy #<bankSPLErr
+                ldy #<SPLErr
                 sty jt_vecError+1
-                ldy #>bankSPLErr
+                ldy #>SPLErr
                 sty jt_vecError+2
 
-                jsr bankLProceed
+                jsr LProceed
                 jsr mscJSRIndirect
-                jmp bankEditBank
+                jmp EditBank
 
                 .endproc
 
 
 ;======================================
-; bankCompile()
+; Compile()
 ;======================================
-bankCompile     .proc
+Compile         .proc
                 ldy #cmpl_bank
                 sty jt_curbank
                 sty bank+cmpl_bank
@@ -114,9 +116,9 @@ bankCompile     .proc
 
 
 ;======================================
-; bankEditBank()
+; EditBank()
 ;======================================
-bankEditBank    .proc
+EditBank        .proc
                 php
                 pha
 
@@ -124,15 +126,15 @@ bankEditBank    .proc
                 ldy #edtr_bank
                 sty jt_curbank
 
-                jmp bankRestore.rbank1
+                jmp Restore.rbank1
 
                 .endproc
 
 
 ;======================================
-; bankGetAlias()
+; GetAlias()
 ;======================================
-bankGetAlias    .proc
+GetAlias        .proc
                 lda #$01
                 jsr mscGetProp
 
@@ -148,7 +150,7 @@ bankGetAlias    .proc
 
                 sta token
 
-                jmp bankRestore
+                jmp Restore
 
 _XIT            jmp mscMNum._varerr
 
@@ -156,27 +158,27 @@ _XIT            jmp mscMNum._varerr
 
 
 ;======================================
-; bankLocalName()
+; LocalName()
 ;======================================
-bankLocalName   .proc
+LocalName       .proc
                 sta bank+lib_bank
 
                 jsr ampl.symbol.GetName._ENTRY1
-                jmp bankRestore
+                jmp Restore
 
                 .endproc
 
 
 ;======================================
-; bankCStmtList()
+; CStmtList()
 ;======================================
-bankCStmtList   .proc
+CStmtList       .proc
                 ldy #cmpl_bank
                 sty jt_curbank
                 sta bank+cmpl_bank
 
                 jsr compiler.StmtList
-                jmp bankEditBank
+                jmp EditBank
 
                 .endproc
 
@@ -184,8 +186,8 @@ bankCStmtList   .proc
 ;======================================
 ;
 ;======================================
-bankMGetT1      .proc
-                jsr bankEditBank
+MGetT1          .proc
+                jsr EditBank
                 jsr editor.window.GetTemp._ENTRY1
 
                 .endproc
@@ -194,9 +196,9 @@ bankMGetT1      .proc
 
 
 ;======================================
-; bankLProceed()
+; LProceed()
 ;======================================
-bankLProceed    .proc
+LProceed        .proc
                 ldy #lib_bank
                 sty jt_curbank
                 sty bank+lib_bank
@@ -208,10 +210,10 @@ bankLProceed    .proc
 ;======================================
 ;
 ;======================================
-bankOptions     .proc
-                jsr bankLProceed
+Options         .proc
+                jsr LProceed
                 jsr lib.opt.Set
-                jmp bankEditBank
+                jmp EditBank
 
                 .endproc
 
@@ -219,11 +221,11 @@ bankOptions     .proc
 ;======================================
 ;
 ;======================================
-bankGetKey      .proc
+GetKey          .proc
                 sta bank+lib_bank
 
                 jsr lib.key.Get
-                jmp bankRestore
+                jmp Restore
 
                 .endproc
 
@@ -231,7 +233,7 @@ bankGetKey      .proc
 ;======================================
 ; Scanner/Parser/Lexeme error
 ;======================================
-bankSPLErr      .proc
+SPLErr          .proc
                 sta bank+lib_bank
 
                 jmp coreSPLErr
@@ -242,8 +244,8 @@ bankSPLErr      .proc
 ;======================================
 ;
 ;======================================
-bankEmLoop      .proc
-                jsr bankEditBank
+EMLoop          .proc
+                jsr EditBank
                 jmp ampl.monitor.Monitor._ENTRY2
 
                 .endproc
@@ -252,7 +254,7 @@ bankEmLoop      .proc
 ;======================================
 ;
 ;======================================
-bankGetArgs     .proc
+GetArgs         .proc
                 pha                     ; save arg type load flag
 
                 sty bank+lib_bank
@@ -285,7 +287,7 @@ _next1          iny
                 sta argtypes,X          ; args inverted
                 bne _next1
 
-_XIT            jmp bankRestore
+_XIT            jmp Restore
 
                 .endproc
 
@@ -293,7 +295,7 @@ _XIT            jmp bankRestore
 ;======================================
 ; call only from LBANK!
 ;======================================
-bankPrintH      .proc
+PrintH          .proc
                 sty bank+edtr_bank
 
                 jsr ampl.monitor.PrintHex
@@ -308,9 +310,11 @@ bankPrintH      .proc
 ; go directly to DOS, do NOT pass GO,
 ; do NOT collect $200, but setup LIB
 ;======================================
-bankDosRet      .proc
-                jsr bankLProceed
+DosRet          .proc
+                jsr LProceed
 
                 jmp (DOSVEC)
 
                 .endproc
+
+                .endnamespace

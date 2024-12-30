@@ -226,12 +226,12 @@ _9              lda #$01
 
                 lda #$01
                 jsr mscGProp
-                jsr bankRestore
+                jsr mainbank.Restore
 
                 jmp _next2
 
 _varerr         ldy #varERR
-_adrerr         jmp bankSPLErr
+_adrerr         jmp mainbank.SPLErr
 
 _XIT            pla                     ; end of table
                 tax
@@ -437,7 +437,7 @@ _1              lda stmax
 
                 ldy #61                 ; out of symbol table space
 
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -461,7 +461,7 @@ cderr           sta bank+edtr_bank
                 jsr ampl.init.SetupSPL  ; reset compiler
 
                 ldy #qcodeERR           ; out of QCODE space
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 

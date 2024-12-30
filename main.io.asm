@@ -8,6 +8,8 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+mainio          .namespace
+
 ;======================================
 ; Open(device, name, mode, opt)
 ;--------------------------------------
@@ -423,7 +425,7 @@ _1              lda ioChnnl
                 jsr Open
                 bpl PrintBuffer
 
-                jmp bankSPLErr          ; oops, error in Open
+                jmp mainbank.SPLErr          ; oops, error in Open
 
                 .endproc
 
@@ -499,7 +501,7 @@ _ENTRY1         lda FR0
 _XIT            rts
 
 _err            ldy #constERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -881,3 +883,5 @@ _2              sta arg0
 
 ;!!                rts
 ;!!                .endproc
+
+                .endnamespace

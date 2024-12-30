@@ -43,6 +43,6 @@ _1              jsr mainio.SystemError
                 ldy #>numbuf
                 jsr mainio.Print
 
-                jmp bankEmLoop
+                jmp mainbank.EMLoop
 
                 .endproc

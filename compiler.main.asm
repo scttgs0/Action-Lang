@@ -354,7 +354,7 @@ _define         jsr MakeEntry
 ;
 ;--------------------------------------
 DefineError     ldy #declERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 
 ;--------------------------------------
@@ -521,7 +521,7 @@ MakeEntry       .proc
 _1              lda qglobal
                 beq CheckParam._ENTRY1
 
-                jsr bankLocalName
+                jsr mainbank.LocalName
 
                 cmp #tokUNDEC
                 beq _2
@@ -747,7 +747,7 @@ _next2          ldx nxttoken
 _4              cmp #tokUNDEC
                 bne _5
 
-                jsr bankGetAlias
+                jsr mainbank.GetAlias
                 bra _next2
 
 _5              cmp #tokTYPE_t
@@ -843,7 +843,7 @@ _3              jsr Expression._ENTRY1
 ;--------------------------------------
 AssignError     .proc
                 ldy #assgnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -986,7 +986,7 @@ ThenError       ldy #thenERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-StmtErr         jmp bankSPLErr
+StmtErr         jmp mainbank.SPLErr
 
 
 ;--------------------------------------
@@ -1564,7 +1564,7 @@ _1              lda #$60
                 jmp RecRet.nxtstmt
 
 _err            ldy #retrnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -1797,7 +1797,7 @@ GetFrame        .proc
                 jmp FrameCd._ENTRY2
 
 _err            ldy #nestERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 
@@ -2049,7 +2049,7 @@ _10             jsr RollOps
                 rts
 
 ;   undefined
-_11             jsr bankGetAlias
+_11             jsr mainbank.GetAlias
                 bra _next1
 
 ;   proc
@@ -2087,7 +2087,7 @@ _15             jsr ampl.cgu.Push2
                 bra _next4
 
 _errParen       ldy #parenthERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 ;   QCODE to handle function ref
 _16             cmp #tokFUNC_t+8
@@ -2199,7 +2199,7 @@ ErrorExpression ldy #exprERR
 ;--------------------------------------
 ;
 ;--------------------------------------
-ErrorExp2       jmp bankSPLErr
+ErrorExp2       jmp mainbank.SPLErr
 
 
 ;======================================
@@ -2366,7 +2366,7 @@ ProcRef         .proc
                 cmp #tokFUNC_t+8
                 bcc _1
 
-_ENTRY1         jsr bankGetArgs             ; A#0, no arg types
+_ENTRY1         jsr mainbank.GetArgs             ; A#0, no arg types
 
                 ldy #tokCONST_t+tokCARD_t   ; sys proc
 _1              sty token
@@ -3235,7 +3235,7 @@ _1              pla
 ;--------------------------------------
 ErrCond         .proc
                 ldy #condtERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
                 .endproc
 

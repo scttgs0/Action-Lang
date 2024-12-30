@@ -15,7 +15,7 @@ io              .namespace
 ;======================================
 GetString       .proc
                 jsr mainio.DisplayStr
-_next1          jsr bankGetKey
+_next1          jsr mainbank.GetKey
 
                 tax
                 cpx #$7E

@@ -157,7 +157,7 @@ _2              cpy #'I'
 _3              cpy #'H'
                 bne _4
 
-                jsr bankPrintH
+                jsr mainbank.PrintH
 
                 jmp _next2
 

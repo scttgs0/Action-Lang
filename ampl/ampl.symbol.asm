@@ -57,7 +57,7 @@ _1              inc arg13               ; try next entry
 
                 iny
 
-_XIT2           jmp bankSPLErr
+_XIT2           jmp mainbank.SPLErr
 
 _XIT            jmp (jt_vecStmRAdr)
 

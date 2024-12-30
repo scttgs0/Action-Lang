@@ -23,7 +23,7 @@ _jt_vecSegEnd   rts                     ; Seg catch all
 _jt_curbank     .byte edtr_bank
 _jt_stmask      .byte $DF
 
-_jt_vecError    jmp bankSPLErr
+_jt_vecError    jmp mainbank.SPLErr
 
 _jt_wsize       .byte 18        ;;40
 _jt_linemax     .byte 120               ; line input max

@@ -24,7 +24,7 @@ Loop            .proc
 _1              lda curCH
                 sta lastCH
 
-                jsr bankGetKey
+                jsr mainbank.GetKey
                 jsr editor.init.EditorInit._ENTRY3
 
                 lda curCH

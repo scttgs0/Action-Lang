@@ -257,7 +257,7 @@ _next1          lda optmsg+20,X
                 ldx #>(tempbuf+10)
                 ldy arg2
 
-                jmp bankMGetT1
+                jmp mainbank.MGetT1
 
                 .endproc
 

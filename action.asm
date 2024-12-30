@@ -80,7 +80,7 @@ INIT            .proc
 
                 jsr ClearScreen
 
-                jsr bankCartStart
+                jsr mainbank.CartStart
                 ;[no return]
 
                 .endproc
@@ -114,9 +114,8 @@ version         .byte $40               ; TODO: [M.m]    4.0
 versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest version!
 
 
-mainio      .namespace
+
                 .include "main.io.asm"
-            .endnamespace
 
 propid          ldx $A0
 

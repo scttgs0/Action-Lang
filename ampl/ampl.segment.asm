@@ -123,7 +123,7 @@ _next2          jsr compiler.Declare
 
 _argerr         ldy #argERR
 
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _3              lda param
                 pha

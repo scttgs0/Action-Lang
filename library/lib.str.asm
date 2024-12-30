@@ -472,20 +472,20 @@ _en73           .ptext "SAssign"
 ;--------------------------------------
 
 libst           .byte 0                     ; 1
-                .byte >en1                  ; EOF #1
-                .byte >en5                  ; TRACE #2
+                .byte >mainbank.en1         ; EOF #1
+                .byte >mainbank.en5         ; TRACE #2
                 .byte 0,0,0                 ; 3
                 .byte >_en53                ; SetColor #6
                 .byte 0                     ; 1
                 .byte >_en60                ; Stick #8
                 .byte 0,0,0,0               ; 4
                 .byte >_en33                ; PrintIDE #13
-                .byte >en2                  ; color #14
+                .byte >mainbank.en2         ; color #14
                 .byte 0,0,0,0,0,0,0,0       ; 8
                 .byte >_en73                ; SAssign #23
                 .byte 0,0,0,0,0,0,0         ; 7
                 .byte >_en56                ; Sound #31
-                .byte >en3                  ; LIST #32
+                .byte >mainbank.en3         ; LIST #32
                 .byte 0,0,0,0,0,0,0,0,0,0
                 .byte 0,0,0,0,0,0,0,0,0     ; 19
                 .byte >_en61                ; STrig #52
@@ -513,7 +513,7 @@ libst           .byte 0                     ; 1
                 .byte >_en66                ; Zero #88
                 .byte >_en46                ; Note #89
                 .byte 0,0                   ; 2
-                .byte >en4                  ; device #92
+                .byte >mainbank.en4         ; device #92
                 .byte >_en70                ; SCompare #93
                 .byte >_en50                ; Position #94
                 .byte 0                     ; 1
@@ -542,7 +542,7 @@ libst           .byte 0                     ; 1
                 .byte >_en16                ; GetD #138
                 .byte 0,0,0,0,0,0,0,0,0,0
                 .byte 0,0,0,0,0,0,0,0       ; 18
-                .byte >en0                  ; Error #157
+                .byte >mainbank.en0         ; Error #157
                 .byte >_en18                ; Put #158
                 .byte 0,0                   ; 2
                 .byte >_en19                ; PutD #161
@@ -588,15 +588,15 @@ libst           .byte 0                     ; 1
                 .byte 0                     ; 1
 
                 .byte 0                     ; 1
-                .byte <en1
-                .byte <en5
+                .byte <mainbank.en1
+                .byte <mainbank.en5
                 .byte 0,0,0                 ; 3
                 .byte <_en53
                 .byte 0                     ; 1
                 .byte <_en60
                 .byte 0,0,0,0               ; 4
                 .byte <_en33
-                .byte <en2
+                .byte <mainbank.en2
                 .byte 0                     ; 1
 
 ;               .byte 0,0,0,0,0,0,0,0       ; 7
@@ -637,7 +637,7 @@ Paddle          .proc
 ;--------------------------------------
 
                 .byte <_en56
-                .byte <en3
+                .byte <mainbank.en3
                 .byte 0,0                   ; 2
 
 ;               .byte 0,0,0,0,0,0,0,0,0,0
@@ -680,7 +680,7 @@ _en63           .ptext "PeekC"
                 .byte <_en66
                 .byte <_en46
                 .byte 0,0                   ; 2
-                .byte <en4
+                .byte <mainbank.en4
                 .byte <_en70
                 .byte <_en50
                 .byte 0                     ; 1
@@ -723,7 +723,7 @@ _en68           .ptext "MoveBlock"
                 .addr lib.msc.MoveBlock     ; #85
                 .byte 3,18,18,12
 
-                .byte <en0
+                .byte <mainbank.en0
                 .byte <_en18
                 .byte 0,0                   ; 2
                 .byte <_en19

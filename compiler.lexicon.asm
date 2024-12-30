@@ -71,7 +71,7 @@ _1              jsr mscAlpha
                 beq _ENTRY3
                 bra _ENTRY1
 
-_2              jsr bankGetName
+_2              jsr mainbank.GetName
                 bmi _ENTRY3
 
 _3              sta nxttoken
@@ -131,7 +131,7 @@ _next1          jsr NextChar            ; cardinal?
                 bcc _1
 
 _err            ldy #constERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _ENTRY1         dey
                 sty choff
@@ -272,7 +272,7 @@ _next2          ldy arg9
                 bpl _next1              ; if not EOF
 
 _1              ldy #strERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _2              jsr NextChar
 
@@ -329,7 +329,7 @@ NextLine        .proc
                 cpy #$88                ; EOF
                 beq _next1
 
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _next1          dec ioChnnl
                 bne NextLine
@@ -451,7 +451,7 @@ Set             .proc
 _XIT1           jmp GetNext._ENTRY1
 
 _err            ldy #setERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _1              jsr GetNext._ENTRY1
                 jmp mscMNum
@@ -467,7 +467,7 @@ Expand          .proc
                 beq _1
 
                 ldy #dfnERR
-                jmp bankSPLErr
+                jmp mainbank.SPLErr
 
 _1              lda #$03
                 jsr mscNextProp

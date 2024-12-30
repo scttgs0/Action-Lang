@@ -265,7 +265,7 @@ _1              lda INITAD
 _XIT            rts
 
 _2              jsr mscMNum
-_3              jsr bankRun
+_3              jsr mainbank.Run
 
                 lda #$00
                 sta device
@@ -390,7 +390,7 @@ WOut            .proc
 ;--------------------------------------
 _mxerr          ldy #endERR
 
-_mwerr          jmp bankSPLErr
+_mwerr          jmp mainbank.SPLErr
 
                 .endproc
 
@@ -409,7 +409,7 @@ Execute         .proc
                 pha
 
                 jsr compiler.lexicon.GetNext
-                jsr bankCStmtList
+                jsr mainbank.CStmtList
 
                 cmp #tokEOF
                 bne WOut._mxerr
@@ -422,7 +422,7 @@ Execute         .proc
                 tax
                 pla
 
-                jmp bankRun
+                jmp mainbank.Run
 
                 .endproc
 
@@ -433,7 +433,7 @@ Execute         .proc
 Compile         .proc
                 jsr ampl.init.SetupSPL
                 jsr mainio.DisplayOff
-                jsr bankCompile
+                jsr mainbank.Compile
 
                 jmp mainio.DisplayOn
 
@@ -466,7 +466,7 @@ Proceed         .proc
 
                 txs
 
-                jmp bankLProceed
+                jmp mainbank.LProceed
 
 _XIT            rts
 
@@ -524,11 +524,11 @@ tblMonitorCmd   .addr jt_vecDispTb+9    ; default routine
                 .text 'b'               ; BOOT
                 .addr Compile
                 .text 'c'               ; COMPILE
-                .addr bankDosRet
+                .addr mainbank.DosRet
                 .text 'd'               ; DOS
                 .addr Quit
                 .text 'e'               ; EDITOR
-                .addr bankOptions
+                .addr mainbank.Options
                 .text 'o'               ; OPTIONS
                 .addr Proceed
                 .text 'p'               ; PROCEED (continue after BRK)

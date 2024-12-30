@@ -47,7 +47,7 @@ Load1           .proc
 ;======================================
 ProcFunc        .proc
                 lda #$00                ; load arg types flag
-                jsr bankGetArgs
+                jsr mainbank.GetArgs
                 jsr compiler.PushST
                 jsr compiler.lexicon.GetNext
 
