@@ -58,7 +58,7 @@ _ENTRY2         cmp #tokEOF
                 and #$7F
                 bra _3
 
-_1              jsr mscAlpha
+_1              jsr mainmsc.Alpha
                 bne _2
 
                 cmp #'['
@@ -78,7 +78,7 @@ _3              sta nxttoken
 
                 ldx #<tblLexCmd
                 ldy #>tblLexCmd
-                jmp mscLookup
+                jmp mainmsc.Lookup
 
 _ENTRY3         sta nxttoken
 
@@ -116,7 +116,7 @@ Dig             .proc
                 jsr mainio.StrToReal
 
 _next1          jsr NextChar            ; cardinal?
-                jsr mscAlphaNum._num
+                jsr mainmsc.AlphaNum._num
                 bne _next1
 
                 cmp #'.'
@@ -344,7 +344,7 @@ _1              ldy top+1
                 ldx cur+1
                 stx curnxt+1
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 bne _2
 
                 ; lda #$00
@@ -454,7 +454,7 @@ _err            ldy #setERR
                 jmp mainbank.SPLErr
 
 _1              jsr GetNext._ENTRY1
-                jmp mscMNum
+                jmp mainmsc.MNum
 
                 .endproc
 
@@ -470,11 +470,11 @@ Expand          .proc
                 jmp mainbank.SPLErr
 
 _1              lda #$03
-                jsr mscNextProp
+                jsr mainmsc.NextProp
 
                 lda zpAllocProps
                 ldx zpAllocProps+1
-                jsr mscResetProp
+                jsr mainmsc.ResetProp
 
                 ldy choff
 _ENTRY1         sta delnxt

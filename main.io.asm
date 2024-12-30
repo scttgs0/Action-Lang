@@ -474,7 +474,7 @@ _1              sta arg5
                 lda FR0
                 ldx FR0+1
                 ldy #$04
-                jsr mscLShift
+                jsr mainmsc.LShift
 
                 clc
                 adc arg5
@@ -799,7 +799,7 @@ LoadBuffer      .proc
 
                 rts
 
-_1              jsr mscCurStr
+_1              jsr mainmsc.CurStr
 
 _ENTRY1         ldy #$00
                 lda (arg0),Y

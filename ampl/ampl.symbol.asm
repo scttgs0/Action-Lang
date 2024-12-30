@@ -137,7 +137,7 @@ _next1          iny
                 cmp #'_'
                 beq _next1
 
-                jsr mscAlphaNum
+                jsr mainmsc.AlphaNum
                 bne _next1
 
                 tya
@@ -220,7 +220,7 @@ NewEntry        .proc
 
                 iny
                 tya
-                jsr mscSTIncr
+                jsr mainmsc.STIncr
 
                 lda #tokUNDEC
 

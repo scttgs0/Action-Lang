@@ -161,7 +161,7 @@ _next1          jsr mainio.LoadBuffer
                 jsr mainio.WriteBuffer
                 bmi _1
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 bne _next1
 
                 lda #$00

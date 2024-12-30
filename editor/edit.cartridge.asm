@@ -49,7 +49,7 @@ _jt_vecAlarm    jmp screen.Bell          ; Alarm
 _jt_eolch       .byte 0                 ; EOLch (default = space)
 
 _jt_lsh
-ltab            .addr mscLShift._lshift
+ltab            .addr mainmsc.LShift._lshift
                 .addr ampl.math.RShift
                 .addr ampl.math.MultI
                 .addr ampl.math.DivC

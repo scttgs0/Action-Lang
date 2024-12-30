@@ -128,12 +128,12 @@ CenterLine      .proc
                 jsr CleanLine
                 beq _1
 
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 beq _1
 
                 inc temps
 
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 beq _1
 
                 inc temps
@@ -197,7 +197,7 @@ Refresh         .proc
 
                 inc CURSOR_Y    ;!!ROWCRS
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 
                 sta arg9
 
@@ -214,7 +214,7 @@ _next1          ldy #$00
                 ldx arg9
                 beq _3
 
-                jsr mscCurStr
+                jsr mainmsc.CurStr
 
 _next2          jsr mainio.PutStr
 
@@ -226,7 +226,7 @@ _next2          jsr mainio.PutStr
 
 _1              inc CURSOR_Y    ;!!ROWCRS
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
                 sta arg9
 
                 dec arg10

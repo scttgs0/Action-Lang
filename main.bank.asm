@@ -94,7 +94,7 @@ Run             .proc
                 sty jt_vecError+2
 
                 jsr LProceed
-                jsr mscJSRIndirect
+                jsr mainmsc.JSRIndirect
                 jmp EditBank
 
                 .endproc
@@ -136,7 +136,7 @@ EditBank        .proc
 ;======================================
 GetAlias        .proc
                 lda #$01
-                jsr mscGetProp
+                jsr mainmsc.GetProp
 
                 cpx #$00
                 beq _XIT
@@ -146,13 +146,13 @@ GetAlias        .proc
                 sta bank+lib_bank
 
                 lda #$00
-                jsr mscGetProp
+                jsr mainmsc.GetProp
 
                 sta token
 
                 jmp Restore
 
-_XIT            jmp mscMNum._varerr
+_XIT            jmp mainmsc.MNum._varerr
 
                 .endproc
 
@@ -260,7 +260,7 @@ GetArgs         .proc
                 sty bank+lib_bank
 
                 lda #$01
-                jsr mscGetProp
+                jsr mainmsc.GetProp
 
                 sta addr
                 stx addr+1

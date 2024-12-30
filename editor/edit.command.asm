@@ -106,7 +106,7 @@ PageContent     .proc
                 jsr editor.display.CleanLine
 
 _next1          ldy arg13
-                jsr mscNext
+                jsr mainmsc.Next
 
                 dec arg14
                 bne _next1
@@ -126,14 +126,14 @@ Paste           .proc
                 stx dirty
 
                 jsr editor.display.CleanLine
-                jsr mscNextUp
+                jsr mainmsc.NextUp
 
                 sta cur+1               ; tricky, fake out top
 
                 jsr editor.display.SaveWindow._ENTRY1
                 jsr editor.chr.DeleteTop
 
-_next1          jsr mscStrPtr
+_next1          jsr mainmsc.StrPtr
                 jsr mainio.LoadBuffer._ENTRY1
                 jsr editor.memory.InsertByte
 
@@ -149,7 +149,7 @@ _1              jsr mainio.ResetCursor
                 lda win1Base+WCUR+1,Y
                 beq _2
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 
 _2              lda #$00
                 jmp editor.display.NewPage._ENTRY1
@@ -223,7 +223,7 @@ ScrollInit      .proc
                 beq _1
 
                 ldy arg13
-                jsr mscNext
+                jsr mainmsc.Next
                 beq _1                  ; EOF
 
                 lda CURSOR_X    ;!!COLCRS

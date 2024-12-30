@@ -99,7 +99,7 @@ InsertSpace     .proc
 ;======================================
 Insert_2        .proc
                 jsr editor.display.CleanLine
-                jsr mscNextUp
+                jsr mainmsc.NextUp
 
                 sta cur+1               ; tricky
 
@@ -162,7 +162,7 @@ _1              ldy sp
                 ldy #$00
                 lda arg0
                 jsr Insert_2._ENTRY2
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 jsr editor.display.Refresh
 
                 jmp Return._ENTRY1
@@ -181,7 +181,7 @@ Return          .proc
                 bne _ENTRY1
 
                 jsr Insert_2._ENTRY1
-                jsr mscNextUp
+                jsr mainmsc.NextUp
                 jsr mainio.LoadBuffer
 
 _ENTRY1         jsr editor.command.ScrollDown
@@ -224,7 +224,7 @@ _1              sta arg3
 _2              jsr editor.memory.DeleteCurrentLine
                 beq _3
 
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 _3              jsr mainio.ChkCursor
 
                 lda #$00
@@ -398,11 +398,11 @@ CSBS            .proc
 ;   merge
                 jsr editor.command.ScrollUp
                 jsr editor.command.Back
-                jsr mscNextDown
+                jsr mainmsc.NextDown
 
                 sta isDirty
 
-                jsr mscCurStr
+                jsr mainmsc.CurStr
 
                 clc
                 ldy #$00

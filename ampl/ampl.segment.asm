@@ -53,7 +53,7 @@ _1              jsr compiler.MakeEntry
                 sta qglobal
 
                 lda #$01
-                jsr mscSTIncr           ; space for num args
+                jsr mainmsc.STIncr      ; space for num args
 
                 ldy #$03
                 lda #$00                ; no args yet
@@ -76,7 +76,7 @@ _next1          sta (symTblLocal),Y
 ;   unused space will be reclaimed
 ;   see Params
                 lda #$20
-                jsr mscSTIncr           ; arg list space
+                jsr mainmsc.STIncr      ; arg list space
                 jsr ampl.cgu.TrashY
 
                 lda nxttoken
@@ -140,18 +140,18 @@ _3              lda param
 
 ;   get beginning of arguments and save actual procedure address
                 lda #$01
-                jsr mscCProp
+                jsr mainmsc.CProp
 
                 sta arg0
                 stx arg1
 
-                jsr mscGetCodeOffset
+                jsr mainmsc.GetCodeOffset
                 jsr compiler.StoreProps
 
 ;   get space for proc variable
                 lda #$4C                ; JMP
                 jsr ampl.cgu.Push1
-                jsr mscGetCodeOffset    ; fill in address
+                jsr mainmsc.GetCodeOffset   ; fill in address
 
                 adc #$02
                 bcc _4
@@ -222,14 +222,14 @@ _next4          lda (curproc),Y
                 inx
                 txa
 
-                jsr mscCodeIncr
+                jsr mainmsc.CodeIncr
 
                 lda arg0
                 ldx arg1
                 jsr ampl.cgu.Push2
 
                 lda #$03
-                jsr mscCProp
+                jsr mainmsc.CProp
 
                 tay
                 tax
@@ -243,7 +243,7 @@ _next5          lda (zpAllocProps),Y
                 inx
                 txa
 
-                jsr mscCodeIncr
+                jsr mainmsc.CodeIncr
 
 _9              jsr compiler.StmtList
                 jmp Segment

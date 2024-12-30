@@ -61,7 +61,7 @@ _next3          lda (buf),Y
                 cpy arg0
                 bcc _next3
 
-_1              jsr mscNextDown
+_1              jsr mainmsc.NextDown
                 beq _2
 
                 jsr mainio.LoadBuffer

@@ -53,7 +53,7 @@ _2              ldx #<tblEditCtrlShft
 _3              ldx #<tblEditCmd
                 ldy #>tblEditCmd
 
-_4              jsr mscLookup
+_4              jsr mainmsc.Lookup
                 jmp Loop
 
                 .endproc

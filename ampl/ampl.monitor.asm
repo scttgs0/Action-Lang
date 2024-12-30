@@ -68,7 +68,7 @@ _1              jsr jt_vecAlarm
                 ora #$20
                 ldx #<tblMonitorCmd
                 ldy #>tblMonitorCmd
-                jsr mscLookup
+                jsr mainmsc.Lookup
 
                 jmp _next1
 
@@ -216,7 +216,7 @@ LoadParams      .proc
 ; SaveParams()
 ;======================================
 SaveParams      .proc
-                jsr mscMNum
+                jsr mainmsc.MNum
 
                 sta arg11
                 stx arg12
@@ -264,7 +264,7 @@ _1              lda INITAD
 
 _XIT            rts
 
-_2              jsr mscMNum
+_2              jsr mainmsc.MNum
 _3              jsr mainbank.Run
 
                 lda #$00
