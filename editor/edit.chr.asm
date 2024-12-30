@@ -48,7 +48,7 @@ _next2          ldy sp
                 lda #$FF
                 sta isDirty
 
-                jsr ioDisplayBuffer
+                jsr mainio.DisplayBuffer
                 jmp editor.command.ScrollRight
 
 _2              ldx insert
@@ -182,7 +182,7 @@ Return          .proc
 
                 jsr Insert_2._ENTRY1
                 jsr mscNextUp
-                jsr ioLoadBuffer
+                jsr mainio.LoadBuffer
 
 _ENTRY1         jsr editor.command.ScrollDown
 
@@ -225,7 +225,7 @@ _2              jsr editor.memory.DeleteCurrentLine
                 beq _3
 
                 jsr mscNextDown
-_3              jsr ioChkCursor
+_3              jsr mainio.ChkCursor
 
                 lda #$00
 
@@ -296,7 +296,7 @@ DeleteNext      .proc
 ; Undo()
 ;======================================
 Undo            .proc
-                jsr ioLoadBuffer
+                jsr mainio.LoadBuffer
                 jmp editor.command.Front
 
                 .endproc
@@ -335,8 +335,8 @@ _next1          iny
 ; RefreshBuf()
 ;======================================
 RefreshBuf      .proc
-                jsr ioDisplayBuffer
-                jmp ioResetColumn._ENTRY1
+                jsr mainio.DisplayBuffer
+                jmp mainio.RestoreColumn._ENTRY1
 
                 .endproc
 
@@ -388,7 +388,7 @@ CSBS            .proc
                 cmp #$02
                 bcs BackSpc._ENTRY1
 
-                jsr ioChkCursor
+                jsr mainio.ChkCursor
                 beq CheckDown._XIT      ; no lines at all!
 
                 ldy #$01

@@ -62,7 +62,7 @@ mscNextDown     .proc
 ; mscNext(,,dir)
 ;======================================
 mscNext         .proc
-                jsr ioChkCursor
+                jsr mainio.ChkCursor
                 beq _XIT
 
                 lda (cur),Y

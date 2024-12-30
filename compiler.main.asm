@@ -29,7 +29,7 @@ ScanParseLex    ;.proc
 _1              lda cacheTop_HI
                 sta top+1
 
-                jsr ioChkCursor._ENTRY1
+                jsr mainio.ChkCursor._ENTRY1
                 beq _XIT1               ; no program !
 
                 jsr compiler.lexicon.GetNext

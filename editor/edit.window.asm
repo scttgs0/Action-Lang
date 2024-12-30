@@ -62,8 +62,8 @@ _1              lda #win2Base-win1Base
 ;======================================
 SaveWorld       .proc
                 jsr editor.display.CleanLine
-                jsr ioSaveColumn
-                ;!! jsr ioRestoreCursorChar ; unnecessary
+                jsr mainio.SaveColumn
+                ;!! jsr mainio.RestoreCursorChar ; unnecessary
                 jsr editor.command.SetSpacing
                 jmp editor.display.SaveWindow
 
@@ -119,8 +119,8 @@ RestoreWorld    .proc
                 sta currentWindow
 
                 jsr editor.display.RestoreWindow
-                jsr ioLoadBuffer
-                jmp ioResetColumn
+                jsr mainio.LoadBuffer
+                jmp mainio.RestoreColumn
 
                 .endproc
 
@@ -189,7 +189,7 @@ CommandString   .proc
                 sta arg0
                 sty arg2
 
-                jsr ioCmdColumn
+                jsr mainio.CmdColumn
 
                 lda #$80
                 sta arg4
@@ -198,8 +198,8 @@ CommandString   .proc
                 ldy arg2
 
                 jsr editor.io.GetString
-                ;!! jsr ioRestoreCursorChar ; unnecessary
-                jmp ioResetColumn
+                ;!! jsr mainio.RestoreCursorChar ; unnecessary
+                jmp mainio.RestoreColumn
 
                 .endproc
 

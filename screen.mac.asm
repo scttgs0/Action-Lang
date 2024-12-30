@@ -18,7 +18,7 @@ Init            .proc
                 jsr CLS                 ; init text mode and clear the screen
 
                 lda #$00
-                jsr ioClose             ; close #0, sets X to 0
+                jsr mainio.Close        ; close #0, sets X to 0
 
                 lda #$0C
                 sta arg3
@@ -27,7 +27,7 @@ Init            .proc
                 ldx #<_data
                 ldy #>_data
 
-                jmp ioOpen
+                jmp mainio.Open
 
 ;--------------------------------------
 

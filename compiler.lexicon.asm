@@ -113,7 +113,7 @@ Dig             .proc
                 sta nxttoken
 
                 jsr LexBuf              ; get buf ptr
-                jsr ioStrToReal
+                jsr mainio.StrToReal
 
 _next1          jsr NextChar            ; cardinal?
                 jsr mscAlphaNum._num
@@ -127,7 +127,7 @@ _next1          jsr NextChar            ; cardinal?
 
                 dec choff
 
-                jsr ioRealToCard
+                jsr mainio.RealToCard
                 bcc _1
 
 _err            ldy #constERR
@@ -209,7 +209,7 @@ Hex             .proc
                 inc choff
 
                 jsr LexBuf
-                jsr ioHexToCard
+                jsr mainio.HexToCard
                 bra Dig._ENTRY1
 
                 .endproc
@@ -323,7 +323,7 @@ NextLine        .proc
                 beq _1
                 bmi _4                  ; eof
 
-                jsr ioReadBuffer
+                jsr mainio.ReadBuffer
                 bpl _2
 
                 cpy #$88                ; EOF
@@ -337,7 +337,7 @@ _next1          dec ioChnnl
 _1              ldy top+1
                 beq _next1              ; set eof, tricky QCODE
 
-                jsr ioLoadBuffer
+                jsr mainio.LoadBuffer
 
                 lda cur
                 sta curnxt
@@ -354,7 +354,7 @@ _2              lda isListing
                 beq _3                  ; don't list
 
                 lda device
-                jsr ioWriteBuffer
+                jsr mainio.WriteBuffer
 
 _3              ldy #$00
                 sty choff
@@ -415,7 +415,7 @@ _ENTRY1         lda #$00
                 inc ioChnnl
 
                 lda #$04
-                jsr ioOpenChannel
+                jsr mainio.OpenChannel
                 jsr NextLine
                 jmp GetNext._ENTRY2
 

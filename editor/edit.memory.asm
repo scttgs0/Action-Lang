@@ -43,7 +43,7 @@ _XIT            rts
 ;======================================
 GeneralErr      .proc
                 ldy #$00
-                jsr ioSystemError
+                jsr mainio.SystemError
 
                 lda spareMem
                 ldx spareMem+1

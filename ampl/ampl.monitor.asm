@@ -44,7 +44,7 @@ _next1          jsr editor.io.InitKeys
                 jsr screen.Init          ; get Graphics(0)
 
 _1              jsr jt_vecAlarm
-                ;!! jsr ioRestoreCursorChar ; unnecessary
+                ;!! jsr mainio.RestoreCursorChar ; unnecessary
 
                 lda #<prompt
                 ldx #>prompt
@@ -162,37 +162,37 @@ _1              lda arg11
 Print           .proc
                 jsr SaveParams
 
-_ENTRY1         jsr ioPrintCard
+_ENTRY1         jsr mainio.PrintCard
 
                 ldy #','
-                jsr ioPutChar
+                jsr mainio.PutChar
 
                 lda arg11
                 ldx arg12
                 jsr PrintHex
-                jsr ioPutSpace
+                jsr mainio.PutSpace
 
                 ldy #'='
-                jsr ioPutChar
-                jsr ioPutSpace
+                jsr mainio.PutChar
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 tay
-                jsr ioPutChar
-                jsr ioPutSpace
+                jsr mainio.PutChar
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 jsr PrintHex
-                jsr ioPutSpace
+                jsr mainio.PutSpace
                 jsr LoadParams
 
                 ldx #$00
-                jsr ioPrintCard
-                jsr ioPutSpace
+                jsr mainio.PrintCard
+                jsr mainio.PutSpace
                 jsr LoadParams
 
-                jsr ioPrintCard
-                jmp ioPutEOL
+                jsr mainio.PrintCard
+                jmp mainio.PutEOL
 
                 .endproc
 
@@ -289,7 +289,7 @@ MemWrite        .proc                   ; write object file
                 sta ioChnnl
 
                 lda #$08                ; output
-                jsr ioOpenChannel
+                jsr mainio.OpenChannel
 
 ;   write header
                 lda #$06
@@ -360,7 +360,7 @@ _next1          lda _mwinit,X
 
 ;   close file
                 lda #$01
-                jmp ioClose
+                jmp mainio.Close
 
 ;--------------------------------------
 
@@ -378,7 +378,7 @@ WOut            .proc
                 lda #$01
                 ldx #arg9
                 ldy #$00
-                jsr ioOutput
+                jsr mainio.Output
 
                 bmi _mwerr
 
@@ -432,10 +432,10 @@ Execute         .proc
 ;======================================
 Compile         .proc
                 jsr ampl.init.SetupSPL
-                jsr ioDisplayOff
+                jsr mainio.DisplayOff
                 jsr bankCompile
 
-                jmp ioDisplayOn
+                jmp mainio.DisplayOn
 
                 .endproc
 
@@ -486,7 +486,7 @@ PrintHex        .proc
                 sta arg2
 
                 ldy #'$'
-                jsr ioPutChar
+                jsr mainio.PutChar
 
 _next1          lda #$00
                 ldx #$04
@@ -505,7 +505,7 @@ _next2          asl arg0
                 adc #$06
 
 _1              tay
-                jsr ioPutChar
+                jsr mainio.PutChar
 
                 dec arg2
                 bne _next1

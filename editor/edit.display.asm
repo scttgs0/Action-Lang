@@ -19,15 +19,15 @@ display         .namespace
 CommandMsg      .proc
                 sta arg0
 
-                jsr ioCmdColumn
+                jsr mainio.CmdColumn
 
                 lda #$00
                 sta arg3
 
                 lda arg0                ; message_LO
                 ldy #$80        ;;#$A0  ; char used for clearing (inverse space)
-                jsr ioPutStr
-                jmp ioResetColumn
+                jsr mainio.PutStr
+                jmp mainio.RestoreColumn
 
                 .endproc
 
@@ -36,7 +36,7 @@ CommandMsg      .proc
 ; CleanLine()
 ;======================================
 CleanLine       .proc
-                jsr ioChkCursor
+                jsr mainio.ChkCursor
 
                 lda isDirty
                 beq _XIT
@@ -49,7 +49,7 @@ CleanLine       .proc
                 jsr editor.memory.DeleteCurrentLine
                 jsr editor.memory.InsertByte
 
-_XIT            jmp ioChkCursor
+_XIT            jmp mainio.ChkCursor
 
                 .endproc
 
@@ -157,7 +157,7 @@ _next1          lda temps
 ;======================================
 TopLine         .proc
                 jsr CleanLine
-                jsr ioChkCursor._ENTRY1
+                jsr mainio.ChkCursor._ENTRY1
 
                 .endproc
 
@@ -173,7 +173,7 @@ NewPage         .proc
 
 _ENTRY1         sta choff
 
-                ;!! jsr ioRestoreCursorChar ; for command line  ; unnecessary
+                ;!! jsr mainio.RestoreCursorChar ; for command line  ; unnecessary
 
                 lda LMARGN
                 sta CURSOR_X    ;!!COLCRS
@@ -192,7 +192,7 @@ Refresh         .proc
                 adc lnum
                 sta CURSOR_Y    ;!!ROWCRS
 
-                jsr ioSaveColumn
+                jsr mainio.SaveColumn
                 jsr SaveWindow
 
                 inc CURSOR_Y    ;!!ROWCRS
@@ -216,7 +216,7 @@ _next1          ldy #$00
 
                 jsr mscCurStr
 
-_next2          jsr ioPutStr
+_next2          jsr mainio.PutStr
 
                 lda arg9
                 bne _1
@@ -232,8 +232,8 @@ _1              inc CURSOR_Y    ;!!ROWCRS
                 dec arg10
                 bne _next1
 
-_2              jsr ioResetCursor
-                jsr ioResetColumn
+_2              jsr mainio.ResetCursor
+                jsr mainio.RestoreColumn
                 jmp editor.chr.RefreshBuf
 
 _3              lda #<editor.cartridge.zero

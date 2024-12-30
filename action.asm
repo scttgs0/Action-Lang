@@ -114,7 +114,9 @@ version         .byte $40               ; TODO: [M.m]    4.0
 versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest version!
 
 
+mainio      .namespace
                 .include "main.io.asm"
+            .endnamespace
 
 propid          ldx $A0
 
@@ -139,6 +141,7 @@ editor      .namespace
                 .include "editor/edit.tab.asm"
             .endnamespace
 
+
 ;--------------------------------------
 ;    "ACTION! - Compiler Routines
 
@@ -149,6 +152,7 @@ ampl        .namespace
                 .include "ampl/ampl.array.asm"
                 .include "ampl/ampl.cgu.asm"
             .endnamespace
+
 
 ;--------------------------------------
 ;    ACTION! - Symbol Table
@@ -187,6 +191,7 @@ ampl_copyright  .null " ACTION! (c) 2024 GPL3           Foenix Adaptation       
 comp_copyright  .null "ACTION! (c) 2024 GPL3           Foenix Adaptation"
                 .byte $00
             .endnamespace
+
 
 ;--------------------------------------
 ;    ACTION! 4.0 - Editor

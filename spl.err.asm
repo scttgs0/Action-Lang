@@ -27,21 +27,21 @@ coreSPLErr      .proc
                 lda curln+1
                 sta win1Base+WCUR+1,X
 
-_1              jsr ioSystemError
-                jsr ioPutEOL
-                jsr ioPrintBuffer
+_1              jsr mainio.SystemError
+                jsr mainio.PutEOL
+                jsr mainio.PrintBuffer
 
                 lda #$00
-                ldx #<msgSysErr
-                ldy #>msgSysErr
-                jsr ioOutput
+                ldx #<mainio.msgSysErr
+                ldy #>mainio.msgSysErr
+                jsr mainio.Output
 
                 lda #$00
                 sta INITAD+1
 
                 ldx #<numbuf
                 ldy #>numbuf
-                jsr ioPrint
+                jsr mainio.Print
 
                 jmp bankEmLoop
 
