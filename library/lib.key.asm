@@ -69,7 +69,7 @@ _3              and #$3F
                 lda #$07                ; GETCHR
                 sta BRKKEY              ; ignore BREAK key
 
-                jsr screenPutCh._ENTRY2
+                jsr screen.PutCh._ENTRY2
 
 _4              ;!!ldx SRTIMR
                 ldx #$0A    ; HACK:

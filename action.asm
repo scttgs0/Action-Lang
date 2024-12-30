@@ -77,12 +77,11 @@ INIT            .proc
 
                 .frsGraphics mcTextOn,mcVideoMode240|mcTextDoubleX|mcTextDoubleY
                 stz DINDEX              ; text mode
+
                 jsr ClearScreen
 
                 jsr bankCartStart
                 ;[no return]
-
-                jmp editor.cartridge.START
 
                 .endproc
 
@@ -120,8 +119,8 @@ versionDate     .byte $24,$12,$19       ; TODO: [YYMMDD] assemble date of latest
 propid          ldx $A0
 
                 .include "screen.mac.asm"
-
                 .include "compiler.inc"
+
 compiler    .namespace
                 .include "compiler.lexicon.asm"
             .endnamespace

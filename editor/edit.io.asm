@@ -51,7 +51,7 @@ _next2          ldy #$00
                 sta (arg12),Y
 
                 eor arg2
-                jsr screenCh
+                jsr screen.PutChar
 
                 jmp _next1
 
@@ -78,13 +78,13 @@ _next3          ldy #$00
                 sbc #$01
                 sta (arg12),Y
 
-                jsr screenCursorLeft
+                jsr screen.CursorLeft
 
                 lda #$20
                 eor arg2
 
-                jsr screenCh
-                jsr screenCursorLeft
+                jsr screen.PutChar
+                jsr screen.CursorLeft
 
                 ldx arg3
                 cpx #$7E

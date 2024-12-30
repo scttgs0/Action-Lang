@@ -44,7 +44,7 @@ zero            .word 0
 _jt_vecSPLEnd   rts
                 .word 0
 
-_jt_vecAlarm    jmp screenBell          ; Alarm
+_jt_vecAlarm    jmp screen.Bell          ; Alarm
 
 _jt_eolch       .byte 0                 ; EOLch (default = space)
 

@@ -21,7 +21,7 @@ InsertChar      .proc
                 cmp jt_linemax
                 bcc _1                  ; test line too long
 
-                jsr screenBell
+                jsr screen.Bell
 
                 ldy #$00
                 lda (buf),Y
@@ -89,7 +89,7 @@ InsertSpace     .proc
                 pla
                 sta insert
 
-                jmp screenCursorLeft
+                jmp screen.CursorLeft
 
                 .endproc
 

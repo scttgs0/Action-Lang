@@ -164,7 +164,7 @@ ioDisplayStr    .proc
                 adc LMARGN
                 sta CURSOR_X    ;!!COLCRS
 
-                jsr screenCursorRight
+                jsr screen.CursorRight
 
                 ldy #$00
                 lda (arg12),Y
@@ -177,7 +177,7 @@ _next1          inc arg4
                 ldy arg4
                 lda (arg12),Y
                 eor arg2
-                jsr screenCh
+                jsr screen.PutChar
 
                 dec arg3
                 bne _next1
@@ -270,7 +270,7 @@ ioSystemError   .proc
                 ;!! jsr ioRestoreCursorChar ; unnecessary
                 jsr ioResetColumn
 
-                jmp screenBell
+                jmp screen.Bell
 
                 .endproc
 
@@ -543,7 +543,7 @@ ioPutEOL        .proc
 ;======================================
 ioPutChar       .proc
                 lda device
-                jmp screenCh._ENTRY1
+                jmp screen.PutChar._ENTRY1
 
                 .endproc
 
@@ -763,8 +763,8 @@ ioResetColumn   .proc
                 sta CURSOR_X    ;!!COLCRS
 
                 ;!! jsr ioZapCursor     ; unnecessary
-_ENTRY1         jsr screenCursorLeft
-                jmp screenCursorRight
+_ENTRY1         jsr screen.CursorLeft
+                jmp screen.CursorRight
 
                 .endproc
 

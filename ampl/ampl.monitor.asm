@@ -23,7 +23,7 @@ Monitor         .proc
                 lda top+1
                 sta cacheTop_HI
 
-_ENTRY1         jsr screenInit
+_ENTRY1         jsr screen.Init
 
                 ldx #$01
                 stx CURSOR_Y    ;!!ROWCRS
@@ -41,7 +41,7 @@ _next1          jsr editor.io.InitKeys
                 lda DINDEX              ; display mode
                 beq _1
 
-                jsr screenInit          ; get Graphics(0)
+                jsr screen.Init          ; get Graphics(0)
 
 _1              jsr jt_vecAlarm
                 ;!! jsr ioRestoreCursorChar ; unnecessary
@@ -232,6 +232,7 @@ Boot            .proc
                 lda #<_bmsg
                 ldx #>_bmsg
                 jsr editor.window.YesNo
+
                 bne MemRun._XIT
                 jmp editor.cartridge.START._cold
 

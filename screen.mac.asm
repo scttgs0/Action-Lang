@@ -8,10 +8,12 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+screen          .namespace
+
 ;======================================
 ;
 ;======================================
-screenInit      .proc
+Init            .proc
 ;   80x60 text mode
                 jsr CLS                 ; init text mode and clear the screen
 
@@ -36,29 +38,29 @@ _data           .ptext "E:"
 
 
 ;======================================
-; screenCh(char)
+; PutChar(char)
 ;--------------------------------------
 ; outputs char to screen
 ; Char passed in A reg
 ; Control characters are ignored
 ;======================================
-screenCh        .proc
+PutChar         .proc
                 tay
                 lda #$00
 _ENTRY1         ldx #$01
-                bne screenPutCh._ENTRY1 ; [unc]
+                bne PutCh._ENTRY1 ; [unc]
 
                 .endproc
 
 
 ;======================================
-; screenPutCh(char)
+; PutCh(char)
 ;--------------------------------------
 ; outputs char to screen.
 ; Char passed in A reg.
 ; Processes control characters.
 ;======================================
-screenPutCh     .proc
+PutCh           .proc
                 tay
                 lda #$00
                 tax
@@ -84,60 +86,62 @@ _ENTRY2         sta IOCB0+ICCOM,X
 
 
 ;======================================
-; screenCursorUp()
+; CursorUp()
 ;--------------------------------------
 ; Move cursor up one
 ;======================================
-screenCursorUp  .proc
+CursorUp        .proc
                 lda #$1C
-                bra screenPutCh
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-; screenCursorDown()
+; CursorDown()
 ;--------------------------------------
 ; Move cursor down one
 ;======================================
-screenCursorDown .proc
+CursorDown      .proc
                 lda #$1D
-                bra screenPutCh
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-; screenBell()
+; Bell()
 ;--------------------------------------
 ; Bell Char
 ;======================================
-screenBell      .proc
+Bell            .proc
                 lda #$FD
-                bra screenPutCh
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-; screenCursorLeft()
+; CursorLeft()
 ;--------------------------------------
 ; Move cursor left one
 ;======================================
-screenCursorLeft .proc
+CursorLeft      .proc
                 lda #$1E
-                bra screenPutCh
+                bra PutCh
 
                 .endproc
 
 
 ;======================================
-; screenCursorRight()
+; CursorRight()
 ;--------------------------------------
 ; Move cursor right one
 ;======================================
-screenCursorRight .proc
+CursorRight     .proc
                 lda #$1F
-                bra screenPutCh
+                bra PutCh
 
                 .endproc
+
+                .endnamespace

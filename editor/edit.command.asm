@@ -254,7 +254,7 @@ ScrollUp        .proc
 
                 dec lnum
                 bmi _1
-                jmp screenCursorUp
+                jmp screen.CursorUp
 
 _1              inc lnum
 
@@ -285,7 +285,7 @@ ScrollDown      .proc
 
                 stx lnum
 
-                jmp screenCursorDown
+                jmp screen.CursorDown
 
 _1              jsr BottomLine
                 stx y__
@@ -353,9 +353,9 @@ ScrollLeft      .proc
                 dec choff
 
                 jsr ioDisplayBuffer
-                jsr screenCursorRight
+                jsr screen.CursorRight
 
-_XIT            jmp screenCursorLeft
+_XIT            jmp screen.CursorLeft
 
                 .endproc
 
@@ -374,9 +374,9 @@ ScrollRight     .proc
                 inc choff
 
                 jsr ioDisplayBuffer
-                jsr screenCursorLeft
+                jsr screen.CursorLeft
 
-_XIT            jmp screenCursorRight
+_XIT            jmp screen.CursorRight
 
                 .endproc
 
