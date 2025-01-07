@@ -12,28 +12,33 @@ array           .namespace
 
 ;======================================
 ; Ref()
+;--------------------------------------
+; on entry:
+;   A           token
+;   Y           token type
 ;======================================
 Ref             .proc
-                ldx nxttoken
-                cpx #tokLParen
-                beq arrconst._2
+                ldx nextToken
+                cpx #tokLeftParen
+                beq _2
 
                 cpx #tokUpArrow
-                beq arrconst._2
+                beq _2
 
-arrvar          ldy #tokVAR_t+tokCARD_t ; no index!
+_arrVar         ldy #tokVAR_t+tokCARD_t ; no index!
                 sty token
-                cmp #tokARRAY_t+8
-                bcc arrconst._XIT1
 
-arrconst        jsr compiler.ProcRef._ENTRY1
+                cmp #tokARRAY_t+8       ; small array?
+                bcc _XIT1               ;   no
+
+_arrConst       jsr compiler.ProcRef._ENTRY1
 
 _XIT1           jmp compiler.PushST
 
 _next1          ldy #$00
                 lda (stack),Y
-                cmp #tokARRAY_t+8
-                bcs _1                  ; small array
+                cmp #tokARRAY_t+8       ; small array?
+                bcs _1                  ;   yes
 
                 iny
                 jsr ampl.cgu.StkP
@@ -41,7 +46,7 @@ _next1          ldy #$00
                 cpx #$00
                 bne _1
 
-;   page zero pointer
+;   zero-page pointer
                 ldy #$01
                 sta (stack),Y
 
@@ -52,8 +57,12 @@ _next1          ldy #$00
 
                 rts
 
+; - - - - - - - - - - - - - - - - - - -
+
 _1              jsr compiler.ZeroST
                 bne _3                  ; [unc]
+
+; - - - - - - - - - - - - - - - - - - -
 
 _2              jsr compiler.PushNext
 
@@ -62,15 +71,17 @@ _2              jsr compiler.PushNext
 
                 jsr compiler.GetExp
 
-                cmp #tokRParen
-                bne arrerr
+                cmp #tokRightParen
+                bne _arrErr
 
                 ldx zpAllocOP
-                bne arrerr
+                bne _arrErr
+
+; - - - - - - - - - - - - - - - - - - -
 
 _3              ldy #$07
                 lda (stack),Y
-arra0           pha
+_arrA0          pha
 
                 lda #tokVAR_t+tokCARD_t
                 sta (stack),Y
@@ -79,8 +90,8 @@ arra0           pha
                 jsr compiler.GenOps
 
                 pla
-                cmp #tokARRAY_t+8
-                bcs arrerr._small
+                cmp #tokARRAY_t+8       ; small array?
+                bcs _small              ;   yes
 
                 and #$07
                 tax
@@ -95,14 +106,17 @@ arra0           pha
                 lda (stack),Y
                 iny
                 ora (stack),Y
+
 _4              sta FR1
                 beq _5                  ; pointer
 
                 ldy compiler.vartype-1,X
-                beq arrerr._XIT2
+                beq _XIT2
 
                 ; cpy #$03
                 ; beq _ARReal
+
+; - - - - - - - - - - - - - - - - - - -
 
 ;   integer or cardinal
 
@@ -144,20 +158,26 @@ _6              jsr ampl.cgu.Op1L
 _7              jsr ampl.cgu.Op1H
                 jmp compiler.CGAdd._ENTRY2
 
-arrerr          ldy #arrayERR           ; bad array ref
+; - - - - - - - - - - - - - - - - - - -
+
+_arrErr         ldy #arrayERR           ; bad array ref
                 jmp mainbank.SPLErr
+
+; - - - - - - - - - - - - - - - - - - -
 
 _XIT2           jmp compiler.CodeGen._ENTRY1
 
-;   small arrary
+; - - - - - - - - - - - - - - - - - - -
+;   small array
+
 _small          ldy #$07
                 sta (stack),Y           ; restore correct type
 
                 lda arg1
-                bpl arrerr              ; can't index with bool.
+                bpl _arrErr             ; can't index with bool.
 
                 bit ampl.cgu.modeArr
-                bne arrerr              ; can't index with array
+                bne _arrErr             ; can't index with array
 
                 ldy #$0A
                 sta (stack),Y

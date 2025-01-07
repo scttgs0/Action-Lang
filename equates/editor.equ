@@ -101,7 +101,7 @@ nxtaddr         = $C9                   ; next token address
 bigSymTblGlobal = $CE                   ; only used if big s.t.
 arrayptr        = $D0                   ; array mem. list
 spnxt           = $D2                   ; next error char
-nxttoken        = $D3                   ; next token value
+nextToken       = $D3                   ; next token value
 
 
 ; ACTION! vars ($480 - $57F)
@@ -122,7 +122,7 @@ cmdln           = $049C                 ; command line offset
 param           = $049D
 opmode          = $049E
 currentWindow   = $049F                 ; window memory offset
-cury            = $04A0                 ; current Y reg (0/1/unknown)
+curYReg         = $04A0                 ; current Y reg (0/1/unknown)
 lastCH          = $04A1                 ; last char
 curCH           = $04A2                 ; current char
 spareMem        = $04A3                 ; -> spare memory
@@ -130,12 +130,12 @@ is2Windows      = $04A5                 ; number of windows (0=single; non-zero=
 allocErr        = $04A6                 ; INC on Alloc error
 delbuf          = $04A7                 ; 6 bytes
 firstChar       = $04AD                 ; used for big symbol table
-taglist         = $04AE                 ; [word]
+tagList         = $04AE                 ; [word]
 chrConvert1     = $04B0                 ; char convert
 win2Base        = $04B1                 ; window 2 data
 bckgrnd         = $04C0                 ; background color
 procSP          = $04C1                 ; Break stack pointer
-argbytes        = $04C2
+argBytes        = $04C2
 isTrace         = $04C3                 ; trace flag
 isBigSymTbl     = $04C4                 ; big symbol table flag
 

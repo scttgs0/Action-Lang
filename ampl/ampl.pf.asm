@@ -8,6 +8,7 @@
 ; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
 
 
+;   Proc/Func Unit
 pf              .namespace
 
 ;======================================
@@ -36,7 +37,6 @@ Load1           .proc
 
                 lda #$81                ; STA
                 jsr ampl.cgu.Op1H
-
                 jmp ProcFunc._ENTRY2
 
                 .endproc
@@ -52,32 +52,31 @@ ProcFunc        .proc
                 jsr compiler.lexicon.GetNext
 
                 ldx #args
-                stx argbytes
+                stx argBytes
 
-                ldx nxttoken
-                cpx #tokRParen
+                ldx nextToken
+                cpx #tokRightParen
                 bne _next1
 
                 jsr compiler.lexicon.GetNext
-
                 bne _next2              ; [unc]
 
 _next1          ldx numargs
                 ldy #tokTEMP_t+tokBYTE_t
                 lda argtypes-1,X
 
-                ldx argbytes
+                ldx argBytes
                 stx abt+3
                 cmp #$7F
                 bcs _1                  ; one byte arg
 
                 sta temps-args+1,X
 
-                inc argbytes
+                inc argBytes
                 iny
 _1              sta temps-args,X
 
-                inc argbytes
+                inc argBytes
 
                 txa
                 jsr compiler.StoreST
@@ -96,10 +95,10 @@ _ENTRY2         lda token
                 cmp #tokComma
                 beq _next1
 
-                cmp #tokRParen
+                cmp #tokRightParen
                 bne _err
 
-                lda argbytes
+                lda argBytes
                 cmp #args+3
                 bcs _2
 
@@ -128,6 +127,8 @@ _4              ldx #args
 
                 jmp _next2
 
+; - - - - - - - - - - - - - - - - - - -
+
 _err            jmp ampl.Segment._argerr
 
 
@@ -148,8 +149,8 @@ _5              stx arg0
                 ldx arg0
                 lda _ops-args,X
 
-; all of this for LDX # and LDY #
-; can't use OpXX for these instr.
+;   all of this for LDX # and LDY #
+;   can't use OpXX for these instr.
 
                 cpx #args
                 beq _9                  ; LDA instr.

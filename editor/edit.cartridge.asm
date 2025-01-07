@@ -72,7 +72,7 @@ _jt_vecStmtEnd  jmp compiler.lexicon.GetNext._ENTRY5  ; STM catch all
                 .byte $86
                 .byte $9D
 
-_jt_vecStmRAdr  .addr ampl.symbol.STMres    ; STMrAdr in EDIT.DEF
+_jt_vecStmRAdr  .addr ampl.symbol.StmtReserved    ; STMrAdr in EDIT.DEF
 
 
 ;======================================
@@ -114,11 +114,11 @@ _next2          lda emjmps-1,Y          ; init RAM
                 sta jt_jmps,Y
                 bne _next2
 
-                ;-- lda #<ampl.symbol.STMres
+                ;-- lda #<ampl.symbol.StmtReserved
                 ;-- sta jt_vecStmRAdr
-                ;-- lda #>ampl.symbol.STMres
+                ;-- lda #>ampl.symbol.StmtReserved
                 ;-- sta jt_vecStmRAdr+1
-                ;-- lda #`ampl.symbol.STMres
+                ;-- lda #`ampl.symbol.StmtReserved
                 ;-- sta jt_vecStmRAdr+2
 
                 ; sty chrConvert1       ; Y=0

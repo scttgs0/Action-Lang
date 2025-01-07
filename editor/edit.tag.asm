@@ -30,18 +30,18 @@ Set             .proc
                 jsr Allocate
 
                 ldy #$01
-                lda taglist+1
+                lda tagList+1
                 sta (zpAllocCurrent),Y
 
                 dey
-                lda taglist
+                lda tagList
                 sta (zpAllocCurrent),Y
 
                 lda zpAllocCurrent
-                sta taglist
+                sta tagList
 
                 ldx zpAllocCurrent+1
-                stx taglist+1
+                stx tagList+1
 
 _1              ldy #$04
                 lda tempbuf+1
@@ -150,8 +150,8 @@ Locate          .proc
 Get             .proc
                 sta arg0
 
-                lda taglist
-                ldx taglist+1
+                lda tagList
+                ldx tagList+1
                 bne _1
 
 _XIT            rts
@@ -183,8 +183,8 @@ _2              ldx zpAllocCurrent+1
 ; FreeTags()
 ;======================================
 FreeTags        .proc
-                lda taglist
-                ldx taglist+1
+                lda tagList
+                ldx tagList+1
                 beq _XIT
 
 _next1          sta zpAllocBest
@@ -204,7 +204,7 @@ _next1          sta zpAllocBest
                 ldx arg1
                 bne _next1
 
-                stx taglist+1
+                stx tagList+1
 
 _XIT            rts
                 .endproc

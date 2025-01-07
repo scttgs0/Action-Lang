@@ -118,7 +118,7 @@ MNum            .proc
                 sta zpAllocSize
                 sta zpAllocSize+1
 
-_next1          lda nxttoken
+_next1          lda nextToken
                 cmp #tokMULT
                 beq _4                  ; QCODE reference
 
@@ -197,7 +197,7 @@ _5              jsr GetCodeOffset       ; table reference
 _6              jsr CopyStr             ; string ref
                 jmp _next3
 
-_next5          lda nxttoken            ; body of table
+_next5          lda nextToken           ; body of table
                 cmp #tokRBracket
                 beq _XIT
 

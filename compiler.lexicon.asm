@@ -30,7 +30,7 @@ GetNext         .proc
 
                 ldx nxtaddr
                 ldy nxtaddr+1
-                lda nxttoken
+                lda nextToken
                 stx addr
                 sty addr+1
                 sta token
@@ -74,13 +74,13 @@ _1              jsr mainmsc.Alpha
 _2              jsr mainbank.GetName
                 bmi _ENTRY3
 
-_3              sta nxttoken
+_3              sta nextToken
 
                 ldx #<tblLexCmd
                 ldy #>tblLexCmd
                 jmp mainmsc.Lookup
 
-_ENTRY3         sta nxttoken
+_ENTRY3         sta nextToken
 
 ;GetNr2         lda $D0
 ;               beq GetNr3
@@ -110,7 +110,7 @@ Com             .proc
 ;======================================
 Dig             .proc
                 lda #tokCONST_t+tokINT_t
-                sta nxttoken
+                sta nextToken
 
                 jsr LexBuf              ; get buf ptr
                 jsr mainio.StrToReal
@@ -146,7 +146,7 @@ _1              sta nxtaddr
                 bne GetNext._ENTRY3
 
 _2              lda #tokCONST_t+tokREAL_t
-                sta nxttoken
+                sta nextToken
 
                 ldy CIX
                 ldx #$FF                ; for SET cmd
@@ -193,7 +193,7 @@ LexEQ           .proc
 _ENTRY1         cmp #'='
                 bne PutBack
 
-                inc nxttoken
+                inc nextToken
                 bne GetNext._ENTRY4     ; [unc]
 
                 .endproc
@@ -204,7 +204,7 @@ _ENTRY1         cmp #'='
 ;======================================
 Hex             .proc
                 lda #tokCONST_t+tokCARD_t
-                sta nxttoken
+                sta nextToken
 
                 inc choff
 
@@ -433,7 +433,7 @@ Set             .proc
 
                 jsr GetNext._ENTRY1
 
-                lda nxttoken
+                lda nextToken
                 cmp #tokEQU
                 bne _err
 
@@ -550,8 +550,8 @@ tblLexChars     .byte tokXOR            ; !
                 .byte tokOR             ; %
                 .byte tokAND            ; &
                 .byte tokSQuote+$80     ; '
-                .byte tokLParen
-                .byte tokRParen
+                .byte tokLeftParen
+                .byte tokRightParen
                 .byte tokMULT
                 .byte tokPLUS
                 .byte tokComma

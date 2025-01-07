@@ -32,8 +32,8 @@ versionDate     .byte $01,$17,$84       ; assemble date of latest version!
 propid          ldx $A0
 
                 .include "screen.mac.asm"
-
                 .include "compiler.inc"
+
 compiler    .namespace
                 .include "compiler.lexicon.asm"
             .endnamespace
@@ -41,7 +41,6 @@ compiler    .namespace
                 .include "main.msc.asm"
                 .include "main.bank.asm"
 
-amplfin
 
 ;--------------------------------------
 ;    ACTION! - Editor Routines
@@ -52,6 +51,7 @@ editor      .namespace
                 .include "editor/edit.substitute.asm"
                 .include "editor/edit.tab.asm"
             .endnamespace
+
 
 ;--------------------------------------
 ;    "ACTION! - Compiler Routines
