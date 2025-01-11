@@ -260,8 +260,7 @@ SystemError     .proc
                 jsr CardToStr
                 jsr CmdColumn
 
-                lda #$80
-                sta arg4
+                .mbv #$80,arg4
                 lda #>numbuf
                 sta arg3
                 ldy #<numbuf
@@ -346,8 +345,7 @@ DisplayOn       .proc
                 sta SDMCTL
                 sta DMACTL
 
-                lda bckgrnd             ; background color
-                sta COLOR4              ; restore background
+                .mba bckgrnd,COLOR4     ; restore background color
 
                 rts
                 .endproc
@@ -732,10 +730,7 @@ ChkCursor       .proc
                 lda cur+1
                 bne _XIT
 
-_ENTRY1         lda top
-                sta cur
-                lda top+1
-                sta cur+1
+_ENTRY1         .mwa top,cur
 
 _XIT            rts
                 .endproc
@@ -816,10 +811,7 @@ _2              sta arg0
 ; Get rid of the old cursor
 ;======================================
 ZapCursor       .proc
-                lda #<CSRCH
-                sta OLDADR
-                lda #>CSRCH
-                sta OLDADR+1
+                .lea CSRCH,OLDADR
 
                 rts
                 .endproc

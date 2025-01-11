@@ -29,8 +29,7 @@ _ENTRY1         ldy #>findbuf
                 ldy #<findbuf
                 jsr editor.window.CommandString
 
-                lda #$F8
-                sta curCH
+                .mbv #$F8,curCH
 
 _ENTRY2         lda findbuf
                 beq _3
@@ -66,8 +65,7 @@ _1              jsr mainmsc.NextDown
 
                 jsr mainio.LoadBuffer
 
-                lda #$00
-                sta sp
+                .mbv #$00,sp
                 beq _next1
 
 _2              sta curCH

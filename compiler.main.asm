@@ -26,8 +26,7 @@ ScanParseLex    ;.proc
                 jsr compiler.lexicon.Get._ENTRY1
                 jmp _next1
 
-_1              lda cacheTop_HI
-                sta top+1
+_1              .mba cacheTop_HI,top+1
 
                 jsr mainio.ChkCursor._ENTRY1
                 beq _XIT1               ; no program !
@@ -102,10 +101,7 @@ _next3          ldy #$01
                 adc (arrayptr),Y
                 sta QCODE+1
 
-                lda arg0
-                sta arrayptr
-                lda arg1
-                sta arrayptr+1
+                .mwa arg0,arrayptr
                 bne _next3
 
                 ; lda arrayPtr
@@ -151,8 +147,7 @@ DeclError       lda #$00                ; reset QCODE before err
 
 _errDecl        jmp DefineError
 
-_type           lda #+tokRECORD-(tokVAR_t-tokCHAR)-1
-                sta type
+_type           .mba #+tokRECORD-(tokVAR_t-tokCHAR)-1,type
 
                 jsr MakeEntry
 
@@ -247,8 +242,7 @@ _1              cmp #tokTYPE
                 stx zpAllocCurrent
 
                 ldx nextToken
-                lda #tokTYPE_t-(tokVAR_t-tokCHAR)-1
-                sta type
+                .mba #tokTYPE_t-(tokVAR_t-tokCHAR)-1,type
                 bne _3                  ; [unc]
 
 _2              cmp #tokDEFINE
@@ -369,8 +363,7 @@ ArrayDecl       clc
                 jsr compiler.lexicon.GetNext
 _next1          jsr MakeEntry
 
-                lda #$02
-                sta numargs             ; variable space
+                .mbv #$02,numargs       ; variable space
 
                 ldx param
                 bne _2
@@ -382,8 +375,7 @@ _next1          jsr MakeEntry
                 cmp #tokLeftParen
                 bne _3
 
-                lda #$04
-                sta numargs
+                .mbv #$04,numargs
 
                 lda arrayptr
                 ldx arrayptr+1
@@ -801,8 +793,7 @@ _ENTRY2         eor #tokEQU
                 cmp #tokEQU
                 bne _3
 
-                lda #$00
-                sta zpAllocOP
+                .mbv #$00,zpAllocOP
 
                 jsr CopyST
 
@@ -1113,8 +1104,7 @@ StmtFOR         .proc
                 cmp #tokARRAY_t+tokREAL_t
                 bcs ErrorFOR
 
-                lda #tokVAR_t+tokCARD_t
-                sta token
+                .mba #tokVAR_t+tokCARD_t,token
 
 ;   get initial value
 _1              ldy #$08
@@ -1332,10 +1322,7 @@ _8              pha
                 cmp #$FF
                 bne _9                  ; yes, branch to top
 
-                lda stkbase-9
-                sta arg0
-                lda stkbase-8
-                sta arg1
+                .mwa stkbase-9,arg0
 
                 ldy #$00
                 txa
@@ -1633,10 +1620,7 @@ AddressWHILE    .proc
 
                 jsr FrameCd._ENTRY2
 
-                lda frame
-                sta whaddr
-                lda frame+1
-                sta whaddr+1
+                .mwa frame,whaddr
 
                 rts
                 .endproc
@@ -1928,8 +1912,7 @@ Expression      .proc
                 lda #$00
                 jsr PushOp
 
-                lda token               ; always non-zero
-                sta zpAllocOP
+                .mba token,zpAllocOP    ; always non-zero
 
 _ENTRY1         jsr jt_vecExpEnd
                 cmp #tokSColon
@@ -2022,8 +2005,7 @@ _7              ldx zpAllocOP
                 cmp #tokMINUS
                 bne Expression._err
 
-                lda #tokUMINUS
-                sta token
+                .mbv #tokUMINUS,token
 
 _8              tax
                 lda prec-1,X
@@ -2105,8 +2087,7 @@ _16             cmp #tokFUNC_t+8
 ;   save temps
                 sty arg0
 
-                lda #args+15
-                sta arg1
+                .mbv #args+15,arg1
 
 _next6          dec arg0
                 ldy arg0
@@ -2136,8 +2117,7 @@ _17             dec arg1
                 sty temps               ; flag result reg.
                 sty arg0
 
-                lda #args+2
-                sta arg1
+                .mbv #args+2,arg1
 
 _next7          inc arg0
                 ldy arg0
@@ -3275,8 +3255,7 @@ _2              lda #$01                ; ORA
 _ENTRY1         jsr ampl.cgu.OpCd1
                 jsr ampl.cgu.PushTrue   ; sets arg9 to zero
 
-                lda #tokCOND_t
-                sta arg7
+                .mbv #tokCOND_t,arg7
 
                 ldy #$0C
                 jsr ampl.cgu.SaveCd

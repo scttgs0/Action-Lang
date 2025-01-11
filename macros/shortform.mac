@@ -1,0 +1,40 @@
+
+;   load effective address
+lea             .macro addr,dest
+                lda #<\addr
+                sta \dest
+                lda #>\addr
+                sta \dest+1
+                .endmacro
+
+
+;   move word value
+mwv             .macro value,dest
+                lda #<\value
+                sta \dest
+                lda #>\value
+                sta \dest+1
+                .endmacro
+
+
+;   move byte value
+mbv             .macro value,dest
+                lda <\value
+                sta \dest
+                .endmacro
+
+
+;   move word absolute
+mwa             .macro src,dest
+                lda \src
+                sta \dest
+                lda \src+1
+                sta \dest+1
+                .endmacro
+
+
+;   move byte absolute
+mba             .macro src,dest
+                lda \src
+                sta \dest
+                .endmacro

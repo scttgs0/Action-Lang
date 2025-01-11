@@ -85,10 +85,7 @@ _XIT            jmp Free
 ; InsertByte()
 ;======================================
 InsertByte      .proc
-                lda cur
-                sta arg3
-                lda cur+1
-                sta arg4
+                .mwa cur,arg3
 
                 jsr InsertBuffer
 
@@ -150,22 +147,17 @@ _1              lda arg0
                 lda arg4
                 bne _3                  ; up # 0
 
-                lda top                 ; down _= top
-                sta arg5
+                .mba top,arg5           ; down _= top
 
                 ldy #$04                ; AFcur(2) _= down
                 sta (zpAllocCurrent),Y
 
-                lda top+1
-                sta arg6
+                .mba top+1,arg6
 
                 iny
                 sta (zpAllocCurrent),Y
 
-                lda zpAllocCurrent      ; top _= AFcur
-                sta top
-                lda zpAllocCurrent+1
-                sta top+1
+                .mwa zpAllocCurrent,top ; top _= AFcur
 
                 ldy #$00                ; AFcur(0) _= 0
                 tya
@@ -267,10 +259,7 @@ DeleteLine      .proc
                 sta arg3
                 bne _1                  ; up # 0
 
-                lda arg4
-                sta top                 ; top _= down
-                lda arg5
-                sta top+1
+                .mwa arg4,top           ; top _= down
 
                 jmp _2
 
@@ -285,10 +274,7 @@ _1              ldy #$04
 _2              lda arg5
                 bne _3                  ; down # 0
 
-                lda arg2
-                sta bot                 ; bot _= up
-                lda arg3
-                sta bot+1
+                .mwa arg2,bot           ; bot _= up
 
                 jmp _4
 

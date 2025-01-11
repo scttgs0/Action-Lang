@@ -102,8 +102,7 @@ _4              cpx #$7D
 ; FRead()
 ;======================================
 FRead           .proc
-                lda #$00
-                sta inbuf
+                .mbv #$00,inbuf
 
                 lda #<rdmsg
                 ldx #>rdmsg
@@ -164,8 +163,7 @@ _next1          jsr mainio.LoadBuffer
                 jsr mainmsc.NextDown
                 bne _next1
 
-                lda #$00
-                sta dirty
+                .mbv #$00,dirty
 
 _ENTRY1         lda #$01
                 jsr mainio.Close
@@ -226,8 +224,7 @@ _next1          lda inbuf,Y
                 dey
                 bne _next1
 
-                lda #':'
-                sta inbuf+2
+                .mbv #':',inbuf+2
                 bne _2                  ; [unc]
 
 _1              lda inbuf+1
@@ -235,14 +232,12 @@ _1              lda inbuf+1
                 bne _3                  ;   no
 
                 ldx #$06
-_2              lda #'D'
-                sta inbuf+1
+_2              .mbv #'D',inbuf+1
 
 _3              stx arg3
                 jsr mainio.DisplayOff
 
-                lda #$01
-                sta arg4                ; clear high bit for cassette
+                .mbv #$01,arg4                ; clear high bit for cassette
 
                 ldx #<inbuf
                 ldy #>inbuf
@@ -276,8 +271,7 @@ InitKeys        .proc
                 lda #$07
                 jsr mainio.Close
 
-                lda #$04
-                sta arg3                ; read only
+                .mbv #$04,arg3                ; read only
 
                 lda #$07
                 ldx #<keybd

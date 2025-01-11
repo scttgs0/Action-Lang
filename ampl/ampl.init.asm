@@ -77,8 +77,7 @@ _2              sta codeBase
                 sta codeBase+1
                 sta QCODE+1
 
-                lda MEMTOP+1
-                sta stmax
+                .mba MEMTOP+1,stmax
                 dec stmax
 
                 clc
@@ -91,26 +90,19 @@ _2              sta codeBase
                 bcs _3
 
 ;   can't allocate memory
-                lda spareMem
-                sta symtab
-                lda spareMem+1
-                sta symtab+1
+                .mwa spareMem,symtab
 
 _err            ldy #allocateERR
                 jmp mainbank.SPLErr
 
-_3              lda spareMem
-                sta frame
+_3              .mba spareMem,frame
 
                 ldx spareMem+1
                 inx
                 inx
                 stx frame+1
 
-                lda #<stkbase
-                sta stack
-                lda #>stkbase
-                sta stack+1
+                .lea stkbase,stack
 
                 sta curYReg             ; unknown initial Y value
 

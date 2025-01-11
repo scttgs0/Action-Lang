@@ -20,8 +20,7 @@ Monitor         .proc
                 ldx delbuf+1
                 jsr editor.chr.DeleteFree   ; get rid of delete buf
 
-                lda top+1
-                sta cacheTop_HI
+                .mba top+1,cacheTop_HI
 
 _ENTRY1         jsr screen.Init
 
@@ -93,14 +92,12 @@ Quit            .proc
 ; ResetWindow()
 ;======================================
 ResetWindow     .proc
-                lda #$17
-                sta cmdln
+                .mbv #$17,cmdln
 
                 lda is2Windows          ; single window?
                 beq _skipWin2           ;   yes
 
-                lda jt_wsize
-                sta cmdln
+                .mba jt_wsize,cmdln
 
 ;   paint window2
                 lda #win2Base-win1Base
@@ -268,8 +265,7 @@ _XIT            rts
 _2              jsr mainmsc.MNum
 _3              jsr mainbank.Run
 
-                lda #$00
-                sta device
+                .mbv #$00,device
 
                 rts
                 .endproc
@@ -286,15 +282,13 @@ MemWrite        .proc                   ; write object file
                 lda INITAD+1
                 beq MemRun._XIT         ; no program!!
 
-                lda #$01
-                sta ioChnnl
+                .mbv #$01,ioChnnl
 
                 lda #$08                ; output
                 jsr mainio.OpenChannel
 
 ;   write header
-                lda #$06
-                sta arg9
+                .mbv #$06,arg9
 
                 lda #$FF
                 sta arg10               ; $FF
@@ -352,10 +346,7 @@ _next1          lda _mwinit,X
                 dex
                 bpl _next1
 
-                lda INITAD
-                sta arg14
-                lda INITAD+1
-                sta arg15
+                .mwa INITAD,arg14
 
                 jsr WOut
 
@@ -461,8 +452,7 @@ Proceed         .proc
 
 ;               ldx procSP              ; break stack pointer
 
-                lda #$00
-                sta procSP
+                .mbv #$00,procSP
 
                 txs
 
@@ -482,8 +472,7 @@ PrintHex        .proc
                 sta arg0
                 stx arg1
 
-                lda #$04
-                sta arg2
+                .mbv #$04,arg2
 
                 ldy #'$'
                 jsr mainio.PutChar

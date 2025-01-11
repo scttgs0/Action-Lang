@@ -25,8 +25,7 @@ GetNext         .proc
                 sty curln+1
                 sta spln
 
-                lda token
-                sta zpAllocPrevToken
+                .mba token,zpAllocPrevToken
 
                 ldx nxtaddr
                 ldy nxtaddr+1
@@ -109,8 +108,7 @@ Com             .proc
 ; Dig()
 ;======================================
 Dig             .proc
-                lda #tokCONST_t+tokINT_t
-                sta nextToken
+                .mba #tokCONST_t+tokINT_t,nextToken
 
                 jsr LexBuf              ; get buf ptr
                 jsr mainio.StrToReal
@@ -145,8 +143,7 @@ _1              sta nxtaddr
                 lda #tokCONST_t+tokBYTE_t
                 bne GetNext._ENTRY3
 
-_2              lda #tokCONST_t+tokREAL_t
-                sta nextToken
+_2              .mba #tokCONST_t+tokREAL_t,nextToken
 
                 ldy CIX
                 ldx #$FF                ; for SET cmd
@@ -203,8 +200,7 @@ _ENTRY1         cmp #'='
 ; Hex()
 ;======================================
 Hex             .proc
-                lda #tokCONST_t+tokCARD_t
-                sta nextToken
+                .mba #tokCONST_t+tokCARD_t,nextToken
 
                 inc choff
 
@@ -233,13 +229,8 @@ ProcFunc        .proc
                 lda qglobal
                 beq PutBack._ENTRY1
 
-                lda #$00
-                sta qglobal
-
-                lda gbase               ; restore qglobal base
-                sta symtab
-                lda gbase+1
-                sta symtab+1
+                .mbv #$00,qglobal
+                .mwa gbase,symtab       ; restore qglobal base
 
                 bne PutBack._ENTRY1     ; [unc]
 
@@ -254,8 +245,7 @@ Str             .proc
                 cmp #tokQuote
                 beq PutBack._ENTRY1  ; zap local st
 
-                lda #$00
-                sta arg9
+                .mbv #$00,arg9
 
 _next1          jsr NextChar
 
@@ -391,8 +381,7 @@ Def             .proc
                 cmp choff
                 bcs _1
 
-                lda defflg
-                sta choff
+                .mba defflg,choff
                 sty defflg
                 bcc NextChar._ENTRY1    ; [unc]
 
@@ -409,8 +398,7 @@ _1              ldy choff
 Get             .proc
                 jsr GetNext._ENTRY1
 
-_ENTRY1         lda #$00
-                sta defflg
+_ENTRY1         .mbv #$00,defflg
 
                 inc ioChnnl
 
@@ -482,8 +470,7 @@ _ENTRY1         sta delnxt
                 stx delnxt+1
                 sty defflg
 
-                lda #$00
-                sta choff
+                .mbv #$00,choff
 
                 jmp GetNext._ENTRY1
 

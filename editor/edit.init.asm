@@ -14,10 +14,7 @@ init            .namespace
 ; Initialize memory
 ;======================================
 Memory          .proc
-                lda MEMLO
-                sta zpAllocBase
-                lda MEMLO+1
-                sta zpAllocBase+1
+                .mwa MEMLO,zpAllocBase
 
                 lda #$00
                 tay
@@ -118,9 +115,7 @@ EditorInit      .proc
                 sta buf
                 ldx zpAllocCurrent+1
                 stx buf+1
-
-                lda #$40             ; translate screen code into ascii code
-                sta chrConvert
+                .mbv #$40,chrConvert    ; translate screen code into ascii code
 
 ;   set HEAD and TAIL within the delete buffer
                 lda #<delbuf

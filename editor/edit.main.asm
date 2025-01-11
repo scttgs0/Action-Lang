@@ -21,8 +21,7 @@ Loop            .proc
                 ldx #>msgOutOfMem
                 jsr editor.display.CommandMsg
 
-_1              lda curCH
-                sta lastCH
+_1              .mba curCH,lastCH
 
                 jsr mainbank.GetKey
                 jsr editor.init.EditorInit._ENTRY3

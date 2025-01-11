@@ -17,8 +17,7 @@ Init            .proc
                 lda #$00
                 jsr mainio.Close        ; close #0, sets X to 0
 
-                lda #$0C
-                sta arg3
+                .mbv #$0C,arg3
 
                 lda #$00
                 ldx #<_data

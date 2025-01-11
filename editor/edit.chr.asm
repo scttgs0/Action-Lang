@@ -45,8 +45,7 @@ _next2          ldy sp
                 lda curCH
                 sta (buf),Y
 
-                lda #$FF
-                sta isDirty
+                .mbv #$FF,isDirty
 
                 jsr mainio.DisplayBuffer
                 jmp editor.command.ScrollRight
@@ -145,8 +144,7 @@ CSRet           .proc
                 sta arg1
 
                 inc arg1
-                lda #$00
-                sta arg0
+                .mbv #$00,arg0
                 beq _1
 
 _next1          lda (buf),Y

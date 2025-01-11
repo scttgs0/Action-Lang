@@ -28,8 +28,7 @@ Segment         .proc
 
 ; - - - - - - - - - - - - - - - - - - -
 
-_proc           lda #tokFUNC_t-tokVAR_t+tokCHAR-1
-                sta type
+_proc           .mbv #tokFUNC_t-tokVAR_t+tokCHAR-1,type
                 bne _1                  ; [unc]
 
 ; - - - - - - - - - - - - - - - - - - -
@@ -65,10 +64,7 @@ _next1          sta (symTblLocal),Y
                 iny                     ; zap local st
                 bne _next1
 
-                lda symtab
-                sta gbase
-                lda symtab+1
-                sta gbase+1
+                .mwa symtab,gbase
 
 ;   space for arg list (8 bytes) and room for name of next proc/func.
 ;   up to 20 letters (24 bytes).
@@ -127,8 +123,7 @@ _argerr         ldy #argERR
 _3              lda param
                 pha
 
-                lda #$00
-                sta param
+                .mbv #$00,param
 
                 jsr compiler.lexicon.GetNext
                 jsr compiler.Declare    ; locals

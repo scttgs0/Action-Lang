@@ -63,8 +63,7 @@ _3              and #$3F
                 beq _8
 
                 ldx #$70
-                lda #$07                ; GETCHR
-                sta BRKKEY              ; ignore BREAK key
+                .mbv #$07,BRKKEY        ; GETCHR - ignore BREAK key
 
                 jsr screen.PutCh._ENTRY2
 

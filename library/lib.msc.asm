@@ -252,8 +252,7 @@ PokeC           .proc
 Zero            .proc
                 pha
 
-                lda #$00
-                sta arg4
+                .mbv #$00,arg4
 
                 pla
                 .endproc

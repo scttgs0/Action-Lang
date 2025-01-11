@@ -22,10 +22,7 @@ _ENTRY          lda #$FF                ; set best size
                 sta zpAllocBSize
                 sta zpAllocBSize+1
 
-                lda #<zpAllocBase       ; last = base
-                sta zpAllocLast
-                lda #>zpAllocBase
-                sta zpAllocLast+1
+                .lea zpAllocBase,zpAllocLast    ; last = base
 
 _next1          ldy #$00
                 lda (zpAllocLast),Y     ; cur = last(0)
@@ -74,16 +71,10 @@ _3              ldy #$02
                 lda (zpAllocCurrent),Y
                 sta zpAllocBSize
 
-                lda zpAllocLast
-                sta zpAllocBest
-                lda zpAllocLast+1
-                sta zpAllocBest+1
+                .mwa zpAllocLast,zpAllocBest
 
 ;   get next entry in list and goto beginning of loop
-_4              lda zpAllocCurrent
-                sta zpAllocLast
-                lda zpAllocCurrent+1
-                sta zpAllocLast+1
+_4              .mwa zpAllocCurrent,zpAllocLast
 
                 clc
                 bcc _next1
@@ -185,15 +176,9 @@ Free            .proc
                 sta zpAllocBest
                 stx zpAllocBest+1
 
-_ENTRY1         lda #<zpAllocBase       ; cur = base
-                sta zpAllocCurrent
-                lda #>zpAllocBase
-                sta zpAllocCurrent+1
+_ENTRY1         .lea zpAllocBase,zpAllocCurrent     ; cur = base
 
-_next1          lda zpAllocCurrent      ; last = cur
-                sta zpAllocLast
-                lda zpAllocCurrent+1
-                sta zpAllocLast+1
+_next1          .mwa zpAllocCurrent,zpAllocLast     ; last = cur
 
                 ldy #$00
                 lda (zpAllocLast),Y     ; cur = last(0)

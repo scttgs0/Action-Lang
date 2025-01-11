@@ -197,8 +197,7 @@ InsertToggle    .proc
                 inc insert
                 beq _XIT
 
-                lda #$FF
-                sta insert
+                .mbv #$FF,insert
 
                 lda #<_msgINSERT
                 ldx #>_msgINSERT
@@ -226,14 +225,12 @@ ScrollInit      .proc
                 jsr mainmsc.Next
                 beq _1                  ; EOF
 
-                lda COLCRS
-                sta x__
+                .mba COLCRS,x__
 
                 ; lda choff
                 ; beq _SI1
 
-                lda #$00
-                sta choff
+                .mbv #$00,choff
 
                 jsr mainio.DisplayBuffer
                 jmp mainio.LoadBuffer
@@ -258,8 +255,7 @@ ScrollUp        .proc
 
 _1              inc lnum
 
-                lda ytop
-                sta y__
+                .mba ytop,y__
 
                 jsr BottomLine
 
@@ -441,15 +437,13 @@ MoveContent     .proc
                 ldx arg4
                 dex
 
-_next1          lda arg0
-                sta arg2
+_next1          .mba arg0,arg2
 
                 clc
                 adc arg5
                 sta arg0
 
-                lda arg1
-                sta arg3
+                .mba arg1,arg3
 
                 adc arg6
                 sta arg1

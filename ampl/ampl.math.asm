@@ -158,8 +158,7 @@ _1              sta params._b
                 sta params._d
                 stx params._c
 
-_2              lda #$00
-                sta params._rh
+_2              .mbv #$00,params._rh
 
                 rts
                 .endproc

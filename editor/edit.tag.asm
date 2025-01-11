@@ -37,8 +37,7 @@ Set             .proc
                 lda tagList
                 sta (zpAllocCurrent),Y
 
-                lda zpAllocCurrent
-                sta tagList
+                .mba zpAllocCurrent,tagList
 
                 ldx zpAllocCurrent+1
                 stx tagList+1

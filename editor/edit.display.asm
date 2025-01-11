@@ -21,8 +21,7 @@ CommandMsg      .proc
 
                 jsr mainio.CmdColumn
 
-                lda #$00
-                sta arg3
+                .mbv #$00,arg3
 
                 lda arg0                ; message_LO
                 ldy #$80                ; char used for clearing (inverse space)
@@ -43,8 +42,7 @@ CleanLine       .proc
 
                 sta dirty
 
-                lda #$00
-                sta isDirty
+                .mbv #$00,isDirty
 
                 jsr editor.memory.DeleteCurrentLine
                 jsr editor.memory.InsertByte
@@ -106,10 +104,7 @@ _XIT            rts
 EndLine         .proc
                 jsr CleanLine
 
-                lda bot
-                sta cur
-                lda bot+1
-                sta cur+1
+                .mwa bot,cur
 
                 .endproc
 
@@ -122,8 +117,7 @@ EndLine         .proc
 ; center line
 ;======================================
 CenterLine      .proc
-                lda #$00
-                sta temps
+                .mbv #$00,temps
 
                 jsr CleanLine
                 beq _1
@@ -175,8 +169,7 @@ _ENTRY1         sta choff
 
                 jsr mainio.RestoreCursorChar ; for command line
 
-                lda LMARGN
-                sta COLCRS
+                .mba LMARGN,COLCRS
 
                 .endproc
 
@@ -208,8 +201,7 @@ Refresh         .proc
                 beq _2
 
 _next1          ldy #$00
-                lda indent
-                sta arg3
+                .mba indent,arg3
 
                 ldx arg9
                 beq _3

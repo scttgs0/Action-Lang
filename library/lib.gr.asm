@@ -21,8 +21,7 @@ Graphics        .proc
                 lda #$00
                 jsr lib.io.Close
 
-                lda #$0C
-                sta arg3
+                .mbv #$0C,arg3
 
                 lda #$00
                 ldx #<_e
@@ -83,13 +82,8 @@ DrawTo          .proc
 GfxIO           .proc
                 jsr Position.pos1
 
-                lda Graphics._color
-                sta Graphics._atachr
-
-                lda #<Graphics._devs
-                sta arg5
-                lda #>Graphics._devs
-                sta arg6
+                .mba Graphics._color,Graphics._atachr
+                .lea Graphics._devs,arg5
 
                 lda #$00
                 sta arg3

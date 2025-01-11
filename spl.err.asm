@@ -36,8 +36,7 @@ _1              jsr mainio.SystemError
                 ldy #>mainio.msgSysErr
                 jsr mainio.Output
 
-                lda #$00
-                sta INITAD+1
+                .mbv #$00,INITAD+1
 
                 ldx #<numbuf
                 ldy #>numbuf

@@ -191,8 +191,7 @@ CommandString   .proc
 
                 jsr mainio.CmdColumn
 
-                lda #$80
-                sta arg4
+                .mbv #$80,arg4
 
                 lda arg0
                 ldy arg2

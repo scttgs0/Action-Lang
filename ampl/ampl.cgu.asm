@@ -39,8 +39,7 @@ _2              lda #$A0                ; LDY #
                 ldx arg12
                 jsr Insert2             ; LDY #$00 or #$01
 
-_3              lda arg12
-                sta curYReg
+_3              .mba arg12,curYReg
 
                 ldy arg13
 _XIT            rts
@@ -51,8 +50,7 @@ _XIT            rts
 ; TrashY()
 ;======================================
 TrashY          .proc
-                lda #$FF
-                sta curYReg
+                .mbv #$FF,curYReg
 
                 rts
                 .endproc
@@ -188,8 +186,7 @@ _6              bit modeConst
                 ; and #$F7
                 ; sta arg7              ; flag Y reg used
 
-                lda #$00
-                sta arg12
+                .mbv #$00,arg12
 
                 lda #$10                ; (addr),Y
 _next1          sta arg10
@@ -231,8 +228,7 @@ _8              pla
                 jmp Push2
 
 ;   constant
-_9              lda #$08                ; data
-                sta arg10
+_9              .mbv #$08,arg10         ; data
 
                 lda arg12
                 beq _10
@@ -610,8 +606,7 @@ PushTrue        .proc
                 ldy #$0A
                 jsr SaveCd
 
-                lda #$00                ; no other TRUE branches
-                sta arg9
+                .mbv #$00,arg9          ; no other TRUE branches
 
                 .endproc
 

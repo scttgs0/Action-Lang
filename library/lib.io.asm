@@ -304,8 +304,7 @@ InputS          .proc
 InputSD         .proc
                 pha
 
-                lda #255
-                sta arg3
+                .mba #255,arg3
 
                 pla
 

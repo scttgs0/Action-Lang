@@ -17,6 +17,9 @@
                 .include "equates/system_atari8.equ"
                 .include "equates/editor.equ"
 
+                .include "macros/shortform.mac"
+
+
 ;--------------------------------------
 ;--------------------------------------
                 * = $8000
