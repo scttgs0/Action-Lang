@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: platform_f256.asm
-; SPDX-FileCopyrightText: Copyright 2023-2024 Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2025, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -145,11 +145,11 @@ _tmp            .byte $00
 
 
 ;======================================
-; Convert BCD to Binary
+; Convert Binary to BCD
 ;======================================
 Bin2Bcd         .proc
-                ldx #00
-                ldy #00
+                ldx #$00
+                ldy #$00
 _next1          cmp #$0A
                 bcc _done
 
@@ -177,6 +177,41 @@ _done           tay
 ;--------------------------------------
 
 _tmp            .byte $00
+
+                .endproc
+
+
+;======================================
+; Convert Binary to Ascii
+;--------------------------------------
+; on entry:
+;   A           byte value
+; on exit:
+;   Y,A         2-byte ascii value
+;======================================
+Bin2Ascii       .proc
+                pha
+
+;   upper-nibble to ascii
+                lsr
+                lsr
+                lsr
+                lsr
+                and #$0F
+                tax
+                ldy _hex,X
+
+;   lower-nibble to ascii
+                pla
+                and #$0F
+                tax
+                lda _hex,X
+
+                rts
+
+;--------------------------------------
+
+_hex            .text '0123456789ABCDEF'
 
                 .endproc
 
@@ -630,9 +665,6 @@ _nextChar       inx
                 cmp #$20
                 beq _space
 
-                cmp #$9B
-                beq _bomb
-
                 cmp #$41
                 bcc _number
                 bra _letter
@@ -661,13 +693,6 @@ _letter         sta CS_TEXT_MEM_PTR+v_RenderLine,X
                 inx
                 clc
                 adc #$40
-                sta CS_TEXT_MEM_PTR+v_RenderLine,X
-
-                bra _nextChar
-
-_bomb           sta CS_TEXT_MEM_PTR+v_RenderLine,X
-                inx
-                inc A
                 sta CS_TEXT_MEM_PTR+v_RenderLine,X
 
                 bra _nextChar
@@ -823,10 +848,10 @@ InitIRQs        .proc
                 sei                     ; disable IRQ
 
 ;   enable IRQ handler
-                ;lda #<vecIRQ_BRK
-                ;sta IRQ_PRIOR
-                ;lda #>vecIRQ_BRK
-                ;sta IRQ_PRIOR+1
+                ;!!lda #<vecIRQ_BRK
+                ;!!sta IRQ_PRIOR
+                ;!!lda #>vecIRQ_BRK
+                ;!!sta IRQ_PRIOR+1
 
                 lda #<irqMain
                 sta vecIRQ_BRK
@@ -872,9 +897,9 @@ InitIRQs        .proc
                 ;!!sta INT_MASK_REG0
 
 ;   enable Keyboard IRQ
-                ; lda INT_MASK_REG1
-                ; and #~INT01_VIA1
-                ; sta INT_MASK_REG1
+                ;!! lda INT_MASK_REG1
+                ;!! and #~INT01_VIA1
+                ;!! sta INT_MASK_REG1
 
 ;   restore IOPAGE control
                 pla

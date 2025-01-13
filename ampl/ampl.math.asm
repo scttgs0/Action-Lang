@@ -189,7 +189,7 @@ _next1          rol params._b
                 tay
                 lda params._rh
                 sbc params._c
-                bcc _1                ; overflow, don't subtract
+                bcc _1                  ; overflow, don't subtract
 
                 sta params._rh
                 sty params._a

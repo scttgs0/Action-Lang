@@ -119,7 +119,7 @@ _next3          ldy #$01
 
 _XIT1           rts
 
-_2              jsr mainmsc.GetCodeOffset    ; no main PROC
+_2              jsr mainmsc.GetCodeOffset   ; no main PROC
 
                 sta INITAD
                 stx INITAD+1
